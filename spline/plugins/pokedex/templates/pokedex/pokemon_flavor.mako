@@ -1,10 +1,6 @@
 <%inherit file="/base.mako"/>
 
 <h1>Sprites</h1>
-<style type="text/css">
-th { vertical-align: middle; }
-.vertical-text { -moz-transform: rotate(-90deg); }
-</style>
 
 <h2>Diamond/Pearl/Platinum</h2>
 <table border="1">
