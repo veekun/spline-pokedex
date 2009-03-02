@@ -4,7 +4,7 @@ import collections
 import logging
 
 import pokedex.db
-from pokedex.db.tables import Pokemon, Type
+from pokedex.db.tables import Generation, Pokemon, Type
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c
 from pylons.controllers.util import abort, redirect_to
@@ -19,6 +19,13 @@ log = logging.getLogger(__name__)
 
 class PokedexController(BaseController):
 
+    def __before__(self):
+        c.session = pokedex.db.connect('mysql://perl@localhost/pydex')
+
+        c.generations = {}
+        for generation in c.session.query(Generation).all():
+            c.generations[generation.id] = generation
+
     def index(self):
         return ''
 
@@ -32,9 +39,8 @@ class PokedexController(BaseController):
         abort(404)
 
     def pokemon(self, name=None):
-        session = pokedex.db.connect('mysql://perl@localhost/pydex')
         try:
-            c.pokemon = session.query(Pokemon).filter_by(name=name).one()
+            c.pokemon = c.session.query(Pokemon).filter_by(name=name).one()
         except NoResultFound:
             return self._not_found()
 
@@ -54,9 +60,8 @@ class PokedexController(BaseController):
         return render('/pokedex/pokemon.mako')
 
     def pokemon_flavor(self, name=None):
-        session = pokedex.db.connect('mysql://perl@localhost/pydex')
         try:
-            c.pokemon = session.query(Pokemon).filter_by(name=name).one()
+            c.pokemon = c.session.query(Pokemon).filter_by(name=name).one()
         except NoResultFound:
             return self._not_found()
         return render('/pokedex/pokemon_flavor.mako')

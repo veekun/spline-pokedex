@@ -1,14 +1,20 @@
 <%inherit file="/base.mako"/>
+<%namespace name="lib" file="/pokedex/lib.mako"/>
 
 <%def name="title()">${c.pokemon.name}</%def>
 
 <h1>Essentials</h1>
 
-<ul>
-    % for type in c.pokemon.types:
-    <li>${type.name}</li>
-    % endfor
-</ul>
+## Portrait block
+<div id="dex-pokemon-portrait">
+    <p id="dex-pokemon-name">${c.pokemon.name}</p>
+    ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='platinum/%d.png' % c.pokemon.id), alt=c.pokemon.name, id="dex-pokemon-portrait-sprite")}
+    <p id="dex-pokemon-types">
+        % for type in c.pokemon.types:
+        ${lib.type_icon(type)}
+        % endfor
+    </p>
+</div>
 
 <h2>Abilities</h2>
 <dl>
@@ -19,18 +25,25 @@
 </dl>
 
 <h2>Damage Taken</h2>
-<dl>
+## Boo not using <dl>  :(  But I can't get them to align horizontally with CSS2
+## if the icon and value have no common element..
+<ul id="dex-pokemon-damage-taken">
     % for type, damage_factor in sorted(c.type_efficacies.items(), \
                                         key=lambda x: x[0].name):
-    <dt>${type.name}</dt>
-    <dd>${damage_factor}</dd>
+    <li class="dex-damage-${damage_factor}">
+        ${lib.type_icon(type)} ${damage_factor}
+    </li>
     % endfor
-</dl>
+</ul>
 
 <h2>Pok&eacute;dex Numbers</h2>
 <dl>
     <dt>Generation</dt>
-    <dd>XXX</dd>
+    <dd>${c.pokemon.generation.name}</dd>
+    % if c.pokemon.generation == c.generations[1]:
+    <dt>RBY code</dt>
+    <dd>${c.pokemon.gen1_internal_id}</dd>
+    % endif
     % for dex_number in c.pokemon.dex_numbers:
     <dt>${dex_number.generation.name}</dt>
     <dd>${dex_number.pokedex_number}</dt>
@@ -44,9 +57,6 @@
     <dd>${foreign_name.name}</dt>
     % endfor
 </dl>
-
-<h2>Misc(??????)</h2>
-rby code.........  eh
 
 <h2>Breeding</h2>
 <dl>
@@ -69,11 +79,11 @@ rby code.........  eh
     <dt>Base happiness</dt>
     <dd>${c.pokemon.base_happiness}</dd>
     <dt>Growth rate</dt>
-    <dd></dd>
+    <dd>XXX</dd>
     <dt>Effort points</dt>
-    <dd></dd>
+    <dd>XXX</dd>
     <dt>Wild held items</dt>
-    <dd></dd>
+    <dd>XXX</dd>
 </dl>
 
 <h1>Evolution Chain</h1>
@@ -94,9 +104,9 @@ rby code.........  eh
 <h1>Flavor</h1>
 <dl>
     <dt>Current sprites</dt>
-    <dd></dd>
+    <dd>XXX</dd>
     <dt>Current flavor</dt>
-    <dd></dd>
+    <dd>XXX</dd>
     <dt>Height</dt>
     <dd>${c.pokemon.height} dm</dd>
     <dt>Weight</dt>
@@ -106,16 +116,20 @@ rby code.........  eh
     <dt>Color</dt>
     <dd>${c.pokemon.color}</dd>
     <dt>Cry</dt>
-    <dd></dd>
+    <dd>XXX</dd>
     <dt>Habitat</dt>
     <dd>${c.pokemon.habitat}</dd>
     <dt>Pawprint</dt>
-    <dd></dd>
+    <dd>XXX</dd>
     <dt>Shape</dt>
-    <dd></dd>
+    <dd>XXX</dd>
 </dl>
 
 <h1>Locations</h1>
-<h1>Moves</h1>
+<p>XXX</p>
 
-<h1>external links</h1>
+<h1>Moves</h1>
+<p>XXX</p>
+
+<h1>External Links</h1>
+<p>XXX</p>
