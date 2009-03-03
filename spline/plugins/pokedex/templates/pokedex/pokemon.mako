@@ -40,7 +40,7 @@
 <dl>
     <dt>Generation</dt>
     <dd>${c.pokemon.generation.name}</dd>
-    % if c.pokemon.generation == c.generations[1]:
+    % if c.pokemon.generation == c.dexlib.generations[1]:
     <dt>RBY code</dt>
     <dd>${c.pokemon.gen1_internal_id}</dd>
     % endif
@@ -61,7 +61,7 @@
 <h2>Breeding</h2>
 <dl>
     <dt>Gender</dt>
-    <dd>${c.pokemon.gender_rate}/8 female XXX</dd>
+    <dd>XXX ${c.dexlib.gender_rates[c.pokemon.gender_rate]}</dd>
     <dt>Egg groups</dt>
     <dd>XXX</dd>
     <dt>Steps to hatch</dt>
