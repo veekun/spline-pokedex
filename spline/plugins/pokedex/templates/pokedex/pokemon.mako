@@ -36,7 +36,7 @@
     % endfor
 </ul>
 
-<h2>Pok&eacute;dex Numbers</h2>
+<h2>Pokédex Numbers</h2>
 <dl>
     <dt>Generation</dt>
     <dd>${lib.generation_icon(c.pokemon.generation)} ${c.pokemon.generation.name}</dd>
@@ -146,4 +146,37 @@
 <p>XXX</p>
 
 <h1>External Links</h1>
-<p>XXX</p>
+<%!
+    import re
+%>\
+<%
+    # Some sites don't believe in Unicode URLs.  Scoff, scoff.
+    # And they all do it differently.  Ugh, ugh.
+    lp_name = c.pokemon.name
+    ghpd_name = c.pokemon.name.lower()
+    smogon_name = c.pokemon.name.lower()
+    if c.pokemon.name == u'Nidoran♀':
+        lp_name = 'Nidoran(f)'
+        ghpd_name = 'nidoran_f'
+        smogon_name = 'nidoran-f'
+    elif c.pokemon.name == u'Nidoran♂':
+        lp_name = 'Nidoran(m)'
+        ghpd_name = 'nidoran_m'
+        smogon_name = 'nidoran-m'
+    elif c.pokemon.name == 'Mr. Mime':
+        ghpd_name = 'mr_mime'
+        smogon_name = 'mr_mime'
+%>
+<ul>
+% if c.pokemon.generation.id <= 1:
+<li>${lib.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/species/${"%03d" % c.pokemon.id}.htm">Azure Heights</a></li>
+% endif
+<li><a href="http://bulbapedia.bulbagarden.net/wiki/${re.sub(' ', '_', c.pokemon.name)}_%28Pok%C3%A9mon%29">Bulbapedia</a></li>
+% if c.pokemon.generation.id <= 2:
+<li>${lib.generation_icon(2)} <a href="http://www.pokemondungeon.com/pokedex/${ghpd_name}.shtml">Gengar and Haunter's Pokémon Dungeon</a></li>
+% endif
+<li><a href="http://www.legendarypokemon.net/pokedex/${lp_name}">Legendary Pokémon</a></li>
+<li><a href="http://www.psypokes.com/dex/psydex/${"%03d" % c.pokemon.id}">PsyPoke</a></li>
+<li><a href="http://www.serebii.net/pokedex-dp/${"%03d" % c.pokemon.id}.shtml">Serebii</a></li>
+<li><a href="http://www.smogon.com/dp/pokemon/${smogon_name}">Smogon</a></li>
+</ul>
