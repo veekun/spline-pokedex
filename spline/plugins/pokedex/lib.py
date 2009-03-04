@@ -11,13 +11,24 @@ import pokedex.db.tables as tables
 # DB session for everyone to use
 session = pokedex.db.connect('mysql://perl@localhost/pydex')
 
-# List of generations, so we can go generation[1]
-generations = {}
-for generation in session.query(tables.Generation).all():
-    generations[generation.id] = generation
+# Qick access to generations and versions
+def generation(id):
+    return session.query(tables.Generation).get(id)
+def version(name):
+    return session.query(tables.Version).filter_by(name=name).one()
+
+# Type efficacy, from percents to Unicode fractions
+type_efficacy_label = {
+    0: '0',
+    25: '¼',
+    50: '½',
+    100: '1',
+    200: '2',
+    400: '4',
+}
 
 # Gender rates, translated from -1..8 to useful text
-gender_rates = {
+gender_rate_label = {
     -1: u'genderless',
     0: u'always male',
     1: u'⅞ male, ⅛ female',

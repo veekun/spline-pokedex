@@ -1,10 +1,10 @@
 /*** General ***/
-.dex-damage-0   { color: #0a0; }
-.dex-damage-25  { color: #6a6; }
-.dex-damage-50  { color: #9a9; }
-.dex-damage-100 { color: #999; }
-.dex-damage-200 { color: #996; }
-.dex-damage-400 { color: #933; }
+.dex-damage-0   { font-weight: bold; color: #44c; }
+.dex-damage-25  { font-weight: bold; color: #4cc; }
+.dex-damage-50  { font-weight: bold; color: #4c4; }
+.dex-damage-100 { font-weight: bold; color: #999; }
+.dex-damage-200 { font-weight: bold; color: #c44; }
+.dex-damage-400 { font-weight: bold; color: #c4c; }
 
 /*** Pokemon pages ***/
 #dex-pokemon-portrait { float: left; width: 15em; text-align: center; }
