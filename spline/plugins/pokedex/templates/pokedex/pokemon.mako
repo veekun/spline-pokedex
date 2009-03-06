@@ -8,7 +8,7 @@
 ## Portrait block
 <div id="dex-pokemon-portrait">
     <p id="dex-pokemon-name">${c.pokemon.name}</p>
-    ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='platinum/%d.png' % c.pokemon.id), alt=c.pokemon.name, id="dex-pokemon-portrait-sprite")}
+    ${lib.pokedex_img('platinum/%d.png' % c.pokemon.id, alt=c.pokemon.name, id="dex-pokemon-portrait-sprite")}
     <p id="dex-pokemon-types">
         % for type in c.pokemon.types:
         ${lib.type_icon(type)}
@@ -61,7 +61,7 @@
 <h2>Breeding</h2>
 <dl>
     <dt>Gender</dt>
-    <dd>${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='gender-rates/%d.png' % c.pokemon.gender_rate), alt='')} ${c.dexlib.gender_rate_label[c.pokemon.gender_rate]}</dd>
+    <dd>${lib.pokedex_img('gender-rates/%d.png' % c.pokemon.gender_rate, alt='')} ${c.dexlib.gender_rate_label[c.pokemon.gender_rate]}</dd>
     <dt>Egg groups</dt>
     <dd>
         <ul>
@@ -126,9 +126,9 @@
         ${int(c.pokemon.height * 0.32808399)}'${"%.1f" % ((c.pokemon.height * 0.32808399 % 1) * 12)}"
         or ${"%.1f" % (c.pokemon.height / 10.0)} m
         <div class="dex-size">
-            ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome/trainer-male.png'), alt='Trainer dude', style="height: %.2f%%" % (c.heights['male'] * 100))}
-            ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome/trainer-female.png'), alt='Trainer dudette', style="height: %.2f%%" % (c.heights['female'] * 100))}
-            ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome/shapes/cropped/%d.png' % c.pokemon.shape.id), alt='', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
+            ${lib.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.heights['male'] * 100))}
+            ${lib.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.heights['female'] * 100))}
+            ${lib.pokedex_img('chrome/shapes/cropped/%d.png' % c.pokemon.shape.id, alt='', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
         </div>
     </dd>
     <dt>Weight</dt>
@@ -136,9 +136,9 @@
         ${"%.1f" % (c.pokemon.weight / 10 * 2.20462262)} lb
         or ${"%.1f" % (c.pokemon.weight / 10)} kg
         <div class="dex-size">
-            ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome/trainer-male.png'), alt='Trainer dude', style="height: %.2f%%" % (c.weights['male'] * 100))}
-            ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome/trainer-female.png'), alt='Trainer dudette', style="height: %.2f%%" % (c.weights['female'] * 100))}
-            ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome/shapes/cropped/%d.png' % c.pokemon.shape.id), alt='', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
+            ${lib.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.weights['male'] * 100))}
+            ${lib.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.weights['female'] * 100))}
+            ${lib.pokedex_img('chrome/shapes/cropped/%d.png' % c.pokemon.shape.id, alt='', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
         </div>
     </dd>
     <dt>Species</dt>
@@ -153,7 +153,7 @@
     <dd>XXX</dd>
     <dt>Shape</dt>
     <dd>
-        ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome/shapes/%d.png' % c.pokemon.shape.id), alt='')}
+        ${lib.pokedex_img('chrome/shapes/%d.png' % c.pokemon.shape.id, alt='')}
         ${c.pokemon.shape.awesome_name}
     </dd>
 

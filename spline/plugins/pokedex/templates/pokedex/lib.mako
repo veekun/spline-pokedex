@@ -1,6 +1,8 @@
-<%def name="type_icon(type)">
-${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome/types/%s.png' % type.name), alt=type.name)}
+<%def name="pokedex_img(src, **attr)">\
+${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path=src), **attr)}\
 </%def>
+
+<%def name="type_icon(type)">${pokedex_img('chrome/types/%s.png' % type.name, alt=type.name)}</%def>
 
 <%def name="version_icons(*versions)">
 % for version in versions:
@@ -9,7 +11,7 @@ ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome
     if isinstance(version, basestring):
         version = c.dexlib.version(version)
 %>\
-${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='versions/%s.png' % version.name.lower()), alt=version.name)}\
+${pokedex_img('versions/%s.png' % version.name.lower(), alt=version.name)}\
 % endfor
 </%def>
 
@@ -19,5 +21,5 @@ ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='versio
     if isinstance(generation, int):
         generation = c.dexlib.generation(generation)
 %>
-${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='versions/generation-%d.png' % generation.id), alt=generation.name)}
+${pokedex_img('versions/generation-%d.png' % generation.id, alt=generation.name)}
 </%def>
