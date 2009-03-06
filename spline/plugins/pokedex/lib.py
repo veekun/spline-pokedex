@@ -5,13 +5,15 @@ really belong in the pokedex core.
 
 from __future__ import absolute_import
 
+import math
+
 import pokedex.db
 import pokedex.db.tables as tables
 
 # DB session for everyone to use
 session = pokedex.db.connect('mysql://perl@localhost/pydex')
 
-# Qick access to generations and versions
+# Quick access to generations and versions
 def generation(id):
     return session.query(tables.Generation).get(id)
 def version(name):
@@ -40,3 +42,16 @@ gender_rate_label = {
     7: u'⅛ male, ⅞ female',
     8: u'always female',
 }
+
+def scale_sizes(size_dict, dimensions=1):
+    """Normalizes a list of sizes so the largest is 1.0.
+
+    Use `dimensions` if the sizes are non-linear, i.e. 2 for scaling area.
+    """
+
+    # x -> (x/max)^(1/dimensions)
+    max_size = float(max(size_dict.values()))
+    scaled_sizes = dict()
+    for k, v in size_dict.items():
+        scaled_sizes[k] = math.pow(v / max_size, 1.0 / dimensions)
+    return scaled_sizes

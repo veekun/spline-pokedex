@@ -54,6 +54,18 @@ class PokedexController(BaseController):
                 # 100, without using floats and regardless of number of types
                 c.type_efficacies[type_efficacy.damage_type] /= 100
 
+        # Sizing
+        # Note that these are totally hardcoded average sizes in Pokemon units:
+        # Male: 17.5 dm, 860 hg
+        # Female: 16 dm, 720 hg
+        heights = dict(pokemon=c.pokemon.height, male=17.5, female=16)
+        c.heights = c.dexlib.scale_sizes(heights)
+        weights = dict(pokemon=c.pokemon.weight, male=860, female=720)
+        # Strictly speaking, weight takes three dimensions.  But the real
+        # measurement here is just "space taken up", and these are sprites, so
+        # the space they actually take up is two-dimensional.
+        c.weights = c.dexlib.scale_sizes(weights, dimensions=2)
+
         return render('/pokedex/pokemon.mako')
 
     def pokemon_flavor(self, name=None):

@@ -122,9 +122,25 @@
     <dt>Current flavor</dt>
     <dd>XXX</dd>
     <dt>Height</dt>
-    <dd>${c.pokemon.height} dm</dd>
+    <dd>
+        ${int(c.pokemon.height * 0.32808399)}'${"%.1f" % ((c.pokemon.height * 0.32808399 % 1) * 12)}"
+        or ${"%.1f" % (c.pokemon.height / 10.0)} m
+        <div class="dex-size">
+            ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome/trainer-male.png'), alt='Trainer dude', style="height: %.2f%%" % (c.heights['male'] * 100))}
+            ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome/trainer-female.png'), alt='Trainer dudette', style="height: %.2f%%" % (c.heights['female'] * 100))}
+            ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome/shapes/cropped/%d.png' % c.pokemon.shape.id), alt='', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
+        </div>
+    </dd>
     <dt>Weight</dt>
-    <dd>${c.pokemon.weight} hg</dd>
+    <dd>
+        ${"%.1f" % (c.pokemon.weight / 10 * 2.20462262)} lb
+        or ${"%.1f" % (c.pokemon.weight / 10)} kg
+        <div class="dex-size">
+            ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome/trainer-male.png'), alt='Trainer dude', style="height: %.2f%%" % (c.weights['male'] * 100))}
+            ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome/trainer-female.png'), alt='Trainer dudette', style="height: %.2f%%" % (c.weights['female'] * 100))}
+            ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome/shapes/cropped/%d.png' % c.pokemon.shape.id), alt='', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
+        </div>
+    </dd>
     <dt>Species</dt>
     <dd>${c.pokemon.species}</dd>
     <dt>Color</dt>
@@ -136,7 +152,11 @@
     <dt>Pawprint</dt>
     <dd>XXX</dd>
     <dt>Shape</dt>
-    <dd>XXX</dd>
+    <dd>
+        ${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path='chrome/shapes/%d.png' % c.pokemon.shape.id), alt='')}
+        ${c.pokemon.shape.awesome_name}
+    </dd>
+
 </dl>
 
 <h1>Locations</h1>
