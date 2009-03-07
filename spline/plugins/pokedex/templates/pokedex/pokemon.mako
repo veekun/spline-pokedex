@@ -117,10 +117,31 @@
 
 <h1>Flavor</h1>
 <dl>
-    <dt>Current sprites</dt>
-    <dd>XXX</dd>
-    <dt>Current flavor</dt>
-    <dd>XXX</dd>
+    ## Only showing current generation's sprites and text
+    <dt>Sprites</dt>
+    <dd>
+        ${lib.pokedex_img('platinum/%d.png' % c.pokemon.id)}
+        ${lib.pokedex_img('platinum/frame2/%d.png' % c.pokemon.id)}
+        % if c.pokemon.has_dp_fem_sprite:
+        ${lib.pokedex_img('platinum/female/%d.png' % c.pokemon.id)}
+        ${lib.pokedex_img('platinum/female/frame2/%d.png' % c.pokemon.id)}
+        % endif
+        <br/>
+        ${lib.pokedex_img('platinum/shiny/%d.png' % c.pokemon.id)}
+        ${lib.pokedex_img('platinum/shiny/frame2/%d.png' % c.pokemon.id)}
+        % if c.pokemon.has_dp_fem_sprite:
+        ${lib.pokedex_img('platinum/shiny/female/%d.png' % c.pokemon.id)}
+        ${lib.pokedex_img('platinum/shiny/female/frame2/%d.png' % c.pokemon.id)}
+        % endif
+    </dd>
+    <dt>Flavor Text</dt>
+    <dd>
+        <ul>
+            % for version_name in 'Diamond', 'Pearl':
+            <li>${lib.version_icons(version_name)} ${c.flavor_text[version_name]}</li>
+            % endfor
+        </ul>
+    </dd>
     <dt>Height</dt>
     <dd>
         ${int(c.pokemon.height * 0.32808399)}'${"%.1f" % ((c.pokemon.height * 0.32808399 % 1) * 12)}"
@@ -146,11 +167,13 @@
     <dt>Color</dt>
     <dd>${c.pokemon.color}</dd>
     <dt>Cry</dt>
-    <dd>XXX</dd>
-    <dt>Habitat</dt>
-    <dd>${c.pokemon.habitat}</dd>
+    <dd>${h.HTML.a('download mp3', href=h.url_for(controller='dex', action='media', path='cries/%d.mp3' % c.pokemon.id))}</dd>
+    % if c.pokemon.generation.id <= 3:
+    <dt>Habitat ${lib.generation_icon(3)}</dt>
+    <dd>${lib.pokedex_img('chrome/habitats/%s.png' % c.dexlib.filename_from_name(c.pokemon.habitat))} ${c.pokemon.habitat}</dd>
+    % endif
     <dt>Pawprint</dt>
-    <dd>XXX</dd>
+    <dd>${lib.pokedex_img('pawprints/%d.png' % c.pokemon.id, alt='')}</dd>
     <dt>Shape</dt>
     <dd>
         ${lib.pokedex_img('chrome/shapes/%d.png' % c.pokemon.shape.id, alt='')}

@@ -6,12 +6,23 @@ really belong in the pokedex core.
 from __future__ import absolute_import
 
 import math
+import re
 
 import pokedex.db
 import pokedex.db.tables as tables
 
 # DB session for everyone to use
 session = pokedex.db.connect('mysql://perl@localhost/pydex')
+
+def filename_from_name(name):
+    """Shorten the name of a whatever to something suitable as a filename.
+
+    e.g. Water's Edge -> waters-edge
+    """
+    name = name.lower()
+    name = re.sub('[ _]+', '-', name)
+    name = re.sub('[^-a-z0-9]', '', name)
+    return name
 
 # Quick access to generations and versions
 def generation(id):

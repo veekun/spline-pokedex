@@ -15,7 +15,7 @@
 /*** Pokemon pages ***/
 #dex-pokemon-portrait { float: left; width: 15em; text-align: center; }
 #dex-pokemon-name { font-size: 2em; }
-#dex-pokemon-portrait-sprite { margin: 0.33em; padding: 7px; background: url(/dex/images/chrome/sprite-frame.png) center center no-repeat; }
+#dex-pokemon-portrait-sprite { margin: 0.33em; padding: 7px; background: url(/dex/media/chrome/sprite-frame.png) center center no-repeat; }
 
 ul#dex-pokemon-damage-taken { overflow: hidden /* new float context */; }
 ul#dex-pokemon-damage-taken li { display: inline-block; text-align: center; padding: 0.125em; }

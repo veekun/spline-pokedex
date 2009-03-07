@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import collections
 import logging
+import mimetypes
 
 import pokedex.db
 from pokedex.db.tables import Generation, Pokemon, Type
@@ -26,9 +27,10 @@ class PokedexController(BaseController):
     def index(self):
         return ''
 
-    def images(self, image_path):
-        response.headers['content-type'] = 'image/png'
-        pkg_path = "data/images/%s" % image_path
+    def media(self, path):
+        (mimetype, whatever) = mimetypes.guess_type(path)
+        response.headers['content-type'] = mimetype
+        pkg_path = "data/media/%s" % path
         return pkg_resources.resource_string('pokedex', pkg_path)
 
     def _not_found(self):
@@ -65,6 +67,11 @@ class PokedexController(BaseController):
         # measurement here is just "space taken up", and these are sprites, so
         # the space they actually take up is two-dimensional.
         c.weights = c.dexlib.scale_sizes(weights, dimensions=2)
+
+        # Flavor text
+        c.flavor_text = {}
+        for pokemon_flavor_text in c.pokemon.flavor_text:
+            c.flavor_text[pokemon_flavor_text.version.name] = pokemon_flavor_text.flavor_text
 
         return render('/pokedex/pokemon.mako')
 

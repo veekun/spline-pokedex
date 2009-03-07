@@ -1,5 +1,5 @@
 <%def name="pokedex_img(src, **attr)">\
-${h.HTML.img(src=h.url_for(controller='dex', action='images', image_path=src), **attr)}\
+${h.HTML.img(src=h.url_for(controller='dex', action='media', path=src), **attr)}\
 </%def>
 
 <%def name="type_icon(type)">${pokedex_img('chrome/types/%s.png' % type.name, alt=type.name)}</%def>
