@@ -37,9 +37,15 @@ class PokedexController(BaseController):
         # XXX make this do fuzzy search or whatever
         abort(404)
 
-    def pokemon(self, name=None):
+    def pokemon(self, name=None, forme=None):
+        q = dexlib.session.query(Pokemon).filter_by(name=name)
+        if forme == None:
+            # "Basic" Formes still have names, but they don't have a base forme
+            # id since they are already the base
+            q = q.filter_by(forme_base_pokemon_id=None)
+
         try:
-            c.pokemon = dexlib.session.query(Pokemon).filter_by(name=name).one()
+            c.pokemon = q.one()
         except NoResultFound:
             return self._not_found()
 
