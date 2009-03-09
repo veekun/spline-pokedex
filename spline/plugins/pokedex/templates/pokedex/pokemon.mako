@@ -36,69 +36,75 @@
     % endfor
 </ul>
 
-<h2>Pokédex Numbers</h2>
-<dl>
-    <dt>Generation</dt>
-    <dd>${lib.generation_icon(c.pokemon.generation)} ${c.pokemon.generation.name}</dd>
-    % if c.pokemon.generation == c.dexlib.generation(1):
-    <dt>${lib.version_icons('Red', 'Blue')} internal id</dt>
-    <dd>${c.pokemon.gen1_internal_id}</dd>
-    % endif
-    % for dex_number in c.pokemon.dex_numbers:
-    <dt>${lib.generation_icon(dex_number.generation)} ${dex_number.generation.main_region}</dt>
-    <dd>${dex_number.pokedex_number}</dt>
-    % endfor
-</dl>
+<div class="dex-column-container">
+<div class="dex-column">
+    <h2>Pokédex Numbers</h2>
+    <dl>
+        <dt>Generation</dt>
+        <dd>${lib.generation_icon(c.pokemon.generation)} ${c.pokemon.generation.name}</dd>
+        % if c.pokemon.generation == c.dexlib.generation(1):
+        <dt>${lib.version_icons('Red', 'Blue')} internal id</dt>
+        <dd>${c.pokemon.gen1_internal_id} == 0x${"%02x" % c.pokemon.gen1_internal_id}</dd>
+        % endif
+        % for dex_number in c.pokemon.dex_numbers:
+        <dt>${lib.generation_icon(dex_number.generation)} ${dex_number.generation.main_region}</dt>
+        <dd>${dex_number.pokedex_number}</dt>
+        % endfor
+    </dl>
 
-<h2>Names</h2>
-<dl>
-    % for foreign_name in c.pokemon.foreign_names:
-    <dt>${foreign_name.language.name}</dt>
-    <dd>${foreign_name.name}</dt>
-    % endfor
-</dl>
-
-<h2>Breeding</h2>
-<dl>
-    <dt>Gender</dt>
-    <dd>${lib.pokedex_img('gender-rates/%d.png' % c.pokemon.gender_rate, alt='')} ${c.dexlib.gender_rate_label[c.pokemon.gender_rate]}</dd>
-    <dt>Egg groups</dt>
-    <dd>
-        <ul>
-            % for i, egg_group in enumerate(c.pokemon.egg_groups):
-            <li>${egg_group.name}</li>
-            % endfor
-        </ul>
-    </dd>
-    <dt>Steps to hatch</dt>
-    <dd>${c.pokemon.evolution_chain.steps_to_hatch}</dd>
-    <dt>Compatibility</dt>
-    <dd>XXX</dd>
-</dl>
-
-<h2>Training</h2>
-<dl>
-    <dt>Base EXP</dt>
-    <dd>${c.pokemon.base_experience}</dd>
-    <dt>Effort points</dt>
-    <dd>
-        <ul>
-            % for pokemon_stat in c.pokemon.stats:
-            % if pokemon_stat.effort:
-            <li>${pokemon_stat.effort} ${pokemon_stat.stat.name}</li>
-            % endif
-            % endfor
-        </ul>
-    </dd>
-    <dt>Capture rate</dt>
-    <dd>${c.pokemon.capture_rate}</dd>
-    <dt>Base happiness</dt>
-    <dd>${c.pokemon.base_happiness}</dd>
-    <dt>Growth rate</dt>
-    <dd>${c.pokemon.evolution_chain.growth_rate.name}</dd>
-    <dt>Wild held items</dt>
-    <dd>XXX</dd>
-</dl>
+    <h2>Names</h2>
+    <dl>
+        % for foreign_name in c.pokemon.foreign_names:
+        <dt>${foreign_name.language.name}</dt>
+        <dd>${foreign_name.name}</dt>
+        % endfor
+    </dl>
+</div>
+<div class="dex-column">
+    <h2>Breeding</h2>
+    <dl>
+        <dt>Gender</dt>
+        <dd>${lib.pokedex_img('gender-rates/%d.png' % c.pokemon.gender_rate, alt='')} ${c.dexlib.gender_rate_label[c.pokemon.gender_rate]}</dd>
+        <dt>Egg groups</dt>
+        <dd>
+            <ul>
+                % for i, egg_group in enumerate(c.pokemon.egg_groups):
+                <li>${egg_group.name}</li>
+                % endfor
+            </ul>
+        </dd>
+        <dt>Steps to hatch</dt>
+        <dd>${c.pokemon.evolution_chain.steps_to_hatch}</dd>
+        <dt>Compatibility</dt>
+        <dd>XXX</dd>
+    </dl>
+</div>
+<div class="dex-column">
+    <h2>Training</h2>
+    <dl>
+        <dt>Base EXP</dt>
+        <dd>${c.pokemon.base_experience}</dd>
+        <dt>Effort points</dt>
+        <dd>
+            <ul>
+                % for pokemon_stat in c.pokemon.stats:
+                % if pokemon_stat.effort:
+                <li>${pokemon_stat.effort} ${pokemon_stat.stat.name}</li>
+                % endif
+                % endfor
+            </ul>
+        </dd>
+        <dt>Capture rate</dt>
+        <dd>${c.pokemon.capture_rate}</dd>
+        <dt>Base happiness</dt>
+        <dd>${c.pokemon.base_happiness}</dd>
+        <dt>Growth rate</dt>
+        <dd>${c.pokemon.evolution_chain.growth_rate.name}</dd>
+        <dt>Wild held items</dt>
+        <dd>XXX</dd>
+    </dl>
+</div>
+</div>
 
 <h1>Evolution Chain</h1>
 <ul>
@@ -116,71 +122,81 @@
 </dl>
 
 <h1>Flavor</h1>
-<dl>
+
+<div class="dex-column-container">
+<div class="dex-column-2x">
+    <h2>Flavor Text</h2>
+    <ul>
+        % for version_name in 'Diamond', 'Pearl':
+        <li>${lib.version_icons(version_name)} ${c.flavor_text[version_name]}</li>
+        % endfor
+    </ul>
+</div>
+<div class="dex-column">
     ## Only showing current generation's sprites and text
-    <dt>Sprites</dt>
-    <dd>
-        ${lib.pokedex_img('platinum/%d.png' % c.pokemon.id)}
-        ${lib.pokedex_img('platinum/frame2/%d.png' % c.pokemon.id)}
-        % if c.pokemon.has_dp_fem_sprite:
-        ${lib.pokedex_img('platinum/female/%d.png' % c.pokemon.id)}
-        ${lib.pokedex_img('platinum/female/frame2/%d.png' % c.pokemon.id)}
+    <h2>Sprites</h2>
+    ${lib.pokedex_img('platinum/%d.png' % c.pokemon.id)}
+    ${lib.pokedex_img('platinum/frame2/%d.png' % c.pokemon.id)}
+    ${lib.pokedex_img('platinum/shiny/%d.png' % c.pokemon.id)}
+    ${lib.pokedex_img('platinum/shiny/frame2/%d.png' % c.pokemon.id)}
+    <br/>
+    % if c.pokemon.has_dp_fem_sprite:
+    ${lib.pokedex_img('platinum/female/%d.png' % c.pokemon.id)}
+    ${lib.pokedex_img('platinum/female/frame2/%d.png' % c.pokemon.id)}
+    ${lib.pokedex_img('platinum/shiny/female/%d.png' % c.pokemon.id)}
+    ${lib.pokedex_img('platinum/shiny/female/frame2/%d.png' % c.pokemon.id)}
+    % endif
+</div>
+</div>
+
+<div class="dex-column-container">
+<div class="dex-column">
+    <h2>Miscellany</h2>
+    <dl>
+        <dt>Species</dt>
+        <dd>${c.pokemon.species}</dd>
+        <dt>Color</dt>
+        <dd>${c.pokemon.color}</dd>
+        <dt>Cry</dt>
+        <dd>${h.HTML.a('download mp3', href=h.url_for(controller='dex', action='media', path='cries/%d.mp3' % c.pokemon.id))}</dd>
+        % if c.pokemon.generation.id <= 3:
+        <dt>Habitat ${lib.generation_icon(3)}</dt>
+        <dd>${lib.pokedex_img('chrome/habitats/%s.png' % c.dexlib.filename_from_name(c.pokemon.habitat))} ${c.pokemon.habitat}</dd>
         % endif
-        <br/>
-        ${lib.pokedex_img('platinum/shiny/%d.png' % c.pokemon.id)}
-        ${lib.pokedex_img('platinum/shiny/frame2/%d.png' % c.pokemon.id)}
-        % if c.pokemon.has_dp_fem_sprite:
-        ${lib.pokedex_img('platinum/shiny/female/%d.png' % c.pokemon.id)}
-        ${lib.pokedex_img('platinum/shiny/female/frame2/%d.png' % c.pokemon.id)}
-        % endif
-    </dd>
-    <dt>Flavor Text</dt>
-    <dd>
-        <ul>
-            % for version_name in 'Diamond', 'Pearl':
-            <li>${lib.version_icons(version_name)} ${c.flavor_text[version_name]}</li>
-            % endfor
-        </ul>
-    </dd>
-    <dt>Height</dt>
-    <dd>
+        <dt>Pawprint</dt>
+        <dd>${lib.pokedex_img('pawprints/%d.png' % c.pokemon.id, alt='')}</dd>
+        <dt>Shape</dt>
+        <dd>
+            ${lib.pokedex_img('chrome/shapes/%d.png' % c.pokemon.shape.id, alt='')}
+            ${c.pokemon.shape.awesome_name}
+        </dd>
+    </dl>
+</div>
+<div class="dex-column">
+    <h2>Height</h2>
+    <p>
         ${int(c.pokemon.height * 0.32808399)}'${"%.1f" % ((c.pokemon.height * 0.32808399 % 1) * 12)}"
         or ${"%.1f" % (c.pokemon.height / 10.0)} m
-        <div class="dex-size">
-            ${lib.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.heights['male'] * 100))}
-            ${lib.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.heights['female'] * 100))}
-            ${lib.pokedex_img('chrome/shapes/cropped/%d.png' % c.pokemon.shape.id, alt='', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
-        </div>
-    </dd>
-    <dt>Weight</dt>
-    <dd>
+    </p>
+    <div class="dex-size">
+        ${lib.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.heights['male'] * 100))}
+        ${lib.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.heights['female'] * 100))}
+        ${lib.pokedex_img('chrome/shapes/cropped/%d.png' % c.pokemon.shape.id, alt='', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
+    </div>
+</div>
+<div class="dex-column">
+    <h2>Weight</h2>
+    <p>
         ${"%.1f" % (c.pokemon.weight / 10 * 2.20462262)} lb
         or ${"%.1f" % (c.pokemon.weight / 10)} kg
-        <div class="dex-size">
-            ${lib.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.weights['male'] * 100))}
-            ${lib.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.weights['female'] * 100))}
-            ${lib.pokedex_img('chrome/shapes/cropped/%d.png' % c.pokemon.shape.id, alt='', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
-        </div>
-    </dd>
-    <dt>Species</dt>
-    <dd>${c.pokemon.species}</dd>
-    <dt>Color</dt>
-    <dd>${c.pokemon.color}</dd>
-    <dt>Cry</dt>
-    <dd>${h.HTML.a('download mp3', href=h.url_for(controller='dex', action='media', path='cries/%d.mp3' % c.pokemon.id))}</dd>
-    % if c.pokemon.generation.id <= 3:
-    <dt>Habitat ${lib.generation_icon(3)}</dt>
-    <dd>${lib.pokedex_img('chrome/habitats/%s.png' % c.dexlib.filename_from_name(c.pokemon.habitat))} ${c.pokemon.habitat}</dd>
-    % endif
-    <dt>Pawprint</dt>
-    <dd>${lib.pokedex_img('pawprints/%d.png' % c.pokemon.id, alt='')}</dd>
-    <dt>Shape</dt>
-    <dd>
-        ${lib.pokedex_img('chrome/shapes/%d.png' % c.pokemon.shape.id, alt='')}
-        ${c.pokemon.shape.awesome_name}
-    </dd>
-
-</dl>
+    </p>
+    <div class="dex-size">
+        ${lib.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.weights['male'] * 100))}
+        ${lib.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.weights['female'] * 100))}
+        ${lib.pokedex_img('chrome/shapes/cropped/%d.png' % c.pokemon.shape.id, alt='', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
+    </div>
+</div>
+</div>
 
 <h1>Locations</h1>
 <p>XXX</p>

@@ -1,5 +1,10 @@
 /*** General ***/
 
+/* Cool three-column layout */
+.dex-column-container { clear: both; overflow: hidden /* float context */; }
+.dex-column { float: left; width: 33%; }
+.dex-column-2x { float: left; width: 66%; }
+
 /* Type damage */
 .dex-damage-0   { font-weight: bold; color: #44c; }
 .dex-damage-25  { font-weight: bold; color: #4cc; }
