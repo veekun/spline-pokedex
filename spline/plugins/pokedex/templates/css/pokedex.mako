@@ -26,6 +26,11 @@ ul#dex-pokemon-damage-taken { overflow: hidden /* new float context */; }
 ul#dex-pokemon-damage-taken li { display: inline-block; text-align: center; padding: 0.125em; }
 ul#dex-pokemon-damage-taken li img { display: block; margin-bottom: 0.25em; }
 
+table.dex-evolution-chain { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0.5em; }
+table.dex-evolution-chain td { empty-cells: hide; padding: 0.5em; vertical-align: middle; border: 1px solid #d8d8d8; background: #f0f0f0; }
+.dex-evolution-chain-pokemon, .dex-evolution-chain-method { display: block; }
+.dex-evolution-chain-pokemon img { float: left; margin: -16px 0; padding: 1em 0; /* center with two lines of text */ padding-right: 0.33em; }
+
 
 
 th { vertical-align: middle; }

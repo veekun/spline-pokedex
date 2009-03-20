@@ -62,6 +62,93 @@ class PokedexController(BaseController):
                 # 100, without using floats and regardless of number of types
                 c.type_efficacies[type_efficacy.damage_type] /= 100
 
+        # Evolution
+        # Format is a matrix as follows:
+        # [
+        #   [ None, Eevee, Vaporeon, None ]
+        #   [ None, None, Jolteon, None ]
+        #   [ None, None, Flareon, None ]
+        #   ... etc ...
+        # ]
+        # That is, each row is a physical row in the resulting table, and each
+        # contains four elements, one per row: Baby, Base, Stage 1, Stage 2.
+        # The Pokemon are actually dictionaries with 'pokemon' and 'span' keys,
+        # where the span is used as the HTML cell's rowspan -- e.g., Eevee has a
+        # total of seven descendents, so it would need to span 7 rows.
+        c.evolution_table = []
+        family = c.pokemon.evolution_chain.pokemon
+        # Strategy: build this table going backwards.
+        # Find a leaf, build the path going back up to its root.  Remember all
+        # of the nodes seen along the way.  Find another leaf not seen so far.
+        # Build its path backwards, sticking it to a seen node if one exists.
+        # Repeat until there are no unseen nodes.
+        seen_nodes = {}
+        while True:
+            # First, find some unseen nodes
+            unseen_leaves = []
+            for pokemon in family:
+                if pokemon in seen_nodes:
+                    continue
+
+                children = []
+                # A Pokemon is a leaf if it has no evolutionary children, so...
+                for possible_child in family:
+                    if possible_child in seen_nodes:
+                        continue
+                    if possible_child.evolution_parent == pokemon:
+                        children.append(possible_child)
+                if len(children) == 0:
+                    unseen_leaves.append(pokemon)
+
+            # If there are none, we're done!  Bail.
+            # Note that it is impossible to have any unseen non-leaves if there
+            # are no unseen leaves; every leaf's ancestors become seen when we
+            # build a path to it.
+            if len(unseen_leaves) == 0:
+                break
+
+            # Go in order by id; arbitrary, but should DTRT given how numbering
+            # tends to work.  This will put Vaporeon before Jolteon, etc.
+            unseen_leaves.sort(key=lambda x: x.id)
+            leaf = unseen_leaves[0]
+
+            # root, parent_n, ... parent2, parent1, leaf
+            current_path = []
+
+            # Finally, go back up the tree to the root
+            current_pokemon = leaf
+            while current_pokemon:
+                if current_pokemon in seen_nodes:
+                    current_node = seen_nodes[current_pokemon]
+                    # Don't need to repeat this node; the first instance will
+                    # have a rowspan
+                    current_path.insert(0, None)
+                else:
+                    current_node = {
+                        'pokemon': current_pokemon,
+                        'span':    0,
+                    }
+                    current_path.insert(0, current_node)
+                    seen_nodes[current_pokemon] = current_node
+
+                # This node has one more row to span: our current leaf
+                current_node['span'] += 1
+
+                current_pokemon = current_pokemon.evolution_parent
+
+            # We want every path to have four nodes: baby, basic, stage 1 and 2.
+            # Every root node is basic, unless it's defined as being a baby.
+            # So first, add an empty baby node at the beginning if this is not
+            # a baby.
+            # We use an empty string to indicate an empty cell, as opposed to a
+            # complete lack of cell due to a tall cell from an earlier row.
+            current_path.insert(0, '')
+            # Now pad to four if necessary.
+            while len(current_path) < 4:
+                current_path.append('')
+
+            c.evolution_table.append(current_path)
+
         # Sizing
         # Note that these are totally hardcoded average sizes in Pokemon units:
         # Male: 17.5 dm, 860 hg

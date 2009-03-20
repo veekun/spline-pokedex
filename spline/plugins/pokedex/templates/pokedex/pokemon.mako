@@ -106,12 +106,46 @@
 </div>
 </div>
 
-<h1>Evolution Chain</h1>
-<ul>
-    % for pokemon in c.pokemon.evolution_chain.pokemon:
-    <li>${pokemon.name}</li>
+<h1>Evolution</h1>
+<table class="dex-evolution-chain">
+<thead>
+<tr>
+    <th>Baby</th>
+    <th>Basic</th>
+    <th>Stage 1</th>
+    <th>Stage 2</th>
+</tr>
+</thead>
+<tbody>
+% for row in c.evolution_table:
+<tr>
+    % for col in row:
+    ## Empty cell
+    % if col == '':
+    <td></td>
+    % elif col != None:
+    <td rowspan="${col['span']}">
+        <a href="" class="dex-evolution-chain-pokemon">
+            ${lib.pokedex_img('icons/%d.png' % col['pokemon'].id, style='float: left;')}
+            ${col['pokemon'].name}
+        </a>
+        % if col['pokemon'].evolution_method:
+        <span class="dex-evolution-chain-method">
+            % if col['pokemon'].evolution_parameter:
+            ${col['pokemon'].evolution_method.name}:
+            ${col['pokemon'].evolution_parameter}
+            % else:
+            ${col['pokemon'].evolution_method.name}
+            % endif
+        </span>
+        % endif
+    </td>
+    % endif
     % endfor
-</ul>
+</tr>
+% endfor
+</tbody>
+</table>
 
 <h1>Stats</h1>
 <dl>
