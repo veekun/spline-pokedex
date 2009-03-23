@@ -148,12 +148,53 @@
 </table>
 
 <h1>Stats</h1>
-<dl>
-    % for pokemon_stat in c.pokemon.stats:
-    <dt>${pokemon_stat.stat.name}</dt>
-    <dd>${pokemon_stat.base_stat}</dt>
-    % endfor
-</dl>
+<%
+    # Most people want to see the best they can get
+    default_stat_level = 100
+    default_stat_iv = 31
+%>\
+<table class="dex-pokemon-stats">
+<col class="dex-col-stat-name">
+<col class="dex-col-stat-bar">
+<col class="dex-col-stat-result">
+<col class="dex-col-stat-result">
+<tr>
+    <th><!-- stat name --></th>
+    <th><!-- bar and value --></th>
+    <th><label for="dex-pokemon-stats-level">Level</label></th>
+    <th><input type="text" size="3" value="${default_stat_level}" disabled="disabled" id="dex-pokemon-stats-level"></th>
+</tr>
+<tr>
+    <th><!-- stat name --></th>
+    <th><!-- bar and value --></th>
+    <th><label for="dex-pokemon-stats-iv">IV</label></th>
+    <th><input type="text" size="3" value="${default_stat_iv}" disabled="disabled" id="dex-pokemon-stats-iv"></th>
+</tr>
+<tr class="header-row">
+    <th><!-- stat name --></th>
+    <th><!-- bar and value --></th>
+    <th>Min Effort</th>
+    <th>Max Effort</th>
+</tr>
+% for pokemon_stat in c.pokemon.stats:
+<tr>
+    <th>${pokemon_stat.stat.name}</th>
+    <td>
+        <div class="dex-pokemon-stats-bar-container">
+            <div class="dex-pokemon-stats-bar" style="width: ${pokemon_stat.base_stat * 100 / 255.0}%;">${pokemon_stat.base_stat}</div>
+        </div>
+    </td>
+<%
+    if pokemon_stat.stat.name == 'HP':
+        stat_formula = c.dex_formulae.calculated_hp
+    else:
+        stat_formula = c.dex_formulae.calculated_stat
+%>\
+    <td class="dex-pokemon-stats-result">${stat_formula(pokemon_stat.base_stat, level=default_stat_level, iv=default_stat_iv, effort=0)}</td>
+    <td class="dex-pokemon-stats-result">${stat_formula(pokemon_stat.base_stat, level=default_stat_level, iv=default_stat_iv, effort=255)}</td>
+</tr>
+% endfor
+</table>
 
 <h1>Flavor</h1>
 

@@ -1,5 +1,10 @@
 /*** General ***/
 
+/* Table columns */
+col.dex-col-stat-name   { width: 10em; }
+col.dex-col-stat-bar    { width: auto; }
+col.dex-col-stat-result { width: 5em; }
+
 /* Cool three-column layout */
 .dex-column-container { clear: both; overflow: hidden /* float context */; }
 .dex-column { float: left; width: 33%; }
@@ -31,6 +36,12 @@ table.dex-evolution-chain td { empty-cells: hide; padding: 0.5em; vertical-align
 .dex-evolution-chain-pokemon, .dex-evolution-chain-method { display: block; }
 .dex-evolution-chain-pokemon img { float: left; margin: -16px 0; padding: 1em 0; /* center with two lines of text */ padding-right: 0.33em; }
 
+table.dex-pokemon-stats { width: 100%; }
+table.dex-pokemon-stats th label { display: block; text-align: right; font-weight: normal; color: #2457a0; }
+table.dex-pokemon-stats th input { text-align: left; }
+table.dex-pokemon-stats .dex-pokemon-stats-bar-container { background: #f8f8f8; }
+table.dex-pokemon-stats .dex-pokemon-stats-bar { padding: 0.33em; border: 1px solid #d8d8d8; background: #f0f0f0; }
+table.dex-pokemon-stats td.dex-pokemon-stats-result { text-align: right; }
 
 
 th { vertical-align: middle; }

@@ -6,6 +6,7 @@ import mimetypes
 
 import pokedex.db
 from pokedex.db.tables import Generation, Pokemon, Type
+import pokedex.formulae
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c
 from pylons.controllers.util import abort, redirect_to
@@ -23,6 +24,7 @@ class PokedexController(BaseController):
 
     def __before__(self):
         c.dexlib = dexlib
+        c.dex_formulae = pokedex.formulae
 
     def index(self):
         return ''
