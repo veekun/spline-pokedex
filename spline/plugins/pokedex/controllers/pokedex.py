@@ -24,6 +24,9 @@ class PokedexController(BaseController):
 
     def __before__(self, action, **params):
         super(PokedexController, self).__before__(action, **params)
+
+        c.javascripts.append('pokedex')
+
         c.dexlib = dexlib
         c.dex_formulae = pokedex.formulae
 

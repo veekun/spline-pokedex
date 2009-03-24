@@ -151,7 +151,7 @@
 <%
     # Most people want to see the best they can get
     default_stat_level = 100
-    default_stat_iv = 31
+    default_stat_effort = 255
 %>\
 <table class="dex-pokemon-stats">
 <col class="dex-col-stat-name">
@@ -167,14 +167,14 @@
 <tr>
     <th><!-- stat name --></th>
     <th><!-- bar and value --></th>
-    <th><label for="dex-pokemon-stats-iv">IV</label></th>
-    <th><input type="text" size="3" value="${default_stat_iv}" disabled="disabled" id="dex-pokemon-stats-iv"></th>
+    <th><label for="dex-pokemon-stats-iv">Effort</label></th>
+    <th><input type="text" size="3" value="${default_stat_effort}" disabled="disabled" id="dex-pokemon-stats-effort"></th>
 </tr>
 <tr class="header-row">
     <th><!-- stat name --></th>
     <th><!-- bar and value --></th>
-    <th>Min Effort</th>
-    <th>Max Effort</th>
+    <th>Min IVs</th>
+    <th>Max IVs</th>
 </tr>
 % for pokemon_stat in c.pokemon.stats:
 <tr>
@@ -190,8 +190,8 @@
     else:
         stat_formula = c.dex_formulae.calculated_stat
 %>\
-    <td class="dex-pokemon-stats-result">${stat_formula(pokemon_stat.base_stat, level=default_stat_level, iv=default_stat_iv, effort=0)}</td>
-    <td class="dex-pokemon-stats-result">${stat_formula(pokemon_stat.base_stat, level=default_stat_level, iv=default_stat_iv, effort=255)}</td>
+    <td class="dex-pokemon-stats-result">${stat_formula(pokemon_stat.base_stat, level=default_stat_level, iv=0, effort=default_stat_effort)}</td>
+    <td class="dex-pokemon-stats-result">${stat_formula(pokemon_stat.base_stat, level=default_stat_level, iv=31, effort=default_stat_effort)}</td>
 </tr>
 % endfor
 </table>
