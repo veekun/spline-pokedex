@@ -22,7 +22,8 @@ log = logging.getLogger(__name__)
 
 class PokedexController(BaseController):
 
-    def __before__(self):
+    def __before__(self, action, **params):
+        super(PokedexController, self).__before__(action, **params)
         c.dexlib = dexlib
         c.dex_formulae = pokedex.formulae
 
@@ -50,6 +51,9 @@ class PokedexController(BaseController):
             c.pokemon = q.one()
         except NoResultFound:
             return self._not_found()
+
+        # Some Javascript
+        c.javascripts.append('pokedex.pokemon')
 
         # Type efficacy
         c.type_efficacies = collections.defaultdict(lambda: 100)
