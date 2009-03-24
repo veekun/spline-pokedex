@@ -1,3 +1,16 @@
+// onload: damage taken table
+$(function() {
+    // Damage Taken table is more useful if people can see all the types that
+    // do 2x damage, etc., at a time.  Let's facilitate that: when a user
+    // hovers over a type, fade out all the types that do NOT have the same
+    // efficacy, leaving all those with the same efficacy most obvious
+    $('#dex-pokemon-damage-taken li').hover(function() {
+        $('#dex-pokemon-damage-taken li:not(.' + this.className + ')').addClass('faded');
+    }, function() {
+        $('#dex-pokemon-damage-taken li').removeClass('faded');
+    });
+});
+
 // onload: stats table
 $(function() {
     var $textboxes = $('input#dex-pokemon-stats-level, input#dex-pokemon-stats-effort');
