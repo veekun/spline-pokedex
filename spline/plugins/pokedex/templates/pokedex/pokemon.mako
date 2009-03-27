@@ -215,7 +215,7 @@
     ${lib.pokedex_img('platinum/shiny/%d.png' % c.pokemon.id)}
     ${lib.pokedex_img('platinum/shiny/frame2/%d.png' % c.pokemon.id)}
     <br/>
-    % if c.pokemon.has_dp_fem_sprite:
+    % if c.pokemon.has_gen4_fem_sprite:
     ${lib.pokedex_img('platinum/female/%d.png' % c.pokemon.id)}
     ${lib.pokedex_img('platinum/female/frame2/%d.png' % c.pokemon.id)}
     ${lib.pokedex_img('platinum/shiny/female/%d.png' % c.pokemon.id)}
