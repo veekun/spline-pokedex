@@ -127,6 +127,12 @@ class PokedexController(BaseController):
             # Finally, go back up the tree to the root
             current_pokemon = leaf
             while current_pokemon:
+                # The loop bails just after current_pokemon is no longer the
+                # root, so this will give us the root after the loop ends;
+                # we need to know if it's a baby to see whether to indent the
+                # entire table below
+                root_pokemon = current_pokemon
+
                 if current_pokemon in seen_nodes:
                     current_node = seen_nodes[current_pokemon]
                     # Don't need to repeat this node; the first instance will
@@ -151,7 +157,8 @@ class PokedexController(BaseController):
             # a baby.
             # We use an empty string to indicate an empty cell, as opposed to a
             # complete lack of cell due to a tall cell from an earlier row.
-            current_path.insert(0, '')
+            if not root_pokemon.is_baby:
+                current_path.insert(0, '')
             # Now pad to four if necessary.
             while len(current_path) < 4:
                 current_path.append('')

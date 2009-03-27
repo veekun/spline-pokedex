@@ -125,7 +125,7 @@
     <td></td>
     % elif col != None:
     <td rowspan="${col['span']}">
-        <a href="" class="dex-evolution-chain-pokemon">
+        <a href="${h.url_for(controller='dex', action='pokemon', name=col['pokemon'].name.lower())}" class="dex-evolution-chain-pokemon">
             ${lib.pokedex_img('icons/%d.png' % col['pokemon'].id, style='float: left;')}
             ${col['pokemon'].name}
         </a>
