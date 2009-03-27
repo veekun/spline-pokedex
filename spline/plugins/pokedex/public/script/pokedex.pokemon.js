@@ -11,6 +11,40 @@ $(function() {
     });
 });
 
+// onload: mini exp calculator
+$(function() {
+    // This just takes a level and sticks in some calculated exp
+
+    var base_exp = $('#dex-pokemon-exp-base').text();
+
+    // Event handler to update the calculated EXP
+    var update_exp_handler = function() {
+        var $level_textbox = $('#dex-pokemon-exp-level');
+        var level = pokedex.parse_integer($level_textbox.val(), 1, 100);
+
+        if (level == undefined) {
+            // Not a number from 1 to 100; bail!
+            $level_textbox.addClass('error');
+            return;
+        }
+        else {
+            $level_textbox.removeClass('error');
+        }
+
+        var exp = pokedex.formulae.earned_exp({
+            'base_exp': base_exp,
+            'level': level,
+        });
+
+        $('#dex-pokemon-exp').text(exp);
+    };
+
+    // Run the above handler when the level is changed, but also during load
+    // (i.e. now) to fix the initial value
+    $('#dex-pokemon-exp-level').keyup(update_exp_handler);
+    update_exp_handler();
+});
+
 // onload: stats table
 $(function() {
     var $textboxes = $('input#dex-pokemon-stats-level, input#dex-pokemon-stats-effort');
@@ -24,17 +58,17 @@ $(function() {
     var update_stats_handler = function() {
         // Error checking; make sure we have integers in both boxes
         var bail = false;       // becomes true if we find an error
-        var box_maxes = {       // textboxes and max possible value
-            'level': 100,
-            'effort': 255
+        var box_ranges = {      // textboxes and possible values
+            'level':  {'min': 1, 'max': 100},
+            'effort': {'min': 0, 'max': 255}
         };
         var input = {};         // parsed integer values
-        for (var box in box_maxes) {
-            var max = box_maxes[box];
+        for (var box in box_ranges) {
+            var range = box_ranges[box];
             var $textbox = $('#dex-pokemon-stats-' + box);
-            var value_raw = $textbox.val();
-            var value = parseInt(value_raw);
-            if (isNaN(value) || value != value_raw || value < 1 || value > max) {
+            var value = pokedex.parse_integer($textbox.val(),
+                                              range.min, range.max);
+            if (value == undefined) {
                 $textbox.addClass('error');
                 bail = true;
             }

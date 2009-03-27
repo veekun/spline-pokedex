@@ -83,7 +83,10 @@
     <h2>Training</h2>
     <dl>
         <dt>Base EXP</dt>
-        <dd>${c.pokemon.base_experience}</dd>
+        <dd>
+            <span id="dex-pokemon-exp-base">${c.pokemon.base_experience}</span> <br/>
+            <span id="dex-pokemon-exp">${c.dex_formulae.earned_exp(base_exp=c.pokemon.base_experience, level=100)}</span> EXP at level <input type="text" size="3" value="100" id="dex-pokemon-exp-level">
+        </dd>
         <dt>Effort points</dt>
         <dd>
             <ul>

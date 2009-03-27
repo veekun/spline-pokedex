@@ -1,5 +1,15 @@
 // Scoping
 var pokedex = {
+    // Returns n as an integer iff it is valid and min <= n <= max; otherwise,
+    // returns undefined.
+    'parse_integer': function(n, min, max) {
+        var parsed = parseInt(n);
+        if (isNaN(parsed) || parsed != n || n < min || n > max)
+            return undefined;
+
+        return parsed;
+    },
+
     // Javascript versions of pokedex.formulae.  Unfortunate to duplicate this,
     // but it's pretty simple and the alternatives are ajax or source code
     // translation.
@@ -22,6 +32,10 @@ var pokedex = {
                     + params.iv
                     + Math.floor(params.effort / 4))
                 * params.level / 100) + 10 + params.level;
+        },
+
+        'earned_exp': function(params) {
+            return Math.floor(params.base_exp * params.level / 7);
         },
     },
 };
