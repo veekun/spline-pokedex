@@ -40,11 +40,11 @@
 <div class="dex-column">
     <h2>Pokédex Numbers</h2>
     <dl>
-        <dt>Generation</dt>
+        <dt>Introduced in</dt>
         <dd>${lib.generation_icon(c.pokemon.generation)} ${c.pokemon.generation.name}</dd>
         % if c.pokemon.generation == c.dexlib.generation(1):
         <dt>${lib.version_icons('Red', 'Blue')} internal id</dt>
-        <dd>${c.pokemon.gen1_internal_id} == 0x${"%02x" % c.pokemon.gen1_internal_id}</dd>
+        <dd>${c.pokemon.gen1_internal_id} (<code>0x${"%02x" % c.pokemon.gen1_internal_id}</code>)</dd>
         % endif
         % for dex_number in c.pokemon.dex_numbers:
         <dt>${lib.generation_icon(dex_number.generation)} ${dex_number.generation.main_region}</dt>
