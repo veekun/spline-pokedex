@@ -277,7 +277,50 @@
 </div>
 
 <h1>Locations</h1>
-<p>XXX</p>
+<table class="dex-encounters">
+<tr class="header-row">
+    <th></th>
+    % for version in c.dexlib.generation(4).versions:
+    <th colspan="3">${lib.version_icons(version)}</th>
+    % endfor
+</tr>
+% for location_area, version_encounters in sorted(c.encounters.items(), \
+                                                  key=lambda (k, v): k.location.name):
+<%
+    num_method_rows = max(map(lambda x: len(x), version_encounters.values())) 
+%>\
+% for row_idx in range(num_method_rows):
+<tr>
+    ## We're doing delicious rowspan hackery, so only show the location label
+    ## for the first physical row
+    % if row_idx == 0:
+    <td rowspan="${num_method_rows}">
+        ${location_area.location.name}
+        % if location_area.name:
+        <div class="dex-location-area">${location_area.name}</div>
+        % endif
+    </td>
+    % endif
+    % for version in c.dexlib.generation(4).versions:
+<%
+        version_encounters.setdefault(version, {})
+        if len(version_encounters[version]) <= row_idx:
+            context.write("<td colspan='3'></td>")
+            continue
+        (type, condition), enc_dict = version_encounters[version].items()[row_idx]
+%>\
+    <td>
+        % if enc_dict['icon_url']:
+        ${lib.pokedex_img(enc_dict['icon_url'])}
+        % endif
+    </td>
+    <td>${enc_dict['level']}</td>
+    <td>${enc_dict['rarity']}%</td>
+    % endfor
+</tr>
+% endfor
+% endfor
+</table>
 
 <h1>Moves</h1>
 <p>XXX</p>

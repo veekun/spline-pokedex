@@ -43,6 +43,7 @@ table.dex-pokemon-stats .dex-pokemon-stats-bar-container { background: #f8f8f8; 
 table.dex-pokemon-stats .dex-pokemon-stats-bar { padding: 0.33em; border: 1px solid #d8d8d8; background: #f0f0f0; }
 table.dex-pokemon-stats td.dex-pokemon-stats-result { text-align: right; }
 
+.dex-location-area { font-size: 0.8em; font-style: italic; }
 
 th { vertical-align: middle; }
 .vertical-text { -moz-transform: rotate(-90deg); }
