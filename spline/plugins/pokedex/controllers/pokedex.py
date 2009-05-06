@@ -201,16 +201,12 @@ class PokedexController(BaseController):
         ### Encounters
         # The table is sorted by location, then area, with each row containing
         # Diamond, Pearl, then Platinum locations.  Thus we build a dictionary:
-        #   encounters[location_area][version] = [ ...list of methods... ]
-        # The values will later become dictionaries; see below.
+        #   encounters[location_area][version]
+        #       = [dict(type=type, condition=condition,
+        #               rarity=30, level="2-3"), ...]
         encounters = {}
-        # First, group the encounters by area/version
-        for encounter in c.pokemon.encounters:
-            encounters.setdefault(encounter.location_area, {}) \
-                      .setdefault(encounter.version, []) \
-                      .append(encounter)
 
-        # Now we want to filter each group of encounters down to just the one
+        # We want to filter each group of encounters down to just the one(s)
         # with the LEAST interesting catch method.  That is, if something shows
         # up during the day walking around, we don't care if it also shows up
         # while using the PokéRadar.
@@ -220,112 +216,99 @@ class PokedexController(BaseController):
         # PokéRadar is in use, we will naively report that as 5% from
         # PokéRadar.  But since we're discarding PokéRadar values as long as
         # the Pokémon still appears normally, this can't happen.
+        # We accomplish all this by only tracking the least-interesting methods
+        # seen so far, and wiping the list if we see an even less interesting
+        # one later for a given area/version.
+        for encounter in c.pokemon.encounters:
+            # Long way to say encounters[location_area][version], with defaults
+            method_list = encounters.setdefault(encounter.location_area, {}) \
+                                    .setdefault(encounter.version, [])
+
+            # Find priority for this combination of slot/condition.
+            # Priorities are the encounter_method_order at the top of the class
+            condition_group = None
+            if encounter.condition:
+                condition_group = encounter.condition.group.name
+            priority = self.encounter_method_order.index(
+                           (encounter.slot.type.name, condition_group))
+
+            if not method_list or priority == method_list[0]['priority']:
+                # Same priority; just add this encounter to what we have
+                pass
+            elif priority > method_list[0]['priority']:
+                # Worse priority: already have something better, so skip this
+                continue
+            elif priority < method_list[0]['priority']:
+                # Better priority: better than what we have, so nuke them
+                method_list[0:len(method_list)] = []
+
+            # Find the dictionary for this type/condition and create/update it
+            method_dicts = filter(lambda x: x['condition'] == encounter.condition
+                                        and x['type'] == encounter.slot.type,
+                                  method_list)
+            if method_dicts:
+                method_dict = method_dicts[0]
+                method_dict['rarity'] += encounter.slot.rarity
+                method_dict['min_level'] = min(method_dict['min_level'],
+                                               encounter.min_level)
+                method_dict['max_level'] = max(method_dict['max_level'],
+                                               encounter.max_level)
+            else:
+                method_dict = dict(type=encounter.slot.type,
+                                   condition=encounter.condition,
+                                   min_level=encounter.min_level,
+                                   max_level=encounter.max_level,
+                                   rarity=encounter.slot.rarity,
+                                   priority=priority,
+                                   )
+                method_list.append(method_dict)
+
+        # Do some post-formatting on the method dictionaries: add icons
+        # representing each method, and collapse the level range into a single
+        # string
         for version_encounters in encounters.values():
-            for version, encounter_list in version_encounters.items():
-                # Group encounters by type and condition.  We need to both
-                # drop everything with a low-priority condition and merge
-                # "level 3, 20%" and "level 2, 10%" into just "level 2-3, 30%".
-                # This requires scrapping the encounter objects for dicts so we
-                # can mess with properties as we want.
-
-                # type, condition => encounter_dict
-                encounter_groups = collections.defaultdict(
-                    lambda: dict(rarity=0, min_level=100, max_level=0)
-                )
-                # best_priority will end up as the lowest index in the 
-                # encounter_method_order list at the top of this class.  Any
-                # groups with this priority will survive and appear on the page
-                best_priority = len(self.encounter_method_order)
-                for encounter in encounter_list:
-                    enc_dict = encounter_groups[encounter.slot.type,
-                                                encounter.condition]
-                    enc_dict['type'] = encounter.slot.type
-                    if encounter.condition:
-                        enc_dict['condition_group'] = encounter.condition.group
-                    else:
-                        enc_dict['condition_group'] = None
-
-                    enc_dict['rarity'] += encounter.slot.rarity
-                    enc_dict['min_level'] = min(enc_dict['min_level'],
-                                                encounter.min_level)
-                    enc_dict['max_level'] = max(enc_dict['max_level'],
-                                                encounter.max_level)
-
-                    # Find the priority for this group
-                    if 'priority' not in enc_dict:
-                        if encounter.condition:
-                            condition_group = encounter.condition.group.name
-                        else:
-                            condition_group = None
-                        priority = self.encounter_method_order.index(
-                                   (encounter.slot.type.name, condition_group))
-                        best_priority = min(best_priority, priority)
-                        enc_dict['priority'] = priority
-
-                for k, v in encounter_groups.items():
-                    if v['priority'] != best_priority:
-                        del encounter_groups[k]
-                        continue
-
+            for method_list in version_encounters.values():
+                for method_dict in method_list:
                     # Construct a level string; collapse "2 - 2" into "2"
-                    if v['min_level'] == v['max_level']:
-                        v['level'] = str(v['min_level'])
+                    if method_dict['min_level'] == method_dict['max_level']:
+                        method_dict['level'] = str(method_dict['min_level'])
                     else:
-                        v['level'] = "%d - %d" % (v['min_level'], v['max_level'])
+                        method_dict['level'] = "%d - %d" % (method_dict['min_level'], method_dict['max_level'])
 
+                    type = method_dict['type']
+                    condition = method_dict['condition']
 
+                    # XXX:
+                    # Note that this approach also strips out times of day, even if
+                    # there are entries for all of morning/day/night.  Ought to use
+                    # default_condition here.
 
-                # We're going to use ONLY the first combination of encounter
-                # type and condition group (e.g. 'swarm') that appears in 
-                # XXX FILTER OUT TYPE/CONDITION KEYS WE DON'T WANT
-                # We don't strip out different types, so surfing, fishing, and
-                # walking can all coexist.  Only strip out walking conditions,
-                # with the following order of prorities:
-                #   none > time of day > swarm > radar > slot 2
-                # I don't believe many (if any) encounters fall into more than
-                # one of swarm/radar/slot 2, so the order there doesn't matter.
-                # XXX:
-                # Note that this approach also strips out times of day, even if
-                # there are entries for all of morning/day/night.  Ought to use
-                # default_condition here.
-
-                # Give each type/condition combo a helpful icon
-                for (type, condition), enc_dict in encounter_groups.items():
+                    # Give each type/condition combo a helpful icon
+                    # XXX special-case five slot-2 rows into one gen-3 row
                     if type.name == 'Surfing':
-                        # Lapras.  Hopefully this is obvious enough
-                        enc_dict['icon_url'] = 'icons/131.png'
+                        method_dict['icon'] = 'chrome/surf.png'
                     elif type.name == 'Fishing with Old Rod':
-                        enc_dict['icon_url'] = 'items/old-rod.png'
+                        method_dict['icon'] = 'items/old-rod.png'
                     elif type.name == 'Fishing with Good Rod':
-                        enc_dict['icon_url'] = 'items/old-rod.png'
+                        method_dict['icon'] = 'items/old-rod.png'
                     elif type.name == 'Fishing with Super Rod':
-                        enc_dict['icon_url'] = 'items/old-rod.png'
+                        method_dict['icon'] = 'items/old-rod.png'
                     elif condition == None:
-                        enc_dict['icon_url'] = 'icons/0.png'
+                        method_dict['icon'] = 'chrome/grass.png'
                     elif condition.name == 'Ruby':
-                        enc_dict['icon_url'] = 'versions/ruby.png'
+                        method_dict['icon'] = 'versions/ruby.png'
                     elif condition.name == 'Sapphire':
-                        enc_dict['icon_url'] = 'versions/sapphire.png'
+                        method_dict['icon'] = 'versions/sapphire.png'
                     elif condition.name == 'Emerald':
-                        enc_dict['icon_url'] = 'versions/emerald.png'
+                        method_dict['icon'] = 'versions/emerald.png'
                     elif condition.name == 'Fire Red':
-                        enc_dict['icon_url'] = 'versions/fire-red.png'
+                        method_dict['icon'] = 'versions/fire-red.png'
                     elif condition.name == 'Leaf Green':
-                        enc_dict['icon_url'] = 'versions/leaf-green.png'
+                        method_dict['icon'] = 'versions/leaf-green.png'
                     else:
-                        enc_dict['icon_url'] = 'chrome/types/?????.png'
+                        method_dict['icon'] = 'chrome/types/?????.png'
 
-                # Replace the dumb list of encounters with our spiffy shortened
-                # list
-                version_encounters[version] = encounter_groups
-
-        # The final structure looks like this:
-        #   encounters[location_area][version][type, condition]
-        #       = [dict(rarity=30, min_level=2, max_level=3), ...]
-        # XXX NO IT SHOULDN'T; SHOULD BE
-        #   encounters[location_area][version]
-        #       = [dict(type=type, condition=condition,
-        #               rarity=30, level="2-3"), ...]
+        # And finally stuff this monstrosity into the template stash
         c.encounters = encounters
 
         return render('/pokedex/pokemon.mako')

@@ -284,41 +284,56 @@
     <th colspan="3">${lib.version_icons(version)}</th>
     % endfor
 </tr>
+<%
+    is_alt_row = False
+%>\
 % for location_area, version_encounters in sorted(c.encounters.items(), \
                                                   key=lambda (k, v): k.location.name):
 <%
     num_method_rows = max(map(lambda x: len(x), version_encounters.values())) 
 %>\
 % for row_idx in range(num_method_rows):
+% if is_alt_row:
+<tr class="altrow">
+% else:
 <tr>
+% endif
     ## We're doing delicious rowspan hackery, so only show the location label
     ## for the first physical row
     % if row_idx == 0:
-    <td rowspan="${num_method_rows}">
+    <td rowspan="${num_method_rows}" class="location">
         ${location_area.location.name}
         % if location_area.name:
         <div class="dex-location-area">${location_area.name}</div>
         % endif
     </td>
     % endif
+
     % for version in c.dexlib.generation(4).versions:
-<%
+    <%
         version_encounters.setdefault(version, {})
         if len(version_encounters[version]) <= row_idx:
             context.write("<td colspan='3'></td>")
             continue
-        (type, condition), enc_dict = version_encounters[version].items()[row_idx]
-%>\
-    <td>
-        % if enc_dict['icon_url']:
-        ${lib.pokedex_img(enc_dict['icon_url'])}
+        method_dict = version_encounters[version][row_idx]
+    %>\
+    <td class="icon">
+        % if method_dict['icon']:
+        ${lib.pokedex_img(method_dict['icon'])}
         % endif
     </td>
-    <td>${enc_dict['level']}</td>
-    <td>${enc_dict['rarity']}%</td>
+    <td colspan="2" title="${method_dict['rarity']}%">
+        ${method_dict['level']}
+        <div class="dex-rarity-bar">
+            <div class="dex-rarity-bar-fill" style="width: ${method_dict['rarity']}%;"></div>
+        </div>
+    </td>
     % endfor
 </tr>
 % endfor
+<%
+    is_alt_row = not is_alt_row
+%>\
 % endfor
 </table>
 
