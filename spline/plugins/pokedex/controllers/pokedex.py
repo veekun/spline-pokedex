@@ -38,6 +38,29 @@ class PokedexController(BaseController):
         ('Walking in grass/caves', u'PokéRadar'),
     ]
 
+    # Dict of type/condition name => icon path
+    # Key is condition name if one exists; otherwise type name
+    encounter_method_icons = {
+        # Encounter types, no special conditions
+        'Surfing': 'chrome/surf.png',
+        'Fishing with Old Rod': 'items/old-rod.png',
+        'Fishing with Good Rod': 'items/good-rod.png',
+        'Fishing with Super Rod': 'items/super-rod.png',
+        'Walking in grass/caves': 'chrome/grass.png',
+
+        # Conditions
+        'During a swarm': 'items/teachy-tv.png',
+        'Morning': 'chrome/morning.png',
+        'Day': 'chrome/daytime.png',
+        'Night': 'chrome/night.png',
+        u'Using PokéRadar': 'items/poke-radar.png',
+        'Ruby': 'versions/ruby.png',
+        'Sapphire': 'versions/sapphire.png',
+        'Emerald': 'versions/emerald.png',
+        'Fire Red': 'versions/fire-red.png',
+        'Leaf Green': 'versions/leaf-green.png',
+    }
+
     def __before__(self, action, **params):
         super(PokedexController, self).__before__(action, **params)
 
@@ -280,33 +303,22 @@ class PokedexController(BaseController):
 
                     # XXX:
                     # Note that this approach also strips out times of day, even if
-                    # there are entries for all of morning/day/night.  Ought to use
-                    # default_condition here.
+                    # there are entries for all of morning/day/night.  Does
+                    # that happen?  (Don't think so.)  Is there a sane fix?
 
                     # Give each type/condition combo a helpful icon
                     # XXX special-case five slot-2 rows into one gen-3 row
-                    if type.name == 'Surfing':
-                        method_dict['icon'] = 'chrome/surf.png'
-                    elif type.name == 'Fishing with Old Rod':
-                        method_dict['icon'] = 'items/old-rod.png'
-                    elif type.name == 'Fishing with Good Rod':
-                        method_dict['icon'] = 'items/old-rod.png'
-                    elif type.name == 'Fishing with Super Rod':
-                        method_dict['icon'] = 'items/old-rod.png'
-                    elif condition == None:
-                        method_dict['icon'] = 'chrome/grass.png'
-                    elif condition.name == 'Ruby':
-                        method_dict['icon'] = 'versions/ruby.png'
-                    elif condition.name == 'Sapphire':
-                        method_dict['icon'] = 'versions/sapphire.png'
-                    elif condition.name == 'Emerald':
-                        method_dict['icon'] = 'versions/emerald.png'
-                    elif condition.name == 'Fire Red':
-                        method_dict['icon'] = 'versions/fire-red.png'
-                    elif condition.name == 'Leaf Green':
-                        method_dict['icon'] = 'versions/leaf-green.png'
+                    # XXX to do the above, just collapse type+condition keys
+                    # into 'name' and make it the title attribute of the icon
+                    # XXX while you're at it make the cells dtrt for short
+                    # levels or a version being entirely absent
+                    if method_dict['condition']:
+                        key = method_dict['condition'].name
                     else:
-                        method_dict['icon'] = 'chrome/types/?????.png'
+                        key = method_dict['type'].name
+
+                    method_dict['icon'] = self.encounter_method_icons \
+                                              .get(key, 'icons/0.png')
 
         # And finally stuff this monstrosity into the template stash
         c.encounters = encounters
