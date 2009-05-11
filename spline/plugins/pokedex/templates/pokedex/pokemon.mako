@@ -281,14 +281,24 @@
 <tr class="header-row">
     <th></th>
     % for version in c.dexlib.generation(4).versions:
-    <th colspan="3">${lib.version_icons(version)}</th>
+    <th><!-- method --></th>
+    <th class="version">${lib.version_icons(version)}</th>
     % endfor
 </tr>
+## Show a dummy row if there's nothing, else we have a header and no data
+% if not len(c.encounters):
+<tr>
+    <td colspan="7">No appearances</td>
+</tr>
+% endif
+## Each version/area combo might have multiple methods (i.e. day + night), so
+## we have to iterate over those too, being careful to show one big cell with
+## the area name in it
 <%
     is_alt_row = False
 %>\
-% for location_area, version_encounters in sorted(c.encounters.items(), \
-                                                  key=lambda (k, v): k.location.name):
+% for location_area, version_encounters in \
+      sorted(c.encounters.items(), key=lambda (k, v): (k.location.name, k.name)):
 <%
     num_method_rows = max(map(lambda x: len(x), version_encounters.values())) 
 %>\
@@ -309,23 +319,26 @@
     </td>
     % endif
 
+    ## Two columns per version, to keep the width constant: method and levels
     % for version in c.dexlib.generation(4).versions:
     <%
         version_encounters.setdefault(version, {})
         if len(version_encounters[version]) <= row_idx:
-            context.write("<td colspan='3'></td>")
+            context.write("<td class='icon'></td><td class='version'></td>")
             continue
         method_dict = version_encounters[version][row_idx]
     %>\
     <td class="icon">
         % if method_dict['icon']:
-        ${lib.pokedex_img(method_dict['icon'])}
+        ${lib.pokedex_img(method_dict['icon'], alt=method_dict['name'], \
+                                               title=method_dict['name'])}
         % endif
     </td>
-    <td colspan="2" title="${method_dict['rarity']}%">
+    <td title="${method_dict['rarity']}%">
         ${method_dict['level']}
         <div class="dex-rarity-bar">
             <div class="dex-rarity-bar-fill" style="width: ${method_dict['rarity']}%;"></div>
+            <div class="dex-rarity-bar-value">${method_dict['rarity']}%</div>
         </div>
     </td>
     % endfor

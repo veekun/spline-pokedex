@@ -242,6 +242,9 @@ class PokedexController(BaseController):
         # We accomplish all this by only tracking the least-interesting methods
         # seen so far, and wiping the list if we see an even less interesting
         # one later for a given area/version.
+        # XXX: Note that this approach also strips out times of day, even if
+        # there are entries for all of morning/day/night.  Does that happen?
+        # (Don't think so.)  Is there a sane fix?
         for encounter in c.pokemon.encounters:
             # Long way to say encounters[location_area][version], with defaults
             method_list = encounters.setdefault(encounter.location_area, {}) \
@@ -296,29 +299,35 @@ class PokedexController(BaseController):
                     if method_dict['min_level'] == method_dict['max_level']:
                         method_dict['level'] = str(method_dict['min_level'])
                     else:
-                        method_dict['level'] = "%d - %d" % (method_dict['min_level'], method_dict['max_level'])
+                        method_dict['level'] = "%(min_level)d–%(max_level)d" \
+                                             % method_dict
 
                     type = method_dict['type']
                     condition = method_dict['condition']
 
-                    # XXX:
-                    # Note that this approach also strips out times of day, even if
-                    # there are entries for all of morning/day/night.  Does
-                    # that happen?  (Don't think so.)  Is there a sane fix?
-
                     # Give each type/condition combo a helpful icon
-                    # XXX special-case five slot-2 rows into one gen-3 row
-                    # XXX to do the above, just collapse type+condition keys
-                    # into 'name' and make it the title attribute of the icon
-                    # XXX while you're at it make the cells dtrt for short
-                    # levels or a version being entirely absent
                     if method_dict['condition']:
                         key = method_dict['condition'].name
                     else:
                         key = method_dict['type'].name
 
+                    method_dict['name'] = key
                     method_dict['icon'] = self.encounter_method_icons \
                                               .get(key, 'icons/0.png')
+
+                # Sort the method dicts so they come out in consistent order
+                method_list.sort(key=lambda x: x['name'])
+
+                # Merge identical RSEFL into one Gen3 row.  The following
+                # approach assumes that RSEFL will only appear alone, which is
+                # true since only one condition can appear
+                condition_names = [x['condition'].name for x in method_list
+                                                       if x['condition']]
+                if set(condition_names) == set(['Ruby', 'Sapphire', 'Emerald',
+                                           'Fire Red', 'Leaf Green']):
+                    del method_list[1:]
+                    method_list[0]['icon'] = 'versions/generation-3.png'
+                    method_list[0]['name'] = 'Gen 3 game in slot 2'
 
         # And finally stuff this monstrosity into the template stash
         c.encounters = encounters

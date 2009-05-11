@@ -43,12 +43,14 @@ table.dex-pokemon-stats .dex-pokemon-stats-bar-container { background: #f8f8f8; 
 table.dex-pokemon-stats .dex-pokemon-stats-bar { padding: 0.33em; border: 1px solid #d8d8d8; background: #f0f0f0; }
 table.dex-pokemon-stats td.dex-pokemon-stats-result { text-align: right; }
 
+table.dex-encounters th.version { width: 8em; }
 table.dex-encounters td { vertical-align: middle; }
 table.dex-encounters td.location { vertical-align: top; }
 table.dex-encounters td.icon { height: 24px; width: 24px; padding-left: 2em; vertical-align: middle; text-align: center; }
 .dex-location-area { font-size: 0.8em; font-style: italic; }
-.dex-rarity-bar { height: 0.75em; margin-top: 0.25em; background: #e8e8e8; border: 1px solid #96bbf2; }
+.dex-rarity-bar { position: relative; font-size: 0.75em; height: 1em; line-height: 1; margin-top: 0.25em; background: #e8e8e8; border: 1px solid #96bbf2; }
 .dex-rarity-bar-fill { height: 100%; background: #96bbf2; }
+.dex-rarity-bar-value { position: absolute; height: 100%; top: 0; right: 0; color: #808080; vertical-align: bottom; }
 
 th { vertical-align: middle; }
 .vertical-text { -moz-transform: rotate(-90deg); }
