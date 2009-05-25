@@ -21,8 +21,8 @@ class PokedexPlugin(PluginBase):
             (resource_filename(__name__, 'templates'), 3)
         ]
 
-    def static_dirs(self):
-        return [ resource_filename(__name__, 'public') ]
+    def static_dir(self):
+        return resource_filename(__name__, 'public')
 
     def hooks(self):
         return [
