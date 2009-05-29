@@ -16,6 +16,7 @@
     </p>
 </div>
 
+<div id="dex-pokemon-beside-portrait">
 <h2>Abilities</h2>
 <dl>
     % for ability in c.pokemon.abilities:
@@ -35,19 +36,20 @@
     </li>
     % endfor
 </ul>
+</div>
 
 <div class="dex-column-container">
 <div class="dex-column">
     <h2>Pokédex Numbers</h2>
     <dl>
         <dt>Introduced in</dt>
-        <dd>${lib.generation_icon(c.pokemon.generation)} ${c.pokemon.generation.name}</dd>
+        <dd>${lib.generation_icon(c.pokemon.generation)}</dd>
         % if c.pokemon.generation == c.dexlib.generation(1):
-        <dt>${lib.version_icons('Red', 'Blue')} internal id</dt>
+        <dt>Internal id for ${lib.version_icons('Red', 'Blue')}</dt>
         <dd>${c.pokemon.gen1_internal_id} (<code>0x${"%02x" % c.pokemon.gen1_internal_id}</code>)</dd>
         % endif
         % for dex_number in c.pokemon.dex_numbers:
-        <dt>${lib.generation_icon(dex_number.generation)} ${dex_number.generation.main_region}</dt>
+        <dt>${dex_number.generation.main_region} ${lib.generation_icon(dex_number.generation)}</dt>
         <dd>${dex_number.pokedex_number}</dt>
         % endfor
     </dl>

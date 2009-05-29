@@ -20,6 +20,6 @@ ${pokedex_img('versions/%s.png' % version.name.lower(), alt=version.name)}\
     # Convert string to generation if necessary
     if isinstance(generation, int):
         generation = c.dexlib.generation(generation)
-%>
-${pokedex_img('versions/generation-%d.png' % generation.id, alt=generation.name)}
+%>\
+${pokedex_img('versions/generation-%d.png' % generation.id, alt=generation.name)}\
 </%def>

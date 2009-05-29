@@ -6,9 +6,10 @@ col.dex-col-stat-bar    { width: auto; }
 col.dex-col-stat-result { width: 5em; }
 
 /* Cool three-column layout */
-.dex-column-container { clear: both; overflow: hidden /* float context */; }
-.dex-column { float: left; width: 33%; }
-.dex-column-2x { float: left; width: 66%; }
+.dex-column-container { clear: both; overflow: hidden /* float context */; margin-top: 1em; }
+.dex-column { float: left; width: 32.333%; margin-left: 1%; }
+.dex-column:first-child { width: 33.333%; margin-left: 0; }
+.dex-column-2x { float: left; width: 66.666%; }
 
 /* Type damage */
 .dex-damage-0   { font-weight: bold; color: #44c; }
@@ -27,7 +28,7 @@ col.dex-col-stat-result { width: 5em; }
 #dex-pokemon-name { font-size: 2em; }
 #dex-pokemon-portrait-sprite { margin: 0.33em; padding: 7px; background: url(/dex/media/chrome/sprite-frame.png) center center no-repeat; }
 
-ul#dex-pokemon-damage-taken { overflow: hidden /* new float context */; }
+ul#dex-pokemon-damage-taken { overflow: hidden /* new float context */; margin-bottom: 2em; }
 ul#dex-pokemon-damage-taken li { display: inline-block; text-align: center; padding: 0.125em; }
 ul#dex-pokemon-damage-taken li img { display: block; margin-bottom: 0.25em; }
 
