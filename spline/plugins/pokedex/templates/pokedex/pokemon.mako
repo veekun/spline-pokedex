@@ -129,7 +129,11 @@
     % if col == '':
     <td></td>
     % elif col != None:
-    <td rowspan="${col['span']}">
+    <td rowspan="${col['span']}"\
+        % if col['pokemon'] == c.pokemon:
+        ${h.literal(' class="selected"')}\
+        % endif
+    >
         <a href="${h.url_for(controller='dex', action='pokemon', name=col['pokemon'].name.lower())}" class="dex-evolution-chain-pokemon">
             ${lib.pokedex_img('icons/%d.png' % col['pokemon'].id, style='float: left;')}
             ${col['pokemon'].name}
