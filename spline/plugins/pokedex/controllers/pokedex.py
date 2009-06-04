@@ -64,7 +64,7 @@ class PokedexController(BaseController):
     def __before__(self, action, **params):
         super(PokedexController, self).__before__(action, **params)
 
-        c.javascripts.append('pokedex')
+        c.javascripts.append(('pokedex', 'pokedex'))
 
         c.dexlib = dexlib
         c.dex_formulae = pokedex.formulae
@@ -95,7 +95,7 @@ class PokedexController(BaseController):
             return self._not_found()
 
         # Some Javascript
-        c.javascripts.append('pokedex.pokemon')
+        c.javascripts.append(('pokedex', 'pokemon'))
 
         ### Type efficacy
         c.type_efficacies = collections.defaultdict(lambda: 100)
