@@ -58,7 +58,11 @@
     <dl>
         % for foreign_name in c.pokemon.foreign_names:
         <dt>${foreign_name.language.name}</dt>
-        <dd>${foreign_name.name}</dt>
+        % if foreign_name.language.name == 'Japanese':
+        <dd>${foreign_name.name} (${c.dexlib.romaji(foreign_name.name)})</dd>
+        % else:
+        <dd>${foreign_name.name}</dd>
+        % endif
         % endfor
     </dl>
 </div>
