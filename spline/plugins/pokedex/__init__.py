@@ -28,3 +28,8 @@ class PokedexPlugin(PluginBase):
         return [
             ('routes_mapping', 3, add_routes_hook),
         ]
+
+    def widgets(self):
+        return [
+            ('page_header', 3, 'widgets/pokedex_lookup.mako'),
+        ]
