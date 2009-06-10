@@ -70,28 +70,70 @@ def scale_sizes(size_dict, dimensions=1):
 def romaji(kana):
     """Converts a string of kana to romaji."""
 
+    vowels = ['a', 'e', 'i', 'o', 'u', 'y']
+
     characters = []
-    last_vowel = None
+    last_vowel = None           # Used for ー
+    pending_sokuon = False      # っ or ッ
+    pending_n = False           # ん or ン need apostrophe before vowel
     for char in kana:
         if ord(char) >= 0xff11 and ord(char) <= 0xff5e:
             # Full-width Latin
+            if pending_sokuon:
+                raise ValueError("Sokuon cannot precede Latin characters.")
+
             char = chr(ord(char) - 0xff11 + 0x31)
             characters.append(char)
 
+            pending_n = False
+
+        elif char in (u'っ', u'ッ'):
+            # Sokuon
+            last_vowel = None
+            pending_sokuon = True
+            pending_n = False
+
         elif char == u'ー':
+            # Extended vowel or n
+            if not last_vowel:
+                raise ValueError(u"'ー' must be followed by a vowel.")
             characters.append(last_vowel)
 
             last_vowel = None
+            pending_sokuon = False
+            pending_n = False
 
         elif char in _romaji_kana:
-            characters.append(_romaji_kana[char])
+            # Regular ol' kana
+            kana = _romaji_kana[char]
 
-            last_vowel = _romaji_kana[char][-1]
+            if pending_sokuon:
+                if kana[0] in vowels:
+                    raise ValueError("Sokuon cannot precede a vowel.")
+
+                characters.append(kana[0])
+            elif pending_n and kana[0] in vowels:
+                characters.append("'")
+
+            characters.append(kana)
+
+            last_vowel = kana[-1]
+            pending_sokuon = False
+            pending_n = kana == 'n'
 
         else:
+            # Not Japanese
+            if pending_sokuon:
+                raise ValueError("Sokuon must be followed by another kana.")
+
             characters.append(char)
 
             last_vowel = None
+            pending_sokuon = False
+            pending_n = False
+
+    if pending_sokuon:
+        raise ValueError("Sokuon cannot be the last character.")
 
     return ''.join(characters)
 
