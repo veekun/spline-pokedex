@@ -17,7 +17,7 @@ from spline import model
 from spline.model import meta
 from spline.lib.base import BaseController, render
 
-from spline.plugins.pokedex import lib as pokedex_lib
+from spline.plugins.pokedex import helpers as pokedex_helpers
 from spline.plugins.pokedex.lib import session as pokedex_session
 
 log = logging.getLogger(__name__)
@@ -218,12 +218,12 @@ class PokedexController(BaseController):
         # Male: 17.5 dm, 860 hg
         # Female: 16 dm, 720 hg
         heights = dict(pokemon=c.pokemon.height, male=17.5, female=16)
-        c.heights = pokedex_lib.scale_sizes(heights)
+        c.heights = pokedex_helpers.scale_sizes(heights)
         weights = dict(pokemon=c.pokemon.weight, male=860, female=720)
         # Strictly speaking, weight takes three dimensions.  But the real
         # measurement here is just "space taken up", and these are sprites, so
         # the space they actually take up is two-dimensional.
-        c.weights = pokedex_lib.scale_sizes(weights, dimensions=2)
+        c.weights = pokedex_helpers.scale_sizes(weights, dimensions=2)
 
         ### Flavor text
         c.flavor_text = {}

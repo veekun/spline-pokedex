@@ -2,7 +2,7 @@ from pkg_resources import resource_filename
 from pylons import config
 
 import controllers.pokedex
-from spline.plugins.pokedex import lib as dexlib
+from spline.plugins.pokedex import helpers as pokedex_helpers
 import spline.lib.helpers as h
 from spline.lib.plugin import PluginBase
 
@@ -16,7 +16,7 @@ class PokedexPlugin(PluginBase):
     def __init__(self):
         """Stuff our helper module in the Pylons h object."""
         # XXX should we really be doing this here?
-        h.pokedex = dexlib
+        h.pokedex = pokedex_helpers
 
     def controllers(self):
         return {
