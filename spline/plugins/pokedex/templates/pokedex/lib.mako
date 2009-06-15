@@ -9,7 +9,7 @@ ${h.HTML.img(src=h.url_for(controller='dex', action='media', path=src), **attr)}
 <%
     # Convert string to version if necessary
     if isinstance(version, basestring):
-        version = c.dexlib.version(version)
+        version = h.pokedex.version(version)
 %>\
 ${pokedex_img('versions/%s.png' % version.name.lower(), alt=version.name)}\
 % endfor
@@ -19,7 +19,7 @@ ${pokedex_img('versions/%s.png' % version.name.lower(), alt=version.name)}\
 <%
     # Convert string to generation if necessary
     if isinstance(generation, int):
-        generation = c.dexlib.generation(generation)
+        generation = h.pokedex.generation(generation)
 %>\
 ${pokedex_img('versions/generation-%d.png' % generation.id, alt=generation.name)}\
 </%def>

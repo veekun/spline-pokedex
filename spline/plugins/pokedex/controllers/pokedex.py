@@ -7,7 +7,6 @@ import mimetypes
 
 import pokedex.db
 from pokedex.db.tables import Generation, Pokemon, Type
-import pokedex.formulae
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c
 from pylons.controllers.util import abort, redirect_to
@@ -17,7 +16,9 @@ from sqlalchemy.orm.exc import NoResultFound
 from spline import model
 from spline.model import meta
 from spline.lib.base import BaseController, render
-from spline.plugins.pokedex import lib as dexlib
+
+from spline.plugins.pokedex import lib as pokedex_lib
+from spline.plugins.pokedex.lib import session as pokedex_session
 
 log = logging.getLogger(__name__)
 
@@ -66,9 +67,6 @@ class PokedexController(BaseController):
 
         c.javascripts.append(('pokedex', 'pokedex'))
 
-        c.dexlib = dexlib
-        c.dex_formulae = pokedex.formulae
-
     def __call__(self, *args, **params):
         """Run the controller, making sure to discard the Pokédex session when
         we're done.
@@ -78,7 +76,7 @@ class PokedexController(BaseController):
         try:
             return super(PokedexController, self).__call__(*args, **params)
         finally:
-            dexlib.session.remove()
+            pokedex_session.remove()
 
     def index(self):
         return ''
@@ -94,7 +92,7 @@ class PokedexController(BaseController):
         abort(404)
 
     def pokemon(self, name=None, forme=None):
-        q = dexlib.session.query(Pokemon).filter_by(name=name)
+        q = pokedex_session.query(Pokemon).filter_by(name=name)
         if forme == None:
             # "Basic" Formes still have names, but they don't have a base forme
             # id since they are already the base
@@ -220,12 +218,12 @@ class PokedexController(BaseController):
         # Male: 17.5 dm, 860 hg
         # Female: 16 dm, 720 hg
         heights = dict(pokemon=c.pokemon.height, male=17.5, female=16)
-        c.heights = c.dexlib.scale_sizes(heights)
+        c.heights = pokedex_lib.scale_sizes(heights)
         weights = dict(pokemon=c.pokemon.weight, male=860, female=720)
         # Strictly speaking, weight takes three dimensions.  But the real
         # measurement here is just "space taken up", and these are sprites, so
         # the space they actually take up is two-dimensional.
-        c.weights = c.dexlib.scale_sizes(weights, dimensions=2)
+        c.weights = pokedex_lib.scale_sizes(weights, dimensions=2)
 
         ### Flavor text
         c.flavor_text = {}
@@ -347,7 +345,7 @@ class PokedexController(BaseController):
 
     def pokemon_flavor(self, name=None):
         try:
-            c.pokemon = dexlib.session.query(Pokemon).filter_by(name=name).one()
+            c.pokemon = pokedex_session.query(Pokemon).filter_by(name=name).one()
         except NoResultFound:
             return self._not_found()
         return render('/pokedex/pokemon_flavor.mako')

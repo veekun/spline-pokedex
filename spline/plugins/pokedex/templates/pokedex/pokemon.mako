@@ -32,7 +32,7 @@
     % for type, damage_factor in sorted(c.type_efficacies.items(), \
                                         key=lambda x: x[0].name):
     <li class="dex-damage-${damage_factor}">
-        ${lib.type_icon(type)} ${c.dexlib.type_efficacy_label[damage_factor]}
+        ${lib.type_icon(type)} ${h.pokedex.type_efficacy_label[damage_factor]}
     </li>
     % endfor
 </ul>
@@ -44,7 +44,7 @@
     <dl>
         <dt>Introduced in</dt>
         <dd>${lib.generation_icon(c.pokemon.generation)}</dd>
-        % if c.pokemon.generation == c.dexlib.generation(1):
+        % if c.pokemon.generation == h.pokedex.generation(1):
         <dt>Internal id for ${lib.version_icons('Red', 'Blue')}</dt>
         <dd>${c.pokemon.gen1_internal_id} (<code>0x${"%02x" % c.pokemon.gen1_internal_id}</code>)</dd>
         % endif
@@ -59,7 +59,7 @@
         % for foreign_name in c.pokemon.foreign_names:
         <dt>${foreign_name.language.name}</dt>
         % if foreign_name.language.name == 'Japanese':
-        <dd>${foreign_name.name} (${c.dexlib.romaji(foreign_name.name)})</dd>
+        <dd>${foreign_name.name} (${h.pokedex.romaji(foreign_name.name)})</dd>
         % else:
         <dd>${foreign_name.name}</dd>
         % endif
@@ -70,7 +70,7 @@
     <h2>Breeding</h2>
     <dl>
         <dt>Gender</dt>
-        <dd>${lib.pokedex_img('gender-rates/%d.png' % c.pokemon.gender_rate, alt='')} ${c.dexlib.gender_rate_label[c.pokemon.gender_rate]}</dd>
+        <dd>${lib.pokedex_img('gender-rates/%d.png' % c.pokemon.gender_rate, alt='')} ${h.pokedex.gender_rate_label[c.pokemon.gender_rate]}</dd>
         <dt>Egg groups</dt>
         <dd>
             <ul>
@@ -91,7 +91,7 @@
         <dt>Base EXP</dt>
         <dd>
             <span id="dex-pokemon-exp-base">${c.pokemon.base_experience}</span> <br/>
-            <span id="dex-pokemon-exp">${c.dex_formulae.earned_exp(base_exp=c.pokemon.base_experience, level=100)}</span> EXP at level <input type="text" size="3" value="100" id="dex-pokemon-exp-level">
+            <span id="dex-pokemon-exp">${h.pokedex.formulae.earned_exp(base_exp=c.pokemon.base_experience, level=100)}</span> EXP at level <input type="text" size="3" value="100" id="dex-pokemon-exp-level">
         </dd>
         <dt>Effort points</dt>
         <dd>
@@ -199,9 +199,9 @@
     </td>
 <%
     if pokemon_stat.stat.name == 'HP':
-        stat_formula = c.dex_formulae.calculated_hp
+        stat_formula = h.pokedex.formulae.calculated_hp
     else:
-        stat_formula = c.dex_formulae.calculated_stat
+        stat_formula = h.pokedex.formulae.calculated_stat
 %>\
     <td class="dex-pokemon-stats-result">${stat_formula(pokemon_stat.base_stat, level=default_stat_level, iv=0, effort=default_stat_effort)}</td>
     <td class="dex-pokemon-stats-result">${stat_formula(pokemon_stat.base_stat, level=default_stat_level, iv=31, effort=default_stat_effort)}</td>
@@ -249,7 +249,7 @@
         <dd>${h.HTML.a('download mp3', href=h.url_for(controller='dex', action='media', path='cries/%d.mp3' % c.pokemon.id))}</dd>
         % if c.pokemon.generation.id <= 3:
         <dt>Habitat ${lib.generation_icon(3)}</dt>
-        <dd>${lib.pokedex_img('chrome/habitats/%s.png' % c.dexlib.filename_from_name(c.pokemon.habitat))} ${c.pokemon.habitat}</dd>
+        <dd>${lib.pokedex_img('chrome/habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.habitat))} ${c.pokemon.habitat}</dd>
         % endif
         <dt>Pawprint</dt>
         <dd>${lib.pokedex_img('pawprints/%d.png' % c.pokemon.id, alt='')}</dd>
@@ -290,7 +290,7 @@
 <table class="dex-encounters">
 <tr class="header-row">
     <th></th>
-    % for version in c.dexlib.generation(4).versions:
+    % for version in h.pokedex.generation(4).versions:
     <th><!-- method --></th>
     <th class="version">${lib.version_icons(version)}</th>
     % endfor
@@ -330,7 +330,7 @@
     % endif
 
     ## Two columns per version, to keep the width constant: method and levels
-    % for version in c.dexlib.generation(4).versions:
+    % for version in h.pokedex.generation(4).versions:
     <%
         version_encounters.setdefault(version, {})
         if len(version_encounters[version]) <= row_idx:

@@ -10,8 +10,10 @@ import re
 
 import pokedex.db
 import pokedex.db.tables as tables
+import pokedex.formulae as formulae
 
 # DB session for everyone to use
+# XXX fixme
 session = pokedex.db.connect('mysql://perl@localhost/pydex')
 
 def filename_from_name(name):

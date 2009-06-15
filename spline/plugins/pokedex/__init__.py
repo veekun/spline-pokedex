@@ -2,6 +2,8 @@ from pkg_resources import resource_filename
 from pylons import config
 
 import controllers.pokedex
+from spline.plugins.pokedex import lib as dexlib
+import spline.lib.helpers as h
 from spline.lib.plugin import PluginBase
 
 def add_routes_hook(map, *args, **kwargs):
@@ -11,6 +13,11 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/dex/pokemon/{name}/flavor', controller='dex', action='pokemon_flavor')
 
 class PokedexPlugin(PluginBase):
+    def __init__(self):
+        """Stuff our helper module in the Pylons h object."""
+        # XXX should we really be doing this here?
+        h.pokedex = dexlib
+
     def controllers(self):
         return {
             'dex': controllers.pokedex.PokedexController,
