@@ -11,6 +11,7 @@ import re
 import pokedex.db
 import pokedex.db.tables as tables
 import pokedex.formulae as formulae
+import spline.lib.helpers as h
 
 # DB session for everyone to use
 # XXX fixme
@@ -25,6 +26,38 @@ def filename_from_name(name):
     name = re.sub('[ _]+', '-', name)
     name = re.sub('[^-a-z0-9]', '', name)
     return name
+
+def pokedex_img(src, **attr):
+    return h.HTML.img(src=h.url_for(controller='dex', action='media', path=src), **attr)
+
+def pokemon_sprite(pokemon, prefix='platinum', form=None, **attr):
+    if not form:
+        form = pokemon.forme_name
+
+    if form:
+        alt_text = "%s (%s)" % (pokemon.name, form)
+        filename = '%d-%s.png' % (pokemon.national_id, form)
+    else:
+        alt_text = pokemon.name
+        filename = '%d.png' % pokemon.id
+
+    attr.setdefault('alt', alt_text)
+    attr.setdefault('title', alt_text)
+
+    return pokedex_img("%s/%s" % (prefix, filename), **attr)
+
+def pokemon_link(pokemon, content, form=None, **attr):
+    """Returns a link to a Pokémon page."""
+
+    if not form:
+        form = pokemon.forme_name
+
+    return h.HTML.a(
+        content,
+        href=h.url_for(controller='dex', action='pokemon',
+                       name=pokemon.name.lower(), form=form),
+        **attr
+        )
 
 # Quick access to generations and versions
 def generation(id):

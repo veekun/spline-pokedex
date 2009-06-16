@@ -139,8 +139,8 @@
         % endif
     >
         <a href="${h.url_for(controller='dex', action='pokemon', name=col['pokemon'].name.lower())}" class="dex-evolution-chain-pokemon">
-            ${lib.pokedex_img('icons/%d.png' % col['pokemon'].id, style='float: left;')}
-            ${col['pokemon'].name}
+            ${h.pokedex.pokemon_sprite(col['pokemon'], prefix='icons', style='float: left;')}
+            ${col['pokemon'].full_name}
         </a>
         % if col['pokemon'].evolution_method:
         <span class="dex-evolution-chain-method">
