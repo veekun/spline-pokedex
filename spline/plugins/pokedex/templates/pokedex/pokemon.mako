@@ -159,6 +159,15 @@
 % endfor
 </tbody>
 </table>
+% if c.pokemon.form_group:
+<h2> ${c.pokemon.name} Forms </h2>
+<ul class="inline">
+    % for form in [_.name for _ in c.pokemon.form_sprites]:
+    <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_sprite(c.pokemon, 'platinum', form=form), form=form)}</li>
+    % endfor
+</ul>
+<p> ${c.pokemon.form_group.description} </p>
+% endif
 
 <h1>Stats</h1>
 <%

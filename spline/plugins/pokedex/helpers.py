@@ -30,9 +30,11 @@ def filename_from_name(name):
 def pokedex_img(src, **attr):
     return h.HTML.img(src=h.url_for(controller='dex', action='media', path=src), **attr)
 
-def pokemon_sprite(pokemon, prefix='platinum', form=None, **attr):
-    if not form:
-        form = pokemon.forme_name
+def pokemon_sprite(pokemon, prefix='platinum', **attr):
+    """Returns an <img> tag for a Pokémon sprite."""
+
+    # Kinda gross, but it's entirely valid to pass None as a form
+    form = attr.pop('form', pokemon.forme_name)
 
     if form:
         alt_text = "%s (%s)" % (pokemon.name, form)
@@ -46,16 +48,27 @@ def pokemon_sprite(pokemon, prefix='platinum', form=None, **attr):
 
     return pokedex_img("%s/%s" % (prefix, filename), **attr)
 
-def pokemon_link(pokemon, content, form=None, **attr):
+def pokemon_link(pokemon, content, **attr):
     """Returns a link to a Pokémon page."""
 
-    if not form:
-        form = pokemon.forme_name
+    # Kinda gross, but it's entirely valid to pass None as a form
+    form = attr.pop('form', pokemon.forme_name)
+
+    url_kwargs = {}
+    if form:
+        url_kwargs['form'] = form
+
+    action = 'pokemon'
+    if not pokemon.forme_name:
+        # If a Pokémon does not have real (different species) forms, e.g.
+        # Unown and its letters, then a form link only makes sense if it's to a
+        # flavor page.
+        action = 'pokemon_flavor'
 
     return h.HTML.a(
         content,
-        href=h.url_for(controller='dex', action='pokemon',
-                       name=pokemon.name.lower(), form=form),
+        href=h.url_for(controller='dex', action=action,
+                       name=pokemon.name.lower(), **url_kwargs),
         **attr
         )
 
