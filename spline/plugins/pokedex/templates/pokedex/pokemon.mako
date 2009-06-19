@@ -8,7 +8,7 @@
 ## Portrait block
 <div id="dex-pokemon-portrait">
     <p id="dex-pokemon-name">${c.pokemon.name}</p>
-    ${lib.pokedex_img('platinum/%d.png' % c.pokemon.id, alt=c.pokemon.name, id="dex-pokemon-portrait-sprite")}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum', id="dex-pokemon-portrait-sprite")}
     <p id="dex-pokemon-types">
         % for type in c.pokemon.types:
         ${lib.type_icon(type)}
@@ -232,16 +232,16 @@
 <div class="dex-column">
     ## Only showing current generation's sprites and text
     <h2>Sprites</h2>
-    ${lib.pokedex_img('platinum/%d.png' % c.pokemon.id)}
-    ${lib.pokedex_img('platinum/frame2/%d.png' % c.pokemon.id)}
-    ${lib.pokedex_img('platinum/shiny/%d.png' % c.pokemon.id)}
-    ${lib.pokedex_img('platinum/shiny/frame2/%d.png' % c.pokemon.id)}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum')}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/frame2')}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny')}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny/frame2')}
     <br/>
     % if c.pokemon.has_gen4_fem_sprite:
-    ${lib.pokedex_img('platinum/female/%d.png' % c.pokemon.id)}
-    ${lib.pokedex_img('platinum/female/frame2/%d.png' % c.pokemon.id)}
-    ${lib.pokedex_img('platinum/shiny/female/%d.png' % c.pokemon.id)}
-    ${lib.pokedex_img('platinum/shiny/female/frame2/%d.png' % c.pokemon.id)}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/female')}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/female/frame2')}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny/female')}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny/female/frame2')}
     % endif
 </div>
 </div>
@@ -261,7 +261,7 @@
         <dd>${lib.pokedex_img('chrome/habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.habitat))} ${c.pokemon.habitat}</dd>
         % endif
         <dt>Pawprint</dt>
-        <dd>${lib.pokedex_img('pawprints/%d.png' % c.pokemon.id, alt='')}</dd>
+        <dd>${h.pokedex.pokemon_sprite(c.pokemon.normal_form, prefix='pawprints')}</dd>
         <dt>Shape</dt>
         <dd>
             ${lib.pokedex_img('chrome/shapes/%d.png' % c.pokemon.shape.id, alt='')}
