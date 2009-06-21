@@ -1,13 +1,21 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="/pokedex/lib.mako"/>
 
-<%def name="title()">${c.pokemon.name}</%def>
+<%def name="title()">\
+% if c.pokemon.forme_name:
+${c.pokemon.forme_name.capitalize()} 
+% endif
+${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
+</%def>
 
 <h1>Essentials</h1>
 
 ## Portrait block
 <div id="dex-pokemon-portrait">
     <p id="dex-pokemon-name">${c.pokemon.name}</p>
+    % if c.pokemon.forme_name:
+    <p id="dex-pokemon-forme">${c.pokemon.forme_name.capitalize()} Forme</p>
+    % endif
     ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum', id="dex-pokemon-portrait-sprite")}
     <p id="dex-pokemon-types">
         % for type in c.pokemon.types:
@@ -48,7 +56,7 @@
         <dt>Internal id for ${lib.version_icons('Red', 'Blue')}</dt>
         <dd>${c.pokemon.gen1_internal_id} (<code>0x${"%02x" % c.pokemon.gen1_internal_id}</code>)</dd>
         % endif
-        % for dex_number in c.pokemon.dex_numbers:
+        % for dex_number in c.pokemon.normal_form.dex_numbers:
         <dt>${dex_number.generation.main_region} ${lib.generation_icon(dex_number.generation)}</dt>
         <dd>${dex_number.pokedex_number}</dt>
         % endfor
@@ -56,7 +64,7 @@
 
     <h2>Names</h2>
     <dl>
-        % for foreign_name in c.pokemon.foreign_names:
+        % for foreign_name in c.pokemon.normal_form.foreign_names:
         <dt>${foreign_name.language.name}</dt>
         % if foreign_name.language.name == 'Japanese':
         <dd>${foreign_name.name} (${h.pokedex.romaji(foreign_name.name)})</dd>
@@ -138,10 +146,12 @@
         ${h.literal(' class="selected"')}\
         % endif
     >
-        <a href="${h.url_for(controller='dex', action='pokemon', name=col['pokemon'].name.lower())}" class="dex-evolution-chain-pokemon">
-            ${h.pokedex.pokemon_sprite(col['pokemon'], prefix='icons', style='float: left;')}
-            ${col['pokemon'].full_name}
-        </a>
+        ${h.pokedex.pokemon_link(
+            pokemon=col['pokemon'],
+            content=h.pokedex.pokemon_sprite(col['pokemon'], prefix='icons', style='float: left;')
+                   + col['pokemon'].full_name,
+            class_='dex-evolution-chain-pokemon',
+        )}
         % if col['pokemon'].evolution_method:
         <span class="dex-evolution-chain-method">
             % if col['pokemon'].evolution_parameter:
@@ -159,14 +169,15 @@
 % endfor
 </tbody>
 </table>
-% if c.pokemon.form_group:
+% if c.pokemon.normal_form.form_group:
 <h2> ${c.pokemon.name} Forms </h2>
 <ul class="inline">
-    % for form in [_.name for _ in c.pokemon.form_sprites]:
+    % for form in [_.name for _ in c.pokemon.normal_form.form_sprites]:
+## XXX class="selected" for current form?
     <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_sprite(c.pokemon, 'platinum', form=form), form=form)}</li>
     % endfor
 </ul>
-<p> ${c.pokemon.form_group.description} </p>
+<p> ${c.pokemon.normal_form.form_group.description} </p>
 % endif
 
 <h1>Stats</h1>
@@ -255,7 +266,7 @@
         <dt>Color</dt>
         <dd>${c.pokemon.color}</dd>
         <dt>Cry</dt>
-        <dd>${h.HTML.a('download mp3', href=h.url_for(controller='dex', action='media', path='cries/%d.mp3' % c.pokemon.id))}</dd>
+        <dd>${h.HTML.a('download mp3', href=h.url_for(controller='dex', action='media', path='cries/%d.mp3' % c.pokemon.national_id))}</dd>
         % if c.pokemon.generation.id <= 3:
         <dt>Habitat ${lib.generation_icon(3)}</dt>
         <dd>${lib.pokedex_img('chrome/habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.habitat))} ${c.pokemon.habitat}</dd>
@@ -396,14 +407,14 @@
 %>
 <ul>
 % if c.pokemon.generation.id <= 1:
-<li>${lib.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/species/${"%03d" % c.pokemon.id}.htm">Azure Heights</a></li>
+<li>${lib.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/species/${"%03d" % c.pokemon.national_id}.htm">Azure Heights</a></li>
 % endif
 <li><a href="http://bulbapedia.bulbagarden.net/wiki/${re.sub(' ', '_', c.pokemon.name)}_%28Pok%C3%A9mon%29">Bulbapedia</a></li>
 % if c.pokemon.generation.id <= 2:
 <li>${lib.generation_icon(2)} <a href="http://www.pokemondungeon.com/pokedex/${ghpd_name}.shtml">Gengar and Haunter's Pokémon Dungeon</a></li>
 % endif
 <li><a href="http://www.legendarypokemon.net/pokedex/${lp_name}">Legendary Pokémon</a></li>
-<li><a href="http://www.psypokes.com/dex/psydex/${"%03d" % c.pokemon.id}">PsyPoke</a></li>
-<li><a href="http://www.serebii.net/pokedex-dp/${"%03d" % c.pokemon.id}.shtml">Serebii</a></li>
+<li><a href="http://www.psypokes.com/dex/psydex/${"%03d" % c.pokemon.national_id}">PsyPoke</a></li>
+<li><a href="http://www.serebii.net/pokedex-dp/${"%03d" % c.pokemon.national_id}.shtml">Serebii</a></li>
 <li><a href="http://www.smogon.com/dp/pokemon/${smogon_name}">Smogon</a></li>
 </ul>

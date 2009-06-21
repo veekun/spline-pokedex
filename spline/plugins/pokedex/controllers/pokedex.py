@@ -91,11 +91,19 @@ class PokedexController(BaseController):
         # XXX make this do fuzzy search or whatever
         abort(404)
 
-    def pokemon(self, name=None, forme=None):
+    def pokemon(self, name=None):
         q = pokedex_session.query(Pokemon).filter_by(name=name)
-        if forme == None:
-            # "Basic" Formes still have names, but they don't have a base forme
-            # id since they are already the base
+
+        # Some Pokémon have a "default" form with no real name, like Deoxys.
+        # Some Pokémon have names for all their forms, e.g., Grass Wormadam.
+        # We have to accept wormadam/None and do the right thing.  So.
+        form = request.params.get('form', None)
+        if form:
+            # If there's a form, it must match exactly
+            q = q.filter_by(forme_name=form)
+        else:
+            # If there's NOT a form, just make sure we get a normal-form
+            # Pokémon, whether or not it has a name
             q = q.filter_by(forme_base_pokemon_id=None)
 
         try:
@@ -164,9 +172,9 @@ class PokedexController(BaseController):
             if len(unseen_leaves) == 0:
                 break
 
-            # Go in order by id; arbitrary, but should DTRT given how numbering
-            # tends to work.  This will put Vaporeon before Jolteon, etc.
-            unseen_leaves.sort(key=lambda x: x.id)
+            # Sort by id, then by forme if any.  This keeps evolutions in about
+            # the order people expect, while clustering formes together.
+            unseen_leaves.sort(key=lambda x: (x.national_id, x.forme_name))
             leaf = unseen_leaves[0]
 
             # root, parent_n, ... parent2, parent1, leaf
@@ -227,7 +235,7 @@ class PokedexController(BaseController):
 
         ### Flavor text
         c.flavor_text = {}
-        for pokemon_flavor_text in c.pokemon.flavor_text:
+        for pokemon_flavor_text in c.pokemon.normal_form.flavor_text:
             c.flavor_text[pokemon_flavor_text.version.name] = pokemon_flavor_text.flavor_text
 
         ### Encounters

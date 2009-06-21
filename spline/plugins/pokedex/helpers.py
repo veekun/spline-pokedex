@@ -35,13 +35,16 @@ def pokemon_sprite(pokemon, prefix='platinum', **attr):
 
     # Kinda gross, but it's entirely valid to pass None as a form
     form = attr.pop('form', pokemon.forme_name)
+    if form == pokemon.forme_name and not pokemon.forme_base_pokemon_id:
+        # Don't use default form's name as part of the filename
+        form = None
 
     if form:
         alt_text = "%s (%s)" % (pokemon.name, form)
         filename = '%d-%s.png' % (pokemon.national_id, form)
     else:
         alt_text = pokemon.name
-        filename = '%d.png' % pokemon.id
+        filename = '%d.png' % pokemon.national_id
 
     attr.setdefault('alt', alt_text)
     attr.setdefault('title', alt_text)
@@ -53,13 +56,18 @@ def pokemon_link(pokemon, content, **attr):
 
     # Kinda gross, but it's entirely valid to pass None as a form
     form = attr.pop('form', pokemon.forme_name)
+    if form == pokemon.forme_name and not pokemon.forme_base_pokemon_id:
+        # Don't use default form's name as part of the link
+        form = None
 
     url_kwargs = {}
     if form:
+        # Don't want a ?form=None, so just only pass a form at all if there's
+        # one to pass
         url_kwargs['form'] = form
 
     action = 'pokemon'
-    if not pokemon.forme_name:
+    if not pokemon.normal_form.formes:
         # If a Pokémon does not have real (different species) forms, e.g.
         # Unown and its letters, then a form link only makes sense if it's to a
         # flavor page.

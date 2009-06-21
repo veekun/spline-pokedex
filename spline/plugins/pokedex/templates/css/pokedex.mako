@@ -26,6 +26,7 @@ col.dex-col-stat-result { width: 5em; }
 /*** Pokemon pages ***/
 #dex-pokemon-portrait { float: left; width: 15em; text-align: center; }
 #dex-pokemon-name { font-size: 2em; }
+#dex-pokemon-forme { font-size: 1.25em; font-weight: bold; }
 #dex-pokemon-portrait-sprite { margin: 0.33em; padding: 7px; background: url(/dex/media/chrome/sprite-frame.png) center center no-repeat; }
 
 ul#dex-pokemon-damage-taken { overflow: hidden /* new float context */; margin-bottom: 2em; }
