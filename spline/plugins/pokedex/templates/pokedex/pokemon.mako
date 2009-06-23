@@ -148,7 +148,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     >
         ${h.pokedex.pokemon_link(
             pokemon=col['pokemon'],
-            content=h.pokedex.pokemon_sprite(col['pokemon'], prefix='icons', style='float: left;')
+            content=h.pokedex.pokemon_sprite(col['pokemon'], prefix='icons')
                    + col['pokemon'].full_name,
             class_='dex-evolution-chain-pokemon',
         )}

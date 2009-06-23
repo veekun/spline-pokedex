@@ -33,11 +33,12 @@ ul#dex-pokemon-damage-taken { overflow: hidden /* new float context */; margin-b
 ul#dex-pokemon-damage-taken li { display: inline-block; text-align: center; padding: 0.125em; }
 ul#dex-pokemon-damage-taken li img { display: block; margin-bottom: 0.25em; }
 
-table.dex-evolution-chain { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0.5em; }
-table.dex-evolution-chain td { empty-cells: hide; padding: 0.5em; vertical-align: middle; border: 1px solid #d8d8d8; background: #f0f0f0; }
+table.dex-evolution-chain { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0.5em; empty-cells: hide; }
+table.dex-evolution-chain td { padding: 0.5em; vertical-align: middle; border: 1px solid #d8d8d8; background: #f0f0f0; }
 table.dex-evolution-chain td.selected { border: 1px solid #bfd3f1; background: #e6eefa; }
-.dex-evolution-chain-pokemon, .dex-evolution-chain-method { display: block; }
-.dex-evolution-chain-pokemon img { float: left; margin: -16px 0; padding: 1em 0; /* center with two lines of text */ padding-right: 0.33em; }
+a.dex-evolution-chain-pokemon { padding-top: 8px /* bump icon up a bit */; display: block; }
+.dex-evolution-chain-method { display: block; overflow: hidden; font-size: 0.8em; line-height: 1.25em; }
+.dex-evolution-chain-pokemon img { float: left; margin-top: -8px /* fills link's top padding */; padding-right: 0.33em; }
 
 table.dex-pokemon-stats { width: 100%; }
 table.dex-pokemon-stats th label { display: block; text-align: right; font-weight: normal; color: #2457a0; }
