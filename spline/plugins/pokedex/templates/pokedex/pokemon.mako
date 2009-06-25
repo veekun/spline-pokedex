@@ -146,12 +146,19 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
         ${h.literal(' class="selected"')}\
         % endif
     >
+        % if col['pokemon'] == c.pokemon:
+        <span class="dex-evolution-chain-pokemon">
+            ${h.pokedex.pokemon_sprite(col['pokemon'], prefix='icons')}
+            ${col['pokemon'].full_name}
+        </span>
+        % else:
         ${h.pokedex.pokemon_link(
             pokemon=col['pokemon'],
             content=h.pokedex.pokemon_sprite(col['pokemon'], prefix='icons')
                    + col['pokemon'].full_name,
             class_='dex-evolution-chain-pokemon',
         )}
+        % endif
         % if col['pokemon'].evolution_method:
         <span class="dex-evolution-chain-method">
             % if col['pokemon'].evolution_parameter:
@@ -173,8 +180,12 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 <h2> ${c.pokemon.name} Forms </h2>
 <ul class="inline">
     % for form in [_.name for _ in c.pokemon.normal_form.form_sprites]:
-## XXX class="selected" for current form?
-    <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_sprite(c.pokemon, 'platinum', form=form), form=form)}</li>
+<%
+    link_class = 'dex-box-link'
+    if form == c.pokemon.forme_name:
+        link_class = link_class + ' selected'
+%>\
+    <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_sprite(c.pokemon, 'platinum', form=form), form=form, class_=link_class)}</li>
     % endfor
 </ul>
 <p> ${c.pokemon.normal_form.form_group.description} </p>
@@ -210,7 +221,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     <th>Max IVs</th>
 </tr>
 % for pokemon_stat in c.pokemon.stats:
-<tr>
+<tr class="color1">
     <th>${pokemon_stat.stat.name}</th>
     <td>
         <div class="dex-pokemon-stats-bar-container">
@@ -334,9 +345,9 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 %>\
 % for row_idx in range(num_method_rows):
 % if is_alt_row:
-<tr class="altrow">
+<tr class="color2">
 % else:
-<tr>
+<tr class="color1">
 % endif
     ## We're doing delicious rowspan hackery, so only show the location label
     ## for the first physical row
@@ -352,11 +363,11 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     ## Two columns per version, to keep the width constant: method and levels
     % for version in h.pokedex.generation(4).versions:
     <%
-        version_encounters.setdefault(version, {})
-        if len(version_encounters[version]) <= row_idx:
+        version_encounters.setdefault(version.name, {})
+        if len(version_encounters[version.name]) <= row_idx:
             context.write("<td class='icon'></td><td class='version'></td>")
             continue
-        method_dict = version_encounters[version][row_idx]
+        method_dict = version_encounters[version.name][row_idx]
     %>\
     <td class="icon">
         % if method_dict['icon']:

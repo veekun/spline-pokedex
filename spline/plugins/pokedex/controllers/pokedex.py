@@ -265,7 +265,7 @@ class PokedexController(BaseController):
         for encounter in c.pokemon.encounters:
             # Long way to say encounters[location_area][version], with defaults
             method_list = encounters.setdefault(encounter.location_area, {}) \
-                                    .setdefault(encounter.version, [])
+                                    .setdefault(encounter.version.name, [])
 
             # Find priority for this combination of slot/condition.
             # Priorities are the encounter_method_order at the top of the class

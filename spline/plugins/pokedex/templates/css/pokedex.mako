@@ -1,5 +1,10 @@
 /*** General ***/
 
+/* Pokémon sprite link grid */
+a.dex-box-link { display: inline-block; margin: 0.25em; border: 1px solid transparent; }
+a.dex-box-link:hover { border: 1px solid #bfd3f1; background: #e6eefa; }
+a.dex-box-link.selected { border: 1px solid #95b7ea; background: #bfd4f2; }
+
 /* Table columns */
 col.dex-col-stat-name   { width: 10em; }
 col.dex-col-stat-bar    { width: auto; }
@@ -35,9 +40,10 @@ ul#dex-pokemon-damage-taken li img { display: block; margin-bottom: 0.25em; }
 
 table.dex-evolution-chain { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0.5em; empty-cells: hide; }
 table.dex-evolution-chain td { padding: 0.5em; vertical-align: middle; border: 1px solid #d8d8d8; background: #f0f0f0; }
-table.dex-evolution-chain td.selected { border: 1px solid #bfd3f1; background: #e6eefa; }
-a.dex-evolution-chain-pokemon { padding-top: 8px /* bump icon up a bit */; display: block; }
+table.dex-evolution-chain td:hover { border: 1px solid #bfd3f1; background: #e6eefa; }
+table.dex-evolution-chain td.selected { border: 1px solid #95b7ea; background: #bfd4f2; }
 .dex-evolution-chain-method { display: block; overflow: hidden; font-size: 0.8em; line-height: 1.25em; }
+.dex-evolution-chain-pokemon { padding-top: 8px /* bump icon up a bit */; display: block; font-weight: bold; }
 .dex-evolution-chain-pokemon img { float: left; margin-top: -8px /* fills link's top padding */; padding-right: 0.33em; }
 
 table.dex-pokemon-stats { width: 100%; }
