@@ -58,7 +58,13 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
         % endif
         % for dex_number in c.pokemon.normal_form.dex_numbers:
         <dt>${dex_number.generation.main_region} ${lib.generation_icon(dex_number.generation)}</dt>
-        <dd>${dex_number.pokedex_number}</dt>
+        <dd>
+            ${dex_number.pokedex_number}
+            ## XXX should this be in the db somehow?
+            % if dex_number.generation.id == 4 and dex_number.pokedex_number > 151:
+            ${lib.version_icons(u'Platinum')}
+            % endif
+        </dd>
         % endfor
     </dl>
 
