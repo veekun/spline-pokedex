@@ -206,44 +206,65 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 <table class="dex-pokemon-stats">
 <col class="dex-col-stat-name">
 <col class="dex-col-stat-bar">
+<col class="dex-col-stat-pctile">
+<col>
 <col class="dex-col-stat-result">
 <col class="dex-col-stat-result">
 <tr>
     <th><!-- stat name --></th>
     <th><!-- bar and value --></th>
+    <th><!-- percentile --></th>
+    <td rowspan="11" class="vertical-line"></td>
     <th><label for="dex-pokemon-stats-level">Level</label></th>
     <th><input type="text" size="3" value="${default_stat_level}" disabled="disabled" id="dex-pokemon-stats-level"></th>
 </tr>
 <tr>
     <th><!-- stat name --></th>
     <th><!-- bar and value --></th>
+    <th><!-- percentile --></th>
     <th><label for="dex-pokemon-stats-iv">Effort</label></th>
     <th><input type="text" size="3" value="${default_stat_effort}" disabled="disabled" id="dex-pokemon-stats-effort"></th>
 </tr>
 <tr class="header-row">
     <th><!-- stat name --></th>
     <th><!-- bar and value --></th>
+    <th><abbr title="Percentile rank">Pctile</abbr></th>
     <th>Min IVs</th>
     <th>Max IVs</th>
 </tr>
 % for pokemon_stat in c.pokemon.stats:
-<tr class="color1">
-    <th>${pokemon_stat.stat.name}</th>
-    <td>
-        <div class="dex-pokemon-stats-bar-container">
-            <div class="dex-pokemon-stats-bar" style="width: ${pokemon_stat.base_stat * 100 / 255.0}%;">${pokemon_stat.base_stat}</div>
-        </div>
-    </td>
 <%
+    stat_info = c.stats[pokemon_stat.stat.name]
+
     if pokemon_stat.stat.name == 'HP':
         stat_formula = h.pokedex.formulae.calculated_hp
     else:
         stat_formula = h.pokedex.formulae.calculated_stat
 %>\
+<tr class="color1">
+    <th>${pokemon_stat.stat.name}</th>
+    <td>
+        <div class="dex-pokemon-stats-bar-container">
+            <div class="dex-pokemon-stats-bar" style="margin-right: ${(1 - stat_info['percentile']) * 100}%; background-color: ${stat_info['background']}; border-color: ${stat_info['border']};">${pokemon_stat.base_stat}</div>
+        </div>
+    </td>
+    <td class="dex-pokemon-stats-pctile">${"%0.1f" % (stat_info['percentile'] * 100)}</td>
     <td class="dex-pokemon-stats-result">${stat_formula(pokemon_stat.base_stat, level=default_stat_level, iv=0, effort=default_stat_effort)}</td>
     <td class="dex-pokemon-stats-result">${stat_formula(pokemon_stat.base_stat, level=default_stat_level, iv=31, effort=default_stat_effort)}</td>
 </tr>
 % endfor
+<tr class="horizontal-line"><td colspan="6"></td></tr>
+<tr class="color1">
+    <th>Total</th>
+    <td>
+        <div class="dex-pokemon-stats-bar-container">
+            <div class="dex-pokemon-stats-bar" style="margin-right: ${(1 - c.stats['total']['percentile']) * 100}%; background-color: ${c.stats['total']['background']}; border-color: ${c.stats['total']['border']};">${c.stats['total']['value']}</div>
+        </div>
+    </td>
+    <td class="dex-pokemon-stats-pctile">${"%0.1f" % (c.stats['total']['percentile'] * 100)}</td>
+    <td></td>
+    <td></td>
+</tr>
 </table>
 
 <h1>Flavor</h1>

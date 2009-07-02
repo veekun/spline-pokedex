@@ -8,6 +8,7 @@ a.dex-box-link.selected { border: 1px solid #95b7ea; background: #bfd4f2; }
 /* Table columns */
 col.dex-col-stat-name   { width: 10em; }
 col.dex-col-stat-bar    { width: auto; }
+col.dex-col-stat-pctile { width: 5em; }
 col.dex-col-stat-result { width: 5em; }
 
 /* Cool three-column layout */
@@ -51,6 +52,7 @@ table.dex-pokemon-stats th label { display: block; text-align: right; font-weigh
 table.dex-pokemon-stats th input { text-align: left; }
 table.dex-pokemon-stats .dex-pokemon-stats-bar-container { background: #f8f8f8; }
 table.dex-pokemon-stats .dex-pokemon-stats-bar { padding: 0.33em; border: 1px solid #d8d8d8; background: #f0f0f0; }
+table.dex-pokemon-stats td.dex-pokemon-stats-pctile { text-align: right; }
 table.dex-pokemon-stats td.dex-pokemon-stats-result { text-align: right; }
 
 table.dex-encounters th.version { width: 8em; }

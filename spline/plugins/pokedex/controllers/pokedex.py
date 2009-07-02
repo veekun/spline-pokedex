@@ -2,16 +2,18 @@
 from __future__ import absolute_import
 
 import collections
+import colorsys
 import logging
 import mimetypes
 
 import pokedex.db
-from pokedex.db.tables import Generation, Pokemon, Type
+from pokedex.db.tables import Generation, Pokemon, PokemonStat, Type
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c
 from pylons.controllers.util import abort, redirect_to
 from routes import url_for, request_config
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.sql import func
 
 from spline import model
 from spline.model import meta
@@ -21,6 +23,15 @@ from spline.plugins.pokedex import helpers as pokedex_helpers
 from spline.plugins.pokedex.lib import session as pokedex_session
 
 log = logging.getLogger(__name__)
+
+
+def bar_color(hue, pastelness):
+    """Returns a color in the form #rrggbb that has the provided hue and
+    lightness/saturation equal to the given "pastelness".
+    """
+    r, g, b = colorsys.hls_to_rgb(hue, pastelness, pastelness)
+    return "#%02x%02x%02x" % (r * 256, g * 256, b * 256)
+
 
 class PokedexController(BaseController):
 
@@ -220,6 +231,46 @@ class PokedexController(BaseController):
                 current_path.append('')
 
             c.evolution_table.append(current_path)
+
+        c.stats = {}  # stat_name => { border, background, percentile }
+                      #              (also 'value' for total)
+        stat_total = 0
+        total_stat_rows = pokedex_session.query(PokemonStat) \
+                                         .filter_by(stat=c.pokemon.stats[0].stat) \
+                                         .count()
+        for pokemon_stat in c.pokemon.stats:
+            stat_info = c.stats[pokemon_stat.stat.name] = {}
+            stat_total += pokemon_stat.base_stat
+            q = pokedex_session.query(PokemonStat) \
+                               .filter_by(stat=pokemon_stat.stat)
+            less = q.filter(PokemonStat.base_stat < pokemon_stat.base_stat) \
+                    .count()
+            equal = q.filter(PokemonStat.base_stat == pokemon_stat.base_stat) \
+                     .count()
+            percentile = (less + equal * 0.5) / total_stat_rows
+            stat_info['percentile'] = percentile
+
+            # Colors for the stat bars, based on percentile
+            stat_info['background'] = bar_color(percentile, 0.9)
+            stat_info['border'] = bar_color(percentile, 0.8)
+
+        # Percentile for the total
+        # Need to make a derived table that fakes pokemon_id, total_stats
+        stat_sum_tbl = pokedex_session.query(func.sum(PokemonStat.base_stat)
+                                                 .label('stat_total')) \
+                                      .group_by(PokemonStat.pokemon_id) \
+                                      .subquery()
+
+        q = pokedex_session.query(stat_sum_tbl)
+        less = q.filter(stat_sum_tbl.c.stat_total < stat_total).count()
+        equal = q.filter(stat_sum_tbl.c.stat_total == stat_total).count()
+        percentile = (less + equal * 0.5) / total_stat_rows
+        c.stats['total'] = {
+            'percentile': percentile,
+            'value': stat_total,
+            'background': bar_color(percentile, 0.9),
+            'border': bar_color(percentile, 0.8),
+        }
 
         ### Sizing
         # Note that these are totally hardcoded average sizes in Pokemon units:
