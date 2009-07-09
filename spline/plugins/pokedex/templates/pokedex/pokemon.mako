@@ -320,26 +320,38 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 </div>
 <div class="dex-column">
     <h2>Height</h2>
-    <p>
-        ${int(c.pokemon.height * 0.32808399)}'${"%.1f" % ((c.pokemon.height * 0.32808399 % 1) * 12)}"
-        or ${"%.1f" % (c.pokemon.height / 10.0)} m
-    </p>
     <div class="dex-size">
-        ${lib.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.heights['male'] * 100))}
-        ${lib.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.heights['female'] * 100))}
-        ${lib.pokedex_img('chrome/shapes/cropped/%d.png' % c.pokemon.shape.id, alt='', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
+        <div class="dex-size-trainer">
+            ${lib.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.heights['trainer'] * 100))}
+            <p class="dex-size-value">
+                <input type="text" size="6" value="" disabled="disabled" id="dex-pokemon-height">
+            </p>
+        </div>
+        <div class="dex-size-pokemon">
+            ${lib.pokedex_img('chrome/shapes/cropped/%d.png' % c.pokemon.shape.id, alt='', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
+            <p class="dex-size-value">
+                ${int(c.pokemon.height * 0.32808399)}'${"%.1f" % ((c.pokemon.height * 0.32808399 % 1) * 12)}" <br/>
+                ${"%.1f" % (c.pokemon.height / 10.0)} m
+            </p>
+        </div>
     </div>
 </div>
 <div class="dex-column">
     <h2>Weight</h2>
-    <p>
-        ${"%.1f" % (c.pokemon.weight / 10 * 2.20462262)} lb
-        or ${"%.1f" % (c.pokemon.weight / 10)} kg
-    </p>
     <div class="dex-size">
-        ${lib.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.weights['male'] * 100))}
-        ${lib.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.weights['female'] * 100))}
-        ${lib.pokedex_img('chrome/shapes/cropped/%d.png' % c.pokemon.shape.id, alt='', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
+        <div class="dex-size-trainer">
+            ${lib.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.weights['trainer'] * 100))}
+            <p class="dex-size-value">
+                <input type="text" size="6" value="" disabled="disabled" id="dex-pokemon-weight">
+            </p>
+        </div>
+        <div class="dex-size-pokemon">
+            ${lib.pokedex_img('chrome/shapes/cropped/%d.png' % c.pokemon.shape.id, alt='', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
+            <p class="dex-size-value">
+                ${"%.1f" % (c.pokemon.weight / 10 * 2.20462262)} lb <br/>
+                ${"%.1f" % (c.pokemon.weight / 10)} kg
+            </p>
+        </div>
     </div>
 </div>
 </div>

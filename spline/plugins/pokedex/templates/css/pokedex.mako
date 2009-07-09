@@ -26,8 +26,17 @@ col.dex-col-stat-result { width: 5em; }
 .dex-damage-400 { font-weight: bold; color: #c4c; }
 
 /* Size comparison */
-.dex-size { height: 120px; }
-.dex-size img { clip: 8px; vertical-align: bottom; }
+.dex-size { height: 120px; padding-bottom: 2.5em /* for -value */; overflow: hidden /* new float context */}
+.dex-size img { clip: 8px; position: absolute; bottom: 0; image-rendering: -moz-crisp-edges; }
+.dex-size .dex-size-trainer,
+.dex-size .dex-size-pokemon { display: block; position: relative; float: left; height: 100%; width: 50%; text-align: left; }
+.dex-size .dex-size-trainer { text-align: right; }
+.dex-size .dex-size-pokemon { text-align: left; }
+.dex-size .dex-size-trainer img { right: 0.25em; }
+.dex-size .dex-size-pokemon img { left: 0.25em; }
+.dex-size .dex-size-value { position: absolute; height: 2em; padding: 0.25em; bottom: -2.5em; }
+.dex-size .dex-size-trainer .dex-size-value { right: 0.25em; }
+.dex-size .dex-size-pokemon .dex-size-value { left: 0.25em; }
 
 /*** Pokemon pages ***/
 #dex-pokemon-portrait { float: left; width: 15em; text-align: center; }
