@@ -324,14 +324,15 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
         <div class="dex-size-trainer">
             ${lib.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.heights['trainer'] * 100))}
             <p class="dex-size-value">
-                <input type="text" size="6" value="" disabled="disabled" id="dex-pokemon-height">
+                <input type="text" size="6" value="${h.pokedex.format_height_imperial(c.trainer_height)}" disabled="disabled" id="dex-pokemon-height">
             </p>
         </div>
         <div class="dex-size-pokemon">
             ${lib.pokedex_img('chrome/shapes/cropped/%d.png' % c.pokemon.shape.id, alt='', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
+            <div class="js-dex-size-raw">${c.pokemon.height}</div>
             <p class="dex-size-value">
-                ${int(c.pokemon.height * 0.32808399)}'${"%.1f" % ((c.pokemon.height * 0.32808399 % 1) * 12)}" <br/>
-                ${"%.1f" % (c.pokemon.height / 10.0)} m
+                ${h.pokedex.format_height_imperial(c.pokemon.height)} <br/>
+                ${h.pokedex.format_height_metric(c.pokemon.height)}
             </p>
         </div>
     </div>
@@ -342,14 +343,15 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
         <div class="dex-size-trainer">
             ${lib.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.weights['trainer'] * 100))}
             <p class="dex-size-value">
-                <input type="text" size="6" value="" disabled="disabled" id="dex-pokemon-weight">
+                <input type="text" size="6" value="${h.pokedex.format_weight_imperial(c.trainer_weight)}" disabled="disabled" id="dex-pokemon-weight">
             </p>
         </div>
         <div class="dex-size-pokemon">
             ${lib.pokedex_img('chrome/shapes/cropped/%d.png' % c.pokemon.shape.id, alt='', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
+            <div class="js-dex-size-raw">${c.pokemon.weight}</div>
             <p class="dex-size-value">
-                ${"%.1f" % (c.pokemon.weight / 10 * 2.20462262)} lb <br/>
-                ${"%.1f" % (c.pokemon.weight / 10)} kg
+                ${h.pokedex.format_weight_imperial(c.pokemon.weight)} <br/>
+                ${h.pokedex.format_weight_metric(c.pokemon.weight)}
             </p>
         </div>
     </div>

@@ -273,15 +273,15 @@ class PokedexController(BaseController):
         }
 
         ### Sizing
-        # Note that these are totally hardcoded average sizes in Pokemon units:
-        # Height: 17.8 dm
-        # Weight: 780 hg
-        heights = dict(pokemon=c.pokemon.height, trainer=17.8)
+        # These are totally hardcoded average sizes in Pokemon units:
+        c.trainer_height = 17.8  # dm
+        c.trainer_weight = 780   # hg
+        heights = dict(pokemon=c.pokemon.height, trainer=c.trainer_height)
         c.heights = pokedex_helpers.scale_sizes(heights)
         # Strictly speaking, weight takes three dimensions.  But the real
         # measurement here is just "space taken up", and these are sprites, so
         # the space they actually take up is two-dimensional.
-        weights = dict(pokemon=c.pokemon.weight, trainer=780)
+        weights = dict(pokemon=c.pokemon.weight, trainer=c.trainer_weight)
         c.weights = pokedex_helpers.scale_sizes(weights, dimensions=2)
 
         ### Flavor text

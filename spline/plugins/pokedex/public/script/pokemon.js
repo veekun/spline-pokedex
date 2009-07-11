@@ -117,3 +117,55 @@ $(function() {
     // ...but also now during page load, as e.g. firefox might remember old input
     update_stats_handler();
 });
+
+// onload: size graph
+$(function() {
+    var $textboxes = $('input#dex-pokemon-height, input#dex-pokemon-weight');
+
+    // Since JS is obviously enabled, let people change the trainers' sizes
+    $textboxes.removeAttr('disabled');
+
+    // Event handler to update the relative sizes
+    var update_sizes_handler = function(event) {
+        var $target = $(event.target);
+        var parse_function;
+        var dimensions;
+        if ($target.is('#dex-pokemon-height')) {
+            parse_function = pokedex.parse_height;
+            dimensions = 1;
+        }
+        else {
+            parse_function = pokedex.parse_weight;
+            dimensions = 2;
+        }
+
+        var input = $target.val();
+        var value = parse_function(input);
+        if (value == undefined) {
+            $target.addClass('error');
+            return;
+        }
+        $target.removeClass('error');
+
+        if (value == 0)
+            // Nothing sane to do here...
+            return;
+
+        var sizes = {
+            'trainer': value,
+            'pokemon': $target.parents('.dex-size').find('.js-dex-size-raw')
+                              .text(),
+        };
+        sizes = pokedex.scale_sizes(sizes, dimensions);
+
+        // Resize trainer and shape proportionally
+        var $container = $target.parents('.dex-size');
+        $container.find('.dex-size-trainer img')
+                  .css('height', sizes.trainer * 100 + '%');
+        $container.find('.dex-size-pokemon img')
+                  .css('height', sizes.pokemon * 100 + '%');
+    };
+
+    $textboxes.keyup(update_sizes_handler);
+    $textboxes.keyup();
+});

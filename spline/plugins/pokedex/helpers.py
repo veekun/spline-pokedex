@@ -110,6 +110,25 @@ gender_rate_label = {
     8: u'always female',
 }
 
+def format_height_metric(height):
+    """Formats a height in decimeters as M m."""
+    return "%.1f m" % (height / 10.0)
+
+def format_height_imperial(height):
+    """Formats a height in decimeters as F'I"."""
+    return "%d'%.1f\"" % (
+        height * 0.32808399,
+        (height * 0.32808399 % 1) * 12,
+    )
+
+def format_weight_metric(weight):
+    """Formats a weight in hectograms as K kg."""
+    return "%.1f kg" % (weight / 10.0)
+
+def format_weight_imperial(weight):
+    """Formats a weight in hectograms as L lb."""
+    return "%.1f lb" % (weight / 10 * 2.20462262)
+
 def scale_sizes(size_dict, dimensions=1):
     """Normalizes a list of sizes so the largest is 1.0.
 
