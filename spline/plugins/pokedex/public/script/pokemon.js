@@ -120,6 +120,21 @@ $(function() {
 
 // onload: size graph
 $(function() {
+    // Also, if there's a cookie containing previously-chosen sizes, let's
+    // fill them in.
+    var sizes_cookie = $.cookie('dex-trainer-size');
+    if (sizes_cookie) {
+        var cookie_parts = sizes_cookie.split(';');
+        $('input#dex-pokemon-height').val(cookie_parts[0]);
+        $('input#dex-pokemon-weight').val(cookie_parts[1]);
+    }
+    // Need to remember the last valid height and weight so we can store
+    // them in a cookie.
+    var last_sizes = {
+        'height': $('input#dex-pokemon-height').val(),
+        'weight': $('input#dex-pokemon-weight').val(),
+    };
+
     var $textboxes = $('input#dex-pokemon-height, input#dex-pokemon-weight');
 
     // Since JS is obviously enabled, let people change the trainers' sizes
@@ -130,13 +145,16 @@ $(function() {
         var $target = $(event.target);
         var parse_function;
         var dimensions;
+        var size_key;
         if ($target.is('#dex-pokemon-height')) {
             parse_function = pokedex.parse_height;
             dimensions = 1;
+            size_key = 'height';
         }
         else {
             parse_function = pokedex.parse_weight;
             dimensions = 2;
+            size_key = 'weight';
         }
 
         var input = $target.val();
@@ -150,6 +168,10 @@ $(function() {
         if (value == 0)
             // Nothing sane to do here...
             return;
+
+        // Store our validated value in a cookie
+        last_sizes[size_key] = input;
+        $.cookie('dex-trainer-size', last_sizes.height + ';' + last_sizes.weight)
 
         var sizes = {
             'trainer': value,

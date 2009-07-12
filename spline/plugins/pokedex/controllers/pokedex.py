@@ -76,6 +76,7 @@ class PokedexController(BaseController):
     def __before__(self, action, **params):
         super(PokedexController, self).__before__(action, **params)
 
+        c.javascripts.append(('pokedex', 'lib/jquery.cookie'))
         c.javascripts.append(('pokedex', 'pokedex'))
 
     def __call__(self, *args, **params):

@@ -27,8 +27,7 @@ var pokedex = {
     },
     'parse_height': function(height) {
         // Disallow empty string
-        if (height.test(/^\s*$/))
-            return undefined;
+        if (/^\s*$/.test(height)) return undefined;
 
         // I am so sorry.  My kingdom for /x.
         // This matches 2', 2ft, 3", 3in, combinations of both, and whitespace
@@ -53,8 +52,7 @@ var pokedex = {
 
     'parse_weight': function(weight) {
         // Disallow empty string
-        if (height.test(/^\s*$/))
-            return undefined;
+        if (/^\s*$/.test(weight)) return undefined;
 
         // This matches 2 lb, 3 oz, or a combination of such
         var match = weight.match(/^\s*(?:((?:\d*\.)?\d+)\s*(?:lb\.?)\s*)?(?:((?:\d*\.)?\d+)(?:oz\.?)\s*)?$/i);
