@@ -51,8 +51,14 @@ def pokemon_sprite(pokemon, prefix='platinum', **attr):
 
     return pokedex_img("%s/%s" % (prefix, filename), **attr)
 
-def pokemon_link(pokemon, content, **attr):
-    """Returns a link to a Pokémon page."""
+def pokemon_link(pokemon, content=None, **attr):
+    """Returns a link to a Pokémon page.
+
+    `pokemon` may be a name or a Pokémon object."""
+
+    # Content defaults to the name of the Pokémon
+    if not content:
+        content = pokemon.name
 
     # Kinda gross, but it's entirely valid to pass None as a form
     form = attr.pop('form', pokemon.forme_name)
@@ -80,7 +86,10 @@ def pokemon_link(pokemon, content, **attr):
         **attr
         )
 
-# Quick access to generations and versions
+# Quick access to a few database objects
+# XXX Should this be here?  Generalized?
+def pokemon(name):
+    return session.query(tables.Pokemon).filter_by(name=name).one()
 def generation(id):
     return session.query(tables.Generation).get(id)
 def version(name):

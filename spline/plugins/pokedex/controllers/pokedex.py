@@ -7,11 +7,13 @@ import logging
 import mimetypes
 
 import pokedex.db
-from pokedex.db.tables import Generation, Pokemon, PokemonStat, Type
+from pokedex.db.tables import Generation, Pokemon, PokemonEggGroup, PokemonStat, Type
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c
 from pylons.controllers.util import abort, redirect_to
 from routes import url_for, request_config
+from sqlalchemy import and_, or_
+from sqlalchemy.orm import aliased
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func
 
@@ -138,6 +140,42 @@ class PokedexController(BaseController):
                 # damage factor into a decimal percentage taken of the starting
                 # 100, without using floats and regardless of number of types
                 c.type_efficacies[type_efficacy.damage_type] /= 100
+
+        ### Breeding compatibility
+        # To simplify this list considerably, we want to find the BASE FORM of
+        # every Pokémon compatible with this one.  The base form is either:
+        # - a Pokémon that is not a baby and has no evolution parent, or
+        # - a Pokémon that has a baby for a parent.
+        # The below query self-joins `pokemon` to itself and tests the above
+        # conditions.
+        # ASSUMPTION: Every base-form Pokémon in a breedable family can breed.
+        # ASSUMPTION: Every family has the same breeding groups throughout.
+        # XXX: This picks up genderless Pokémon!
+        # XXX: Incidentally, this also shows every Rotom form, which is a bit
+        # naughty
+        if c.pokemon.gender_rate == -1:
+            # Genderless; Ditto only
+            ditto = pokedex_session.query(Pokemon).filter_by(name='Ditto') \
+                                   .one()
+            c.compatible_families = [ditto]
+        elif c.pokemon.egg_groups[0].id == 15:
+            # No Eggs group
+            pass
+        else:
+            parent_a = aliased(Pokemon)
+            egg_group_ids = [_.id for _ in c.pokemon.egg_groups]
+            q = pokedex_session.query(Pokemon)
+            q = q.outerjoin((parent_a, Pokemon.evolution_parent)) \
+                 .join(PokemonEggGroup) \
+                 .filter(
+                    or_(
+                        and_(parent_a.id == None, Pokemon.is_baby == False),
+                        parent_a.is_baby == True,
+                    )
+                 ) \
+                 .filter(PokemonEggGroup.egg_group_id.in_(egg_group_ids)) \
+                 .order_by(Pokemon.id)
+            c.compatible_families = q.all()
 
         ### Evolution
         # Format is a matrix as follows:

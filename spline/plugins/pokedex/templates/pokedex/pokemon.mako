@@ -95,9 +95,25 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
         </dd>
         <dt>Steps to hatch</dt>
         <dd>${c.pokemon.evolution_chain.steps_to_hatch}</dd>
-        <dt>Compatibility</dt>
-        <dd>XXX</dd>
     </dl>
+
+    <h2>Compatibility</h2>
+    % if c.pokemon.name == 'Ditto':
+    <p>Ditto can breed with any other breedable Pokémon, but can never produce a Ditto egg.</p>
+    % elif c.pokemon.egg_groups[0].id == 15:
+    ## Egg group 15 is the special No Eggs group
+    <p>${c.pokemon.name} cannot breed.</p>
+    % else:
+    <ul class="inline dex-pokemon-compatibility">
+        % for pokemon in c.compatible_families:
+        <li>${h.pokedex.pokemon_link(
+            pokemon,
+            h.pokedex.pokemon_sprite(pokemon, prefix='icons'),
+            class_='dex-icon-link',
+        )}</li>
+        % endfor
+    </ul>
+    % endif
 </div>
 <div class="dex-column">
     <h2>Training</h2>
