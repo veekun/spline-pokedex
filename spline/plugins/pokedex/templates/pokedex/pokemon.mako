@@ -1,5 +1,6 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="/pokedex/lib.mako"/>
+<%! from spline.plugins.pokedex import db %>\
 
 <%def name="title()">\
 % if c.pokemon.forme_name:
@@ -52,8 +53,8 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     <dl>
         <dt>Introduced in</dt>
         <dd>${lib.generation_icon(c.pokemon.generation)}</dd>
-        % if c.pokemon.generation == h.pokedex.generation(1):
-        <dt>Internal id for ${lib.version_icons('Red', 'Blue')}</dt>
+        % if c.pokemon.generation == db.generation(1):
+        <dt>Internal id for ${lib.version_icons(u'Red', u'Blue')}</dt>
         <dd>${c.pokemon.gen1_internal_id} (<code>0x${"%02x" % c.pokemon.gen1_internal_id}</code>)</dd>
         % endif
         % for dex_number in c.pokemon.normal_form.dex_numbers:
@@ -378,7 +379,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 <table class="dex-encounters">
 <tr class="header-row">
     <th></th>
-    % for version in h.pokedex.generation(4).versions:
+    % for version in db.generation(4).versions:
     <th><!-- method --></th>
     <th class="version">${lib.version_icons(version)}</th>
     % endfor
@@ -418,7 +419,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     % endif
 
     ## Two columns per version, to keep the width constant: method and levels
-    % for version in h.pokedex.generation(4).versions:
+    % for version in db.generation(4).versions:
     <%
         version_encounters.setdefault(version.name, {})
         if len(version_encounters[version.name]) <= row_idx:

@@ -21,11 +21,10 @@ from spline import model
 from spline.model import meta
 from spline.lib.base import BaseController, render
 
-from spline.plugins.pokedex import helpers as pokedex_helpers
-from spline.plugins.pokedex.lib import session as pokedex_session
+from spline.plugins.pokedex import db, helpers as pokedex_helpers
+from spline.plugins.pokedex.db import pokedex_session
 
 log = logging.getLogger(__name__)
-
 
 def bar_color(hue, pastelness):
     """Returns a color in the form #rrggbb that has the provided hue and
@@ -106,22 +105,9 @@ class PokedexController(BaseController):
         abort(404)
 
     def pokemon(self, name=None):
-        q = pokedex_session.query(Pokemon).filter_by(name=name)
-
-        # Some Pokémon have a "default" form with no real name, like Deoxys.
-        # Some Pokémon have names for all their forms, e.g., Grass Wormadam.
-        # We have to accept wormadam/None and do the right thing.  So.
         form = request.params.get('form', None)
-        if form:
-            # If there's a form, it must match exactly
-            q = q.filter_by(forme_name=form)
-        else:
-            # If there's NOT a form, just make sure we get a normal-form
-            # Pokémon, whether or not it has a name
-            q = q.filter_by(forme_base_pokemon_id=None)
-
         try:
-            c.pokemon = q.one()
+            c.pokemon = db.pokemon(name, form=form)
         except NoResultFound:
             return self._not_found()
 
@@ -442,8 +428,11 @@ class PokedexController(BaseController):
         return render('/pokedex/pokemon.mako')
 
     def pokemon_flavor(self, name=None):
+        # Ignoring form for now, since it could also be a sprite-form, and
+        # the lookup won't work
+        #form = request.params.get('form', None)
         try:
-            c.pokemon = pokedex_session.query(Pokemon).filter_by(name=name).one()
+            c.pokemon = db.pokemon(name)
         except NoResultFound:
             return self._not_found()
         return render('/pokedex/pokemon_flavor.mako')

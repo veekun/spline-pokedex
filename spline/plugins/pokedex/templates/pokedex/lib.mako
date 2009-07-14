@@ -1,3 +1,4 @@
+<%! from spline.plugins.pokedex import db %>\
 <%def name="pokedex_img(src, **attr)">\
 ${h.HTML.img(src=h.url_for(controller='dex', action='media', path=src), **attr)}\
 </%def>
@@ -9,7 +10,7 @@ ${h.HTML.img(src=h.url_for(controller='dex', action='media', path=src), **attr)}
 <%
     # Convert string to version if necessary
     if isinstance(version, basestring):
-        version = h.pokedex.version(version)
+        version = db.version(version)
 %>\
 ${pokedex_img('versions/%s.png' % version.name.lower(), alt=version.name)}\
 % endfor
@@ -19,7 +20,7 @@ ${pokedex_img('versions/%s.png' % version.name.lower(), alt=version.name)}\
 <%
     # Convert string to generation if necessary
     if isinstance(generation, int):
-        generation = h.pokedex.generation(generation)
+        generation = db.generation(generation)
 %>\
 ${pokedex_img('versions/generation-%d.png' % generation.id, alt=generation.name)}\
 </%def>

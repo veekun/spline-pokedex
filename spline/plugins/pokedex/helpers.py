@@ -8,14 +8,8 @@ from __future__ import absolute_import
 import math
 import re
 
-import pokedex.db
-import pokedex.db.tables as tables
 import pokedex.formulae as formulae
 import spline.lib.helpers as h
-
-# DB session for everyone to use
-# XXX fixme
-session = pokedex.db.connect('mysql://perl@localhost/pydex')
 
 def filename_from_name(name):
     """Shorten the name of a whatever to something suitable as a filename.
@@ -85,15 +79,6 @@ def pokemon_link(pokemon, content=None, **attr):
                        name=pokemon.name.lower(), **url_kwargs),
         **attr
         )
-
-# Quick access to a few database objects
-# XXX Should this be here?  Generalized?
-def pokemon(name):
-    return session.query(tables.Pokemon).filter_by(name=name).one()
-def generation(id):
-    return session.query(tables.Generation).get(id)
-def version(name):
-    return session.query(tables.Version).filter_by(name=name).one()
 
 # Type efficacy, from percents to Unicode fractions
 type_efficacy_label = {
