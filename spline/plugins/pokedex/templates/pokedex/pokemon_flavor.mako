@@ -7,8 +7,8 @@
 <table border="1">
 <tr>
     <th></th>
-    <th colspan="2">${lib.version_icons('Diamond', 'Pearl')}<br/>Diamond/Pearl</th>
-    <th colspan="2">${lib.version_icons('Platinum')}<br/>Platinum</th>
+    <th colspan="2">${lib.version_icons(u'Diamond', u'Pearl')}<br/>Diamond/Pearl</th>
+    <th colspan="2">${lib.version_icons(u'Platinum')}<br/>Platinum</th>
 </tr>
 <tr>
     <th class="vertical-text">Normal</th>

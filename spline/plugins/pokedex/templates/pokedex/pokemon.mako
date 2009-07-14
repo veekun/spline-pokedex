@@ -289,7 +289,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 <div class="dex-column-2x">
     <h2>Flavor Text</h2>
     <ul>
-        % for version_name in 'Diamond', 'Pearl':
+        % for version_name in u'Diamond', u'Pearl':
         <li>${lib.version_icons(version_name)} ${c.flavor_text[version_name]}</li>
         % endfor
     </ul>
