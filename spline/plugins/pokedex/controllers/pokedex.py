@@ -136,9 +136,6 @@ class PokedexController(BaseController):
         # conditions.
         # ASSUMPTION: Every base-form Pokémon in a breedable family can breed.
         # ASSUMPTION: Every family has the same breeding groups throughout.
-        # XXX: This picks up genderless Pokémon!
-        # XXX: Incidentally, this also shows every Rotom form, which is a bit
-        # naughty
         if c.pokemon.gender_rate == -1:
             # Genderless; Ditto only
             ditto = pokedex_session.query(Pokemon).filter_by(name='Ditto') \
@@ -153,6 +150,8 @@ class PokedexController(BaseController):
             q = pokedex_session.query(Pokemon)
             q = q.outerjoin((parent_a, Pokemon.evolution_parent)) \
                  .join(PokemonEggGroup) \
+                 .filter(Pokemon.gender_rate != -1) \
+                 .filter(Pokemon.forme_base_pokemon_id == None) \
                  .filter(
                     or_(
                         and_(parent_a.id == None, Pokemon.is_baby == False),

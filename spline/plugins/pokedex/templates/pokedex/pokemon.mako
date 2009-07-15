@@ -99,7 +99,8 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     </dl>
 
     <h2>Compatibility</h2>
-    % if c.pokemon.name == 'Ditto':
+    % if c.pokemon.egg_groups[0].id == 13:
+    ## Egg group 13 is the special Ditto group
     <p>Ditto can breed with any other breedable Pokémon, but can never produce a Ditto egg.</p>
     % elif c.pokemon.egg_groups[0].id == 15:
     ## Egg group 15 is the special No Eggs group
