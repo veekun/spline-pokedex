@@ -151,8 +151,11 @@ var height_units = {
     'meter':    1,
     'metre':    1,
 
+    'ångström': 1e-10,
+    'angstrom': 1e-10,
     'thou':     0.0000254,
     'inch':     0.0254,
+    'hand':     0.1016,
     'foot':     0.3048,
     'yard':     0.9144,
     'furlong':  201.168,
@@ -168,15 +171,28 @@ var height_units = {
     'cable':    185.3184,
     'nauticalmile': 1853.184,
 
-    // astronomical
+    // astronomy and physics
     'astronomicalunit': 1.496e11,
-    'lightyear': 9.461e15,
-    'parsec':   3.0857e16,
+    'lightyear':        9.461e15,
+    'lightsecond':      299792458,
+    'lightminute':      17987547480,
+    'lighthour':        1079252848800,
+    'lightday':         2.59020684e13,
+    'lightweek':        1.81314479e14,
+    'lightfortnight':   3.62628958e14,
+    'parsec':           3.0857e16,
+    'plancklength':     1.61625281e-35,
+    'lightplanck':      1.61625281e-35,
 
+    // ancient
+    'cubit':    0.45,
+    'royalcubit': 0.525,
 };
 var height_abbrs = {
+    'Å'  : 'ångström',
     'm'  : 'meter',
     'in' : 'inch',
+    'h'  : 'hand',
     'ft' : 'foot',
     'yd' : 'yard',
     'mi' : 'mile',
@@ -212,6 +228,8 @@ var weight_units = {
     'pennyweight':      0.001555174,
     'gram':             0.001,
     'bushel':           27.216,  // wheat
+
+    'planckmass':       2.1764411e-8,
 };
 var weight_abbrs = {
     'gr':   'grain',
@@ -287,6 +305,7 @@ function parse_size(size, units, abbrs) {
         // SI prefix can be zero chars (for none), one char (most of them),
         // or two chars (deca-).  To avoid a cross-join regex mess, just
         // try these three cases
+        // Unit abbreviations are always case-sensitive.
         var si_abbr, unit_abbr;
         for (var i in [0, 1, 2]) {
             // Borrow these for readability
@@ -308,16 +327,17 @@ function parse_size(size, units, abbrs) {
             continue;
         }
 
-        // Try full names
+        // Try full names; these can be case-insensitive.
         var si_factor = 1;
         for (var prefix in si_prefixes) {
             var regex = new RegExp('^' + prefix, 'i');
             if (unit.match(regex)) {
                 si_factor = si_prefixes[prefix];
-                unit = unit.replace(regex, '');
+                unit = unit.replace(regex, '').toLowerCase();
                 break;
             }
         }
+        unit = unit.toLowerCase();
         if (units[unit]) {
             result += amount * units[unit] * si_factor;
             continue;
