@@ -345,7 +345,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
             </p>
         </div>
         <div class="dex-size-pokemon">
-            ${lib.pokedex_img('chrome/shapes/cropped/%d.png' % c.pokemon.shape.id, alt='', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
+            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
             <div class="js-dex-size-raw">${c.pokemon.height}</div>
             <p class="dex-size-value">
                 ${h.pokedex.format_height_imperial(c.pokemon.height)} <br/>
@@ -364,7 +364,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
             </p>
         </div>
         <div class="dex-size-pokemon">
-            ${lib.pokedex_img('chrome/shapes/cropped/%d.png' % c.pokemon.shape.id, alt='', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
+            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
             <div class="js-dex-size-raw">${c.pokemon.weight}</div>
             <p class="dex-size-value">
                 ${h.pokedex.format_weight_imperial(c.pokemon.weight)} <br/>
