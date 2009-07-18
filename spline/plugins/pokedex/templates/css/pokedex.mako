@@ -55,6 +55,8 @@ ul#dex-pokemon-damage-taken li img { display: block; margin-bottom: 0.25em; }
 
 ul.dex-pokemon-compatibility { max-height: 136px /* four rows of icons plus borders */; overflow: auto; }
 
+.dex-pokemon-item-rarity { display: inline-block; width: 3em; text-align: right; }
+
 table.dex-evolution-chain { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0.5em; empty-cells: hide; }
 table.dex-evolution-chain td { padding: 0.5em; vertical-align: middle; border: 1px solid #d8d8d8; background: #f0f0f0; }
 table.dex-evolution-chain td:hover { border: 1px solid #bfd3f1; background: #e6eefa; }

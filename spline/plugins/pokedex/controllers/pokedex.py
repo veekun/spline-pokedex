@@ -162,6 +162,43 @@ class PokedexController(BaseController):
                  .order_by(Pokemon.id)
             c.compatible_families = q.all()
 
+        ### Wild held items
+        # Stored separately per version due to *rizer shenanigans (grumble),
+        # so in some 99.9% of cases we want to merge them all into a single
+        # per-generation list.
+        # I also want to look to the future (past?) and expect supporting held
+        # items from older games, so I'm trying not to assume gen-4-only here.
+        # Thus we have to store these as:
+        #   generation => { version => [ (item, rarity), ... ] }
+        # In the case of all versions within a generation being merged, the
+        # key is None instead of a version object.
+        c.held_items = {}
+        version_held_items = {}  # version => [ (item, rarity), ... ]
+        for pokemon_item in c.pokemon.items:
+            version_held_items.setdefault(pokemon_item.version, []) \
+                              .append((pokemon_item.item, pokemon_item.rarity))
+        for generation in [db.generation(4)]:
+            # Figure out if we can merge the versions for this gen, i.e., if
+            # every list of (item, rarity) tuples is identical
+            can_merge = True
+            first_held_items = version_held_items.setdefault(generation.versions[0], [])
+            for version in generation.versions[1:]:
+                version_held_items.setdefault(version, [])
+                if version_held_items[version] != first_held_items:
+                    can_merge = False
+                    break
+
+            # Copy appropriate per-version item lists to the final dictionary.
+            # If we can merge, stick any version's list under the key None;
+            # otherwise, we have to copy them all
+            if can_merge:
+                c.held_items[generation] = { None: first_held_items }
+            else:
+                version_dict = {}
+                c.held_items[generation] = version_dict
+                for version in generation.versions:
+                    version_dict[version] = version_held_items[version]
+
         ### Evolution
         # Format is a matrix as follows:
         # [

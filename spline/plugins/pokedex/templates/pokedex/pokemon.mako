@@ -142,7 +142,29 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
         <dt>Growth rate</dt>
         <dd>${c.pokemon.evolution_chain.growth_rate.name}</dd>
         <dt>Wild held items</dt>
-        <dd>XXX</dd>
+        <dd>
+            % for generation, version_dict in c.held_items.items():
+## I only have gen4 data now, so showing a generation isn't very useful
+##            <h3>${lib.generation_icon(generation)}</h3>
+            ## "x and y" returns x if x is false; x might be None here and we'd
+            ## rather not try to get None.id
+            % for version, item_records in sorted(version_dict.items(), \
+                                                  key=lambda (k,v): k and k.id):
+                % if not len(item_records):
+                <p>None</p>
+                % endif
+                % for item, rarity in item_records:
+                <p>
+                    % if version:
+                    ${lib.version_icons(version)}
+                    % endif
+                    <span class="dex-pokemon-item-rarity">${rarity}%</span>
+                    ${h.pokedex.item_link(item)}
+                </p>
+                % endfor
+            % endfor
+            % endfor
+        </dd>
     </dl>
 </div>
 </div>

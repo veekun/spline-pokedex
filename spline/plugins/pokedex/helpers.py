@@ -80,6 +80,12 @@ def pokemon_link(pokemon, content=None, **attr):
         **attr
         )
 
+def item_link(item):
+    """Returns a link to the requested item."""
+    filename = h.pokedex.filename_from_name(item.name)
+    return pokedex_img("items/%s.png" % filename, alt=item.name,
+                                                  title=item.name) + item.name
+
 # Type efficacy, from percents to Unicode fractions
 type_efficacy_label = {
     0: '0',
