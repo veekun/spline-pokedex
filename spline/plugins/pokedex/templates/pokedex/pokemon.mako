@@ -1,5 +1,4 @@
 <%inherit file="/base.mako"/>
-<%namespace name="lib" file="/pokedex/lib.mako"/>
 <%! from spline.plugins.pokedex import db %>\
 
 <%def name="title()">\
@@ -20,7 +19,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum', id="dex-pokemon-portrait-sprite")}
     <p id="dex-pokemon-types">
         % for type in c.pokemon.types:
-        ${lib.type_icon(type)}
+        ${h.pokedex.type_icon(type)}
         % endfor
     </p>
 </div>
@@ -41,7 +40,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     % for type, damage_factor in sorted(c.type_efficacies.items(), \
                                         key=lambda x: x[0].name):
     <li class="dex-damage-${damage_factor}">
-        ${lib.type_icon(type)} ${h.pokedex.type_efficacy_label[damage_factor]}
+        ${h.pokedex.type_icon(type)} ${h.pokedex.type_efficacy_label[damage_factor]}
     </li>
     % endfor
 </ul>
@@ -52,18 +51,18 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     <h2>Pokédex Numbers</h2>
     <dl>
         <dt>Introduced in</dt>
-        <dd>${lib.generation_icon(c.pokemon.generation)}</dd>
+        <dd>${h.pokedex.generation_icon(c.pokemon.generation)}</dd>
         % if c.pokemon.generation == db.generation(1):
-        <dt>Internal id for ${lib.version_icons(u'Red', u'Blue')}</dt>
+        <dt>Internal id for ${h.pokedex.version_icons(u'Red', u'Blue')}</dt>
         <dd>${c.pokemon.gen1_internal_id} (<code>0x${"%02x" % c.pokemon.gen1_internal_id}</code>)</dd>
         % endif
         % for dex_number in c.pokemon.normal_form.dex_numbers:
-        <dt>${dex_number.generation.main_region} ${lib.generation_icon(dex_number.generation)}</dt>
+        <dt>${dex_number.generation.main_region} ${h.pokedex.generation_icon(dex_number.generation)}</dt>
         <dd>
             ${dex_number.pokedex_number}
             ## XXX should this be in the db somehow?
             % if dex_number.generation.id == 4 and dex_number.pokedex_number > 151:
-            ${lib.version_icons(u'Platinum')}
+            ${h.pokedex.version_icons(u'Platinum')}
             % endif
         </dd>
         % endfor
@@ -85,7 +84,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     <h2>Breeding</h2>
     <dl>
         <dt>Gender</dt>
-        <dd>${lib.pokedex_img('gender-rates/%d.png' % c.pokemon.gender_rate, alt='')} ${h.pokedex.gender_rate_label[c.pokemon.gender_rate]}</dd>
+        <dd>${h.pokedex.pokedex_img('gender-rates/%d.png' % c.pokemon.gender_rate, alt='')} ${h.pokedex.gender_rate_label[c.pokemon.gender_rate]}</dd>
         <dt>Egg groups</dt>
         <dd>
             <ul>
@@ -145,7 +144,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
         <dd>
             % for generation, version_dict in c.held_items.items():
 ## I only have gen4 data now, so showing a generation isn't very useful
-##            <h3>${lib.generation_icon(generation)}</h3>
+##            <h3>${h.pokedex.generation_icon(generation)}</h3>
             ## "x and y" returns x if x is false; x might be None here and we'd
             ## rather not try to get None.id
             % for version, item_records in sorted(version_dict.items(), \
@@ -156,7 +155,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
                 % for item, rarity in item_records:
                 <p>
                     % if version:
-                    ${lib.version_icons(version)}
+                    ${h.pokedex.version_icons(version)}
                     % endif
                     <span class="dex-pokemon-item-rarity">${rarity}%</span>
                     ${h.pokedex.item_link(item)}
@@ -314,7 +313,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     <h2>Flavor Text</h2>
     <ul>
         % for version_name in u'Diamond', u'Pearl':
-        <li>${lib.version_icons(version_name)} ${c.flavor_text[version_name]}</li>
+        <li>${h.pokedex.version_icons(version_name)} ${c.flavor_text[version_name]}</li>
         % endfor
     </ul>
 </div>
@@ -346,14 +345,14 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
         <dt>Cry</dt>
         <dd>${h.HTML.a('download mp3', href=h.url_for(controller='dex', action='media', path='cries/%d.mp3' % c.pokemon.national_id))}</dd>
         % if c.pokemon.generation.id <= 3:
-        <dt>Habitat ${lib.generation_icon(3)}</dt>
-        <dd>${lib.pokedex_img('chrome/habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.habitat))} ${c.pokemon.habitat}</dd>
+        <dt>Habitat ${h.pokedex.generation_icon(3)}</dt>
+        <dd>${h.pokedex.pokedex_img('chrome/habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.habitat))} ${c.pokemon.habitat}</dd>
         % endif
         <dt>Pawprint</dt>
         <dd>${h.pokedex.pokemon_sprite(c.pokemon.normal_form, prefix='pawprints')}</dd>
         <dt>Shape</dt>
         <dd>
-            ${lib.pokedex_img('chrome/shapes/%d.png' % c.pokemon.shape.id, alt='')}
+            ${h.pokedex.pokedex_img('chrome/shapes/%d.png' % c.pokemon.shape.id, alt='')}
             ${c.pokemon.shape.awesome_name}
         </dd>
     </dl>
@@ -362,7 +361,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     <h2>Height</h2>
     <div class="dex-size">
         <div class="dex-size-trainer">
-            ${lib.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.heights['trainer'] * 100))}
+            ${h.pokedex.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.heights['trainer'] * 100))}
             <p class="dex-size-value">
                 <input type="text" size="6" value="${h.pokedex.format_height_imperial(c.trainer_height)}" disabled="disabled" id="dex-pokemon-height">
             </p>
@@ -381,7 +380,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     <h2>Weight</h2>
     <div class="dex-size">
         <div class="dex-size-trainer">
-            ${lib.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.weights['trainer'] * 100))}
+            ${h.pokedex.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.weights['trainer'] * 100))}
             <p class="dex-size-value">
                 <input type="text" size="6" value="${h.pokedex.format_weight_imperial(c.trainer_weight)}" disabled="disabled" id="dex-pokemon-weight">
             </p>
@@ -404,7 +403,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     <th></th>
     % for version in db.generation(4).versions:
     <th><!-- method --></th>
-    <th class="version">${lib.version_icons(version)}</th>
+    <th class="version">${h.pokedex.version_icons(version)}</th>
     % endfor
 </tr>
 ## Show a dummy row if there's nothing, else we have a header and no data
@@ -452,7 +451,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     %>\
     <td class="icon">
         % if method_dict['icon']:
-        ${lib.pokedex_img(method_dict['icon'], alt=method_dict['name'], \
+        ${h.pokedex.pokedex_img(method_dict['icon'], alt=method_dict['name'], \
                                                title=method_dict['name'])}
         % endif
     </td>
@@ -499,11 +498,11 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 %>
 <ul>
 % if c.pokemon.generation.id <= 1:
-<li>${lib.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/species/${"%03d" % c.pokemon.national_id}.htm">Azure Heights</a></li>
+<li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/species/${"%03d" % c.pokemon.national_id}.htm">Azure Heights</a></li>
 % endif
 <li><a href="http://bulbapedia.bulbagarden.net/wiki/${re.sub(' ', '_', c.pokemon.name)}_%28Pok%C3%A9mon%29">Bulbapedia</a></li>
 % if c.pokemon.generation.id <= 2:
-<li>${lib.generation_icon(2)} <a href="http://www.pokemondungeon.com/pokedex/${ghpd_name}.shtml">Gengar and Haunter's Pokémon Dungeon</a></li>
+<li>${h.pokedex.generation_icon(2)} <a href="http://www.pokemondungeon.com/pokedex/${ghpd_name}.shtml">Gengar and Haunter's Pokémon Dungeon</a></li>
 % endif
 <li><a href="http://www.legendarypokemon.net/pokedex/${lp_name}">Legendary Pokémon</a></li>
 <li><a href="http://www.psypokes.com/dex/psydex/${"%03d" % c.pokemon.national_id}">PsyPoke</a></li>

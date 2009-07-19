@@ -24,6 +24,32 @@ def filename_from_name(name):
 def pokedex_img(src, **attr):
     return h.HTML.img(src=h.url_for(controller='dex', action='media', path=src), **attr)
 
+
+# XXX Should these be able to promote to db objects, rather than demoting to
+# strings and integers?  If so, how to do that without requiring db access
+# from here?
+def generation_icon(generation):
+    """Returns a generation icon, given a generation number."""
+    # Convert generation to int if necessary
+    if not isinstance(generation, int):
+        generation = generation.id
+
+    return pokedex_img('versions/generation-%d.png' % generation,
+                       alt="Generation %d" % generation)
+
+def version_icons(*versions):
+    """Returns some version icons, given a list of version names."""
+    version_icons = ''
+    for version in versions:
+        # Convert version to string if necessary
+        if not isinstance(version, basestring):
+            version = version.name
+        version_icons += pokedex_img('versions/%s.png' % version.lower(),
+                                     alt=version)
+
+    return version_icons
+
+
 def pokemon_sprite(pokemon, prefix='platinum', **attr):
     """Returns an <img> tag for a Pokémon sprite."""
 
@@ -80,11 +106,17 @@ def pokemon_link(pokemon, content=None, **attr):
         **attr
         )
 
+
+def type_icon(type):
+    return pokedex_img('chrome/types/%s.png' % type.name, alt=type.name)
+
+
 def item_link(item):
     """Returns a link to the requested item."""
     filename = h.pokedex.filename_from_name(item.name)
-    return pokedex_img("items/%s.png" % filename, alt=item.name,
-                                                  title=item.name) + item.name
+    return pokedex_img("items/%s.png" % filename,
+                       alt=item.name, title=item.name) + item.name
+
 
 # Type efficacy, from percents to Unicode fractions
 type_efficacy_label = {
