@@ -11,6 +11,7 @@ from spline.lib.plugin import PluginBase
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
     map.connect('/dex/media/*path', controller='dex', action='media')
+    map.connect('/dex/lookup', controller='dex', action='lookup')
     map.connect('/dex/pokemon/{name}', controller='dex', action='pokemon')
     map.connect('/dex/pokemon/{name}/flavor', controller='dex', action='pokemon_flavor')
 

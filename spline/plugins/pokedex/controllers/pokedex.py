@@ -8,6 +8,7 @@ import mimetypes
 
 import pokedex.db
 from pokedex.db.tables import Generation, Pokemon, PokemonEggGroup, PokemonStat, Type
+import pokedex.lookup
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c
 from pylons.controllers.util import abort, redirect_to
@@ -99,6 +100,21 @@ class PokedexController(BaseController):
         response.headers['content-type'] = mimetype
         pkg_path = "data/media/%s" % path
         return pkg_resources.resource_string('pokedex', pkg_path)
+
+    def lookup(self):
+        """Find a page in the Pokédex given a name.
+
+        Also performs fuzzy search.
+        """
+        name = request.params.get('lookup', None)
+        results = pokedex.lookup.lookup(pokedex_session, name)
+
+        if results:
+            redirect_to(controller='dex', action='pokemon',
+                        name=results[0][0].name.lower())
+
+        # XXX real error page
+        return self._not_found()
 
     def _not_found(self):
         # XXX make this do fuzzy search or whatever
