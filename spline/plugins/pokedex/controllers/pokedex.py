@@ -107,11 +107,16 @@ class PokedexController(BaseController):
         Also performs fuzzy search.
         """
         name = request.params.get('lookup', None)
-        results = pokedex.lookup.lookup(pokedex_session, name)
+        results, exact = pokedex.lookup.lookup(pokedex_session, name)
 
+        # XXX fuzzy match page for multiple results
         if results:
-            redirect_to(controller='dex', action='pokemon',
-                        name=results[0][0].name.lower())
+            # Using the table name as an action directly looks kinda gross, but
+            # I can't think of anywhere I've ever broken this convention, and
+            # making a dictionary to get data I already have is just silly
+            redirect_to(controller='dex',
+                        action=results[0].__tablename__,
+                        name=results[0].name.lower())
 
         # XXX real error page
         return self._not_found()
