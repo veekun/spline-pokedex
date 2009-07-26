@@ -73,7 +73,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
         % for foreign_name in c.pokemon.normal_form.foreign_names:
         <dt>${foreign_name.language.name}</dt>
         % if foreign_name.language.name == 'Japanese':
-        <dd>${foreign_name.name} (${h.pokedex.romaji(foreign_name.name)})</dd>
+        <dd>${foreign_name.name} (${h.pokedex.romanize(foreign_name.name)})</dd>
         % else:
         <dd>${foreign_name.name}</dd>
         % endif
