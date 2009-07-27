@@ -472,7 +472,22 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 </table>
 
 <h1>Moves</h1>
-<p>XXX</p>
+<table>
+<tr class="header-row">
+    <th>Version</th>
+    <th>Move</th>
+    <th>Method</th>
+    <th>Level</th>
+</tr>
+% for pokemon_move in c.pokemon.pokemon_moves:
+<tr>
+    <td>${h.pokedex.version_icons(*pokemon_move.version_group.versions)}</td>
+    <td>${pokemon_move.move.name}</td>
+    <td>${pokemon_move.method.name}</td>
+    <td>${pokemon_move.level}</td>
+</tr>
+% endfor
+</table>
 
 <h1>External Links</h1>
 <%!

@@ -7,7 +7,7 @@ import logging
 import mimetypes
 
 import pokedex.db
-from pokedex.db.tables import Generation, Pokemon, PokemonEggGroup, PokemonStat, Type
+from pokedex.db.tables import Ability, Generation, Item, Move, Pokemon, PokemonEggGroup, PokemonStat, Type
 import pokedex.lookup
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c
@@ -493,3 +493,37 @@ class PokedexController(BaseController):
         except NoResultFound:
             return self._not_found()
         return render('/pokedex/pokemon_flavor.mako')
+
+
+    def moves(self, name):
+        try:
+            c.move = db.get_by_name(Move, name)
+        except NoResultFound:
+            return self._not_found()
+        return render('/pokedex/move.mako')
+
+
+    def types(self, name):
+        try:
+            c.type = db.get_by_name(Type, name)
+        except NoResultFound:
+            return self._not_found()
+        return render('/pokedex/type.mako')
+
+
+    def abilities(self, name):
+        try:
+            c.ability = db.get_by_name(Ability, name)
+        except NoResultFound:
+            return self._not_found()
+        return render('/pokedex/ability.mako')
+
+
+    def items(self, name):
+        try:
+            c.item = db.get_by_name(Item, name)
+        except NoResultFound:
+            return self._not_found()
+        return render('/pokedex/item.mako')
+
+

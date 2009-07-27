@@ -45,7 +45,9 @@ def version_icons(*versions):
         # Convert version to string if necessary
         if not isinstance(version, basestring):
             version = version.name
-        version_icons += pokedex_img('versions/%s.png' % version.lower(),
+
+        version_filename = filename_from_name(version)
+        version_icons += pokedex_img('versions/%s.png' % version_filename,
                                      alt=version)
 
     return version_icons

@@ -11,6 +11,16 @@ from sqlalchemy.sql import func
 pokedex_session = pokedex.db.connect(pylons.config['pokedex_db_url'])
 
 # Quick access to a few database objects
+def get_by_name(table, name):
+    """Finds a single row in the given table by name, ignoring case.
+
+    Don't use this for Pokémon!  Use `pokemon()`, as it knows about forms.
+    """
+    q = pokedex_session.query(table).filter(func.lower(table.name)
+                                            == name.lower())
+
+    return q.one()
+
 def pokemon(name, form=None):
     # Force case-insensitive matching the heavy-handed way
     q = pokedex_session.query(tables.Pokemon) \
