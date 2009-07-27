@@ -37,6 +37,15 @@ def bar_color(hue, pastelness):
 
 class PokedexController(BaseController):
 
+    # Used by lookup disambig pages
+    table_labels = {
+        Ability: 'ability',
+        Item: 'item',
+        Move: 'move',
+        Pokemon: 'Pokémon',
+        Type: 'type',
+    }
+
     # List of (slot_type.name, condition_group.name)
     # These are ordered roughly in increasing order of inconvenience and when
     # in the game they become available -- i.e. it's arbitrary
@@ -109,8 +118,20 @@ class PokedexController(BaseController):
         name = request.params.get('lookup', None)
         results, exact = pokedex.lookup.lookup(pokedex_session, name)
 
-        # XXX fuzzy match page for multiple results
-        if results:
+        if len(results) == 0:
+            # Nothing found
+            # XXX real error page
+            return self._not_found()
+
+        elif len(results) == 1:
+            # Only one possibility!  Hooray!
+
+            if not exact:
+                # Wasn't an exact match, but we can only figure out one thing
+                # the user might have meant, so redirect to it anyway
+                # XXX add an informative message here
+                pass
+
             # Using the table name as an action directly looks kinda gross, but
             # I can't think of anywhere I've ever broken this convention, and
             # making a dictionary to get data I already have is just silly
@@ -118,12 +139,19 @@ class PokedexController(BaseController):
                         action=results[0].__tablename__,
                         name=results[0].name.lower())
 
-        # XXX real error page
-        return self._not_found()
+        else:
+            # Multiple matches.  Could be exact (e.g., Metronome) or a fuzzy
+            # match.  Result page looks about the same either way
+            c.input = name
+            c.exact = exact
+            c.results = results
+            c.table_labels = self.table_labels
+            return render('/pokedex/lookup_results.mako')
 
     def _not_found(self):
         # XXX make this do fuzzy search or whatever
         abort(404)
+
 
     def pokemon(self, name=None):
         form = request.params.get('form', None)
