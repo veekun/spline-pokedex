@@ -511,7 +511,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
         ghpd_name = 'mr_mime'
         smogon_name = 'mr_mime'
 %>
-<ul>
+<ul class="classic-list">
 % if c.pokemon.generation.id <= 1:
 <li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/species/${"%03d" % c.pokemon.national_id}.htm">Azure Heights</a></li>
 % endif
