@@ -150,7 +150,12 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
             % for version, item_records in sorted(version_dict.items(), \
                                                   key=lambda (k,v): k and k.id):
                 % if not len(item_records):
-                <p>None</p>
+                <p>
+                    % if version:
+                    ${h.pokedex.version_icons(version)}
+                    % endif
+                    None
+                </p>
                 % endif
                 % for item, rarity in item_records:
                 <p>

@@ -232,6 +232,11 @@ class PokedexController(BaseController):
             can_merge = True
             first_held_items = version_held_items.setdefault(generation.versions[0], [])
             for version in generation.versions[1:]:
+                # XXX HG/SS aren't out yet, and we don't want to show 'None'
+                # rows because that's not really correct.  So skip them
+                if version.name in (u'Heart Gold', u'Soul Silver'):
+                    continue
+
                 version_held_items.setdefault(version, [])
                 if version_held_items[version] != first_held_items:
                     can_merge = False
@@ -246,7 +251,13 @@ class PokedexController(BaseController):
                 version_dict = {}
                 c.held_items[generation] = version_dict
                 for version in generation.versions:
-                    version_dict[version] = version_held_items[version]
+                    # XXX HG/SS aren't out yet, and we don't want to show 'None'
+                    # rows because that's not really correct.  So skip them
+                    if version.name in (u'Heart Gold', u'Soul Silver'):
+                        continue
+                    version_dict[version] = version_held_items.get(version, [])
+
+        print c.held_items
 
         ### Evolution
         # Format is a matrix as follows:
