@@ -257,8 +257,6 @@ class PokedexController(BaseController):
                         continue
                     version_dict[version] = version_held_items.get(version, [])
 
-        print c.held_items
-
         ### Evolution
         # Format is a matrix as follows:
         # [
