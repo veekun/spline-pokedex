@@ -477,20 +477,36 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 </table>
 
 <h1>Moves</h1>
-<table>
+<table class="dex-moves striped-rows">
+% for version_group in c.move_version_groups:
+<col class="dex-col-version">
+% endfor
+% for method, method_list in c.moves.items():
 <tr class="header-row">
-    <th>Version</th>
+    % for version_group in c.move_version_groups:
+    <th>${h.pokedex.version_icons(*version_group.versions)}</th>
+    % endfor
     <th>Move</th>
-    <th>Method</th>
-    <th>Level</th>
 </tr>
-% for pokemon_move in c.pokemon.pokemon_moves:
+<tr class="subheader-row">
+    <th colspan="${len(c.move_version_groups) + 1}"><strong>${method.name}</strong>: ${method.description}</th>
+</tr>
+% for move, version_group_data in method_list:
 <tr>
-    <td>${h.pokedex.version_icons(*pokemon_move.version_group.versions)}</td>
-    <td>${pokemon_move.move.name}</td>
-    <td>${pokemon_move.method.name}</td>
-    <td>${pokemon_move.level}</td>
+    % for version_group in c.move_version_groups:
+    % if version_group not in version_group_data:
+    <td></td>
+    % elif method.name == 'Level up':
+    <td>${version_group_data[version_group]['level']}</td>
+    % elif method.name == 'Machine':
+    <td>TMXX</td>
+    % else:
+    <td>&bull;</td>
+    % endif
+    % endfor
+    <td><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></td>
 </tr>
+% endfor
 % endfor
 </table>
 

@@ -7,7 +7,7 @@ import logging
 import mimetypes
 
 import pokedex.db
-from pokedex.db.tables import Ability, Generation, Item, Move, Pokemon, PokemonEggGroup, PokemonStat, Type
+from pokedex.db.tables import Ability, Generation, Item, Move, Pokemon, PokemonEggGroup, PokemonMove, PokemonStat, Type, VersionGroup
 import pokedex.lookup
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c
@@ -520,6 +520,91 @@ class PokedexController(BaseController):
 
         # And finally stuff this monstrosity into the template stash
         c.encounters = encounters
+
+        ### Moves
+        # Oh no.
+        # Moves are grouped by method.
+        # Within a method is a list of move rows.
+        # A move row contains a level or other status per version group, plus
+        # a move id.
+        # Thus: method => [ (move, { version_group => data, ... }), ... ]
+        # "data" is whatever per-version information is appropriate for this
+        # move method, such as a TM number or level.
+        c.moves = collections.defaultdict(list)
+        c.move_version_groups = pokedex_session.query(VersionGroup).all()
+        # Grab the rows with a manual query so we can sort thm in about the row
+        # they go in the table.  This should keep it as compact as possible
+        q = pokedex_session.query(PokemonMove) \
+                           .filter_by(pokemon_id=c.pokemon.id) \
+                           .order_by(PokemonMove.level.asc(),
+                                     PokemonMove.order.asc(),
+                                     PokemonMove.version_group_id.asc())
+        for pokemon_move in q:
+            method_list = c.moves[pokemon_move.method]
+
+            # Assemble the data for this method and version(s)
+            vg_data = dict(
+                level=pokemon_move.level,
+                order=pokemon_move.order,
+            )
+            this_vg = pokemon_move.version_group
+
+            # Find the best place to insert a row.
+            # In general, we just want the move names in order, so we can just
+            # tack rows on and sort them at the end.  However!  Level-up moves
+            # must stay in the same order within a version group.  So we have
+            # to do some special ordering here.
+            # These two vars are the boundaries of where we can find or insert
+            # a new row.  Only level-up moves have these restrictions
+            lower_bound = None
+            upper_bound = None
+            if pokemon_move.method.name == 'Level up':
+                vg_data['sort'] = (pokemon_move.level, pokemon_move.order)
+
+                # Find the next-lowest and next-highest rows.  Our row must fit
+                # between those
+                for i, (move, version_group_data) in enumerate(method_list):
+                    if this_vg not in version_group_data:
+                        # Can't be a bound; not related to this version!
+                        continue
+
+                    if version_group_data[this_vg]['sort'] > vg_data['sort']:
+                        if not upper_bound or i < upper_bound:
+                            upper_bound = i
+                    if version_group_data[this_vg]['sort'] < vg_data['sort']:
+                        if not lower_bound or i > lower_bound:
+                            lower_bound = i
+
+            # We're using Python's slice syntax, which includes the lower bound
+            # and excludes the upper.  But we want to exclude both, so bump the
+            # lower bound
+            if lower_bound != None:
+                lower_bound += 1
+
+            # Check for a free existing row for this move; if one exists, we
+            # can just add our data to that same row
+            valid_row = None
+            for table_row in method_list[lower_bound:upper_bound]:
+                move, version_group_data = table_row
+                if move == pokemon_move.move and this_vg not in version_group_data:
+                    valid_row = table_row
+                    break
+            if valid_row:
+                valid_row[1][this_vg] = vg_data
+                continue
+
+            # Otherwise, just make a new row and stuff it in.
+            # Rows are sorted by level going up, so any future ones wanting to
+            # use this row will have higher levels.  Let's put this as close to
+            # the end as we can, then, or we risk making multiple rows for the
+            # same move unnecessarily
+            new_row = ( pokemon_move.move, { this_vg: vg_data } )
+            method_list.insert(upper_bound or len(method_list), new_row)
+
+        for method, method_list in c.moves.items():
+            if method.name == 'Level up':
+                continue
+            method_list.sort(key=lambda (move, version_group_data): move.name)
 
         return render('/pokedex/pokemon.mako')
 

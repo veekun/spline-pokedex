@@ -13,6 +13,7 @@ col.dex-col-stat-name   { width: 10em; }
 col.dex-col-stat-bar    { width: auto; }
 col.dex-col-stat-pctile { width: 5em; }
 col.dex-col-stat-result { width: 5em; }
+col.dex-col-version     { width: 4em; }
 
 /* Cool three-column layout */
 .dex-column-container { clear: both; overflow: hidden /* float context */; margin-top: 1em; }
@@ -81,6 +82,11 @@ table.dex-encounters td.icon { height: 24px; width: 24px; padding-left: 2em; ver
 .dex-rarity-bar { position: relative; font-size: 0.75em; height: 1em; line-height: 1; margin-top: 0.25em; background: #e8e8e8; border: 1px solid #96bbf2; }
 .dex-rarity-bar-fill { height: 100%; background: #96bbf2; }
 .dex-rarity-bar-value { position: absolute; height: 100%; top: 0; right: 0; color: #808080; vertical-align: bottom; }
+
+table.dex-moves {;}
+table.dex-moves td, table.dex-moves th { padding: 0.5em; text-align: center; }
+table.dex-moves tr.subheader-row th { padding: 0.17em 0.5em; text-align: left; }
+
 
 th { vertical-align: middle; }
 .vertical-text { -moz-transform: rotate(-90deg); }
