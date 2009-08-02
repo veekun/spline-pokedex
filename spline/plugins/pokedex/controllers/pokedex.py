@@ -187,7 +187,7 @@ class PokedexController(BaseController):
         # ASSUMPTION: Every family has the same breeding groups throughout.
         if c.pokemon.gender_rate == -1:
             # Genderless; Ditto only
-            ditto = pokedex_session.query(Pokemon).filter_by(name='Ditto') \
+            ditto = pokedex_session.query(Pokemon).filter_by(name=u'Ditto') \
                                    .one()
             c.compatible_families = [ditto]
         elif c.pokemon.egg_groups[0].id == 15:
@@ -526,10 +526,9 @@ class PokedexController(BaseController):
         # A move row contains a level or other status per version group, plus
         # a move id.
         # Thus: method => [ (move, { version_group => data, ... }), ... ]
-        # "data" is whatever per-version information is appropriate for this
-        # move method, such as a TM number or level.
+        # "data" is a dictionary of whatever per-version information is
+        # appropriate for this move method, such as a TM number or level.
         c.moves = collections.defaultdict(list)
-        c.move_version_groups = pokedex_session.query(VersionGroup).all()
         # Grab the rows with a manual query so we can sort thm in about the row
         # they go in the table.  This should keep it as compact as possible
         q = pokedex_session.query(PokemonMove) \
@@ -539,13 +538,10 @@ class PokedexController(BaseController):
                                      PokemonMove.version_group_id.asc())
         for pokemon_move in q:
             method_list = c.moves[pokemon_move.method]
-
-            # Assemble the data for this method and version(s)
-            vg_data = dict(
-                level=pokemon_move.level,
-                order=pokemon_move.order,
-            )
             this_vg = pokemon_move.version_group
+
+            # Create a container for data for this method and version(s)
+            vg_data = dict()
 
             # Find the best place to insert a row.
             # In general, we just want the move names in order, so we can just
@@ -558,6 +554,11 @@ class PokedexController(BaseController):
             upper_bound = None
             if pokemon_move.method.name == 'Level up':
                 vg_data['sort'] = (pokemon_move.level, pokemon_move.order)
+                vg_data['level'] = pokemon_move.level
+                # Level 1 is generally thought of as a special category of starter
+                # move, so the table will be easier to read if it indicates this
+                if vg_data['level'] == 1:
+                    vg_data['level'] = '—'  # em dash
 
                 # Find the next-lowest and next-highest rows.  Our row must fit
                 # between those
@@ -596,13 +597,72 @@ class PokedexController(BaseController):
             # use this row will have higher levels.  Let's put this as close to
             # the end as we can, then, or we risk making multiple rows for the
             # same move unnecessarily
-            new_row = ( pokemon_move.move, { this_vg: vg_data } )
+            new_row = pokemon_move.move, { this_vg: vg_data }
             method_list.insert(upper_bound or len(method_list), new_row)
 
         for method, method_list in c.moves.items():
             if method.name == 'Level up':
                 continue
             method_list.sort(key=lambda (move, version_group_data): move.name)
+
+        # XXX Need to do something with move tutors, seriously.
+        # 1. Need to know which tutors are usable.  This varies by move and vg.
+        # 2. Need to be able to collapse them, but tutors are never the same
+        #    between versions, and didn't exist at all in RS or DP.
+        # (1) can be solved by adding a ? icon or tooltip or something and
+        # having a move_tutors table keyed on move+version_group.
+        # (2) can be solved by reverting to the Veekun Prime way of just
+        # listing version icons within the row, BUT I would need to somehow
+        # keep the same versions aligned.  Make collapsed columns use colspan?
+        # Use dummy invisible pngs or spacer divs?
+
+        # Finally, we want to collapse identical adjacent columns within the
+        # same generation.
+        # All we really need to know is what versions are ultimately collapsed
+        # into each column, so we need a list of lists of version groups:
+        # [ [ rb, y ], [ gs ], [ c ], ... ]
+        c.move_columns = []
+        # We also want to know what columns are the last for a generation, so
+        # we can put divider lines between gens.  Accumulate indices of these
+        # columns as we go
+        c.move_divider_columns = []
+        # Only even consider versions in which this Pokémon actually exists
+        q = pokedex_session.query(Generation) \
+                           .filter(Generation.id >= c.pokemon.generation_id) \
+                           .order_by(Generation.id.asc())
+        for generation in q:
+            last_vg = None
+            for i, version_group in enumerate(generation.version_groups):
+                if i == 0:
+                    # Can't collapse this column anywhere!  Just add it as a
+                    # new column
+                    c.move_columns.append( [version_group] )
+                    last_vg = version_group
+                    continue
+
+                # Test to see if this version group column is identical to the
+                # one immediately to its left; if so, we can combine them
+                squashable = True
+                for method_list in c.moves.values():
+                    for move, version_group_data in method_list:
+                        if version_group_data.get(version_group, None) \
+                            != version_group_data.get(last_vg, None):
+                            squashable = False
+                            break
+                    if not squashable:
+                        break
+
+                if squashable:
+                    # Stick this version group in the previous column
+                    c.move_columns[-1].append(version_group)
+                else:
+                    # Create a new column
+                    c.move_columns.append( [version_group] )
+
+                last_vg = version_group
+
+            # Remember the last column within the generation
+            c.move_divider_columns.append(len(c.move_columns) - 1)
 
         return render('/pokedex/pokemon.mako')
 

@@ -13,7 +13,8 @@ col.dex-col-stat-name   { width: 10em; }
 col.dex-col-stat-bar    { width: auto; }
 col.dex-col-stat-pctile { width: 5em; }
 col.dex-col-stat-result { width: 5em; }
-col.dex-col-version     { width: 4em; }
+col.dex-col-version     { width: 3.5em; }  /* two versions (32px < 33px == 3em) plus 0.17em padding < 3.5em */
+col.dex-col-last-version{ border-right: 1px solid #b4c7e6; }
 
 /* Cool three-column layout */
 .dex-column-container { clear: both; overflow: hidden /* float context */; margin-top: 1em; }
@@ -84,8 +85,10 @@ table.dex-encounters td.icon { height: 24px; width: 24px; padding-left: 2em; ver
 .dex-rarity-bar-value { position: absolute; height: 100%; top: 0; right: 0; color: #808080; vertical-align: bottom; }
 
 table.dex-moves {;}
-table.dex-moves td, table.dex-moves th { padding: 0.5em; text-align: center; }
+table.dex-moves td { padding: 0.5em; text-align: center; }
+table.dex-moves th { padding: 0.5em 0.17em; text-align: center; }
 table.dex-moves tr.subheader-row th { padding: 0.17em 0.5em; text-align: left; }
+table.dex-moves td.egg { padding: 0 /* egg sprite consumes a lot of space, so let it extend into padding */; }
 
 
 th { vertical-align: middle; }

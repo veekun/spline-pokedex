@@ -478,28 +478,40 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 
 <h1>Moves</h1>
 <table class="dex-moves striped-rows">
-% for version_group in c.move_version_groups:
+% for i, column in enumerate(c.move_columns):
+% if i in c.move_divider_columns:
+<col class="dex-col-version dex-col-last-version">
+% else:
 <col class="dex-col-version">
+% endif
 % endfor
-% for method, method_list in c.moves.items():
+## XXX How to sort these "correctly"...?
+% for method, method_list in sorted(c.moves.items(), \
+                                    key=lambda (k, v): k.id):
 <tr class="header-row">
-    % for version_group in c.move_version_groups:
-    <th>${h.pokedex.version_icons(*version_group.versions)}</th>
+    % for column in c.move_columns:
+    <th>
+        % for version_group in column:
+        ${h.pokedex.version_icons(*version_group.versions)}
+        % endfor
+    </th>
     % endfor
     <th>Move</th>
 </tr>
 <tr class="subheader-row">
-    <th colspan="${len(c.move_version_groups) + 1}"><strong>${method.name}</strong>: ${method.description}</th>
+    <th colspan="${len(c.move_columns) + 1}"><strong>${method.name}</strong>: ${method.description}</th>
 </tr>
 % for move, version_group_data in method_list:
 <tr>
-    % for version_group in c.move_version_groups:
-    % if version_group not in version_group_data:
+    % for column in c.move_columns:
+    % if column[0] not in version_group_data:
     <td></td>
     % elif method.name == 'Level up':
-    <td>${version_group_data[version_group]['level']}</td>
+    <td>${version_group_data[column[0]]['level']}</td>
     % elif method.name == 'Machine':
     <td>TMXX</td>
+    % elif method.name == 'Egg':
+    <td class="dex-moves-egg">${h.pokedex.pokedex_img('icons/egg-cropped.png')}</td>
     % else:
     <td>&bull;</td>
     % endif
