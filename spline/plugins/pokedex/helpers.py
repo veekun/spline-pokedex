@@ -8,6 +8,7 @@ from __future__ import absolute_import
 import math
 import re
 
+from pylons import url
 import pokedex.formulae as formulae
 from pokedex.roomaji import romanize
 import spline.lib.helpers as h
@@ -111,7 +112,10 @@ def pokemon_link(pokemon, content=None, **attr):
 
 
 def type_icon(type):
-    return pokedex_img('chrome/types/%s.png' % type.name, alt=type.name)
+    return h.HTML.a(
+        pokedex_img('chrome/types/%s.png' % type.name, alt=type.name),
+        href=url(controller='dex', action='types', name=type.name.lower()),
+    )
 
 
 def item_link(item):

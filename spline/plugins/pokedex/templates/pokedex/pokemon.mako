@@ -478,6 +478,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 
 <h1>Moves</h1>
 <table class="dex-moves striped-rows">
+## COLUMNS
 % for i, column in enumerate(c.move_columns):
 % if i in c.move_divider_columns:
 <col class="dex-col-version dex-col-last-version">
@@ -486,6 +487,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 % endif
 % endfor
 ## XXX How to sort these "correctly"...?
+## HEADERS
 % for method, method_list in sorted(c.moves.items(), \
                                     key=lambda (k, v): k.id):
 <tr class="header-row">
@@ -497,10 +499,18 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     </th>
     % endfor
     <th>Move</th>
+    <th>Type</th>
+    <th>Dmg</th>
+    <th>PP</th>
+    <th>Power</th>
+    <th>Acc</th>
+    <th>Pri</th>
+    <th>Effect</th>
 </tr>
 <tr class="subheader-row">
-    <th colspan="${len(c.move_columns) + 1}"><strong>${method.name}</strong>: ${method.description}</th>
+    <th colspan="${len(c.move_columns) + 8}"><strong>${method.name}</strong>: ${method.description}</th>
 </tr>
+## DATA
 % for move, version_group_data in method_list:
 <tr>
     % for column in c.move_columns:
@@ -516,7 +526,21 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     <td>&bull;</td>
     % endif
     % endfor
+
     <td><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></td>
+    <td>${h.pokedex.pokedex_img("chrome/damage-classes/%s.png" % move.category)}</td>
+    <td>${h.pokedex.type_icon(move.type)}</td>
+    <td>${move.pp}</td>
+    <td>${move.power}</td>
+    <td>${move.accuracy}%</td>
+    % if move.effect.priority == 0:
+    <td></td>
+    % elif move.effect.priority > 0:
+    <td class="priority-fast">${move.effect.priority}</td>
+    % else:
+    <td class="priority-slow">${move.effect.priority}</td>
+    % endif
+    <td class="effect">${move.effect.short_effect}</td>
 </tr>
 % endfor
 % endfor
