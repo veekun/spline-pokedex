@@ -643,7 +643,14 @@ class PokedexController(BaseController):
                 # Test to see if this version group column is identical to the
                 # one immediately to its left; if so, we can combine them
                 squashable = True
-                for method_list in c.moves.values():
+                for method, method_list in c.moves.items():
+                    # Tutors are special; they will NEVER collapse, so ignore
+                    # them for now.  When we actually print the table, we'll
+                    # concatenate all the tutor cells instead of just using the
+                    # first one like with everything else
+                    if method.name == 'Tutor':
+                        continue
+
                     for move, version_group_data in method_list:
                         if version_group_data.get(version_group, None) \
                             != version_group_data.get(last_vg, None):
@@ -663,6 +670,17 @@ class PokedexController(BaseController):
 
             # Remember the last column within the generation
             c.move_divider_columns.append(len(c.move_columns) - 1)
+
+        # Used for tutored moves: we want to leave a blank space for collapsed
+        # columns with tutored versions in them so all the versions line up,
+        # and to do that we need to know which versions actually have tutored
+        # moves -- otherwise we'd leave space for R/S, D/P, etc
+        c.move_tutor_version_groups = []
+        for method, method_list in c.moves.items():
+            if method.name != 'Tutor':
+                continue
+            for move, version_group_data in method_list:
+                c.move_tutor_version_groups.extend(version_group_data.keys())
 
         return render('/pokedex/pokemon.mako')
 

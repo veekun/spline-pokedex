@@ -492,8 +492,11 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
                                     key=lambda (k, v): k.id):
 <tr class="header-row">
     % for column in c.move_columns:
-    <th>
-        % for version_group in column:
+    <th class="version">
+        % for i, version_group in enumerate(column):
+        % if i != 0:
+        <br>
+        % endif
         ${h.pokedex.version_icons(*version_group.versions)}
         % endfor
     </th>
@@ -514,7 +517,19 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 % for move, version_group_data in method_list:
 <tr>
     % for column in c.move_columns:
-    % if column[0] not in version_group_data:
+    % if method.name == 'Tutor':
+    ## Tutored moves never ever collapse!  Have to merge all the known values,
+    ## rather than ignoring all but the first
+    <td class="tutored">
+        % for version_group in column:
+        % if version_group in version_group_data:
+        ${h.pokedex.version_icons(*version_group.versions)}
+        % elif version_group in c.move_tutor_version_groups:
+        <span class="no-tutor">${h.pokedex.version_icons(*version_group.versions)}</span>
+        % endif
+        % endfor
+    </td>
+    % elif column[0] not in version_group_data:
     <td></td>
     % elif method.name == 'Level up':
     <td>${version_group_data[column[0]]['level']}</td>

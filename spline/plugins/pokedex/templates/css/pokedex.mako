@@ -92,6 +92,8 @@ table.dex-moves td.egg { padding: 0 /* egg sprite consumes a lot of space, so le
 table.dex-moves td.priority-fast { font-weight: bold; color: green; }
 table.dex-moves td.priority-slow { font-weight: bold; color: red; }
 table.dex-moves td.effect { font-size: 0.8em; text-align: left; }
+table.dex-moves td.tutored { white-space: nowrap; }
+table.dex-moves .no-tutor { visibility: hidden; }
 
 
 th { vertical-align: middle; }
