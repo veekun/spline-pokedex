@@ -112,8 +112,11 @@ def pokemon_link(pokemon, content=None, **attr):
 
 
 def type_icon(type):
+    return pokedex_img('chrome/types/%s.png' % type.name, alt=type.name)
+
+def type_link(type):
     return h.HTML.a(
-        pokedex_img('chrome/types/%s.png' % type.name, alt=type.name),
+        type_icon(type),
         href=url(controller='dex', action='types', name=type.name.lower()),
     )
 

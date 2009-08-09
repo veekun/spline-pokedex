@@ -19,7 +19,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum', id="dex-pokemon-portrait-sprite")}
     <p id="dex-pokemon-types">
         % for type in c.pokemon.types:
-        ${h.pokedex.type_icon(type)}
+        ${h.pokedex.type_link(type)}
         % endfor
     </p>
 </div>
@@ -40,7 +40,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     % for type, damage_factor in sorted(c.type_efficacies.items(), \
                                         key=lambda x: x[0].name):
     <li class="dex-damage-${damage_factor}">
-        ${h.pokedex.type_icon(type)} ${h.pokedex.type_efficacy_label[damage_factor]}
+        ${h.pokedex.type_link(type)} ${h.pokedex.type_efficacy_label[damage_factor]}
     </li>
     % endfor
 </ul>
@@ -544,7 +544,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 
     <td><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></td>
     <td>${h.pokedex.pokedex_img("chrome/damage-classes/%s.png" % move.category)}</td>
-    <td>${h.pokedex.type_icon(move.type)}</td>
+    <td>${h.pokedex.type_link(move.type)}</td>
     <td>${move.pp}</td>
     <td>${move.power}</td>
     <td>${move.accuracy}%</td>
