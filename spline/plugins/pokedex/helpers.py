@@ -3,7 +3,7 @@
 really belong in the pokedex core.
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 import math
 import re
@@ -154,7 +154,7 @@ gender_rate_label = {
 
 def format_height_metric(height):
     """Formats a height in decimeters as M m."""
-    return "%.1f m" % (height / 10.0)
+    return "%.1f m" % (height / 10)
 
 def format_height_imperial(height):
     """Formats a height in decimeters as F'I"."""
@@ -165,7 +165,7 @@ def format_height_imperial(height):
 
 def format_weight_metric(weight):
     """Formats a weight in hectograms as K kg."""
-    return "%.1f kg" % (weight / 10.0)
+    return "%.1f kg" % (weight / 10)
 
 def format_weight_imperial(weight):
     """Formats a weight in hectograms as L lb."""
