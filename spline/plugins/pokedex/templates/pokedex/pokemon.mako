@@ -493,12 +493,18 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 <tr class="header-row">
     % for column in c.move_columns:
     <th class="version">
+      % if len(column) == len(column[0].generation.version_groups):
+        ## If the entire gen has been collapsed into a single column, just show
+        ## the gen icon instead of the messy stack of version icons
+        ${h.pokedex.generation_icon(column[0].generation)}
+      % else:
         % for i, version_group in enumerate(column):
         % if i != 0:
         <br>
         % endif
         ${h.pokedex.version_icons(*version_group.versions)}
         % endfor
+      % endif
     </th>
     % endfor
     <th>Move</th>
@@ -516,7 +522,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 ## DATA
 % for move, version_group_data in method_list:
 <tr>
-    % for column in c.move_columns:
+  % for column in c.move_columns:
     % if method.name == 'Tutor':
     ## Tutored moves never ever collapse!  Have to merge all the known values,
     ## rather than ignoring all but the first
@@ -540,7 +546,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     % else:
     <td>&bull;</td>
     % endif
-    % endfor
+  % endfor
 
     <td><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></td>
     <td>${h.pokedex.pokedex_img("chrome/damage-classes/%s.png" % move.category)}</td>
@@ -548,6 +554,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     <td>${move.pp}</td>
     <td>${move.power}</td>
     <td>${move.accuracy}%</td>
+    ## Priority is colored red for slow and green for fast
     % if move.effect.priority == 0:
     <td></td>
     % elif move.effect.priority > 0:
