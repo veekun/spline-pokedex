@@ -543,6 +543,12 @@ class PokedexController(BaseController):
             # Create a container for data for this method and version(s)
             vg_data = dict()
 
+            # TMs need to know their own TM number
+            for machine in pokemon_move.move.machines:
+                if machine.generation == this_vg.generation:
+                    vg_data['machine'] = machine.machine_number
+                    break
+
             # Find the best place to insert a row.
             # In general, we just want the move names in order, so we can just
             # tack rows on and sort them at the end.  However!  Level-up moves
@@ -604,17 +610,6 @@ class PokedexController(BaseController):
             if method.name == 'Level up':
                 continue
             method_list.sort(key=lambda (move, version_group_data): move.name)
-
-        # XXX Need to do something with move tutors, seriously.
-        # 1. Need to know which tutors are usable.  This varies by move and vg.
-        # 2. Need to be able to collapse them, but tutors are never the same
-        #    between versions, and didn't exist at all in RS or DP.
-        # (1) can be solved by adding a ? icon or tooltip or something and
-        # having a move_tutors table keyed on move+version_group.
-        # (2) can be solved by reverting to the Veekun Prime way of just
-        # listing version icons within the row, BUT I would need to somehow
-        # keep the same versions aligned.  Make collapsed columns use colspan?
-        # Use dummy invisible pngs or spacer divs?
 
         # Finally, we want to collapse identical adjacent columns within the
         # same generation.

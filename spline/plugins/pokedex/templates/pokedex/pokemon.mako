@@ -540,7 +540,17 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     % elif method.name == 'Level up':
     <td>${version_group_data[column[0]]['level']}</td>
     % elif method.name == 'Machine':
-    <td>TMXX</td>
+    <% machine_number = version_group_data[column[0]].get('machine', None) %>\
+    <td>
+      % if not machine_number:
+        <% pass %>\
+      % elif machine_number > 100:
+      ## HM
+        <strong>H</strong>${machine_number - 100}
+      % else:
+        ${"%02d" % machine_number}
+      % endif
+    </td>
     % elif method.name == 'Egg':
     <td class="dex-moves-egg">${h.pokedex.pokedex_img('icons/egg-cropped.png')}</td>
     % else:
