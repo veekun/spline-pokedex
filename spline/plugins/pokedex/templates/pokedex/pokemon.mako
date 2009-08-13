@@ -11,20 +11,20 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 <h1>Essentials</h1>
 
 ## Portrait block
-<div id="dex-pokemon-portrait">
-    <p id="dex-pokemon-name">${c.pokemon.name}</p>
+<div id="dex-page-portrait">
+    <p id="dex-page-name">${c.pokemon.name}</p>
     % if c.pokemon.forme_name:
     <p id="dex-pokemon-forme">${c.pokemon.forme_name.capitalize()} Forme</p>
     % endif
     ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum', id="dex-pokemon-portrait-sprite")}
-    <p id="dex-pokemon-types">
+    <p id="dex-page-types">
         % for type in c.pokemon.types:
         ${h.pokedex.type_link(type)}
         % endfor
     </p>
 </div>
 
-<div id="dex-pokemon-beside-portrait">
+<div id="dex-page-beside-portrait">
 <h2>Abilities</h2>
 <dl>
     % for ability in c.pokemon.abilities:
@@ -36,10 +36,10 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 <h2>Damage Taken</h2>
 ## Boo not using <dl>  :(  But I can't get them to align horizontally with CSS2
 ## if the icon and value have no common element..
-<ul id="dex-pokemon-damage-taken">
+<ul id="dex-page-damage">
     % for type, damage_factor in sorted(c.type_efficacies.items(), \
                                         key=lambda x: x[0].name):
-    <li class="dex-damage-${damage_factor}">
+    <li class="dex-damage-taken-${damage_factor}">
         ${h.pokedex.type_link(type)} ${h.pokedex.type_efficacy_label[damage_factor]}
     </li>
     % endfor
@@ -568,9 +568,9 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     % if move.effect.priority == 0:
     <td></td>
     % elif move.effect.priority > 0:
-    <td class="priority-fast">${move.effect.priority}</td>
+    <td class="dex-priority-fast">${move.effect.priority}</td>
     % else:
-    <td class="priority-slow">${move.effect.priority}</td>
+    <td class="dex-priority-slow">${move.effect.priority}</td>
     % endif
     <td class="effect">${move.effect.short_effect}</td>
 </tr>

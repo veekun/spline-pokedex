@@ -1,5 +1,5 @@
 # encoding: utf8
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 import collections
 import colorsys
@@ -174,7 +174,7 @@ class PokedexController(BaseController):
                 # a percentage.  Dividing by 100 with every iteration turns the
                 # damage factor into a decimal percentage taken of the starting
                 # 100, without using floats and regardless of number of types
-                c.type_efficacies[type_efficacy.damage_type] /= 100
+                c.type_efficacies[type_efficacy.damage_type] //= 100
 
         ### Breeding compatibility
         # To simplify this list considerably, we want to find the BASE FORM of
@@ -695,6 +695,26 @@ class PokedexController(BaseController):
             c.move = db.get_by_name(Move, name)
         except NoResultFound:
             return self._not_found()
+
+        ### Type efficacy
+        c.type_efficacies = {}
+        for type_efficacy in c.move.type.damage_efficacies:
+            c.type_efficacies[type_efficacy.target_type] = \
+                type_efficacy.damage_factor
+
+        ### Machines
+        q = pokedex_session.query(Generation) \
+                           .filter(Generation.id >= c.move.generation.id) \
+                           .order_by(Generation.id.asc())
+        c.generations = {}
+        c.machines = {}
+        for generation in q:
+            c.machines[generation] = None
+
+        for machine in c.move.machines:
+            print machine.__dict__
+            c.machines[machine.generation] = machine.machine_number
+
         return render('/pokedex/move.mako')
 
 

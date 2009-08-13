@@ -23,12 +23,19 @@ col.dex-col-last-version{ border-right: 1px solid #b4c7e6; }
 .dex-column-2x { float: left; width: 66.666%; }
 
 /* Type damage */
-.dex-damage-0   { font-weight: bold; color: #44c; }
-.dex-damage-25  { font-weight: bold; color: #4cc; }
-.dex-damage-50  { font-weight: bold; color: #4c4; }
-.dex-damage-100 { font-weight: bold; color: #999; }
-.dex-damage-200 { font-weight: bold; color: #c44; }
-.dex-damage-400 { font-weight: bold; color: #c4c; }
+.dex-damage-taken-0   { font-weight: bold; color: #44c; }
+.dex-damage-taken-25  { font-weight: bold; color: #4cc; }
+.dex-damage-taken-50  { font-weight: bold; color: #4c4; }
+.dex-damage-taken-100 { font-weight: bold; color: #999; }
+.dex-damage-taken-200 { font-weight: bold; color: #c44; }
+.dex-damage-taken-400 { font-weight: bold; color: #c4c; }
+
+.dex-damage-dealt-0   { font-weight: bold; color: #44c; }
+.dex-damage-dealt-25  { font-weight: bold; color: #c4c; }
+.dex-damage-dealt-50  { font-weight: bold; color: #c44; }
+.dex-damage-dealt-100 { font-weight: bold; color: #999; }
+.dex-damage-dealt-200 { font-weight: bold; color: #4c4; }
+.dex-damage-dealt-400 { font-weight: bold; color: #4cc; }
 
 /* Size comparison */
 .dex-size { height: 120px; padding-bottom: 2.5em /* for -value */; overflow: hidden /* new float context */}
@@ -45,15 +52,16 @@ col.dex-col-last-version{ border-right: 1px solid #b4c7e6; }
 .dex-size .dex-size-trainer .dex-size-value { right: 0.25em; }
 .dex-size .dex-size-pokemon .dex-size-value { left: 0.25em; }
 
-/*** Pokemon pages ***/
-#dex-pokemon-portrait { float: left; width: 15em; text-align: center; }
-#dex-pokemon-name { font-size: 2em; }
+/*** Individual pages ***/
+#dex-page-portrait { float: left; width: 15em; min-height: 10em; padding-bottom: 1em; text-align: center; }
+#dex-page-portrait p { margin: 0.25em 0; }
+p#dex-page-name { font-size: 2em; margin: 0.12em 0; }
 #dex-pokemon-forme { font-size: 1.25em; font-weight: bold; }
 #dex-pokemon-portrait-sprite { margin: 0.33em; padding: 7px; background: url(/dex/media/chrome/sprite-frame.png) center center no-repeat; }
 
-ul#dex-pokemon-damage-taken { overflow: hidden /* new float context */; margin-bottom: 2em; }
-ul#dex-pokemon-damage-taken li { display: inline-block; text-align: center; padding: 0.125em; }
-ul#dex-pokemon-damage-taken li img { display: block; margin-bottom: 0.25em; }
+ul#dex-page-damage { overflow: hidden /* new float context */; margin-bottom: 2em; }
+ul#dex-page-damage li { display: inline-block; text-align: center; padding: 0.125em; }
+ul#dex-page-damage li img { display: block; margin-bottom: 0.25em; }
 
 ul.dex-pokemon-compatibility { max-height: 136px /* four rows of icons plus borders */; overflow: auto; }
 
@@ -89,13 +97,12 @@ table.dex-moves td { padding: 0.33em; vertical-align: middle; text-align: center
 table.dex-moves th { padding: 0.33em 0.17em; text-align: center; }
 table.dex-moves tr.subheader-row th { padding: 0.17em 0.33em; text-align: left; }
 table.dex-moves td.egg { padding: 0 /* egg sprite consumes a lot of space, so let it extend into padding */; }
-table.dex-moves td.priority-fast { font-weight: bold; color: green; }
-table.dex-moves td.priority-slow { font-weight: bold; color: red; }
 table.dex-moves td.effect { font-size: 0.8em; text-align: left; }
 table.dex-moves td.tutored { white-space: nowrap; }
 table.dex-moves .no-tutor { visibility: hidden; }
 
-
 th { vertical-align: middle; }
 .vertical-text { -moz-transform: rotate(-90deg); }
 
+.dex-priority-fast { font-weight: bold; color: green; }
+.dex-priority-slow { font-weight: bold; color: red; }
