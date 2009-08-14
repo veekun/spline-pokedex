@@ -679,6 +679,7 @@ class PokedexController(BaseController):
 
         return render('/pokedex/pokemon.mako')
 
+
     def pokemon_flavor(self, name=None):
         # Ignoring form for now, since it could also be a sprite-form, and
         # the lookup won't work
@@ -687,6 +688,12 @@ class PokedexController(BaseController):
             c.pokemon = db.pokemon(name)
         except NoResultFound:
             return self._not_found()
+
+        c.flavor_text = {}  # generation => version => text
+        for flavor_text in c.pokemon.flavor_text:
+            c.flavor_text.setdefault(flavor_text.version.generation, {}) \
+                          [flavor_text.version] = flavor_text.flavor_text
+
         return render('/pokedex/pokemon_flavor.mako')
 
 

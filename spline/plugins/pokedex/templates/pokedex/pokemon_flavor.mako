@@ -1,13 +1,119 @@
 <%inherit file="/base.mako"/>
 
-<h1>Sprites</h1>
+<%def name="title()">${c.pokemon.name}</%def>
 
-<h2>Diamond/Pearl/Platinum</h2>
-<table border="1">
-<tr>
+<h1>Pokédex Description</h1>
+% for generation, version_texts in sorted(c.flavor_text.items(), \
+                                          key=lambda (k, v): k.id):
+<div class="dex-pokemon-flavor-generation">${h.pokedex.generation_icon(generation)}</div>
+<dl class="dex-pokemon-flavor-text">
+    % for version, flavor_text in sorted(version_texts.items(), \
+                                         key=lambda (k, v): k.id):
+    <dt>${h.pokedex.version_icons(version)}</dt>
+    <dd>${flavor_text}</dd>
+    % endfor
+</dl>
+% endfor
+
+
+<h1>Main Game Sprites</h1>
+
+<h2>${h.pokedex.generation_icon(1)} Blue, Red &amp; Blue, Yellow</h2>
+<table>
+<tr class="header-row">
     <th></th>
-    <th colspan="2">${h.pokedex.version_icons(u'Diamond', u'Pearl')}<br/>Diamond/Pearl</th>
-    <th colspan="2">${h.pokedex.version_icons(u'Platinum')}<br/>Platinum</th>
+    <td class="vertical-line" rowspan="2"></td>
+    <th>Blue</th>
+    <td class="vertical-line" rowspan="2"></td>
+    <th>${h.pokedex.version_icons(u'Red', u'Blue')}</th>
+    <td class="vertical-line" rowspan="2"></td>
+    <th>${h.pokedex.version_icons(u'Yellow')}</th>
+    <td class="vertical-line" rowspan="2"></td>
+    <th></th>
+</tr>
+<tr>
+    <th class="vertical-text">Normal</th>
+    <td>${h.pokedex.pokedex_img('jp-blue/%d.png' % c.pokemon.id)}</td>
+    <td>${h.pokedex.pokedex_img('red-blue/%d.png' % c.pokemon.id)}</td>
+    <td>${h.pokedex.pokedex_img('yellow/%d.png' % c.pokemon.id)}</td>
+
+    <td>${h.pokedex.pokedex_img('red-blue/back/%d.png' % c.pokemon.id)}</td>
+</tr>
+</table>
+
+<h2>${h.pokedex.generation_icon(2)} Gold &amp; Silver, Crystal</h2>
+<table>
+<tr class="header-row">
+    <th></th>
+    <td class="vertical-line" rowspan="3"></td>
+    <th>${h.pokedex.version_icons(u'Gold')}</th>
+    <td class="vertical-line" rowspan="3"></td>
+    <th>${h.pokedex.version_icons(u'Silver')}</th>
+    <td class="vertical-line" rowspan="3"></td>
+    <th>${h.pokedex.version_icons(u'Crystal')}</th>
+    <td class="vertical-line" rowspan="3"></td>
+    <th></th>
+</tr>
+<tr>
+    <th class="vertical-text">Normal</th>
+    <td>${h.pokedex.pokedex_img('gold/%d.png' % c.pokemon.id)}</td>
+    <td>${h.pokedex.pokedex_img('silver/%d.png' % c.pokemon.id)}</td>
+    <td>${h.pokedex.pokedex_img('crystal/%d.gif' % c.pokemon.id)}</td>
+
+    <td>${h.pokedex.pokedex_img('gold/back/%d.png' % c.pokemon.id)}</td>
+</tr>
+<tr>
+    <th class="vertical-text">Shiny</th>
+    <td>${h.pokedex.pokedex_img('gold/shiny/%d.png' % c.pokemon.id)}</td>
+    <td>${h.pokedex.pokedex_img('silver/shiny/%d.png' % c.pokemon.id)}</td>
+    <td>${h.pokedex.pokedex_img('crystal/shiny/%d.gif' % c.pokemon.id)}</td>
+
+    <td>${h.pokedex.pokedex_img('gold/back/shiny/%d.png' % c.pokemon.id)}</td>
+</tr>
+</table>
+
+<h2>${h.pokedex.generation_icon(3)} Ruby &amp; Sapphire, Emerald, Fire Red &amp; Leaf Green</h2>
+<table>
+<tr class="header-row">
+    <th></th>
+    <td class="vertical-line" rowspan="3"></td>
+    <th>${h.pokedex.version_icons(u'Ruby', u'Sapphire')}</th>
+    <td class="vertical-line" rowspan="3"></td>
+    <th>${h.pokedex.version_icons(u'Emerald')}</th>
+    <td class="vertical-line" rowspan="3"></td>
+    <th colspan="2">${h.pokedex.version_icons(u'Fire Red', u'Leaf Green')}</th>
+    <td class="vertical-line" rowspan="3"></td>
+    <th></th>
+    <!-- XXX emerald animated?  frlg back? -->
+</tr>
+<tr>
+    <th class="vertical-text">Normal</th>
+    <td>${h.pokedex.pokedex_img('ruby-sapphire/%d.png' % c.pokemon.id)}</td>
+    <td>${h.pokedex.pokedex_img('emerald/%d.png' % c.pokemon.id)}</td>
+    <td>${h.pokedex.pokedex_img('firered-leafgreen/%d.png' % c.pokemon.id)}</td>
+    <td>${h.pokedex.pokedex_img('firered-leafgreen/back/%d.png' % c.pokemon.id)}</td>
+
+    <td>${h.pokedex.pokedex_img('ruby-sapphire/back/%d.png' % c.pokemon.id)}</td>
+</tr>
+<tr>
+    <th class="vertical-text">Shiny</th>
+    <td>${h.pokedex.pokedex_img('ruby-sapphire/shiny/%d.png' % c.pokemon.id)}</td>
+    <td>${h.pokedex.pokedex_img('emerald/shiny/%d.png' % c.pokemon.id)}</td>
+    <td>${h.pokedex.pokedex_img('firered-leafgreen/shiny/%d.png' % c.pokemon.id)}</td>
+    <td>${h.pokedex.pokedex_img('firered-leafgreen/back/shiny/%d.png' % c.pokemon.id)}</td>
+
+    <td>${h.pokedex.pokedex_img('ruby-sapphire/back/shiny/%d.png' % c.pokemon.id)}</td>
+</tr>
+</table>
+
+<h2>${h.pokedex.generation_icon(4)} Diamond &amp; Pearl, Platinum</h2>
+<table>
+<tr class="header-row">
+    <th></th>
+    <td class="vertical-line" rowspan="3"></td>
+    <th colspan="2">${h.pokedex.version_icons(u'Diamond', u'Pearl')}</th>
+    <td class="vertical-line" rowspan="3"></td>
+    <th colspan="2">${h.pokedex.version_icons(u'Platinum')}</th>
 </tr>
 <tr>
     <th class="vertical-text">Normal</th>
@@ -98,3 +204,9 @@
 </tr>
 % endif
 </table>
+
+
+<h1>Other Images</h1>
+
+<h2>Sugimori Art</h2>
+<p> ${h.pokedex.pokedex_img('sugimori/%d.png' % c.pokemon.id)} </p>
