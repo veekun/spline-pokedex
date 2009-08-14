@@ -97,7 +97,8 @@ def pokemon_link(pokemon, content=None, **attr):
         url_kwargs['form'] = form
 
     action = 'pokemon'
-    if pokemon.normal_form.form_group and not pokemon.normal_form.formes:
+    if form and pokemon.normal_form.form_group \
+            and not pokemon.normal_form.formes:
         # If a Pokémon does not have real (different species) forms, e.g.
         # Unown and its letters, then a form link only makes sense if it's to a
         # flavor page.
