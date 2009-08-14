@@ -77,42 +77,41 @@
 <tr class="header-row">
     <th></th>
     <td class="vertical-line" rowspan="3"></td>
-    <th>${h.pokedex.version_icons(u'Ruby', u'Sapphire')}</th>
+    <th colspan="2">${h.pokedex.version_icons(u'Ruby', u'Sapphire')}</th>
     <td class="vertical-line" rowspan="3"></td>
     <th>${h.pokedex.version_icons(u'Emerald')}</th>
     <td class="vertical-line" rowspan="3"></td>
     <th colspan="2">${h.pokedex.version_icons(u'Fire Red', u'Leaf Green')}</th>
-    <td class="vertical-line" rowspan="3"></td>
-    <th></th>
-    <!-- XXX emerald animated?  frlg back? -->
+    <!-- XXX emerald animated? -->
 </tr>
 <tr>
     <th class="vertical-text">Normal</th>
     <td>${h.pokedex.pokedex_img('ruby-sapphire/%d.png' % c.pokemon.id)}</td>
+    <td>${h.pokedex.pokedex_img('ruby-sapphire/back/%d.png' % c.pokemon.id)}</td>
+
     <td>${h.pokedex.pokedex_img('emerald/%d.png' % c.pokemon.id)}</td>
     <td>${h.pokedex.pokedex_img('firered-leafgreen/%d.png' % c.pokemon.id)}</td>
     <td>${h.pokedex.pokedex_img('firered-leafgreen/back/%d.png' % c.pokemon.id)}</td>
-
-    <td>${h.pokedex.pokedex_img('ruby-sapphire/back/%d.png' % c.pokemon.id)}</td>
 </tr>
 <tr>
     <th class="vertical-text">Shiny</th>
     <td>${h.pokedex.pokedex_img('ruby-sapphire/shiny/%d.png' % c.pokemon.id)}</td>
+    <td>${h.pokedex.pokedex_img('ruby-sapphire/back/shiny/%d.png' % c.pokemon.id)}</td>
+
     <td>${h.pokedex.pokedex_img('emerald/shiny/%d.png' % c.pokemon.id)}</td>
     <td>${h.pokedex.pokedex_img('firered-leafgreen/shiny/%d.png' % c.pokemon.id)}</td>
     <td>${h.pokedex.pokedex_img('firered-leafgreen/back/shiny/%d.png' % c.pokemon.id)}</td>
-
-    <td>${h.pokedex.pokedex_img('ruby-sapphire/back/shiny/%d.png' % c.pokemon.id)}</td>
 </tr>
 </table>
 
 <h2>${h.pokedex.generation_icon(4)} Diamond &amp; Pearl, Platinum</h2>
+<% dpp_rowspan = 1 + 2 + (2 if c.pokemon.has_gen4_fem_sprite else 0) %>\
 <table>
 <tr class="header-row">
     <th></th>
-    <td class="vertical-line" rowspan="3"></td>
+    <td class="vertical-line" rowspan="${dpp_rowspan}"></td>
     <th colspan="2">${h.pokedex.version_icons(u'Diamond', u'Pearl')}</th>
-    <td class="vertical-line" rowspan="3"></td>
+    <td class="vertical-line" rowspan="${dpp_rowspan}"></td>
     <th colspan="2">${h.pokedex.version_icons(u'Platinum')}</th>
 </tr>
 <tr>
