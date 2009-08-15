@@ -89,7 +89,11 @@
     <td>${h.pokedex.pokedex_img('ruby-sapphire/%d.png' % c.pokemon.id)}</td>
     <td>${h.pokedex.pokedex_img('ruby-sapphire/back/%d.png' % c.pokemon.id)}</td>
 
-    <td>${h.pokedex.pokedex_img('emerald/%d.png' % c.pokemon.id)}</td>
+    <td>
+        ${h.pokedex.pokedex_img('emerald/%d.png' % c.pokemon.id)}
+        ${h.pokedex.pokedex_img('emerald/frame2/%d.png' % c.pokemon.id)}
+        ${h.pokedex.pokedex_img('emerald/animated/%d.gif' % c.pokemon.id)}
+    </td>
     <td>${h.pokedex.pokedex_img('firered-leafgreen/%d.png' % c.pokemon.id)}</td>
     <td>${h.pokedex.pokedex_img('firered-leafgreen/back/%d.png' % c.pokemon.id)}</td>
 </tr>
@@ -98,7 +102,11 @@
     <td>${h.pokedex.pokedex_img('ruby-sapphire/shiny/%d.png' % c.pokemon.id)}</td>
     <td>${h.pokedex.pokedex_img('ruby-sapphire/back/shiny/%d.png' % c.pokemon.id)}</td>
 
-    <td>${h.pokedex.pokedex_img('emerald/shiny/%d.png' % c.pokemon.id)}</td>
+    <td>
+        ${h.pokedex.pokedex_img('emerald/shiny/%d.png' % c.pokemon.id)}
+        ${h.pokedex.pokedex_img('emerald/shiny/frame2/%d.png' % c.pokemon.id)}
+        ${h.pokedex.pokedex_img('emerald/shiny/animated/%d.gif' % c.pokemon.id)}
+    </td>
     <td>${h.pokedex.pokedex_img('firered-leafgreen/shiny/%d.png' % c.pokemon.id)}</td>
     <td>${h.pokedex.pokedex_img('firered-leafgreen/back/shiny/%d.png' % c.pokemon.id)}</td>
 </tr>
