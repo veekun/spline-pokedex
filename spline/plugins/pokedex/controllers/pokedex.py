@@ -7,13 +7,13 @@ import logging
 import mimetypes
 
 import pokedex.db
-from pokedex.db.tables import Ability, Generation, Item, Move, Pokemon, PokemonEggGroup, PokemonMove, PokemonStat, Type, VersionGroup
+from pokedex.db.tables import Ability, EggGroup, Generation, Item, Move, Pokemon, PokemonEggGroup, PokemonMove, PokemonStat, Type, VersionGroup
 import pokedex.lookup
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c
 from pylons.controllers.util import abort, redirect_to
 from routes import url_for, request_config
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func
@@ -179,8 +179,9 @@ class PokedexController(BaseController):
         ### Breeding compatibility
         # To simplify this list considerably, we want to find the BASE FORM of
         # every Pokémon compatible with this one.  The base form is either:
-        # - a Pokémon that is not a baby and has no evolution parent, or
-        # - a Pokémon that has a baby for a parent.
+        # - a Pokémon that has breeding groups and no evolution parent, or
+        # - a Pokémon whose parent has no breeding groups (i.e. 15 only)
+        #   and no evolution parent.
         # The below query self-joins `pokemon` to itself and tests the above
         # conditions.
         # ASSUMPTION: Every base-form Pokémon in a breedable family can breed.
@@ -197,14 +198,21 @@ class PokedexController(BaseController):
             parent_a = aliased(Pokemon)
             egg_group_ids = [_.id for _ in c.pokemon.egg_groups]
             q = pokedex_session.query(Pokemon)
-            q = q.outerjoin((parent_a, Pokemon.evolution_parent)) \
-                 .join(PokemonEggGroup) \
+            q = q.join(PokemonEggGroup) \
+                 .outerjoin((parent_a, Pokemon.evolution_parent)) \
                  .filter(Pokemon.gender_rate != -1) \
                  .filter(Pokemon.forme_base_pokemon_id == None) \
                  .filter(
+                    # This is a "base form" iff either:
                     or_(
-                        and_(parent_a.id == None, Pokemon.is_baby == False),
-                        parent_a.is_baby == True,
+                        # This is the root form (no parent)
+                        # (It has to be breedable too, but we're filtering by
+                        # an egg group so that's granted)
+                        parent_a.id == None,
+                        # Or this can breed and evolves from something that
+                        # can't
+                        and_(parent_a.egg_groups.any(id=15),
+                             parent_a.evolution_parent_pokemon_id == None),
                     )
                  ) \
                  .filter(PokemonEggGroup.egg_group_id.in_(egg_group_ids)) \
