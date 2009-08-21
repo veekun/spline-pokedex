@@ -11,20 +11,28 @@
 
 <ul class="classic-list">
 % for result in c.results:
+<%
+    object = result.object
+%>\
 <li>
-    The ${c.table_labels[result.__class__]}
-    <a href="${url(controller='dex', action=result.__tablename__, name=result.name.lower())}">
-    % if result.__tablename__ == 'pokemon':
-    ${h.pokedex.pokemon_sprite(result, prefix='icons')}
-    % elif result.__tablename__ == 'items':
-    ${h.pokedex.pokedex_img("items/%s.png" % h.pokedex.filename_from_name(result.name))}
-    % elif result.__tablename__ == 'types':
-    ${h.pokedex.type_icon(result)}
-    % elif result.__tablename__ == 'moves':
-    ${h.pokedex.type_icon(result.type)}
-    ${h.pokedex.pokedex_img("chrome/damage-classes/%s.png" % result.category)}
+    The ${c.table_labels[object.__class__]}
+    <a href="${url(controller='dex', action=object.__tablename__, name=object.name.lower())}">
+    % if object.__tablename__ == 'pokemon':
+    ${h.pokedex.pokemon_sprite(object, prefix='icons')}
+    % elif object.__tablename__ == 'items':
+    ${h.pokedex.pokedex_img("items/%s.png" % h.pokedex.filename_from_name(object.name))}
+    % elif object.__tablename__ == 'types':
+    ${h.pokedex.type_icon(object)}
+    % elif object.__tablename__ == 'moves':
+    ${h.pokedex.type_icon(object.type)}
+    ${h.pokedex.pokedex_img("chrome/damage-classes/%s.png" % object.category)}
     % endif
-    ${result.name}
+\
+    ${object.name}
+\
+    % if result.language:
+    (in ${result.language})
+    % endif
     </a>
 </li>
 % endfor

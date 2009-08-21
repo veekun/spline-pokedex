@@ -116,7 +116,7 @@ class PokedexController(BaseController):
         Also performs fuzzy search.
         """
         name = request.params.get('lookup', None)
-        results, exact = pokedex.lookup.lookup(
+        results = pokedex.lookup.lookup(
             name,
             session=pokedex_session,
             indices=config['spline.pokedex.index'],
@@ -130,7 +130,7 @@ class PokedexController(BaseController):
         elif len(results) == 1:
             # Only one possibility!  Hooray!
 
-            if not exact:
+            if not results[0].exact:
                 # Wasn't an exact match, but we can only figure out one thing
                 # the user might have meant, so redirect to it anyway
                 # XXX add an informative message here
@@ -141,13 +141,13 @@ class PokedexController(BaseController):
             # making a dictionary to get data I already have is just silly
             redirect_to(controller='dex',
                         action=results[0].__tablename__,
-                        name=results[0].name.lower())
+                        name=results[0].object.name.lower())
 
         else:
             # Multiple matches.  Could be exact (e.g., Metronome) or a fuzzy
             # match.  Result page looks about the same either way
             c.input = name
-            c.exact = exact
+            c.exact = results[0].exact
             c.results = results
             c.table_labels = self.table_labels
             return render('/pokedex/lookup_results.mako')

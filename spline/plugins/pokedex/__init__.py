@@ -34,7 +34,8 @@ def after_setup_hook(*args, **kwargs):
     recreate = not config['debug']
 
     config['spline.pokedex.index'] = pokedex.lookup.open_index(
-        directory=os.path.join(config['pylons.paths']['root'], 'data'),
+        directory=os.path.join(config['pylons.paths']['local'],
+                               'data', 'pokedex-index'),
         session=pokedex_session,
         recreate=recreate,
     )
