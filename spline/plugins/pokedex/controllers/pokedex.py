@@ -116,7 +116,11 @@ class PokedexController(BaseController):
         Also performs fuzzy search.
         """
         name = request.params.get('lookup', None)
-        results, exact = pokedex.lookup.lookup(name, session=pokedex_session)
+        results, exact = pokedex.lookup.lookup(
+            name,
+            session=pokedex_session,
+            indices=config['spline.pokedex.index'],
+        )
 
         if len(results) == 0:
             # Nothing found
