@@ -29,11 +29,10 @@
     % endif
 \
     ${object.name}
-\
-    % if result.language:
-    (in ${result.language})
-    % endif
     </a>
+    % if result.language:
+    ("${result.name}" in ${result.language})
+    % endif
 </li>
 % endfor
 </ul>

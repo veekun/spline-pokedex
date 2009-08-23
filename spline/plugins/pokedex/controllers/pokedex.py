@@ -139,9 +139,13 @@ class PokedexController(BaseController):
             # Using the table name as an action directly looks kinda gross, but
             # I can't think of anywhere I've ever broken this convention, and
             # making a dictionary to get data I already have is just silly
+            form = {}
+            if results[0].object.forme_base_pokemon_id:
+                form['form'] = results[0].object.forme_name
             redirect_to(controller='dex',
-                        action=results[0].__tablename__,
-                        name=results[0].object.name.lower())
+                        action=results[0].object.__tablename__,
+                        name=results[0].object.name.lower(),
+                        **form)
 
         else:
             # Multiple matches.  Could be exact (e.g., Metronome) or a fuzzy
