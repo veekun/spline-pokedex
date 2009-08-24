@@ -63,22 +63,40 @@ def pokemon_sprite(pokemon, prefix='platinum', **attr):
         # Don't use default form's name as part of the filename
         form = None
 
+    if 'crystal' in prefix or 'animated' in prefix:
+        ext = 'gif'
+    else:
+        ext = 'png'
+
     if form:
         alt_text = "%s (%s)" % (pokemon.name, form)
-        filename = '%d-%s.png' % (pokemon.national_id, form)
+        filename = '%d-%s.%s' % (pokemon.national_id, form, ext)
     else:
         alt_text = pokemon.name
-        filename = '%d.png' % pokemon.national_id
+        filename = '%d.%s' % (pokemon.national_id, ext)
 
     attr.setdefault('alt', alt_text)
     attr.setdefault('title', alt_text)
 
     return pokedex_img("%s/%s" % (prefix, filename), **attr)
 
-def pokemon_link(pokemon, content=None, **attr):
+def pokemon_link(pokemon, content=None, to_flavor=False, **attr):
     """Returns a link to a Pokémon page.
 
-    `pokemon` may be a name or a Pokémon object."""
+    `pokemon`
+        A name or a Pokémon object.
+    
+    `content`
+        Link text (or image, or whatever).
+
+    `form`
+        An alternate form to link to.  If the form is only a sprite, the link
+        will be to the flavor page.
+
+    `to_flavor`
+        If True, the link will always be to the flavor page, regardless of
+        form.
+    """
 
     # Content defaults to the name of the Pokémon
     if not content:
@@ -102,6 +120,8 @@ def pokemon_link(pokemon, content=None, **attr):
         # If a Pokémon does not have real (different species) forms, e.g.
         # Unown and its letters, then a form link only makes sense if it's to a
         # flavor page.
+        action = 'pokemon_flavor'
+    elif to_flavor:
         action = 'pokemon_flavor'
 
     return h.HTML.a(

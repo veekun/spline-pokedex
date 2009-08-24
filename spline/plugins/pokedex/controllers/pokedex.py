@@ -697,13 +697,19 @@ class PokedexController(BaseController):
 
 
     def pokemon_flavor(self, name=None):
-        # Ignoring form for now, since it could also be a sprite-form, and
-        # the lookup won't work
-        #form = request.params.get('form', None)
         try:
             c.pokemon = db.pokemon(name)
         except NoResultFound:
             return self._not_found()
+
+        # Deal with forms.  Sprite forms, remember!
+        c.form = request.params.get('form', None)
+        c.forms = [_.name for _ in c.pokemon.form_sprites]
+        c.forms.sort()
+        if c.form:
+            c.sprite_filename = u"%d-%s" % (c.pokemon.id, c.form)
+        else:
+            c.sprite_filename = unicode(c.pokemon.id)
 
         ### Flavor text
         c.flavor_text = {}  # generation => [ ( versions, text ) ]
