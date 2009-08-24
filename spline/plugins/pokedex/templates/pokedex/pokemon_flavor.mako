@@ -17,6 +17,7 @@
 
 <h1>Main Game Sprites</h1>
 
+% if c.pokemon.generation_id <= 1:
 <h2>${h.pokedex.generation_icon(1)} Blue, Red &amp; Blue, Yellow</h2>
 <table>
 <tr class="header-row">
@@ -39,7 +40,9 @@
     <td>${h.pokedex.pokedex_img('red-blue/back/%d.png' % c.pokemon.id)}</td>
 </tr>
 </table>
+% endif
 
+% if c.pokemon.generation_id <= 2:
 <h2>${h.pokedex.generation_icon(2)} Gold &amp; Silver, Crystal</h2>
 <table>
 <tr class="header-row">
@@ -70,7 +73,10 @@
     <td>${h.pokedex.pokedex_img('gold/back/shiny/%d.png' % c.pokemon.id)}</td>
 </tr>
 </table>
+% endif
 
+% if c.pokemon.generation_id <= 3:
+<% show_frlg = (c.pokemon.generation_id == 1 or c.pokemon.name == u'Teddiursa') %>\
 <h2>${h.pokedex.generation_icon(3)} Ruby &amp; Sapphire, Emerald, Fire Red &amp; Leaf Green</h2>
 <table>
 <tr class="header-row">
@@ -79,9 +85,10 @@
     <th colspan="2">${h.pokedex.version_icons(u'Ruby', u'Sapphire')}</th>
     <td class="vertical-line" rowspan="3"></td>
     <th>${h.pokedex.version_icons(u'Emerald')}</th>
+% if show_frlg:
     <td class="vertical-line" rowspan="3"></td>
     <th colspan="2">${h.pokedex.version_icons(u'Fire Red', u'Leaf Green')}</th>
-    <!-- XXX emerald animated? -->
+% endif
 </tr>
 <tr>
     <th class="vertical-text">Normal</th>
@@ -93,8 +100,10 @@
         ${h.pokedex.pokedex_img('emerald/frame2/%d.png' % c.pokemon.id)}
         ${h.pokedex.pokedex_img('emerald/animated/%d.gif' % c.pokemon.id)}
     </td>
+% if show_frlg:
     <td>${h.pokedex.pokedex_img('firered-leafgreen/%d.png' % c.pokemon.id)}</td>
     <td>${h.pokedex.pokedex_img('firered-leafgreen/back/%d.png' % c.pokemon.id)}</td>
+% endif
 </tr>
 <tr>
     <th class="vertical-text">Shiny</th>
@@ -106,11 +115,15 @@
         ${h.pokedex.pokedex_img('emerald/shiny/frame2/%d.png' % c.pokemon.id)}
         ${h.pokedex.pokedex_img('emerald/shiny/animated/%d.gif' % c.pokemon.id)}
     </td>
+% if show_frlg:
     <td>${h.pokedex.pokedex_img('firered-leafgreen/shiny/%d.png' % c.pokemon.id)}</td>
     <td>${h.pokedex.pokedex_img('firered-leafgreen/back/shiny/%d.png' % c.pokemon.id)}</td>
+% endif
 </tr>
 </table>
+% endif
 
+% if c.pokemon.generation_id <= 4:
 <h2>${h.pokedex.generation_icon(4)} Diamond &amp; Pearl, Platinum</h2>
 <% dpp_rowspan = 1 + 2 + (2 if c.pokemon.has_gen4_fem_sprite else 0) %>\
 <table>
@@ -210,6 +223,7 @@
 </tr>
 % endif
 </table>
+% endif
 
 
 <h1>Other Images</h1>
