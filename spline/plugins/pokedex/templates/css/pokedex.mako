@@ -104,8 +104,8 @@ table.dex-moves .no-tutor { visibility: hidden; }
 .dex-pokemon-flavor-generation { position: absolute; line-height: 1.5; }
 dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation { padding-top: 1.5em; }
 dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation + dl.dex-pokemon-flavor-text { padding-top: 1.5em; }
-dl.dex-pokemon-flavor-text dt { width: 5.5em; }
-dl.dex-pokemon-flavor-text dd { padding-left: 6em; }
+dl.dex-pokemon-flavor-text dt { width: 7em /* enough for gen, two versions, and space */; }
+dl.dex-pokemon-flavor-text dd { padding-left: 7.5em; }
 
 th { vertical-align: middle; }
 .vertical-text { -moz-transform: rotate(-90deg); }

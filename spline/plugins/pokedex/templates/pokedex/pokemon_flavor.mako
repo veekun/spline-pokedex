@@ -7,9 +7,8 @@
                                           key=lambda (k, v): k.id):
 <div class="dex-pokemon-flavor-generation">${h.pokedex.generation_icon(generation)}</div>
 <dl class="dex-pokemon-flavor-text">
-    % for version, flavor_text in sorted(version_texts.items(), \
-                                         key=lambda (k, v): k.id):
-    <dt>${h.pokedex.version_icons(version)}</dt>
+    % for versions, flavor_text in version_texts:
+    <dt>${h.pokedex.version_icons(*versions)}</dt>
     <dd>${flavor_text}</dd>
     % endfor
 </dl>

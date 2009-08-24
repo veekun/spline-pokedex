@@ -705,10 +705,32 @@ class PokedexController(BaseController):
         except NoResultFound:
             return self._not_found()
 
-        c.flavor_text = {}  # generation => version => text
-        for flavor_text in c.pokemon.flavor_text:
-            c.flavor_text.setdefault(flavor_text.version.generation, {}) \
-                          [flavor_text.version] = flavor_text.flavor_text
+        ### Flavor text
+        c.flavor_text = {}  # generation => [ ( versions, text ) ]
+        db_flavor_text = c.pokemon.flavor_text
+        db_flavor_text.sort(key=lambda _: _.version_id)
+
+        for flavor_text in db_flavor_text:
+            flavor_tuple = ([flavor_text.version], flavor_text.flavor_text)
+            gen_text = c.flavor_text.setdefault(flavor_text.version.generation,
+                                                [])
+
+            # Check for an existing tuple with the same text and a version from
+            # the same group; i.e., if we're doing Blue and the text matches
+            # Red's, stick them in the same tuple
+            found_existing = False
+            for versions, text in gen_text:
+                if versions[0].version_group_id == \
+                        flavor_text.version.version_group_id \
+                    and text == flavor_text.flavor_text:
+
+                    versions.append(flavor_text.version)
+                    found_existing = True
+                    break
+
+            if not found_existing:
+                # No matches; add a new row
+                gen_text.append(flavor_tuple)
 
         return render('/pokedex/pokemon_flavor.mako')
 
