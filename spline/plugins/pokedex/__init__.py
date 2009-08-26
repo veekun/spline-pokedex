@@ -29,15 +29,8 @@ def after_setup_hook(*args, **kwargs):
     """Hook to grab a Pokédex whoosh index and remember it in the Pylons
     config.
     """
-    # Don't force a recreate when in debug mode!  It adds a ~2s delay for the
-    # server restart every time a file is changed
-    recreate = not config['debug']
-
     config['spline.pokedex.index'] = pokedex.lookup.open_index(
-        directory=os.path.join(config['pylons.paths']['local'],
-                               'data', 'pokedex-index'),
         session=pokedex_session,
-        recreate=recreate,
     )
 
 
