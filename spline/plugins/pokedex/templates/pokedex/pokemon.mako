@@ -565,14 +565,14 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     <td>${move.power}</td>
     <td>${move.accuracy}%</td>
     ## Priority is colored red for slow and green for fast
-    % if move.effect.priority == 0:
+    % if move.priority == 0:
     <td></td>
-    % elif move.effect.priority > 0:
-    <td class="dex-priority-fast">${move.effect.priority}</td>
+    % elif move.priority > 0:
+    <td class="dex-priority-fast">${move.priority}</td>
     % else:
-    <td class="dex-priority-slow">${move.effect.priority}</td>
+    <td class="dex-priority-slow">${move.priority}</td>
     % endif
-    <td class="effect">${move.effect.short_effect}</td>
+    <td class="effect">${move.short_effect}</td>
 </tr>
 % endfor
 % endfor

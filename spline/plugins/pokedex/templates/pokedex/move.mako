@@ -15,7 +15,7 @@
 
 <div id="dex-page-beside-portrait">
 <h2>Summary</h2>
-<p>${c.move.effect.short_effect}</p>
+<p>${c.move.short_effect}</p>
 </div>
 
 <h2>Damage Dealt</h2>
@@ -53,12 +53,12 @@
         <dt>Effect chance</dt>
         <dd>${c.move.effect_chance or 'n/a'}</dd>
         <dt>Priority</dt>
-        % if c.move.effect.priority > 0:
-        <dd><span class="dex-priority-fast">${c.move.effect.priority}</span> (fast)</dd>
-        % elif c.move.effect.priority < 0:
-        <dd><span class="dex-priority-slow">${c.move.effect.priority}</span> (slow)</dd>
+        % if c.move.priority > 0:
+        <dd><span class="dex-priority-fast">${c.move.priority}</span> (fast)</dd>
+        % elif c.move.priority < 0:
+        <dd><span class="dex-priority-slow">${c.move.priority}</span> (slow)</dd>
         % else:
-        <dd>${c.move.effect.priority} (normal)</dd>
+        <dd>${c.move.priority} (normal)</dd>
         % endif
     </dl>
 </div>
