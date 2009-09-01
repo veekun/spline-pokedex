@@ -25,7 +25,7 @@
     ${h.pokedex.type_icon(object)}
     % elif object.__tablename__ == 'moves':
     ${h.pokedex.type_icon(object.type)}
-    ${h.pokedex.pokedex_img("chrome/damage-classes/%s.png" % object.category)}
+    ${h.pokedex.damage_class_icon(object.damage_class)}
     % endif
 \
     ${object.name}

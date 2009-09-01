@@ -8,7 +8,7 @@
     <p id="dex-page-name">${c.move.name}</p>
     <p id="dex-page-types">
         ${h.pokedex.type_link(c.move.type)}
-        ${h.pokedex.pokedex_img("chrome/damage-classes/%s.png" % c.move.category)}
+        ${h.pokedex.damage_class_icon(c.move.damage_class)}
     </p>
     <p>${h.pokedex.generation_icon(c.move.generation)}</p>
 </div>
@@ -34,7 +34,7 @@
     <h2>Stats</h2>
     <dl>
         <dt>Power</dt>
-        % if c.move.category == 'none':
+        % if c.move.damage_class.name == 'None':
         <dd>n/a</dd>
         % else:
         <dd>${c.move.power}</dd>
@@ -42,7 +42,7 @@
         <dt>Accuracy</dt>
         <dd>
             ${c.move.accuracy}%
-            % if c.move.accuracy != 100 and c.move.category != 'none':
+            % if c.move.accuracy != 100 and c.move.damage_class.name != 'None':
             ≈ ${"%.1f" % (c.move.power * c.move.accuracy / 100.0)} power
             % endif
         </dd>

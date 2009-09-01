@@ -132,6 +132,14 @@ def pokemon_link(pokemon, content=None, to_flavor=False, **attr):
         )
 
 
+def damage_class_icon(damage_class):
+    return pokedex_img(
+        "chrome/damage-classes/%s.png" % damage_class.name.lower(),
+        alt=damage_class.name,
+        title="%s: %s" % (damage_class.name, damage_class.description),
+    )
+
+
 def type_icon(type):
     return pokedex_img('chrome/types/%s.png' % type.name, alt=type.name)
 
