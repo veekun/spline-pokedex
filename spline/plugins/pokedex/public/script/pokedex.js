@@ -39,3 +39,34 @@ var pokedex = {
         },
     },
 };
+
+
+
+// Easter egg: obdurate
+$(function() {
+    $('.dex-obdurate').each(function() {
+        var $this = $(this);
+        var text = $this.text();
+
+        // Wrap words in these so the browser doesn't break in the middle of a
+        // "word"
+        var nobr_start = '<nobr>';
+        var nobr_end = '</nobr><wbr>';
+
+        var newtext = [ nobr_start ];
+
+        for (var i = 0; i < text.length; i++) {
+            var ch = text.substr(i, 1);
+            newtext.push('<img src="/dex/media/fonts/diamond-pearl-platinum/' + ch + '.png">');
+
+            if (ch == ' ') {
+                // Allow break on spaces
+                newtext.push(nobr_end);
+                newtext.push(nobr_start);
+            }
+        }
+
+        newtext.push(nobr_end);
+        $this.html(newtext.join(''));
+    });
+});

@@ -116,6 +116,15 @@ class PokedexController(BaseController):
         Also performs fuzzy search.
         """
         name = request.params.get('lookup', None)
+        name = name.strip()
+
+        ### Special stuff that bypasses lookup
+        if name.lower() == 'obdurate':
+            # Pokémon flavor text in the D/P font
+            return self._egg_unlock_cheat('obdurate')
+
+
+        ### Regular lookup
         results = pokedex.lookup.lookup(
             name,
             session=pokedex_session,
@@ -159,6 +168,15 @@ class PokedexController(BaseController):
     def _not_found(self):
         # XXX make this do fuzzy search or whatever
         abort(404)
+
+
+    def _egg_unlock_cheat(self, cheat):
+        """Easter egg that writes Pokédex data in the Pokémon font."""
+        cheat_key = "cheat_%s" % cheat
+        session[cheat_key] = not session.get(cheat_key, False)
+        session.save()
+        c.this_cheat_key = cheat_key
+        return render('/pokedex/cheat_unlocked.mako')
 
 
     def pokemon(self, name=None):

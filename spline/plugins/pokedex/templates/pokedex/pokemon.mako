@@ -316,11 +316,17 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 <div class="dex-column-container">
 <div class="dex-column-2x">
     <h2>Flavor Text</h2>
-    <ul>
+    <dl class="dex-pokemon-flavor-text">
+<%
+        class_ = ''
+        if session.get('cheat_obdurate', False):
+            class_ = ' class="dex-obdurate"'
+%>\
         % for version_name in u'Diamond', u'Pearl':
-        <li>${h.pokedex.version_icons(version_name)} ${c.flavor_text[version_name]}</li>
+        <dt>${h.pokedex.version_icons(version_name)}</dt>
+        <dd${h.literal(class_)}>${c.flavor_text[version_name]}</dd>
         % endfor
-    </ul>
+    </dl>
 </div>
 <div class="dex-column">
     ## Only showing current generation's sprites and text

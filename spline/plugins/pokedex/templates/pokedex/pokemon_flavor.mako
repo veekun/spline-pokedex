@@ -7,9 +7,14 @@
                                           key=lambda (k, v): k.id):
 <div class="dex-pokemon-flavor-generation">${h.pokedex.generation_icon(generation)}</div>
 <dl class="dex-pokemon-flavor-text">
+<%
+    class_ = ''
+    if session.get('cheat_obdurate', False):
+        class_ = ' class="dex-obdurate"'
+%>\
     % for versions, flavor_text in version_texts:
     <dt>${h.pokedex.version_icons(*versions)}</dt>
-    <dd>${flavor_text}</dd>
+    <dd${h.literal(class_)}>${flavor_text}</dd>
     % endfor
 </dl>
 % endfor

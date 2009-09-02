@@ -112,3 +112,15 @@ th { vertical-align: middle; }
 
 .dex-priority-fast { font-weight: bold; color: green; }
 .dex-priority-slow { font-weight: bold; color: red; }
+
+
+#dex-cheat-unlocked { overflow: hidden /* float containment */; width: 60%; margin: auto; margin-top: 10em; }
+#dex-cheat-unlocked .dex-cheat-unlocked-left { float: left; }
+#dex-cheat-unlocked .dex-cheat-unlocked-right { float: right; }
+#dex-cheat-unlocked .dex-cheat-unlocked-line1 { font-size: 48px; font-weight: bold; text-align: center; text-transform: uppercase; }
+#dex-cheat-unlocked .dex-cheat-unlocked-line2 { font-size: 34px; font-weight: bold; text-align: center; text-transform: uppercase; }
+#dex-cheat-list { margin-top: 1em; margin-bottom: 5em; text-align: center; }
+#dex-cheat-list li { display: inline; padding: 0.5em 1em; }
+#dex-cheat-list li.this-cheat { font-weight: bold; }
+
+.dex-obdurate-word { white-space: nowrap; }
