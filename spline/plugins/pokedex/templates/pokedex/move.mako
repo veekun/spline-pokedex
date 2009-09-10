@@ -88,16 +88,6 @@
 
 
 <h1>Effect</h1>
-<p>${h.literal(c.move.effect.as_html)}</p>
-
-<h2>Flavor</h2>
-
-<h2>Categories</h2>
-<ul>
-% for category in c.move.move_effect.categories:
-<li>${category.name}</li>
-% endfor
-</ul>
-
-
-
+<div class="dex-effect">
+${h.literal(c.move.effect.as_html)}
+</div>

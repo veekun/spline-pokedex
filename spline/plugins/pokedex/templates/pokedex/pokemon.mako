@@ -578,7 +578,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     % else:
     <td class="dex-priority-slow">${move.priority}</td>
     % endif
-    <td class="effect">${move.short_effect}</td>
+    <td class="effect">${h.literal(move.short_effect.as_html)}</td>
 </tr>
 % endfor
 % endfor

@@ -113,6 +113,12 @@ th { vertical-align: middle; }
 .dex-priority-fast { font-weight: bold; color: green; }
 .dex-priority-slow { font-weight: bold; color: red; }
 
+/* Move effects, etc */
+.dex-effect a { font-weight: normal; }
+/* XXX temporary until I can put this on all paragraphs */
+.dex-effect p { line-height: 1.4; }
+.dex-effect p + p { margin-top: 1em; }
+
 
 #dex-cheat-unlocked { overflow: hidden /* float containment */; width: 60%; margin: auto; margin-top: 10em; }
 #dex-cheat-unlocked .dex-cheat-unlocked-left { float: left; }

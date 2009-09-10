@@ -2,14 +2,17 @@
 import os.path
 from pkg_resources import resource_filename
 
-from pylons import config
+from docutils import nodes
+from docutils.parsers.rst import roles
+from pylons import config, url
+from sqlalchemy.orm.exc import NoResultFound
 
 import pokedex.db
 import pokedex.db.tables as tables
 import pokedex.lookup
 import spline.plugins.pokedex.controllers.pokedex
 from spline.plugins.pokedex import helpers as pokedex_helpers
-from spline.plugins.pokedex.db import pokedex_session
+from spline.plugins.pokedex.db import get_by_name, pokedex_session
 import spline.lib.helpers as h
 from spline.lib.plugin import PluginBase
 
@@ -25,13 +28,46 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/dex/pokemon/{name}/flavor', controller='dex', action='pokemon_flavor')
     map.connect('/dex/types/{name}', controller='dex', action='types')
 
-def after_setup_hook(*args, **kwargs):
-    """Hook to grab a Pokédex whoosh index and remember it in the Pylons
-    config.
+def get_role(table):
+    """Need a separate function here to avoid problems with generating closures
+    inside a loop below.
     """
+
+    table_name = table.__tablename__
+
+    def role(name, rawtext, text, lineno, inliner, options={}, content=[]):
+        try:
+            # Find the object and get a link to it
+            obj = get_by_name(table, text)
+            options['refuri'] = url(controller='dex', action=table_name,
+                                    name=obj.name.lower())
+            node = nodes.reference(rawtext, obj.name, **options)
+        except NoResultFound:
+            # Invalid name.  Just ignore the tag I guess
+            node = nodes.inline(rawtext, text, **options)
+        return [node], []
+
+    return role
+
+def after_setup_hook(*args, **kwargs):
+    """Hook to do some housekeeping after the app starts."""
     config['spline.pokedex.index'] = pokedex.lookup.open_index(
         session=pokedex_session,
     )
+
+    ### reST text roles
+
+    for table in (tables.Ability, tables.Item, tables.Move, tables.Pokemon,
+                  tables.Type):
+        roles.register_local_role(table.__singlename__, get_role(table))
+
+    # For now, simply remove mechanic links
+    def mechanic_role(name, rawtext, text, lineno, inliner, options={},
+                      content=[]):
+        node = nodes.inline(rawtext, text, **options)
+        return [node], []
+
+    roles.register_local_role('mechanic', mechanic_role)
 
 
 class PokedexPlugin(PluginBase):
