@@ -151,6 +151,8 @@
     <th colspan="2">${h.pokedex.version_icons(u'Diamond', u'Pearl')}</th>
     <td class="vertical-line" rowspan="${dpp_rowspan}"></td>
     <th colspan="2">${h.pokedex.version_icons(u'Platinum')}</th>
+    <td class="vertical-line" rowspan="${dpp_rowspan}"></td>
+    <th colspan="2">${h.pokedex.version_icons(u'Heart Gold', u'Soul Silver')}</th>
 </tr>
 <tr>
     <th class="vertical-text">Normal</th>
@@ -167,6 +169,15 @@
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/frame2', form=c.form)}
+    </td>
+
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/frame2', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/frame2', form=c.form)}
     </td>
 </tr>
 % if c.pokemon.has_gen4_fem_sprite:
@@ -194,6 +205,19 @@
     % else:
     <td>n/a</td>
     % endif
+
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/female', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/female/frame2', form=c.form)}
+    </td>
+    % if c.pokemon.has_gen4_fem_back_sprite:
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/female', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/female/frame2', form=c.form)}
+    </td>
+    % else:
+    <td>n/a</td>
+    % endif
 </tr>
 % endif
 <tr>
@@ -211,6 +235,15 @@
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/shiny', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/shiny/frame2', form=c.form)}
+    </td>
+
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny/frame2', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/shiny', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/shiny/frame2', form=c.form)}
     </td>
 </tr>
 % if c.pokemon.has_gen4_fem_sprite:
@@ -234,6 +267,19 @@
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/shiny/female', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/shiny/female/frame2', form=c.form)}
+    </td>
+    % else:
+    <td>n/a</td>
+    % endif
+
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny/female', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny/female/frame2', form=c.form)}
+    </td>
+    % if c.pokemon.has_gen4_fem_back_sprite:
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/shiny/female', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/shiny/female/frame2', form=c.form)}
     </td>
     % else:
     <td>n/a</td>

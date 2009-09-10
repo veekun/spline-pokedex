@@ -16,7 +16,7 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
     % if c.pokemon.forme_name:
     <p id="dex-pokemon-forme">${c.pokemon.forme_name.capitalize()} Forme</p>
     % endif
-    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum', id="dex-pokemon-portrait-sprite")}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver', id="dex-pokemon-portrait-sprite")}
     <p id="dex-page-types">
         % for type in c.pokemon.types:
         ${h.pokedex.type_link(type)}
@@ -331,16 +331,16 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 <div class="dex-column">
     ## Only showing current generation's sprites and text
     <h2>Sprites</h2>
-    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum')}
-    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/frame2')}
-    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny')}
-    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny/frame2')}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver')}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/frame2')}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny')}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny/frame2')}
     <br/>
     % if c.pokemon.has_gen4_fem_sprite:
-    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/female')}
-    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/female/frame2')}
-    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny/female')}
-    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny/female/frame2')}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/female')}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/female/frame2')}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny/female')}
+    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny/female/frame2')}
     % endif
 </div>
 </div>
