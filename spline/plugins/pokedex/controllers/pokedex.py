@@ -76,7 +76,7 @@ class PokedexController(BaseController):
         'Morning': 'chrome/morning.png',
         'Day': 'chrome/daytime.png',
         'Night': 'chrome/night.png',
-        u'Using PokéRadar': 'items/poke-radar.png',
+        u'Using PokéRadar': 'items/poké-radar.png',
         'Ruby': 'versions/ruby.png',
         'Sapphire': 'versions/sapphire.png',
         'Emerald': 'versions/emerald.png',
