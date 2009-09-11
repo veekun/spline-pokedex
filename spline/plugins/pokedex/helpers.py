@@ -20,7 +20,7 @@ def filename_from_name(name):
     """
     name = name.lower()
     name = re.sub('[ _]+', '-', name)
-    name = re.sub('[^-éa-z0-9]', '', name)
+    name = re.sub(u'[^-éa-z0-9]', '', name)
     return name
 
 def pokedex_img(src, **attr):
