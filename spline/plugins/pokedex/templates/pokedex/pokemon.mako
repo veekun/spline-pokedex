@@ -313,6 +313,10 @@ ${c.pokemon.name} - Pokémon #${c.pokemon.national_id}\
 
 <h1>Flavor</h1>
 
+<ul class="see-also">
+<li> <img src="${h.static_uri('spline', 'icons/arrow-000-medium.png')}" alt="See also:"> <a href="${url.current(action='pokemon_flavor')}">All versions' flavor text and sprites</a> </li>
+</ul>
+
 <div class="dex-column-container">
 <div class="dex-column-2x">
     <h2>Flavor Text</h2>
