@@ -15,7 +15,7 @@
 
 <div id="dex-page-beside-portrait">
 <h2>Summary</h2>
-<p>${c.move.short_effect}</p>
+<p>${h.literal(c.move.short_effect.as_html)}</p>
 </div>
 
 <h2>Damage Dealt</h2>
