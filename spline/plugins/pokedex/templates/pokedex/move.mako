@@ -1,6 +1,6 @@
 <%inherit file="/base.mako"/>
 
-<%def name="title()">${c.move.name}</%def>
+<%def name="title()">${c.move.name} – Move #${c.move.id}</%def>
 
 <h1>Essentials</h1>
 
