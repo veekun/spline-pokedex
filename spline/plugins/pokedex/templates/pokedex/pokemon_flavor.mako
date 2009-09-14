@@ -294,6 +294,109 @@
 % endif
 
 
+<h1>Miscellaneous Game Art</h1>
+
+% if c.pokemon.generation_id <= 4:
+<h2> ${h.pokedex.version_icons(u'Heart Gold', u'Soul Silver')} Heart Gold &amp; Soul Silver Overworld </h2>
+<% ow_rowspan = 1 + 2 + (3 if c.pokemon.has_gen4_fem_sprite else 0) %>\
+<table>
+<tr class="header-row">
+    % if c.pokemon.has_gen4_fem_sprite:
+    <th></th>
+    <td class="vertical-line" rowspan="${ow_rowspan}"></td>
+    % endif
+    <th>Left</th>
+    <td class="vertical-line" rowspan="${ow_rowspan}"></td>
+    <th>Down</th>
+    <td class="vertical-line" rowspan="${ow_rowspan}"></td>
+    <th>Up</th>
+    <td class="vertical-line" rowspan="${ow_rowspan}"></td>
+    <th>Right</th>
+</tr>
+<tr>
+    % if c.pokemon.has_gen4_fem_sprite:
+    <th class="vertical-text" rowspan="2">Male</th>
+    % endif
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/left', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/left/frame2', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/down/frame2', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/down', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/up', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/up/frame2', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/right', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/right/frame2', form=c.form)}
+    </td>
+</tr>
+<tr>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/left', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/left/frame2', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/down/frame2', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/down', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/up', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/up/frame2', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/right', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/right/frame2', form=c.form)}
+    </td>
+</tr>
+% if c.pokemon.has_gen4_fem_sprite:
+<tr class="horizontal-line"></tr>
+<tr>
+    <th class="vertical-text" rowspan="2">Female</th>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/left', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/left/frame2', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/down/frame2', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/down', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/up', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/up/frame2', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/right', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/right/frame2', form=c.form)}
+    </td>
+</tr>
+<tr>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/left', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/left/frame2', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/down/frame2', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/down', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/up', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/up/frame2', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/right', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/right/frame2', form=c.form)}
+    </td>
+</tr>
+% endif
+</table>
+% endif
+
+
+
 <h1>Other Images</h1>
 
 <h2>Sugimori Art</h2>
