@@ -24,7 +24,7 @@
 % endfor
 
 
-<h1>Main Game Sprites</h1>
+<h1>Main Game Portraits</h1>
 % if c.forms:
 <h3>Forms</h3>
 <ul class="inline">
@@ -146,8 +146,8 @@
 % endif
 
 % if c.pokemon.generation_id <= 4:
-<h2>${h.pokedex.generation_icon(4)} Diamond &amp; Pearl, Platinum</h2>
-<% dpp_rowspan = 1 + 2 + (2 if c.pokemon.has_gen4_fem_sprite else 0) %>\
+<h2>${h.pokedex.generation_icon(4)} Diamond &amp; Pearl, Platinum, Heart Gold &amp; Soul Silver</h2>
+<% dpp_rowspan = 1 + 2 + (3 if c.pokemon.has_gen4_fem_sprite else 0) %>\
 <table>
 <tr class="header-row">
     <th></th>
@@ -159,7 +159,12 @@
     <th colspan="2">${h.pokedex.version_icons(u'Heart Gold', u'Soul Silver')}</th>
 </tr>
 <tr>
-    <th class="vertical-text">Normal</th>
+    <th class="vertical-text">
+        Normal
+        % if c.pokemon.has_gen4_fem_back_sprite:
+        <br/> (male)
+        % endif
+    </th>
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/frame2', form=c.form)}
@@ -184,7 +189,39 @@
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/frame2', form=c.form)}
     </td>
 </tr>
+<tr>
+    <th class="vertical-text">
+        Shiny
+        % if c.pokemon.has_gen4_fem_back_sprite:
+        <br/> (male)
+        % endif
+    </th>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/shiny', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/shiny/frame2', form=c.form)}
+    </td>
+    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/back/shiny', form=c.form)}</td>
+
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny/frame2', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/shiny', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/shiny/frame2', form=c.form)}
+    </td>
+
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny/frame2', form=c.form)}
+    </td>
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/shiny', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/shiny/frame2', form=c.form)}
+    </td>
+</tr>
 % if c.pokemon.has_gen4_fem_sprite:
+<tr class="horizontal-line"></tr>
 <tr>
     <th><div class="vertical-text">Normal<br/>(female)</div></th>
     <td>
@@ -223,34 +260,6 @@
     <td>n/a</td>
     % endif
 </tr>
-% endif
-<tr>
-    <th class="vertical-text">Shiny</th>
-    <td>
-        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/shiny', form=c.form)}
-        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/shiny/frame2', form=c.form)}
-    </td>
-    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/back/shiny', form=c.form)}</td>
-
-    <td>
-        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny', form=c.form)}
-        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny/frame2', form=c.form)}
-    </td>
-    <td>
-        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/shiny', form=c.form)}
-        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/shiny/frame2', form=c.form)}
-    </td>
-
-    <td>
-        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny', form=c.form)}
-        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny/frame2', form=c.form)}
-    </td>
-    <td>
-        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/shiny', form=c.form)}
-        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/shiny/frame2', form=c.form)}
-    </td>
-</tr>
-% if c.pokemon.has_gen4_fem_sprite:
 <tr>
     <th class="vertical-text">Shiny<br/>(female)</th>
     <td>
