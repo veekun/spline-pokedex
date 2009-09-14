@@ -7,7 +7,7 @@ import logging
 import mimetypes
 
 import pokedex.db
-from pokedex.db.tables import Ability, EggGroup, Generation, Item, Move, Pokemon, PokemonEggGroup, PokemonMove, PokemonStat, Type, VersionGroup
+from pokedex.db.tables import Ability, EggGroup, Generation, Item, Move, MoveFlagType, Pokemon, PokemonEggGroup, PokemonMove, PokemonStat, Type, VersionGroup
 import pokedex.lookup
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c
@@ -769,6 +769,14 @@ class PokedexController(BaseController):
         for type_efficacy in c.move.type.damage_efficacies:
             c.type_efficacies[type_efficacy.target_type] = \
                 type_efficacy.damage_factor
+
+        ### Flags
+        c.flags = []
+        move_flags = pokedex_session.query(MoveFlagType) \
+                                    .order_by(MoveFlagType.id.asc())
+        for flag in move_flags:
+            has_flag = flag in c.move.flags
+            c.flags.append((flag, has_flag))
 
         ### Machines
         q = pokedex_session.query(Generation) \

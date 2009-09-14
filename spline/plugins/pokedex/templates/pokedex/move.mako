@@ -65,7 +65,17 @@
 
 <div class="dex-column">
     <h2>Flags</h2>
-
+    <ul class="classic">
+      % for flag, has_flag in c.flags:
+        % if has_flag:
+        <li>${flag.name}</li>
+        <!-- XXX -->
+        <!-- {h.literal(flag.description.as_html)} -->
+        % else:
+        <li class="disabled">${flag.name}</li>
+        % endif
+      % endfor
+    </ul>
 </div>
 
 <div class="dex-column">
