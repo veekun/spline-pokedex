@@ -69,6 +69,18 @@
 </div>
 
 <div class="dex-column">
+    <h2>Names</h2>
+    <dl>
+        % for foreign_name in c.move.foreign_names:
+        <dt>${foreign_name.language.name}</dt>
+        % if foreign_name.language.name == 'Japanese':
+        <dd>${foreign_name.name} (${h.pokedex.romanize(foreign_name.name)})</dd>
+        % else:
+        <dd>${foreign_name.name}</dd>
+        % endif
+        % endfor
+    </dl>
+
     <h2>Machines</h2>
     <dl>
       % for generation, machine_number in sorted(c.machines.items(), \
