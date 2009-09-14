@@ -12,7 +12,6 @@ import pokedex.lookup
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c
 from pylons.controllers.util import abort, redirect_to
-from routes import url_for, request_config
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm.exc import NoResultFound

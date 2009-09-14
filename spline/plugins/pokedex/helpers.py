@@ -24,7 +24,7 @@ def filename_from_name(name):
     return name
 
 def pokedex_img(src, **attr):
-    return h.HTML.img(src=h.url_for(controller='dex', action='media', path=src), **attr)
+    return h.HTML.img(src=url(controller='dex', action='media', path=src), **attr)
 
 
 # XXX Should these be able to promote to db objects, rather than demoting to
@@ -126,7 +126,7 @@ def pokemon_link(pokemon, content=None, to_flavor=False, **attr):
 
     return h.HTML.a(
         content,
-        href=h.url_for(controller='dex', action=action,
+        href=url(controller='dex', action=action,
                        name=pokemon.name.lower(), **url_kwargs),
         **attr
         )

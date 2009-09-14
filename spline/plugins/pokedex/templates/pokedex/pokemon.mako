@@ -358,7 +358,7 @@ ${c.pokemon.name} – Pokémon #${c.pokemon.national_id}\
         <dt>Color</dt>
         <dd>${c.pokemon.color}</dd>
         <dt>Cry</dt>
-        <dd>${h.HTML.a('download mp3', href=h.url_for(controller='dex', action='media', path='cries/%d.mp3' % c.pokemon.national_id))}</dd>
+        <dd>${h.HTML.a('download mp3', href=url(controller='dex', action='media', path='cries/%d.mp3' % c.pokemon.national_id))}</dd>
         % if c.pokemon.generation.id <= 3:
         <dt>Habitat ${h.pokedex.generation_icon(3)}</dt>
         <dd>${h.pokedex.pokedex_img('chrome/habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.habitat))} ${c.pokemon.habitat}</dd>

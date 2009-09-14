@@ -1,4 +1,4 @@
-<form id="pokedex-lookup" method="GET" action="${h.url_for(controller='dex', action='lookup')}">
+<form id="pokedex-lookup" method="GET" action="${url(controller='dex', action='lookup')}">
 <p> <label>
     Pokédex <br/>
     <input type="text" name="lookup" class="dex-lookup js-dex-complete"/>
