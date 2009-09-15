@@ -108,10 +108,20 @@
 </div>
 </div>
 
+
 <h1>Effect</h1>
 <div class="dex-effect">
 ${h.literal(c.move.effect.as_html)}
 </div>
+<h2>Flavor Text</h2>
+<dl>
+    % for move_flavor_text in c.move.flavor_text:
+    <dt>${h.pokedex.generation_icon(move_flavor_text.generation)}</dt>
+    <dd>${move_flavor_text.flavor_text}</dd>
+    % endfor
+</dl>
+
+
 
 <h1>Contests</h1>
 <div class="dex-column-container">
