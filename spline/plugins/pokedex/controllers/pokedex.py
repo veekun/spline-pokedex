@@ -51,6 +51,7 @@ class PokedexController(BaseController):
     encounter_method_order = [
         ('Walking in grass/caves', None),
         ('Walking in grass/caves', u'Time of day'),
+        ('Rock Smash', None),
         ('Fishing with Old Rod', None),
         ('Fishing with Good Rod', None),
         ('Surfing', None),
@@ -475,6 +476,7 @@ class PokedexController(BaseController):
             condition_group = None
             if encounter.condition:
                 condition_group = encounter.condition.group.name
+
             priority = self.encounter_method_order.index(
                            (encounter.slot.type.name, condition_group))
 
