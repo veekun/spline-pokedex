@@ -108,8 +108,37 @@
 </div>
 </div>
 
-
 <h1>Effect</h1>
 <div class="dex-effect">
 ${h.literal(c.move.effect.as_html)}
 </div>
+
+<h1>Contests</h1>
+<div class="dex-column-container">
+<div class="dex-column">
+    <h2>${h.pokedex.generation_icon(3)} Contest</h2>
+    <dl>
+        <dt>Type</dt>
+        <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type, alt=c.move.contest_type, title=c.move.contest_type)}</dd>
+        <dt>Appeal</dt>
+        <dd title="${c.move.contest_effect.appeal}">${u'♡' * c.move.contest_effect.appeal}</dd>
+        <dt>Jam</dt>
+        <dd title="${c.move.contest_effect.jam}">${u'♥' * c.move.contest_effect.jam}</dd>
+        <dt>Flavor text</dt>
+        <dd>${c.move.contest_effect.flavor_text}</dd>
+    </dl>
+</div>
+
+<div class="dex-column">
+    <h2>${h.pokedex.generation_icon(4)} Super Contest</h2>
+    <dl>
+        <dt>Type</dt>
+        <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type, alt=c.move.contest_type, title=c.move.contest_type)}</dd>
+        <dt>Appeal</dt>
+        <dd title="${c.move.super_contest_effect.appeal}">${u'♡' * c.move.super_contest_effect.appeal}</dd>
+        <dt>Flavor text</dt>
+        <dd>${c.move.super_contest_effect.flavor_text}</dd>
+    </dl>
+</div>
+</div>
+
