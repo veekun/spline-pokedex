@@ -39,7 +39,7 @@
 </ul>
 % endif
 
-% if c.pokemon.generation_id <= 1:
+% if c.introduced_in.id <= 2:
 <h2>${h.pokedex.generation_icon(1)} Blue, Red &amp; Blue, Yellow</h2>
 <table>
 <tr class="header-row">
@@ -64,7 +64,7 @@
 </table>
 % endif
 
-% if c.pokemon.generation_id <= 2:
+% if c.introduced_in.id <= 4:
 <h2>${h.pokedex.generation_icon(2)} Gold &amp; Silver, Crystal</h2>
 <table>
 <tr class="header-row">
@@ -97,7 +97,7 @@
 </table>
 % endif
 
-% if c.pokemon.generation_id <= 3:
+% if c.introduced_in.id <= 7:
 <% show_frlg = (c.pokemon.generation_id == 1 or c.pokemon.name == u'Teddiursa') %>\
 <h2>${h.pokedex.generation_icon(3)} Ruby &amp; Sapphire, Emerald, Fire Red &amp; Leaf Green</h2>
 <table>
@@ -151,10 +151,15 @@
 <table>
 <tr class="header-row">
     <th></th>
+    ## Rotom forms only exist beyond Platinum
+    % if c.introduced_in.id <= 8:
     <td class="vertical-line" rowspan="${dpp_rowspan}"></td>
     <th colspan="2">${h.pokedex.version_icons(u'Diamond', u'Pearl')}</th>
+    % endif
+    % if c.introduced_in.id <= 9:
     <td class="vertical-line" rowspan="${dpp_rowspan}"></td>
     <th colspan="2">${h.pokedex.version_icons(u'Platinum')}</th>
+    % endif
     <td class="vertical-line" rowspan="${dpp_rowspan}"></td>
     <th colspan="2">${h.pokedex.version_icons(u'Heart Gold', u'Soul Silver')}</th>
 </tr>
@@ -165,12 +170,15 @@
         <br/> (male)
         % endif
     </th>
+    % if c.introduced_in.id <= 8:
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/frame2', form=c.form)}
     </td>
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/back', form=c.form)}</td>
+    % endif
 
+    % if c.introduced_in.id <= 9:
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/frame2', form=c.form)}
@@ -179,6 +187,7 @@
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/frame2', form=c.form)}
     </td>
+    % endif
 
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver', form=c.form)}
@@ -196,12 +205,15 @@
         <br/> (male)
         % endif
     </th>
+    % if c.introduced_in.id <= 8:
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/shiny', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/shiny/frame2', form=c.form)}
     </td>
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/back/shiny', form=c.form)}</td>
+    % endif
 
+    % if c.introduced_in.id <= 9:
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny/frame2', form=c.form)}
@@ -210,6 +222,7 @@
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/shiny', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/shiny/frame2', form=c.form)}
     </td>
+    % endif
 
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny', form=c.form)}
@@ -224,6 +237,7 @@
 <tr class="horizontal-line"></tr>
 <tr>
     <th><div class="vertical-text">Normal<br/>(female)</div></th>
+    % if c.introduced_in.id <= 8:
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/female', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/female/frame2', form=c.form)}
@@ -233,7 +247,9 @@
     % else:
     <td>n/a</td>
     % endif
+    % endif
 
+    % if c.introduced_in.id <= 9:
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/female', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/female/frame2', form=c.form)}
@@ -245,6 +261,7 @@
     </td>
     % else:
     <td>n/a</td>
+    % endif
     % endif
 
     <td>
@@ -262,6 +279,7 @@
 </tr>
 <tr>
     <th class="vertical-text">Shiny<br/>(female)</th>
+    % if c.introduced_in.id <= 8:
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/shiny/female', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/shiny/female/frame2', form=c.form)}
@@ -271,7 +289,9 @@
     % else:
     <td>n/a</td>
     % endif
+    % endif
 
+    % if c.introduced_in.id <= 9:
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny/female', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny/female/frame2', form=c.form)}
@@ -283,6 +303,7 @@
     </td>
     % else:
     <td>n/a</td>
+    % endif
     % endif
 
     <td>

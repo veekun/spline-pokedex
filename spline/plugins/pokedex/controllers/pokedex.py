@@ -7,7 +7,7 @@ import logging
 import mimetypes
 
 import pokedex.db
-from pokedex.db.tables import Ability, EggGroup, Generation, Item, Move, MoveFlagType, Pokemon, PokemonEggGroup, PokemonMove, PokemonStat, Type, VersionGroup
+from pokedex.db.tables import Ability, EggGroup, Generation, Item, Move, MoveFlagType, Pokemon, PokemonEggGroup, PokemonFormSprite, PokemonMove, PokemonStat, Type, VersionGroup
 import pokedex.lookup
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c
@@ -725,6 +725,16 @@ class PokedexController(BaseController):
         c.form = request.params.get('form', None)
         c.forms = [_.name for _ in c.pokemon.form_sprites]
         c.forms.sort()
+
+        if c.form:
+            spr_form = pokedex_session.query(PokemonFormSprite) \
+                                      .filter_by(pokemon_id=c.pokemon.id,
+                                                 name=c.form) \
+                                      .one()
+            c.introduced_in = spr_form.introduced_in
+        else:
+            c.introduced_in = c.pokemon.generation.version_groups[0]
+
         if c.form:
             c.sprite_filename = u"%d-%s" % (c.pokemon.id, c.form)
         else:
