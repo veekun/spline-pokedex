@@ -137,6 +137,31 @@ ${h.literal(c.move.effect.as_html)}
         <dd title="${c.move.contest_effect.jam}">${u'♥' * c.move.contest_effect.jam}</dd>
         <dt>Flavor text</dt>
         <dd>${c.move.contest_effect.flavor_text}</dd>
+
+        <dt>Use after</dt>
+        <dd>
+            % if c.move.contest_combo_prev:
+            <ul class="inline-commas">
+                % for move in c.move.contest_combo_prev:
+                <li><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></li>
+                % endfor
+            </ul>
+            % else:
+            None
+            % endif
+        </dd>
+        <dt>Use before</dt>
+        <dd>
+            % if c.move.contest_combo_next:
+            <ul class="inline-commas">
+                % for move in c.move.contest_combo_next:
+                <li><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></li>
+                % endfor
+            </ul>
+            % else:
+            None
+            % endif
+        </dd>
     </dl>
     % else:
     <p>This move does not exist in games with Contests.</p>
@@ -153,6 +178,31 @@ ${h.literal(c.move.effect.as_html)}
         <dd title="${c.move.super_contest_effect.appeal}">${u'♡' * c.move.super_contest_effect.appeal}</dd>
         <dt>Flavor text</dt>
         <dd>${c.move.super_contest_effect.flavor_text}</dd>
+
+        <dt>Use after</dt>
+        <dd>
+            % if c.move.super_contest_combo_prev:
+            <ul class="inline-commas">
+                % for move in c.move.super_contest_combo_prev:
+                <li><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></li>
+                % endfor
+            </ul>
+            % else:
+            None
+            % endif
+        </dd>
+        <dt>Use before</dt>
+        <dd>
+            % if c.move.super_contest_combo_next:
+            <ul class="inline-commas">
+                % for move in c.move.super_contest_combo_next:
+                <li><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></li>
+                % endfor
+            </ul>
+            % else:
+            None
+            % endif
+        </dd>
     </dl>
     % else:
     <p>This move does not exist in games with Super Contests.</p>
