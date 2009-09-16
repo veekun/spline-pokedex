@@ -37,6 +37,7 @@
     )}</li>
 % endfor
 </ul>
+<p> ${c.pokemon.normal_form.form_group.description} </p>
 % endif
 
 % if c.introduced_in.id <= 2:
