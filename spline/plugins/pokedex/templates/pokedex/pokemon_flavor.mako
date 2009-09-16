@@ -98,15 +98,25 @@
 % endif
 
 % if c.introduced_in.id <= 7:
-<% show_frlg = (c.pokemon.generation_id == 1 or c.pokemon.name == u'Teddiursa') %>\
+<% show_rusa = not (c.pokemon.name == u'Deoxys' and c.form) %>\
+<% show_emerald = not (c.pokemon.name == u'Deoxys' and c.form != 'speed') %>\
+<% show_frlg = (c.pokemon.generation_id == 1
+                or c.pokemon.name == u'Teddiursa'
+                or (c.pokemon.name == u'Deoxys' and c.form in ('attack', 'defense'))) %>\
 <h2>${h.pokedex.generation_icon(3)} Ruby &amp; Sapphire, Emerald, Fire Red &amp; Leaf Green</h2>
+## Deoxys is a giant mess.
+## Normal only exists in R/S; Speed only in Emerald; Attack only in LG; Defense only in FR.
 <table>
 <tr class="header-row">
     <th></th>
+% if show_rusa:
     <td class="vertical-line" rowspan="3"></td>
     <th colspan="2">${h.pokedex.version_icons(u'Ruby', u'Sapphire')}</th>
+% endif
+% if show_emerald:
     <td class="vertical-line" rowspan="3"></td>
     <th>${h.pokedex.version_icons(u'Emerald')}</th>
+% endif
 % if show_frlg:
     <td class="vertical-line" rowspan="3"></td>
     <th colspan="2">${h.pokedex.version_icons(u'Fire Red', u'Leaf Green')}</th>
@@ -114,14 +124,19 @@
 </tr>
 <tr>
     <th class="vertical-text">Normal</th>
+% if show_rusa:
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='ruby-sapphire', form=c.form)}</td>
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='ruby-sapphire/back', form=c.form)}</td>
+% endif
 
+% if show_emerald:
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald/frame2', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald/animated', form=c.form)}
     </td>
+% endif
+
 % if show_frlg:
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='firered-leafgreen', form=c.form)}</td>
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='firered-leafgreen/back', form=c.form)}</td>
@@ -129,14 +144,19 @@
 </tr>
 <tr>
     <th class="vertical-text">Shiny</th>
+% if show_rusa:
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='ruby-sapphire/shiny', form=c.form)}</td>
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='ruby-sapphire/back/shiny', form=c.form)}</td>
+% endif
 
+% if show_emerald:
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald/shiny', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald/shiny/frame2', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald/shiny/animated', form=c.form)}
     </td>
+% endif
+
 % if show_frlg:
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='firered-leafgreen/shiny', form=c.form)}</td>
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='firered-leafgreen/back/shiny', form=c.form)}</td>
