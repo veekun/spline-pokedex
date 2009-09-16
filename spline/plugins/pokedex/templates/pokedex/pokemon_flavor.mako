@@ -31,9 +31,9 @@
 % for form in c.forms:
     <li>${h.pokedex.pokemon_link(
             c.pokemon,
-            h.pokedex.pokemon_sprite(c.pokemon, prefix='icons', form=form),
+            h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver', form=form),
             to_flavor=True, form=form,
-            class_='dex-icon-link',
+            class_='dex-icon-link' + (' selected' if form == c.form else ''),
     )}</li>
 % endfor
 </ul>
