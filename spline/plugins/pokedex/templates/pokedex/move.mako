@@ -127,6 +127,7 @@ ${h.literal(c.move.effect.as_html)}
 <div class="dex-column-container">
 <div class="dex-column">
     <h2>${h.pokedex.generation_icon(3)} Contest</h2>
+    % if c.move.contest_effect:
     <dl>
         <dt>Type</dt>
         <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type, alt=c.move.contest_type, title=c.move.contest_type)}</dd>
@@ -137,10 +138,14 @@ ${h.literal(c.move.effect.as_html)}
         <dt>Flavor text</dt>
         <dd>${c.move.contest_effect.flavor_text}</dd>
     </dl>
+    % else:
+    <p>This move does not exist in games with Contests.</p>
+    % endif
 </div>
 
 <div class="dex-column">
     <h2>${h.pokedex.generation_icon(4)} Super Contest</h2>
+    % if c.move.super_contest_effect:
     <dl>
         <dt>Type</dt>
         <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type, alt=c.move.contest_type, title=c.move.contest_type)}</dd>
@@ -149,6 +154,9 @@ ${h.literal(c.move.effect.as_html)}
         <dt>Flavor text</dt>
         <dd>${c.move.super_contest_effect.flavor_text}</dd>
     </dl>
+    % else:
+    <p>This move does not exist in games with Super Contests.</p>
+    % endif
 </div>
 </div>
 
