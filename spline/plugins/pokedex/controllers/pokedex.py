@@ -727,10 +727,15 @@ class PokedexController(BaseController):
         c.forms.sort()
 
         if c.form:
-            spr_form = pokedex_session.query(PokemonFormSprite) \
-                                      .filter_by(pokemon_id=c.pokemon.id,
-                                                 name=c.form) \
-                                      .one()
+            try:
+                spr_form = pokedex_session.query(PokemonFormSprite) \
+                                          .filter_by(pokemon_id=c.pokemon.id,
+                                                     name=c.form) \
+                                          .one()
+            except NoResultFound:
+                # Not a valid form!
+                abort(404)
+
             c.introduced_in = spr_form.introduced_in
         else:
             c.introduced_in = c.pokemon.generation.version_groups[0]
