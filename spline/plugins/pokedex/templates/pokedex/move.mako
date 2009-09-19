@@ -93,17 +93,26 @@
 
     <h2>Machines</h2>
     <dl>
-      % for generation, machine_number in sorted(c.machines.items(), \
-                                                 key=lambda (k, v): k.id):
+    % for generation, version_numbers in sorted(c.machines.items(), \
+                                                key=lambda (k, v): k.id):
         <dt>${h.pokedex.generation_icon(generation)}</dt>
-        % if not machine_number:
-        <dd>Not a TM</dd>
-        % elif machine_number > 100:
-        <dd>HM${"%02d" % (machine_number - 100)}</dd>
-        % else:
-        <dd>TM${"%02d" % machine_number}</dd>
-        % endif
-      % endfor
+        <dd>
+          % for version_group, machine_number in version_numbers:
+            % if version_group:
+            ## Null version_group means this gen is all the same machine
+            ${h.pokedex.version_icons(*version_group.versions)}
+            % endif
+            % if not machine_number:
+            Not a TM
+            % elif machine_number > 100:
+            HM${"%02d" % (machine_number - 100)}
+            % else:
+            TM${"%02d" % machine_number}
+            % endif
+            <br>
+          % endfor
+        </dd>
+    % endfor
     </dl>
 </div>
 </div>

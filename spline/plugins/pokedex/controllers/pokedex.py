@@ -1,7 +1,7 @@
 # encoding: utf8
 from __future__ import absolute_import, division
 
-import collections
+from collections import defaultdict, namedtuple
 import colorsys
 import logging
 import mimetypes
@@ -190,7 +190,7 @@ class PokedexController(BaseController):
         c.javascripts.append(('pokedex', 'pokemon'))
 
         ### Type efficacy
-        c.type_efficacies = collections.defaultdict(lambda: 100)
+        c.type_efficacies = defaultdict(lambda: 100)
         for target_type in c.pokemon.types:
             for type_efficacy in target_type.target_efficacies:
                 c.type_efficacies[type_efficacy.damage_type] *= \
@@ -563,7 +563,7 @@ class PokedexController(BaseController):
         # Thus: method => [ (move, { version_group => data, ... }), ... ]
         # "data" is a dictionary of whatever per-version information is
         # appropriate for this move method, such as a TM number or level.
-        c.moves = collections.defaultdict(list)
+        c.moves = defaultdict(list)
         # Grab the rows with a manual query so we can sort thm in about the row
         # they go in the table.  This should keep it as compact as possible
         q = pokedex_session.query(PokemonMove) \
@@ -580,7 +580,7 @@ class PokedexController(BaseController):
 
             # TMs need to know their own TM number
             for machine in pokemon_move.move.machines:
-                if machine.generation == this_vg.generation:
+                if machine.version_group == this_vg:
                     vg_data['machine'] = machine.machine_number
                     break
 
@@ -799,14 +799,42 @@ class PokedexController(BaseController):
         q = pokedex_session.query(Generation) \
                            .filter(Generation.id >= c.move.generation.id) \
                            .order_by(Generation.id.asc())
-        c.generations = {}
+        raw_machines = {}
+        # raw_machines = { generation: { version_group: machine_number } }
         c.machines = {}
+        # c.machines: generation => [ (versions, machine_number), ... ]
+        # Populate an empty dict first so we know which versions don't have a
+        # TM for this move
         for generation in q:
-            c.machines[generation] = None
+            c.machines[generation] = []
+            raw_machines[generation] = {}
+            for version_group in generation.version_groups:
+                raw_machines[generation][version_group] = None
 
+        # Fetch the actual machine numbers
         for machine in c.move.machines:
-            print machine.__dict__
-            c.machines[machine.generation] = machine.machine_number
+            raw_machines[machine.version_group.generation] \
+                        [machine.version_group] = machine.machine_number
+
+        # Collapse that into an easily-displayed form
+        VersionMachine = namedtuple('VersionMachine',
+                                    ['version_group', 'machine_number'])
+        # dictionary -> list of tuples
+        for generation, vg_numbers in raw_machines.items():
+            for version_group, machine_number in vg_numbers.items():
+                c.machines[generation].append(
+                    VersionMachine(version_group=version_group,
+                                   machine_number=machine_number,
+                    )
+                )
+        for generation, vg_numbers in c.machines.items():
+            machine_numbers = [_.machine_number for _ in vg_numbers]
+            if len(set(machine_numbers)) == 1:
+                # Merge generations that have the same machine number everywhere
+                c.machines[generation] = [( None, vg_numbers[0].machine_number )]
+            else:
+                # Otherwise, sort by version group
+                vg_numbers.sort(key=lambda item: item.version_group.id)
 
         return render('/pokedex/move.mako')
 
