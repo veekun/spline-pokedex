@@ -1,10 +1,9 @@
 <%inherit file="/base.mako"/>
+<%namespace name="lib" file="lib.mako"/>
 
 <%def name="title()">${c.pokemon.name}</%def>
 
-<ul class="see-also">
-<li> <img src="${h.static_uri('spline', 'icons/arrow-180-medium.png')}" alt="See also:"> <a href="${url.current(action='pokemon')}">Return to main Pokédex page</a> </li>
-</ul>
+${lib.pokemon_page_header()}
 
 <h1>Pokédex Description</h1>
 % for generation, version_texts in sorted(c.flavor_text.items(), \

@@ -8,6 +8,20 @@ a.dex-box-link { display: inline-block; margin: 0.25em; border: 1px solid transp
 a.dex-box-link:hover { border: 1px solid #bfd3f1; background: #e6eefa; }
 a.dex-box-link.selected { border: 1px solid #95b7ea; background: #bfd4f2; }
 
+/* Header */
+ul.inline-menu { text-align: middle; }
+ul.inline-menu > li { display: inline; }
+ul.inline-menu > li:after { content: ' | '; }
+ul.inline-menu > li:last-child:after { content: none; }
+
+#dex-header { overflow: hidden; /* new float context */ text-align: center; line-height: 24px; /* keep buttons at least 24px tall */ }
+#dex-header-prev { float: left;  text-align: left; }
+#dex-header-next { float: right; text-align: right; }
+#dex-header-prev, #dex-header-next { width: 15em; min-height: 24px; margin: 0; }
+#dex-header-prev img, #dex-header-next img { vertical-align: middle; }
+#dex-header ul.inline-menu {  line-height: 1.2; }
+#dex-header + h1 { margin-top: 0.25em; }
+
 /* Table columns */
 col.dex-col-stat-name   { width: 10em; }
 col.dex-col-stat-bar    { width: auto; }

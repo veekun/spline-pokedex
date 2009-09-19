@@ -1,12 +1,15 @@
 <%inherit file="/base.mako"/>
+<%namespace name="lib" file="lib.mako"/>
 <%! from spline.plugins.pokedex import db %>\
 
 <%def name="title()">\
 % if c.pokemon.forme_name:
-${c.pokemon.forme_name.capitalize()} 
+${c.pokemon.forme_name.capitalize()}
 % endif
 ${c.pokemon.name} – Pokémon #${c.pokemon.national_id}\
 </%def>
+
+${lib.pokemon_page_header()}
 
 <h1>Essentials</h1>
 

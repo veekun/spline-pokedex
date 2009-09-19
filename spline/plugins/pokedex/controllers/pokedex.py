@@ -179,6 +179,17 @@ class PokedexController(BaseController):
         return render('/pokedex/cheat_unlocked.mako')
 
 
+    def _prev_next_pokemon(self, pokemon):
+        """Returns a 2-tuple of the previous and next Pokémon."""
+        max_id = pokedex_session.query(Pokemon) \
+                                .filter_by(forme_base_pokemon_id=None) \
+                                .count()
+        prev_pokemon = pokedex_session.query(Pokemon).get(
+            (c.pokemon.national_id - 1 - 1) % max_id + 1)
+        next_pokemon = pokedex_session.query(Pokemon).get(
+            (c.pokemon.national_id - 1 + 1) % max_id + 1)
+        return prev_pokemon, next_pokemon
+
     def pokemon(self, name=None):
         form = request.params.get('form', None)
         try:
@@ -188,6 +199,9 @@ class PokedexController(BaseController):
 
         # Some Javascript
         c.javascripts.append(('pokedex', 'pokemon'))
+
+        ### Previous and next for the header
+        c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
 
         ### Type efficacy
         c.type_efficacies = defaultdict(lambda: 100)
@@ -745,6 +759,9 @@ class PokedexController(BaseController):
         else:
             c.sprite_filename = unicode(c.pokemon.id)
 
+        ### Previous and next for the header
+        c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
+
         ### Flavor text
         c.flavor_text = {}  # generation => [ ( versions, text ) ]
         db_flavor_text = c.pokemon.flavor_text
@@ -780,6 +797,13 @@ class PokedexController(BaseController):
             c.move = db.get_by_name(Move, name)
         except NoResultFound:
             return self._not_found()
+
+        ### Prev/next for header
+        max_id = pokedex_session.query(Move).count()
+        c.prev_move = pokedex_session.query(Move).get(
+            (c.move.id - 1 - 1) % max_id + 1)
+        c.next_move = pokedex_session.query(Move).get(
+            (c.move.id - 1 + 1) % max_id + 1)
 
         ### Type efficacy
         c.type_efficacies = {}
