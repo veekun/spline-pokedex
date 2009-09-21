@@ -232,3 +232,38 @@ ${h.literal(c.move.effect.as_html)}
 </div>
 </div>
 
+<h1>Pokémon</h1>
+<table class="dex-pokemon-moves striped-rows">
+## COLUMNS
+% for i, column in enumerate(c.pokemon_columns):
+% if i in c.pokemon_divider_columns:
+<col class="dex-col-version dex-col-last-version">
+% else:
+<col class="dex-col-version">
+% endif
+% endfor
+${lib.pokemon_table_columns()}
+## HEADERS
+% for method, method_list in c.pokemon:
+<tr class="header-row">
+    % for column in c.pokemon_columns:
+    ${lib.pokemon_move_table_column_header(column)}
+    % endfor
+    ${lib.pokemon_table_header()}
+</tr>
+<tr class="subheader-row">
+    <th colspan="${len(c.pokemon_columns) + 12}"><strong>${method.name}</strong>: ${method.description}</th>
+</tr>
+## DATA
+% for pokemon, version_group_data in method_list:
+<tr>
+    % for column in c.pokemon_columns:
+    ${lib.pokemon_move_table_method_cell(column, method, version_group_data)}
+    % endfor
+    ${lib.pokemon_table_row(pokemon)}
+</tr>
+% endfor
+% endfor
+
+</table>
+

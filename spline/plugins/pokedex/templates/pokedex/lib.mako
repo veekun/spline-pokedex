@@ -24,3 +24,131 @@
     </ul>
 </div>
 </%def>
+
+
+###### Common tables
+<%def name="pokemon_move_table_column_header(column)">
+<th class="version">
+  % if len(column) == len(column[0].generation.version_groups):
+    ## If the entire gen has been collapsed into a single column, just show
+    ## the gen icon instead of the messy stack of version icons
+    ${h.pokedex.generation_icon(column[0].generation)}
+  % else:
+    % for i, version_group in enumerate(column):
+    % if i != 0:
+    <br>
+    % endif
+    ${h.pokedex.version_icons(*version_group.versions)}
+    % endfor
+  % endif
+</th>
+</%def>
+
+
+## Given a method and some data, returns a cell indicating in some useful
+## manner how a move is learned.
+## Makes some use of c.move_tutor_version_groups, if it exists.
+## XXX How to sort these "correctly"...?
+## XXX How to sort these "correctly"...?
+<%def name="pokemon_move_table_method_cell(column, method, version_group_data)">
+<% version_group = column[0] %>\
+% if method.name == 'Tutor' and c.move_tutor_version_groups:
+<td class="tutored">
+  ## Tutored moves never ever collapse!  Have to merge all the known values,
+  ## rather than ignoring all but the first
+  % for version_group in column:
+    % if version_group in version_group_data:
+    ${h.pokedex.version_icons(*version_group.versions)}
+    % elif version_group in c.move_tutor_version_groups:
+    <span class="no-tutor">${h.pokedex.version_icons(*version_group.versions)}</span>
+    % endif
+  % endfor
+</td>
+% elif version_group not in version_group_data:
+## Could be an empty hash, in which case it's here but has no metadata
+<td></td>
+% elif method.name == 'Level up':
+<td>
+  % if version_group_data[version_group]['level'] == 1:
+    —
+  % else:
+    ${version_group_data[version_group]['level']}
+  % endif
+</td>
+% elif method.name == 'Machine':
+<% machine_number = version_group_data[version_group]['machine'] %>\
+<td>
+  % if machine_number > 100:
+  ## HM
+    <strong>H</strong>${machine_number - 100}
+  % else:
+    ${"%02d" % machine_number}
+  % endif
+</td>
+% elif method.name == 'Egg':
+<td class="dex-moves-egg">${h.pokedex.pokedex_img('icons/egg-cropped.png')}</td>
+% else:
+<td>&bull;</td>
+% endif
+</%def>
+
+
+<%def name="pokemon_table_columns()">
+<col class="dex-col-name">
+<col class="dex-col-type2">
+<col class="dex-col-ability">
+<col class="dex-col-gender">
+<col class="dex-col-egg-group">
+<col class="dex-col-stat">
+<col class="dex-col-stat">
+<col class="dex-col-stat">
+<col class="dex-col-stat">
+<col class="dex-col-stat">
+<col class="dex-col-stat">
+<col class="dex-col-stat-total">
+</%def>
+
+<%def name="pokemon_table_header()">
+<th>Pokémon</th>
+<th>Type</th>
+<th>Ability</th>
+<th>Gender</th>
+<th>Egg Group</th>
+<th>HP</th>
+<th>Atk</th>
+<th>Def</th>
+<th>SpA</th>
+<th>SpD</th>
+<th>Spd</th>
+<th>Total</th>
+</%def>
+
+<%def name="pokemon_table_row(pokemon)">
+<td>${h.pokedex.pokemon_link(pokemon)}</td>
+<td class="type2">
+    % for type in pokemon.types:
+    ${h.pokedex.type_link(type)}
+    % endfor
+</td>
+<td class="ability">
+  % for i, ability in enumerate(pokemon.abilities):
+    % if i > 0:
+    <br>
+    % endif
+    <a href="${url(controller='dex', action='abilities', name=ability.name.lower())}">${ability.name}</a>
+  % endfor
+</td>
+<td>${h.pokedex.pokedex_img('gender-rates/%d.png' % pokemon.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.gender_rate])}</td>
+<td class="egg-group">
+  % for i, egg_group in enumerate(pokemon.egg_groups):
+    % if i > 0:
+    <br>
+    % endif
+    ${egg_group.name}
+  % endfor
+</td>
+% for pokemon_stat in pokemon.stats:
+<td>${pokemon_stat.base_stat}</td>
+% endfor
+<td>${sum((pokemon_stat.base_stat for pokemon_stat in pokemon.stats))}</td>
+</%def>

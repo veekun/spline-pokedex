@@ -106,14 +106,17 @@ table.dex-encounters td.icon { height: 24px; width: 24px; padding-left: 2em; ver
 .dex-rarity-bar-fill { height: 100%; background: #96bbf2; }
 .dex-rarity-bar-value { position: absolute; height: 100%; top: 0; right: 0; color: #808080; vertical-align: bottom; }
 
-table.dex-moves {;}
-table.dex-moves td { padding: 0.33em; vertical-align: middle; text-align: center; }
-table.dex-moves th { padding: 0.33em 0.17em; text-align: center; }
-table.dex-moves tr.subheader-row th { padding: 0.17em 0.33em; text-align: left; }
-table.dex-moves td.egg { padding: 0 /* egg sprite consumes a lot of space, so let it extend into padding */; }
-table.dex-moves td.effect { font-size: 0.8em; text-align: left; }
-table.dex-moves td.tutored { white-space: nowrap; }
-table.dex-moves .no-tutor { visibility: hidden; }
+table.dex-pokemon-moves {;}
+table.dex-pokemon-moves td { padding: 0.33em; vertical-align: middle; text-align: center; }
+table.dex-pokemon-moves th { padding: 0.33em 0.17em; text-align: center; }
+table.dex-pokemon-moves tr.subheader-row th { padding: 0.17em 0.33em; text-align: left; }
+table.dex-pokemon-moves td.egg { padding: 0 /* egg sprite consumes a lot of space, so let it extend into padding */; }
+table.dex-pokemon-moves td.effect { font-size: 0.8em; text-align: left; }
+table.dex-pokemon-moves td.tutored { white-space: nowrap; }
+table.dex-pokemon-moves .no-tutor { visibility: hidden; }
+table.dex-pokemon-moves td.type2 { text-align: left; }
+table.dex-pokemon-moves td.ability { font-size: 0.75em; }
+table.dex-pokemon-moves td.egg-group { font-size: 0.75em; }
 
 .dex-pokemon-flavor-generation { position: absolute; line-height: 1.5; }
 dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation { padding-top: 1.5em; }

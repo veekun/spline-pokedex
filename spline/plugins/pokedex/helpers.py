@@ -98,15 +98,18 @@ def pokemon_link(pokemon, content=None, to_flavor=False, **attr):
         form.
     """
 
-    # Content defaults to the name of the Pokémon
-    if not content:
-        content = pokemon.name
-
     # Kinda gross, but it's entirely valid to pass None as a form
     form = attr.pop('form', pokemon.forme_name)
     if form == pokemon.forme_name and not pokemon.forme_base_pokemon_id:
         # Don't use default form's name as part of the link
         form = None
+
+    # Content defaults to the name of the Pokémon
+    if not content:
+        if form:
+            content = "%s %s" % (form.title(), pokemon.name)
+        else:
+            content = pokemon.name
 
     url_kwargs = {}
     if form:

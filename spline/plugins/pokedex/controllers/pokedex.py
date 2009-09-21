@@ -34,6 +34,108 @@ def bar_color(hue, pastelness):
     return "#%02x%02x%02x" % (r * 256, g * 256, b * 256)
 
 
+def first(func, iterable):
+    """Returns the first element in iterable for which func(elem) is true.
+
+    Equivalent to next(ifilter(func, iterable)).
+    """
+
+    for elem in iterable:
+        if func(elem):
+            return elem
+
+def _pokemon_move_method_sort_key((method, _)):
+    """Sorts methods by id, except that tutors and machines are bumped to the
+    bottom, as they tend to be much longer than everything else.
+    """
+    if method.name in (u'Tutor', u'Machine'):
+        return method.id + 1000
+    else:
+        return method.id
+
+def _collapse_pokemon_move_columns(table, thing):
+    """Combines adjacent identical columns in a pokemon_move structure.
+
+    Arguments are the table structure (defined in comments below) and the
+    Pokémon or move in question.
+
+    Returns a 2-ruple consisting of:
+    - a list of columns like `[ [ rb, y ], [ gs ], [ c ], ...]`
+    - a list of indexes in the above list, corresponding to columns that are
+      the last of their generation
+    """
+
+    # All we really need to know is what versions are ultimately collapsed into
+    # each column, so we need a list of lists of version groups:
+    move_columns = []
+    # We also want to know what columns are the last for a generation, so we
+    # can put divider lines between gens.  Accumulate indices of these as we go
+    move_divider_columns = []
+    # Only even consider versions in which this item actually exists
+    q = pokedex_session.query(Generation) \
+                       .filter(Generation.id >= thing.generation_id) \
+                       .order_by(Generation.id.asc())
+    for generation in q:
+        last_vg = None
+        for i, version_group in enumerate(generation.version_groups):
+            if i == 0:
+                # Can't collapse these versions anywhere!  Create a new column
+                move_columns.append( [version_group] )
+                last_vg = version_group
+                continue
+
+            # Test to see if this version group column is identical to the one
+            # immediately to its left; if so, we can combine them
+            squashable = True
+            for method, method_list in table:
+                # Tutors are special; they will NEVER collapse, so ignore them
+                # for now.  When we actually print the table, we'll concatenate
+                # all the tutor cells instead of just using the first one like
+                # with everything else
+                if method.name == 'Tutor':
+                    continue
+
+                for move, version_group_data in method_list:
+                    if version_group_data.get(version_group, None) \
+                        != version_group_data.get(last_vg, None):
+                        squashable = False
+                        break
+                if not squashable:
+                    # Definitely can't collapse.  Bail
+                    break
+
+            if squashable:
+                # Stick this version group in the previous column
+                move_columns[-1].append(version_group)
+            else:
+                # Create a new column
+                move_columns.append( [version_group] )
+
+            last_vg = version_group
+
+        # Remember the last column within the generation
+        move_divider_columns.append(len(move_columns) - 1)
+
+    return move_columns, move_divider_columns
+
+def _move_tutor_version_groups(table):
+    """Tutored moves are never the same between version groups, so the column
+    collapsing ignores tutors entirely.  This means that we might end up
+    wanting to show several versions as having a tutor within a single column.
+    So that "E, FRLG" lines up with "FRLG", there has to be a blank space for
+    "E", which requires finding all the version groups that contain tutors.
+    """
+
+    move_tutor_version_groups = set()
+    for method, method_list in table:
+        if method.name != 'Tutor':
+            continue
+        for move, version_group_data in method_list:
+            move_tutor_version_groups.update(version_group_data.keys())
+
+    return move_tutor_version_groups
+
+
 class PokedexController(BaseController):
 
     # Used by lookup disambig pages
@@ -399,6 +501,7 @@ class PokedexController(BaseController):
 
             c.evolution_table.append(current_path)
 
+        ### Stats
         c.stats = {}  # stat_name => { border, background, percentile }
                       #              (also 'value' for total)
         stat_total = 0
@@ -574,10 +677,12 @@ class PokedexController(BaseController):
         # Within a method is a list of move rows.
         # A move row contains a level or other status per version group, plus
         # a move id.
-        # Thus: method => [ (move, { version_group => data, ... }), ... ]
+        # Thus: ( method, [ (move, { version_group => data, ... }), ... ] )
+        # First, though, we make a dictionary for quick access to each method's
+        # list.
         # "data" is a dictionary of whatever per-version information is
         # appropriate for this move method, such as a TM number or level.
-        c.moves = defaultdict(list)
+        move_methods = defaultdict(list)
         # Grab the rows with a manual query so we can sort thm in about the row
         # they go in the table.  This should keep it as compact as possible
         q = pokedex_session.query(PokemonMove) \
@@ -586,17 +691,18 @@ class PokedexController(BaseController):
                                      PokemonMove.order.asc(),
                                      PokemonMove.version_group_id.asc())
         for pokemon_move in q:
-            method_list = c.moves[pokemon_move.method]
+            method_list = move_methods[pokemon_move.method]
             this_vg = pokemon_move.version_group
 
             # Create a container for data for this method and version(s)
             vg_data = dict()
 
             # TMs need to know their own TM number
-            for machine in pokemon_move.move.machines:
-                if machine.version_group == this_vg:
+            if pokemon_move.method.name == 'Machine':
+                machine = first(lambda _: _.version_group == this_vg,
+                                pokemon_move.move.machines)
+                if machine:
                     vg_data['machine'] = machine.machine_number
-                    break
 
             # Find the best place to insert a row.
             # In general, we just want the move names in order, so we can just
@@ -610,10 +716,6 @@ class PokedexController(BaseController):
             if pokemon_move.method.name == 'Level up':
                 vg_data['sort'] = (pokemon_move.level, pokemon_move.order)
                 vg_data['level'] = pokemon_move.level
-                # Level 1 is generally thought of as a special category of starter
-                # move, so the table will be easier to read if it indicates this
-                if vg_data['level'] == 1:
-                    vg_data['level'] = '—'  # em dash
 
                 # Find the next-lowest and next-highest rows.  Our row must fit
                 # between those
@@ -655,76 +757,22 @@ class PokedexController(BaseController):
             new_row = pokemon_move.move, { this_vg: vg_data }
             method_list.insert(upper_bound or len(method_list), new_row)
 
-        for method, method_list in c.moves.items():
+        # Convert dictionary to our desired list of tuples
+        c.moves = move_methods.items()
+        c.moves.sort(key=_pokemon_move_method_sort_key)
+
+        # Sort non-level moves by name
+        for method, method_list in c.moves:
             if method.name == 'Level up':
                 continue
             method_list.sort(key=lambda (move, version_group_data): move.name)
 
-        # Finally, we want to collapse identical adjacent columns within the
-        # same generation.
-        # All we really need to know is what versions are ultimately collapsed
-        # into each column, so we need a list of lists of version groups:
-        # [ [ rb, y ], [ gs ], [ c ], ... ]
-        c.move_columns = []
-        # We also want to know what columns are the last for a generation, so
-        # we can put divider lines between gens.  Accumulate indices of these
-        # columns as we go
-        c.move_divider_columns = []
-        # Only even consider versions in which this Pokémon actually exists
-        q = pokedex_session.query(Generation) \
-                           .filter(Generation.id >= c.pokemon.generation_id) \
-                           .order_by(Generation.id.asc())
-        for generation in q:
-            last_vg = None
-            for i, version_group in enumerate(generation.version_groups):
-                if i == 0:
-                    # Can't collapse this column anywhere!  Just add it as a
-                    # new column
-                    c.move_columns.append( [version_group] )
-                    last_vg = version_group
-                    continue
+        # Finally, collapse identical columns within the same generation
+        c.move_columns, c.move_divider_columns \
+            = _collapse_pokemon_move_columns(table=c.moves, thing=c.pokemon)
 
-                # Test to see if this version group column is identical to the
-                # one immediately to its left; if so, we can combine them
-                squashable = True
-                for method, method_list in c.moves.items():
-                    # Tutors are special; they will NEVER collapse, so ignore
-                    # them for now.  When we actually print the table, we'll
-                    # concatenate all the tutor cells instead of just using the
-                    # first one like with everything else
-                    if method.name == 'Tutor':
-                        continue
-
-                    for move, version_group_data in method_list:
-                        if version_group_data.get(version_group, None) \
-                            != version_group_data.get(last_vg, None):
-                            squashable = False
-                            break
-                    if not squashable:
-                        break
-
-                if squashable:
-                    # Stick this version group in the previous column
-                    c.move_columns[-1].append(version_group)
-                else:
-                    # Create a new column
-                    c.move_columns.append( [version_group] )
-
-                last_vg = version_group
-
-            # Remember the last column within the generation
-            c.move_divider_columns.append(len(c.move_columns) - 1)
-
-        # Used for tutored moves: we want to leave a blank space for collapsed
-        # columns with tutored versions in them so all the versions line up,
-        # and to do that we need to know which versions actually have tutored
-        # moves -- otherwise we'd leave space for R/S, D/P, etc
-        c.move_tutor_version_groups = []
-        for method, method_list in c.moves.items():
-            if method.name != 'Tutor':
-                continue
-            for move, version_group_data in method_list:
-                c.move_tutor_version_groups.extend(version_group_data.keys())
+        # Grab list of all the version groups with tutor moves
+        c.move_tutor_version_groups = _move_tutor_version_groups(c.moves)
 
         return render('/pokedex/pokemon.mako')
 
@@ -859,6 +907,66 @@ class PokedexController(BaseController):
             else:
                 # Otherwise, sort by version group
                 vg_numbers.sort(key=lambda item: item.version_group.id)
+
+        ### Pokémon
+        # This is kinda like the moves for Pokémon, but backwards.  Imagine
+        # that!  We have the same basic structure, a list of:
+        #     ( method, [ (pokemon, { version_group => data, ... }), ... ] )
+        pokemon_methods = defaultdict(list)
+        q = pokedex_session.query(PokemonMove) \
+                           .filter_by(move_id=c.move.id) \
+                           .order_by(PokemonMove.level.asc(),
+                                     PokemonMove.order.asc(),
+                                     PokemonMove.version_group_id.asc())
+        for pokemon_move in q:
+            method_list = pokemon_methods[pokemon_move.method]
+            this_vg = pokemon_move.version_group
+
+            # Create a container for data for this method and version(s)
+            vg_data = dict()
+
+            if pokemon_move.method.name == 'Level up':
+                # Level-ups need to know what level
+                vg_data['level'] = pokemon_move.level
+            elif pokemon_move.method.name == 'Machine':
+                # TMs need to know their own TM number
+                machine = first(lambda _: _.version_group == this_vg,
+                                pokemon_move.move.machines)
+                if machine:
+                    vg_data['machine'] = machine.machine_number
+
+            # The Pokémon version does sorting here, but we're just going to
+            # sort by name regardless of method, so leave that until last
+
+            # Check for a free existing row for this move; if one exists, we
+            # can just add our data to that same row
+            valid_row = first(
+                lambda (pokemon, version_group_data):
+                    pokemon == pokemon_move.pokemon and \
+                    this_vg not in version_group_data,
+                method_list
+            )
+            if valid_row:
+                valid_row[1][this_vg] = vg_data
+                continue
+
+            # Otherwise, we need a new row
+            method_list.append(( pokemon_move.pokemon, { this_vg: vg_data } ))
+
+        # Convert dictionary to our desired list of tuples
+        c.pokemon = pokemon_methods.items()
+        c.pokemon.sort(key=_pokemon_move_method_sort_key)
+
+        # Sort by Pokémon name
+        for method, method_list in c.pokemon:
+            method_list.sort(key=lambda (pokemon, whatever): pokemon.name)
+
+        # Finally, collapse identical columns within the same generation
+        c.pokemon_columns, c.pokemon_divider_columns \
+            = _collapse_pokemon_move_columns(table=c.pokemon, thing=c.move)
+
+        # Grab list of all the version groups with tutor moves
+        c.move_tutor_version_groups = _move_tutor_version_groups(c.pokemon)
 
         return render('/pokedex/move.mako')
 

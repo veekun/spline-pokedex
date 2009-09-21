@@ -490,7 +490,7 @@ ${lib.pokemon_page_header()}
 </table>
 
 <h1>Moves</h1>
-<table class="dex-moves striped-rows">
+<table class="dex-pokemon-moves striped-rows">
 ## COLUMNS
 % for i, column in enumerate(c.move_columns):
 % if i in c.move_divider_columns:
@@ -499,26 +499,11 @@ ${lib.pokemon_page_header()}
 <col class="dex-col-version">
 % endif
 % endfor
-## XXX How to sort these "correctly"...?
 ## HEADERS
-% for method, method_list in sorted(c.moves.items(), \
-                                    key=lambda (k, v): k.id):
+% for method, method_list in c.moves:
 <tr class="header-row">
     % for column in c.move_columns:
-    <th class="version">
-      % if len(column) == len(column[0].generation.version_groups):
-        ## If the entire gen has been collapsed into a single column, just show
-        ## the gen icon instead of the messy stack of version icons
-        ${h.pokedex.generation_icon(column[0].generation)}
-      % else:
-        % for i, version_group in enumerate(column):
-        % if i != 0:
-        <br>
-        % endif
-        ${h.pokedex.version_icons(*version_group.versions)}
-        % endfor
-      % endif
-    </th>
+    ${lib.pokemon_move_table_column_header(column)}
     % endfor
     <th>Move</th>
     <th>Type</th>
@@ -535,41 +520,9 @@ ${lib.pokemon_page_header()}
 ## DATA
 % for move, version_group_data in method_list:
 <tr>
-  % for column in c.move_columns:
-    % if method.name == 'Tutor':
-    ## Tutored moves never ever collapse!  Have to merge all the known values,
-    ## rather than ignoring all but the first
-    <td class="tutored">
-        % for version_group in column:
-        % if version_group in version_group_data:
-        ${h.pokedex.version_icons(*version_group.versions)}
-        % elif version_group in c.move_tutor_version_groups:
-        <span class="no-tutor">${h.pokedex.version_icons(*version_group.versions)}</span>
-        % endif
-        % endfor
-    </td>
-    % elif column[0] not in version_group_data:
-    <td></td>
-    % elif method.name == 'Level up':
-    <td>${version_group_data[column[0]]['level']}</td>
-    % elif method.name == 'Machine':
-    <% machine_number = version_group_data[column[0]].get('machine', None) %>\
-    <td>
-      % if not machine_number:
-        <% pass %>\
-      % elif machine_number > 100:
-      ## HM
-        <strong>H</strong>${machine_number - 100}
-      % else:
-        ${"%02d" % machine_number}
-      % endif
-    </td>
-    % elif method.name == 'Egg':
-    <td class="dex-moves-egg">${h.pokedex.pokedex_img('icons/egg-cropped.png')}</td>
-    % else:
-    <td>&bull;</td>
-    % endif
-  % endfor
+    % for column in c.move_columns:
+    ${lib.pokemon_move_table_method_cell(column, method, version_group_data)}
+    % endfor
 
     <td><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></td>
     <td>${h.pokedex.type_link(move.type)}</td>
