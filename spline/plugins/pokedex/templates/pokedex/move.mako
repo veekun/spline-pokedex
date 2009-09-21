@@ -264,6 +264,16 @@ ${lib.pokemon_table_columns()}
 </tr>
 % endfor
 % endfor
-
 </table>
 
+<h1>External Links</h1>
+<ul class="classic-list">
+% if c.move.generation.id <= 1:
+<li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/attacks/${c.move.name[0].lower()}/${c.move.name.lower().replace(' ', '_')}.htm">Azure Heights</a></li>
+% endif
+<li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.move.name.replace(' ', '_')}_%28move%29">Bulbapedia</a></li>
+<li><a href="http://www.legendarypokemon.net/attacks/${c.move.name.replace(' ', '+')}/">Legendary Pok&eacute;mon</a></li>
+<li><a href="http://www.psypokes.com/dex/techdex/${"%03d" % c.move.id}">PsyPoke</a></li>
+<li><a href="http://www.serebii.net/attackdex-dp/${c.move.name.lower().replace(' ', '')}.shtml">Serebii</a></li>
+<li><a href="http://www.smogon.com/dp/moves/${c.move.name.lower().replace(' ', '_')}">Smogon</a></li>
+</ul>
