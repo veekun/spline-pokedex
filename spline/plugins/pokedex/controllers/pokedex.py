@@ -10,8 +10,9 @@ import pokedex.db
 from pokedex.db.tables import Ability, EggGroup, Generation, Item, Move, MoveFlagType, Pokemon, PokemonEggGroup, PokemonFormSprite, PokemonMove, PokemonStat, Type, VersionGroup
 import pokedex.lookup
 import pkg_resources
-from pylons import config, request, response, session, tmpl_context as c
+from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
+from pylons.decorators import jsonify
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm.exc import NoResultFound
@@ -279,6 +280,45 @@ class PokedexController(BaseController):
         session.save()
         c.this_cheat_key = cheat_key
         return render('/pokedex/cheat_unlocked.mako')
+
+
+    @jsonify
+    def suggest(self):
+        """Returns a JSON array of Pokédex lookup suggestions, compatible with
+        the OpenSearch spec.
+        """
+
+        prefix = request.params.get('prefix', None)
+        if not prefix:
+            return []
+
+        suggestions = pokedex.lookup.prefix_lookup(prefix)
+
+        names = []     # actual terms that will appear in the list
+        metadata = []  # parallel array of metadata my suggest widget uses
+        for suggestion in suggestions:
+            row = suggestion.object
+            names.append(suggestion.name)
+            meta = dict(
+                type=row.__singlename__,
+            )
+            if isinstance(row, Pokemon):
+                meta['image'] = url(controller='dex', action='media', path="icons/%d.png" % row.id)
+            elif isinstance(row, Move):
+                meta['image'] = url(controller='dex', action='media', path="chrome/types/%s.png" % row.type.name)
+            elif isinstance(row, Type):
+                meta['image'] = url(controller='dex', action='media', path="chrome/types/%s.png" % row.name)
+            elif isinstance(row, Item):
+                meta['image'] = url(controller='dex', action='media', path="items/%s.png" % pokedex_helpers.filename_from_name(row.name))
+            metadata.append(meta)
+
+        return [
+            prefix,
+            names,
+            None,       # descriptions
+            None,       # query URLs
+            metadata,   # my metadata; outside the spec's range
+        ]
 
 
     def _prev_next_pokemon(self, pokemon):

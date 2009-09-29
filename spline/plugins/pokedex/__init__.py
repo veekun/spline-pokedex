@@ -4,7 +4,7 @@ from pkg_resources import resource_filename
 
 from docutils import nodes
 from docutils.parsers.rst import roles
-from pylons import config, url
+from pylons import config, tmpl_context as c, url
 from sqlalchemy.orm.exc import NoResultFound
 
 import pokedex.db
@@ -20,6 +20,7 @@ def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
     map.connect('/dex/media/*path', controller='dex', action='media')
     map.connect('/dex/lookup', controller='dex', action='lookup')
+    map.connect('/dex/suggest', controller='dex', action='suggest')
 
     map.connect('/dex/abilities/{name}', controller='dex', action='abilities')
     map.connect('/dex/items/{name}', controller='dex', action='items')
@@ -69,6 +70,10 @@ def after_setup_hook(*args, **kwargs):
 
     roles.register_local_role('mechanic', mechanic_role)
 
+def before_controller_hook(*args, **kwargs):
+    """Hook to inject suggestion-box Javascript into every page."""
+    c.javascripts.append(('pokedex', 'pokedex-suggestions'))
+
 
 class PokedexPlugin(PluginBase):
     def __init__(self):
@@ -96,6 +101,7 @@ class PokedexPlugin(PluginBase):
         return [
             ('routes_mapping', 3, add_routes_hook),
             ('after_setup', 3, after_setup_hook),
+            ('before_controller', 3, before_controller_hook),
         ]
 
     def widgets(self):
