@@ -238,7 +238,7 @@ ${lib.pokemon_page_header()}
     if form == c.pokemon.forme_name:
         link_class = link_class + ' selected'
 %>\
-    <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_sprite(c.pokemon, 'platinum', form=form), form=form, class_=link_class)}</li>
+    <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_sprite(c.pokemon, 'heartgold-soulsilver', form=form), form=form, class_=link_class)}</li>
     % endfor
 </ul>
 <p> ${c.pokemon.normal_form.form_group.description} </p>
