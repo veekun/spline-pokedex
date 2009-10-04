@@ -778,24 +778,50 @@ class PokedexController(BaseController):
                 lower_bound += 1
 
             # Check for a free existing row for this move; if one exists, we
-            # can just add our data to that same row
+            # can just add our data to that same row.
+            # It's also possible that an existing row for this move can be
+            # shifted forwards into our valid range, if there are no
+            # intervening rows with levels in the same version groups that that
+            # row has.  This is unusual, but happens when a lot of moves have
+            # been shuffled around multiple times, like with Pikachu
             valid_row = None
-            for table_row in method_list[lower_bound:upper_bound]:
+            for i, table_row in enumerate(method_list[0:upper_bound]):
                 move, version_group_data = table_row
-                if move == pokemon_move.move and this_vg not in version_group_data:
+
+                # If we've already found a row for version X outside our valid
+                # range but run across another row with a level for X, that row
+                # cannot be moved up, so it's not usable
+                if valid_row and set(valid_row[1].keys()).intersection(
+                                     set(version_group_data.keys())):
+                    valid_row = None
+
+                if move == pokemon_move.move \
+                    and this_vg not in version_group_data:
+
                     valid_row = table_row
-                    break
+                    # If we're inside the valid range, just take the first row
+                    # we find.  If we're outside it, we want the last possible
+                    # row to avoid shuffling the table too much.  So only break
+                    # if this row is inside lb/ub
+                    if i >= lower_bound:
+                        break
+
             if valid_row:
+                if method_list.index(valid_row) < lower_bound:
+                    # Move the row up if necessary
+                    method_list.remove(valid_row)
+                    method_list.insert(lower_bound, valid_row)
                 valid_row[1][this_vg] = vg_data
                 continue
 
             # Otherwise, just make a new row and stuff it in.
-            # Rows are sorted by level going up, so any future ones wanting to
-            # use this row will have higher levels.  Let's put this as close to
-            # the end as we can, then, or we risk making multiple rows for the
-            # same move unnecessarily
+            # Rows are sorted by level before version group.  If we see move X
+            # for a level, then move Y for another game, then move X for that
+            # other game, the two X's should be able to collapse.  Thus we put
+            # the Y before the first X to leave space for the second X -- that
+            # is, add new rows as early in the list as possible
             new_row = pokemon_move.move, { this_vg: vg_data }
-            method_list.insert(upper_bound or len(method_list), new_row)
+            method_list.insert(lower_bound or 0, new_row)
 
         # Convert dictionary to our desired list of tuples
         c.moves = move_methods.items()
