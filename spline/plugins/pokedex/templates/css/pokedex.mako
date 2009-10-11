@@ -112,6 +112,7 @@ table.dex-pokemon-moves th { padding: 0.33em 0.17em; text-align: center; }
 table.dex-pokemon-moves tr.subheader-row th { padding: 0.17em 0.33em; text-align: left; }
 table.dex-pokemon-moves td.egg { padding: 0 /* egg sprite consumes a lot of space, so let it extend into padding */; }
 table.dex-pokemon-moves td.effect { font-size: 0.8em; text-align: left; }
+table.dex-pokemon-moves td.effect p { margin: 0; }
 table.dex-pokemon-moves td.tutored { white-space: nowrap; }
 table.dex-pokemon-moves .no-tutor { visibility: hidden; }
 table.dex-pokemon-moves td.type2 { text-align: left; }
