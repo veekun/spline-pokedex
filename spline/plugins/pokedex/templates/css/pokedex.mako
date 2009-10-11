@@ -62,13 +62,13 @@ col.dex-col-last-version{ border-right: 1px solid #b4c7e6; }
 .dex-size .dex-size-trainer img { right: 0.25em; }
 .dex-size .dex-size-pokemon img { left: 0.25em; }
 .dex-size .js-dex-size-raw { display: none; }
-.dex-size .dex-size-value { position: absolute; height: 2em; padding: 0.25em; bottom: -2.5em; }
+.dex-size .dex-size-value { position: absolute; height: 2em; margin: 0; line-height: 1; padding: 0.25em; bottom: -2.5em; }
 .dex-size .dex-size-trainer .dex-size-value { right: 0.25em; }
 .dex-size .dex-size-pokemon .dex-size-value { left: 0.25em; }
 
 /*** Individual pages ***/
 #dex-page-portrait { float: left; width: 15em; min-height: 10em; padding-bottom: 1em; text-align: center; }
-#dex-page-portrait p { margin: 0.25em 0; }
+#dex-page-portrait p { margin: 0.25em 0; line-height: 1; }
 p#dex-page-name { font-size: 2em; margin: 0.12em 0; }
 #dex-pokemon-forme { font-size: 1.25em; font-weight: bold; }
 #dex-pokemon-portrait-sprite { margin: 0.33em; padding: 7px; background: url(/dex/media/chrome/sprite-frame.png) center center no-repeat; }
@@ -132,9 +132,6 @@ th { vertical-align: middle; }
 
 /* Move effects, etc */
 .dex-effect a { font-weight: normal; }
-/* XXX temporary until I can put this on all paragraphs */
-.dex-effect p { line-height: 1.4; }
-.dex-effect p + p { margin-top: 1em; }
 
 
 #dex-cheat-unlocked { overflow: hidden /* float containment */; width: 60%; margin: auto; margin-top: 10em; }
