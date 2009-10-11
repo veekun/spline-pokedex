@@ -197,7 +197,9 @@ var pokedex_suggestions = {
         // Select the highlighted entry if there be one, otherwise submit
         else if (e.keyCode == 13) {  // enter
             // If the suggestion list isn't visible, do nothing special
-            if ($suggest_box.css('visibility') == "hidden") {
+            if ($suggest_box.css('visibility') == "hidden"
+                || ! $selected.length)
+            {
                 return;
             }
 
