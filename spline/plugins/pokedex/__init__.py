@@ -15,7 +15,7 @@ import spline.plugins.pokedex.controllers.pokedex
 from spline.plugins.pokedex import helpers as pokedex_helpers
 from spline.plugins.pokedex.db import get_by_name, pokedex_session
 import spline.lib.helpers as h
-from spline.lib.plugin import PluginBase, PluginLink
+from spline.lib.plugin import PluginBase, Priority
 
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
@@ -89,7 +89,7 @@ class PokedexPlugin(PluginBase):
 
     def template_dirs(self):
         return [
-            (resource_filename(__name__, 'templates'), 3)
+            (resource_filename(__name__, 'templates'), Priority.NORMAL)
         ]
 
     def static_dir(self):
@@ -100,9 +100,9 @@ class PokedexPlugin(PluginBase):
 
     def hooks(self):
         return [
-            ('routes_mapping', 3, add_routes_hook),
-            ('after_setup', 3, after_setup_hook),
-            ('before_controller', 3, before_controller_hook),
+            ('routes_mapping',    Priority.NORMAL, add_routes_hook),
+            ('after_setup',       Priority.NORMAL, after_setup_hook),
+            ('before_controller', Priority.NORMAL, before_controller_hook),
         ]
 
     def links(self):
@@ -116,5 +116,5 @@ class PokedexPlugin(PluginBase):
 
     def widgets(self):
         return [
-            ('page_header', 3, 'widgets/pokedex_lookup.mako'),
+            ('page_header', Priority.NORMAL, 'widgets/pokedex_lookup.mako'),
         ]
