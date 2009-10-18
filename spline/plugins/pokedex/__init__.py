@@ -4,7 +4,8 @@ from pkg_resources import resource_filename
 
 from docutils import nodes
 from docutils.parsers.rst import roles
-from pylons import config, tmpl_context as c, url
+from pylons import config, tmpl_context as c
+from routes import url_for as url
 from sqlalchemy.orm.exc import NoResultFound
 
 import pokedex.db
@@ -14,7 +15,7 @@ import spline.plugins.pokedex.controllers.pokedex
 from spline.plugins.pokedex import helpers as pokedex_helpers
 from spline.plugins.pokedex.db import get_by_name, pokedex_session
 import spline.lib.helpers as h
-from spline.lib.plugin import PluginBase
+from spline.lib.plugin import PluginBase, PluginLink
 
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
@@ -102,6 +103,15 @@ class PokedexPlugin(PluginBase):
             ('routes_mapping', 3, add_routes_hook),
             ('after_setup', 3, after_setup_hook),
             ('before_controller', 3, before_controller_hook),
+        ]
+
+    def links(self):
+        """
+        """
+        return [
+            (u'Pokédex', url('/dex'), [
+                (u'Eevee', url(controller='dex', action='pokemon', name='eevee'), []),
+            ]),
         ]
 
     def widgets(self):
