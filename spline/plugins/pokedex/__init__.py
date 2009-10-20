@@ -15,7 +15,7 @@ import spline.plugins.pokedex.controllers.pokedex
 from spline.plugins.pokedex import helpers as pokedex_helpers
 from spline.plugins.pokedex.db import get_by_name, pokedex_session
 import spline.lib.helpers as h
-from spline.lib.plugin import PluginBase, Priority
+from spline.lib.plugin import PluginBase, PluginLink, Priority
 
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
@@ -106,11 +106,9 @@ class PokedexPlugin(PluginBase):
         ]
 
     def links(self):
-        """
-        """
         return [
-            (u'Pokédex', url('/dex'), [
-                (u'Eevee', url(controller='dex', action='pokemon', name='eevee'), []),
+            PluginLink(u'Pokédex', url('/dex'), children=[
+                PluginLink(u'Eevee', url(controller='dex', action='pokemon', name='eevee')),
             ]),
         ]
 
