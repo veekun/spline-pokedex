@@ -142,6 +142,12 @@ ${h.literal(c.move.effect.as_html)}
     <dd>${move_flavor_text.flavor_text}</dd>
     % endfor
 </dl>
+<h2>Categories</h2>
+<ul>
+    % for category in c.move.move_effect.categories:
+    <li>${category.name}</li>
+    % endfor
+</ul>
 
 
 
