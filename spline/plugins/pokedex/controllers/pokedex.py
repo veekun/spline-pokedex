@@ -219,6 +219,12 @@ class PokedexController(BaseController):
         Also performs fuzzy search.
         """
         name = request.params.get('lookup', None)
+        if not name:
+            # Nothing entered.  What?  Where did you come from?
+            # There's nothing sensible to do here.  Let's use an obscure status
+            # code, like 204 No Content.
+            abort(204)
+
         name = name.strip()
 
         ### Special stuff that bypasses lookup
