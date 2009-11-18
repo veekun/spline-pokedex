@@ -60,9 +60,16 @@ pokedex.pokemon_moves = {
                        pokedex.generation_ct - num_generations + 1);
             $this.data('pokemon_moves.column_classes', column_classes);
 
+            // Remember the arrangement of rows, including header rows.  Using
+            // references to the rows themselves will also let us delete them
+            // at will and restore them later, which makes resetting to page
+            // default much easier
+            var row_order = $this.find('tr').get();
+            $this.data('pokemon_moves.original_rows', row_order);
+
             // Bind action to the available links
             // Add a row with controls
-            var $controls = $('<tr></tr>');
+            var $controls = $('<tr class="js-dex-pokemon-moves-controls"></tr>');
             var vg_start = 0;
             var vg_width = 0;
             for (var i = 0; i < $version_columns.length; i++) {
@@ -97,10 +104,17 @@ pokedex.pokemon_moves = {
         });
     },
 
-    // Reset filtering
-    'show_columns': function(e) {
+    // Reset filtering, sorting, etc.
+    'restore': function(e) {
         var $td = $(e.target).closest('td');
         var $this = $td.closest('table.dex-pokemon-moves');
+
+        // Restore rows -- BEFORE unhiding everything, dummy.
+        // note: Don't delete the row with filter links in it!
+        $this.find('tr:not(.js-dex-pokemon-moves-controls)').remove();
+        $( $this.data('pokemon_moves.original_rows') ).appendTo($this);
+
+        // Ok, now unhide everything
         $this.find('td, th').css('display', null);
 
         // Restore column definitions
@@ -112,7 +126,7 @@ pokedex.pokemon_moves = {
 
         // Change the filter link back
         var $img = $td.find('img');
-        $td.unbind('click', pokedex.pokemon_moves.show_columns);
+        $td.unbind('click', pokedex.pokemon_moves.restore);
         $td.click(pokedex.pokemon_moves.filter_columns);
         $img.attr({
             'src':   '/static/spline/icons/funnel.png',
@@ -138,23 +152,42 @@ pokedex.pokemon_moves = {
 
         // Write out only the <col> tags for the columns we're keeping
         var column_classes = $this.data('pokemon_moves.column_classes');
-        var filter_parts = [];
+        var hidden_cell_css = [];
+        var visible_cell_css = [];
         $this.find('col.dex-col-version').remove();
         for (var col = column_classes.length; col >= 1; col--) {
             if (columns_hash[col]) {
                 $this.prepend('<col class="' + column_classes[col - 1] + '">');
-                continue;
+                visible_cell_css.push(':nth-child(' + col + ')')
             }
-            filter_parts.push(':nth-child(' + col + ')')
+            else {
+                hidden_cell_css.push(':nth-child(' + col + ')')
+            }
         }
 
-        // Hide the appropriate cells in every row but the header control row
-        var $cells = $this.find('tr:not(.subheader-row)')
-                          .not($tr)
-                          .find('th, td');
-        $cells.add( $this.find('col.dex-col-version') );
-        $cells.filter( filter_parts.join(',') )
+        // Hide the appropriate cells in every row that isn't mucked up by
+        // colspan (i.e. a subheader or the control row)
+        var $non_spanned_rows = $this.find('tr:not(.subheader-row)')
+                                     .not($tr);
+        var $cells = $non_spanned_rows.find('th, td');
+        $cells.filter( hidden_cell_css.join(',') )
               .css('display', 'none');
+        $this.find('col.dex-col-version')
+             .filter( hidden_cell_css.join(',') )
+             .css('display', 'none');
+
+        // Hide any rows that only have empty cells remaining
+        // i.e. hide any rows that AREN'T rows WITHOUT empty cells remaining.
+        var $visible_cells = $cells.filter( visible_cell_css.join(',') )
+        var $relevant_rows = $visible_cells.not('.tutored, :empty')
+                                           .closest('tr');
+        // Tutors have a different notion of "empty", as each cell is its own
+        // mini table thing.  They're empty iff they have no img children.
+        var $relevant_tutor_rows = $visible_cells.filter('.tutored')
+                                                 .children('img')
+                                                 .closest('tr');
+        $relevant_rows = $relevant_rows.add($relevant_tutor_rows);
+        $non_spanned_rows.not($relevant_rows).remove();
 
         // Similarly filter the control row
         $tr.find('td').not($td).css('display', 'none');
@@ -162,7 +195,7 @@ pokedex.pokemon_moves = {
         // Set the lone remaining filter icon to unfilter
         var $img = $td.find('img');
         $td.unbind('click', pokedex.pokemon_moves.filter_columns);
-        $td.click(pokedex.pokemon_moves.show_columns);
+        $td.click(pokedex.pokemon_moves.restore);
         $img.attr({
             'src':   '/static/spline/icons/overlay/funnel--minus.png',
             'alt':   'Unfilter',
