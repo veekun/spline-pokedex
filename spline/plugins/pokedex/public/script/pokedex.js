@@ -105,11 +105,23 @@ pokedex.pokemon_moves = {
 
             // Create buttons for sorting by a column
             var $first_tds = $first_tr.find('td, th');
+            var $first_data = $this.find('tr:not(.js-dex-pokemon-moves-controls)'
+                                         + ':not(.header-row)'
+                                         + ':not(.subheader-row)')
+                                   .eq(0)
+                                   .find('td');
             var num_columns = $first_tds.length;
             for (var i = $version_columns.length; i < num_columns; i++) {
                 var is_numeric = false;
+
+                if (parseInt($first_data.eq(i).text()))
+                    // Ought to cover stats, which are always numeric
+                    is_numeric = true;
+
+                // Other columns that are numeric in theory but may contain
+                // missing or junk data
+                // Fair warning: this is kinda brittle
                 var column_title = $first_tds.eq(i).text();
-                // Fair warning: this is brittle
                 if (column_title == 'PP'  || column_title == 'Power' ||
                     column_title == 'Acc' || column_title == 'Pri')
                 {
@@ -209,16 +221,37 @@ pokedex.pokemon_moves = {
 
         $table.append($unfiltered_rows);
 
-        // Reset sort links
-        $td.unbind('click', pokedex.pokemon_moves.reset);
-        $td.click(pokedex.pokemon_moves.sort_rows);
-        var is_numeric = $td.data('pokemon_moves.is_numeric');
-        $td.find('img').attr({
-            'src':   '/static/spline/icons/sort-'
-                     + (is_numeric ? 'number-descending' : 'alphabet')
-                     + '.png',
-            'alt':   'Sort',
-            'title': 'Sort'
+        // Reset sort links and remove styling
+        pokedex.pokemon_moves.unsort_partial($table);
+    },
+
+    // Reset the current sorted column's link to its original "sort this"
+    // state, and delete the colorful sorted-by class from the sorted column.
+    // Used if we sort by one column, then sort by another without unsorting
+    // first
+    'unsort_partial': function($table) {
+        // Remove highlight class
+        $table.find('td.js-sorted-by').removeClass('js-sorted-by');
+
+        $table.find('tr.js-dex-pokemon-moves-controls'
+                  + ' img[src*="sort--minus.png"]').each(function() {
+            var $this = $(this);
+            var $td = $this.closest('td');
+
+            // Reset click event handler
+            $td.unbind('click', pokedex.pokemon_moves.unsort);
+            $td.click(pokedex.pokemon_moves.sort_rows);
+
+            // Reset icon
+            var is_numeric = $this.closest('td')
+                                  .data('pokemon_moves.is_numeric');
+            $this.attr({
+                'src':   '/static/spline/icons/sort-'
+                         + (is_numeric ? 'number-descending' : 'alphabet')
+                         + '.png',
+                'alt':   'Sort',
+                'title': 'Sort'
+            });
         });
     },
 
@@ -262,9 +295,6 @@ pokedex.pokemon_moves = {
         var $cells = $non_spanned_rows.find('th, td');
         $cells.filter( hidden_cell_css.join(',') )
               .css('display', 'none');
-        $this.find('col.dex-col-version')
-             .filter( hidden_cell_css.join(',') )
-             .css('display', 'none');
 
         // Hide any rows that only have empty cells remaining
         // i.e. hide any rows that AREN'T rows WITHOUT empty cells remaining.
@@ -301,9 +331,15 @@ pokedex.pokemon_moves = {
 
     // Sort the table by the selected column
     'sort_rows': function(e) {
-        var $tr = $(e.target).closest('tr');
-        var $this = $tr.closest('table.dex-pokemon-moves');
         var $td = $(e.target).closest('td');
+        var $tr = $td.closest('tr');
+        var $this = $tr.closest('table.dex-pokemon-moves');
+
+        // Reset the currently-sorted column, if any
+        pokedex.pokemon_moves.unsort_partial($this);
+
+        // Highlight the current sort
+        $td.addClass('js-sorted-by');
 
         // Multi-step process, here.
         // 1. Find all the rows that aren't the control row or the first header
@@ -335,8 +371,8 @@ pokedex.pokemon_moves = {
             var $this = $(this);
             // Use html() over text() so types sort correctly.  Yes, that means
             // the sort key is '<a href=".../normal">...'.  Gross.
-            var sortkey = $this.find('td:nth-child(' + column_idx + ')')
-                               .html();
+            var $td = $this.find('td:nth-child(' + column_idx + ')');
+            var sortkey = $td.html();
             if (is_numeric) {
                 sortkey = parseInt(sortkey);
                 // Negative so biggest comes first
@@ -349,6 +385,10 @@ pokedex.pokemon_moves = {
             var name = $this.find('td:nth-child(' + name_column_idx + ')')
                             .text();
             $this.data('pokemon_moves.sortkey2', name);
+
+            // While we're here!  Add a class to make it obvious what we're
+            // sorting by
+            $td.addClass('js-sorted-by');
         });
         var sort_callback = function(a, b) {
             var a_value = $(a).data('pokemon_moves.sortkey1');

@@ -23,6 +23,7 @@ ul.inline-menu > li:last-child:after { content: none; }
 #dex-header + h1 { margin-top: 0.25em; }
 
 /* Table columns */
+col.dex-col-stat        { width: 3em; }
 col.dex-col-stat-name   { width: 10em; }
 col.dex-col-stat-bar    { width: auto; }
 col.dex-col-stat-pctile { width: 5em; }
@@ -107,6 +108,7 @@ table.dex-encounters td.icon { height: 24px; width: 24px; padding-left: 2em; ver
 .dex-rarity-bar-value { position: absolute; height: 100%; top: 0; right: 0; color: #808080; vertical-align: bottom; }
 
 table.dex-pokemon-moves {;}
+table.dex-pokemon-pokemon-moves { width: 100%; }
 table.dex-pokemon-moves td { padding: 0.33em; vertical-align: middle; text-align: center; }
 table.dex-pokemon-moves th { padding: 0.33em 0.17em; text-align: center; }
 table.dex-pokemon-moves tr.subheader-row th { padding: 0.17em 0.33em; text-align: left; }
@@ -118,6 +120,13 @@ table.dex-pokemon-moves .no-tutor { visibility: hidden; }
 table.dex-pokemon-moves td.type2 { text-align: left; }
 table.dex-pokemon-moves td.ability { font-size: 0.75em; }
 table.dex-pokemon-moves td.egg-group { font-size: 0.75em; }
+table.dex-pokemon-moves td.stat { text-align: right; }
+/* javascript filtering/sorting */
+table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls:hover { background: transparent; outline: none; }
+table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls td:hover { cursor: pointer; outline: 1px solid #bfd3f1; outline-offset: -1px; background: #e6eefa; }
+table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls td.js-sorted-by { background: #f0efe6; }
+table.dex-pokemon-moves tr:nth-child(2n) td.js-sorted-by { background: #f0efe6; }
+table.dex-pokemon-moves tr:nth-child(2n+1) td.js-sorted-by { background: #f6f4ea; }
 
 .dex-pokemon-flavor-generation { position: absolute; line-height: 1.5; }
 dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation { padding-top: 1.5em; }

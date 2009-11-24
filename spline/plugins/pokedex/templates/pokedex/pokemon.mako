@@ -493,7 +493,7 @@ ${lib.pokemon_page_header()}
 </table>
 
 <h1>Moves</h1>
-<table class="dex-pokemon-moves striped-rows">
+<table class="dex-pokemon-moves dex-pokemon-pokemon-moves striped-rows">
 ## COLUMNS
 % for i, column in enumerate(c.move_columns):
 % if i in c.move_divider_columns:

@@ -148,7 +148,7 @@
   % endfor
 </td>
 % for pokemon_stat in pokemon.stats:
-<td>${pokemon_stat.base_stat}</td>
+<td class="stat">${pokemon_stat.base_stat}</td>
 % endfor
 <td>${sum((pokemon_stat.base_stat for pokemon_stat in pokemon.stats))}</td>
 </%def>
