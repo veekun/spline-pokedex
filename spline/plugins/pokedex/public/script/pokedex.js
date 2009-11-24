@@ -45,6 +45,8 @@ pokedex.pokemon_moves = {
     'init': function() {
         $('.dex-pokemon-moves').each(function() {
             var $this = $(this);
+            var $first_tr = $this.find('tr').eq(0);
+
             // Remember the arrangement of version columns and separators
             // on page load
             var column_classes = [];
@@ -59,6 +61,8 @@ pokedex.pokemon_moves = {
             $this.data('pokemon_moves.first_generation',
                        pokedex.generation_ct - num_generations + 1);
             $this.data('pokemon_moves.column_classes', column_classes);
+            $this.data('pokemon_moves.version_column_count',
+                       $version_columns.length);
 
             // Remember the arrangement of rows, including header rows.  Using
             // references to the rows themselves will also let us delete them
@@ -67,18 +71,20 @@ pokedex.pokemon_moves = {
             var row_order = $this.find('tr').get();
             $this.data('pokemon_moves.original_rows', row_order);
 
-            // Bind action to the available links
-            // Add a row with controls
+
             var $controls = $('<tr class="js-dex-pokemon-moves-controls"></tr>');
+
+            // Create buttons for filtering by generation
             var vg_start = 0;
             var vg_width = 0;
+            var $last_filter_control;
             for (var i = 0; i < $version_columns.length; i++) {
                 vg_width++;
                 if ($( $version_columns[i] )
                     .hasClass('dex-col-last-version'))
                 {
                     var $control = $(
-                        '<td class="fake-link" colspan="' + vg_width + '">'
+                        '<td class="js-dex-pokemon-moves-filter-link" colspan="' + vg_width + '">'
                         + '<img src="/static/spline/icons/funnel.png" alt="Filter" title="Filter">'
                         + '</td>'
                     );
@@ -89,51 +95,134 @@ pokedex.pokemon_moves = {
                             'end':   vg_start + vg_width - 1
                         }
                     );
+                    $last_filter_control = $control;
                     $control.click(pokedex.pokemon_moves.filter_columns);
                     $controls.append($control);
                     vg_start += vg_width;
                     vg_width = 0;
                 }
             }
-            var $first_tr = $( $this.find('tr')[0] );
+
+            // Create buttons for sorting by a column
+            var $first_tds = $first_tr.find('td, th');
+            var num_columns = $first_tds.length;
+            for (var i = $version_columns.length; i < num_columns; i++) {
+                var is_numeric = false;
+                var column_title = $first_tds.eq(i).text();
+                // Fair warning: this is brittle
+                if (column_title == 'PP'  || column_title == 'Power' ||
+                    column_title == 'Acc' || column_title == 'Pri')
+                {
+                    is_numeric = true;
+                }
+
+                var $control = $(
+                    '<td class="js-dex-pokemon-moves-sort-link">'
+                    + '<img src="/static/spline/icons/sort-'
+                        + (is_numeric ? 'number-descending' : 'alphabet')
+                        + '.png" alt="Sort" title="Sort">'
+                    + '</td>'
+                );
+                $control.data('pokemon_moves.column', i + 1);
+                $control.data('pokemon_moves.is_numeric', is_numeric);
+                $control.click(pokedex.pokemon_moves.sort_rows);
+                $controls.append($control);
+            }
+
+            // Add controls to the document
             $first_tr.before($controls);
 
             // Initially filter to only the most recent games, i.e., the last
             // column
-            $controls.find('td:last-child').click();
+            $last_filter_control.click();
         });
     },
 
-    // Reset filtering, sorting, etc.
-    'restore': function(e) {
+    //// These functions handle restoring the table to its original state.
+    //// There isn't a simple way to undo a sort without affecting the
+    //// generation filter or vice versa.  Also, when a filter is removed, the
+    //// table needs to be reset (in case the filter removed any rows) and then
+    //// resorted.  So if either is disabled, we actually just reset the entire
+    //// table and then re-apply whatever's appropriate.
+
+    // Reset filtering
+    'unfilter': function(e) {
         var $td = $(e.target).closest('td');
-        var $this = $td.closest('table.dex-pokemon-moves');
-
-        // Restore rows -- BEFORE unhiding everything, dummy.
-        // note: Don't delete the row with filter links in it!
-        $this.find('tr:not(.js-dex-pokemon-moves-controls)').remove();
-        $( $this.data('pokemon_moves.original_rows') ).appendTo($this);
-
-        // Ok, now unhide everything
-        $this.find('td, th').css('display', null);
+        var $table = $td.closest('table.dex-pokemon-moves');
+        var $controls = $table.find('tr.js-dex-pokemon-moves-controls');
 
         // Restore column definitions
-        $this.find('col.dex-col-version').remove();
-        var column_classes = $this.data('pokemon_moves.column_classes');
+        $table.find('col.dex-col-version').remove();
+        var column_classes = $table.data('pokemon_moves.column_classes');
         for (var col = column_classes.length; col >= 1; col--) {
-            $this.prepend('<col class="' + column_classes[col - 1] + '">');
+            $table.prepend('<col class="' + column_classes[col - 1] + '">');
         }
 
-        // Change the filter link back
-        var $img = $td.find('img');
-        $td.unbind('click', pokedex.pokemon_moves.restore);
+        // Unhide everything in the controls row
+        $controls.find('td, th').css('display', null);
+
+        // Unhide generation columns in ALL rows and unmark them as filtered
+        var $original_rows = $( $table.data('pokemon_moves.original_rows') );
+        $original_rows.find('td, th').css('display', null);
+        $original_rows.removeData('pokemon_moves.filtered_out');
+
+        // Blank the table
+        $table.find('tr')
+               .not('.js-dex-pokemon-moves-controls')
+               .slice(1)  // leave the first header row
+               .remove();
+
+        // Repopulate the table, to restore any filtered-out rows
+        var sorted_rows = $table.data('pokemon_moves.sorted_rows');
+        var $sorted_rows;
+        if (sorted_rows) $sorted_rows = $(sorted_rows);
+        else             $sorted_rows = $original_rows;
+        $table.append($sorted_rows);
+
+        // Reset filter links
+        $td.unbind('click', pokedex.pokemon_moves.unfilter);
         $td.click(pokedex.pokemon_moves.filter_columns);
-        $img.attr({
+        $td.find('img').attr({
             'src':   '/static/spline/icons/funnel.png',
             'alt':   'Filter',
             'title': 'Filter'
         });
     },
+
+    // Reset sorting
+    'unsort': function(e) {
+        var $td = $(e.target).closest('td');
+        var $table = $td.closest('table.dex-pokemon-moves');
+
+        $table.removeData('pokemon_moves.sorted_rows');
+
+        // Restore list of rows...  but only if they haven't been removed by
+        // filtering
+        // Can't use remove() here, as it clears the data() on the rows
+        $table.find('tr:not(.js-dex-pokemon-moves-controls)').each(function() {
+            this.parentNode.removeChild(this);
+        });
+        var $original_rows = $( $table.data('pokemon_moves.original_rows') );
+        var $unfiltered_rows = $original_rows.filter(function() {
+            return ! $(this).data('pokemon_moves.filtered_out');
+        });
+
+        $table.append($unfiltered_rows);
+
+        // Reset sort links
+        $td.unbind('click', pokedex.pokemon_moves.reset);
+        $td.click(pokedex.pokemon_moves.sort_rows);
+        var is_numeric = $td.data('pokemon_moves.is_numeric');
+        $td.find('img').attr({
+            'src':   '/static/spline/icons/sort-'
+                     + (is_numeric ? 'number-descending' : 'alphabet')
+                     + '.png',
+            'alt':   'Sort',
+            'title': 'Sort'
+        });
+    },
+
+    //// Actually do filtering or sorting
 
     // Show only the columns numbered in the passed list
     'filter_columns': function(e) {
@@ -167,8 +256,9 @@ pokedex.pokemon_moves = {
 
         // Hide the appropriate cells in every row that isn't mucked up by
         // colspan (i.e. a subheader or the control row)
-        var $non_spanned_rows = $this.find('tr:not(.subheader-row)')
-                                     .not($tr);
+        var $all_rows = $( $this.data('pokemon_moves.original_rows') );
+        var $non_spanned_rows = $all_rows.not('.subheader-row')
+                                         .not($tr);
         var $cells = $non_spanned_rows.find('th, td');
         $cells.filter( hidden_cell_css.join(',') )
               .css('display', 'none');
@@ -187,19 +277,115 @@ pokedex.pokemon_moves = {
                                                  .children('img')
                                                  .closest('tr');
         $relevant_rows = $relevant_rows.add($relevant_tutor_rows);
-        $non_spanned_rows.not($relevant_rows).remove();
+
+        var $empty_rows = $non_spanned_rows.not($relevant_rows);
+        // Must do remove() FIRST, as it nukes data()
+        $empty_rows.remove()
+                   .data('pokemon_moves.filtered_out', true);
 
         // Similarly filter the control row
-        $tr.find('td').not($td).css('display', 'none');
+        $tr.find('td.js-dex-pokemon-moves-filter-link')
+           .not($td)
+           .css('display', 'none');
 
         // Set the lone remaining filter icon to unfilter
         var $img = $td.find('img');
         $td.unbind('click', pokedex.pokemon_moves.filter_columns);
-        $td.click(pokedex.pokemon_moves.restore);
+        $td.click(pokedex.pokemon_moves.unfilter);
         $img.attr({
             'src':   '/static/spline/icons/overlay/funnel--minus.png',
             'alt':   'Unfilter',
             'title': 'Unfilter'
+        });
+    },
+
+    // Sort the table by the selected column
+    'sort_rows': function(e) {
+        var $tr = $(e.target).closest('tr');
+        var $this = $tr.closest('table.dex-pokemon-moves');
+        var $td = $(e.target).closest('td');
+
+        // Multi-step process, here.
+        // 1. Find all the rows that aren't the control row or the first header
+        //    row.
+        // 2. Save the rows that contain actual data.
+        // 3. Delete everything.
+        // 4. Sort the saved rows.
+        // 5. Reinsert the saved rows.
+        var $rows = $this.find('tr').not($tr);
+        $rows = $rows.slice(1);
+        // Can't use remove() here, as it clears the data() on the rows
+        $rows.each(function() {
+            this.parentNode.removeChild(this);
+        });
+
+        // Get a list of all the data rows -- i.e., not the headers
+        var data_rows = $( $this.data('pokemon_moves.original_rows') )
+            .not('.header-row, .subheader-row').get();
+
+        // Create a sort function.
+        // Experimentation reveals that Array.sort(func) will actually call
+        // func() for every pair of items that need comparing—which is O(n²) in
+        // the worst case.  Let's cache the sort key for each row, then, and
+        // remove it afterwards.
+        var column_idx = $td.data('pokemon_moves.column');
+        var is_numeric = $td.data('pokemon_moves.is_numeric');
+        var name_column_idx = 1 + $this.data('pokemon_moves.version_column_count');
+        $(data_rows).each(function() {
+            var $this = $(this);
+            // Use html() over text() so types sort correctly.  Yes, that means
+            // the sort key is '<a href=".../normal">...'.  Gross.
+            var sortkey = $this.find('td:nth-child(' + column_idx + ')')
+                               .html();
+            if (is_numeric) {
+                sortkey = parseInt(sortkey);
+                // Negative so biggest comes first
+                if (sortkey) sortkey *= -1;
+                else sortkey = 0;
+            }
+            $this.data('pokemon_moves.sortkey1', sortkey);
+
+            // Name is always fallback
+            var name = $this.find('td:nth-child(' + name_column_idx + ')')
+                            .text();
+            $this.data('pokemon_moves.sortkey2', name);
+        });
+        var sort_callback = function(a, b) {
+            var a_value = $(a).data('pokemon_moves.sortkey1');
+            var b_value = $(b).data('pokemon_moves.sortkey1');
+            if      (a_value > b_value) return  1;
+            else if (a_value < b_value) return -1;
+
+            // Try names as a fallback
+            var a_name = $(a).data('pokemon_moves.sortkey2');
+            var b_name = $(b).data('pokemon_moves.sortkey2');
+            if      (a_name > b_name) return  1;
+            else if (a_name < b_name) return -1;
+
+            // Equal, as far as we care
+            return 0;
+        };
+
+        // Sort the rows
+        data_rows.sort(sort_callback);
+
+        // Some of the rows are hidden by the generation filter and won't be
+        // shown, but the order of ALL the rows needs to be saved so the filter
+        // can be removed without having to re-sort everything
+        $this.data('pokemon_moves.sorted_rows', data_rows);
+        var $data_rows = $(data_rows).filter(function() {
+            return ! $(this).data('pokemon_moves.filtered_out');
+        });
+        $this.append($data_rows);
+
+        // Change the link to unsort
+        var $img = $td.find('img');
+        $td.unbind('click', pokedex.pokemon_moves.sort_rows);
+        $td.click(pokedex.pokemon_moves.unsort);
+        $img.attr({
+            'src':   '/static/spline/icons/overlay/sort--minus.png',
+            'alt':   'Unsort',
+            'title': 'Unsort'
         });
     },
 };
