@@ -7,7 +7,7 @@ import logging
 import mimetypes
 
 import pokedex.db
-from pokedex.db.tables import Ability, EggGroup, Generation, Item, Move, MoveFlagType, Pokemon, PokemonEggGroup, PokemonFormSprite, PokemonMove, PokemonStat, Type, VersionGroup
+from pokedex.db.tables import Ability, EggGroup, Generation, Item, Language, Move, MoveFlagType, Pokemon, PokemonEggGroup, PokemonFormSprite, PokemonMove, PokemonStat, Type, VersionGroup
 import pokedex.lookup
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c, url
@@ -21,6 +21,7 @@ from sqlalchemy.sql import func
 from spline import model
 from spline.model import meta
 from spline.lib.base import BaseController, render
+from spline.lib import helpers
 
 from spline.plugins.pokedex import db, helpers as pokedex_helpers
 from spline.plugins.pokedex.db import pokedex_session
@@ -308,14 +309,32 @@ class PokedexController(BaseController):
             meta = dict(
                 type=row.__singlename__,
             )
+
+            # Get an accompanying image.  Moves get their type; abilities get
+            # nothing; everything else gets the obvious corresponding icon
+            image = None
             if isinstance(row, Pokemon):
-                meta['image'] = url(controller='dex', action='media', path="icons/%d.png" % row.id)
+                image = "icons/{0}.png".format(row.id)
             elif isinstance(row, Move):
-                meta['image'] = url(controller='dex', action='media', path="chrome/types/%s.png" % row.type.name)
+                image = "chrome/types/{0}.png".format(row.type.name)
             elif isinstance(row, Type):
-                meta['image'] = url(controller='dex', action='media', path="chrome/types/%s.png" % row.name)
+                path = "chrome/types/{0}.png".format(row.name)
             elif isinstance(row, Item):
-                meta['image'] = url(controller='dex', action='media', path="items/%s.png" % pokedex_helpers.filename_from_name(row.name))
+                path = "items/{0}.png".format(
+                    pokedex_helpers.filename_from_name(row.name))
+
+            if image:
+                meta['image'] = url(controller='dex', action='media',
+                                    path=image)
+
+            # Give a country icon so JavaScript doesn't have to hardcore Spline
+            # paths.  Don't *think* we need to give the long language name...
+            meta['language'] = suggestion.iso3166
+            meta['language_icon'] = helpers.static_uri(
+                'spline',
+                'flags/{0}.png'.format(suggestion.iso3166)
+            )
+
             metadata.append(meta)
 
         return [

@@ -31,7 +31,7 @@
     ${object.name}
     </a>
     % if result.language:
-    ("${result.name}" in ${result.language})
+    (<img src="${h.static_uri('spline', "flags/{0}.png".format(result.iso3166))}" alt="${result.language}" title="${result.language}"> ${result.name})
     % endif
 </li>
 % endfor

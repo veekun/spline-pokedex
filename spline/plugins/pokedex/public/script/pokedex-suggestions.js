@@ -94,6 +94,12 @@ var pokedex_suggestions = {
                         $suggestion_el.css('background-image', "url(" + metadata.image + ")");
                     }
 
+                    // Add country flag if not English
+                    if (metadata.language && metadata.language != 'us') {
+                        $suggestion_el.prepend('<img src="' + metadata.language_icon + '"'
+                                             + ' alt="[' + metadata.language + ']"> ');
+                    }
+
                     // Events
                     $suggestion_el.click(pokedex_suggestions.update_lookup);
 

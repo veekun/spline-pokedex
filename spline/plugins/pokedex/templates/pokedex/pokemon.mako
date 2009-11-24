@@ -74,7 +74,10 @@ ${lib.pokemon_page_header()}
     <h2>Names</h2>
     <dl>
         % for foreign_name in c.pokemon.normal_form.foreign_names:
-        <dt>${foreign_name.language.name}</dt>
+        <dt>
+            ${foreign_name.language.name}
+            <img src="${h.static_uri('spline', "flags/{0}.png".format(foreign_name.language.iso3166))}" alt="">
+        </dt>
         % if foreign_name.language.name == 'Japanese':
         <dd>${foreign_name.name} (${h.pokedex.romanize(foreign_name.name)})</dd>
         % else:
