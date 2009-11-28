@@ -7,7 +7,7 @@ import logging
 import mimetypes
 
 import pokedex.db
-from pokedex.db.tables import Ability, EggGroup, Generation, Item, Language, Move, MoveFlagType, Pokemon, PokemonEggGroup, PokemonFormSprite, PokemonMove, PokemonStat, Type, VersionGroup
+from pokedex.db.tables import Ability, EggGroup, Generation, Item, Language, Machine, Move, MoveFlagType, Pokemon, PokemonEggGroup, PokemonFormSprite, PokemonMove, PokemonStat, Type, VersionGroup
 import pokedex.lookup
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c, url
@@ -748,13 +748,18 @@ class PokedexController(BaseController):
         # "data" is a dictionary of whatever per-version information is
         # appropriate for this move method, such as a TM number or level.
         move_methods = defaultdict(list)
-        # Grab the rows with a manual query so we can sort thm in about the row
-        # they go in the table.  This should keep it as compact as possible
+        # Grab the rows with a manual query so we can sort them in about the
+        # order they go in the table.  This should keep it as compact as
+        # possible.  Levels go in level order, and machines go in TM number
+        # order
         q = pokedex_session.query(PokemonMove) \
                            .filter_by(pokemon_id=c.pokemon.id) \
+                           .outerjoin((Machine, PokemonMove.machine)) \
                            .order_by(PokemonMove.level.asc(),
+                                     Machine.machine_number.asc(),
                                      PokemonMove.order.asc(),
-                                     PokemonMove.version_group_id.asc())
+                                     PokemonMove.version_group_id.asc()) \
+                           .all()
         for pokemon_move in q:
             method_list = move_methods[pokemon_move.method]
             this_vg = pokemon_move.version_group
@@ -764,22 +769,22 @@ class PokedexController(BaseController):
 
             # TMs need to know their own TM number
             if pokemon_move.method.name == 'Machine':
-                machine = first(lambda _: _.version_group == this_vg,
-                                pokemon_move.move.machines)
-                if machine:
-                    vg_data['machine'] = machine.machine_number
+                vg_data['machine'] = pokemon_move.machine.machine_number
 
             # Find the best place to insert a row.
             # In general, we just want the move names in order, so we can just
             # tack rows on and sort them at the end.  However!  Level-up moves
-            # must stay in the same order within a version group.  So we have
-            # to do some special ordering here.
+            # must stay in the same order within a version group, and TMs are
+            # similarly ordered by number.  So we have to do some special
+            # ordering here.
             # These two vars are the boundaries of where we can find or insert
             # a new row.  Only level-up moves have these restrictions
             lower_bound = None
             upper_bound = None
-            if pokemon_move.method.name == 'Level up':
-                vg_data['sort'] = (pokemon_move.level, pokemon_move.order)
+            if pokemon_move.method.name in ('Level up', 'Machine'):
+                vg_data['sort'] = (pokemon_move.level,
+                                   vg_data.get('machine', None),
+                                   pokemon_move.order)
                 vg_data['level'] = pokemon_move.level
 
                 # Find the next-lowest and next-highest rows.  Our row must fit
@@ -854,7 +859,7 @@ class PokedexController(BaseController):
 
         # Sort non-level moves by name
         for method, method_list in c.moves:
-            if method.name == 'Level up':
+            if method.name in ('Level up', 'Machine'):
                 continue
             method_list.sort(key=lambda (move, version_group_data): move.name)
 
