@@ -356,8 +356,8 @@ pokedex.pokemon_moves = {
         });
 
         // Get a list of all the data rows -- i.e., not the headers
-        var data_rows = $( $this.data('pokemon_moves.original_rows') )
-            .not('.header-row, .subheader-row').get();
+        var $original_rows = $( $this.data('pokemon_moves.original_rows') );
+        var $data_rows = $original_rows.not('.header-row, .subheader-row');
 
         // Create a sort function.
         // Experimentation reveals that Array.sort(func) will actually call
@@ -367,7 +367,7 @@ pokedex.pokemon_moves = {
         var column_idx = $td.data('pokemon_moves.column');
         var is_numeric = $td.data('pokemon_moves.is_numeric');
         var name_column_idx = 1 + $this.data('pokemon_moves.version_column_count');
-        $(data_rows).each(function() {
+        $data_rows.each(function() {
             var $this = $(this);
             // Use html() over text() so types sort correctly.  Yes, that means
             // the sort key is '<a href=".../normal">...'.  Gross.
@@ -406,17 +406,42 @@ pokedex.pokemon_moves = {
             return 0;
         };
 
-        // Sort the rows
-        data_rows.sort(sort_callback);
+        // Sort the rows in groups divided by header rows.  (If we're in merged
+        // mode, there will only be one header at the top anyway, so there's no
+        // need to do anything special)
+        var $unsorted_rows = $( $original_rows );
+        var sorted_rows = [];
+        while ($unsorted_rows.length) {
+            // Pull out header rows followed by everything up until the next
+            // header row
+            var first_header = $unsorted_rows.filter('.header-row').get(1);
+            var $chunk;
+            if (first_header) {
+                var endpoint = $unsorted_rows.index(first_header);
+                $chunk = $unsorted_rows.slice(0, endpoint)
+                $unsorted_rows = $unsorted_rows.slice(endpoint);
+            }
+            else {
+                $chunk = $unsorted_rows;
+                $unsorted_rows = $( [] );
+            }
+
+            var $headers = $chunk.filter('.header-row, .subheader-row');
+            var data = $chunk.not('.header-row, .subheader-row').get();
+            data.sort(sort_callback);
+
+            sorted_rows = sorted_rows.concat($headers.get())
+                                     .concat(data);
+        }
 
         // Some of the rows are hidden by the generation filter and won't be
         // shown, but the order of ALL the rows needs to be saved so the filter
         // can be removed without having to re-sort everything
-        $this.data('pokemon_moves.sorted_rows', data_rows);
-        var $data_rows = $(data_rows).filter(function() {
+        $this.data('pokemon_moves.sorted_rows', sorted_rows);
+        var $sorted_rows = $(sorted_rows).filter(function() {
             return ! $(this).data('pokemon_moves.filtered_out');
         });
-        $this.append($data_rows);
+        $this.append($sorted_rows);
 
         // Change the link to unsort
         var $img = $td.find('img');
