@@ -18,9 +18,10 @@ def filename_from_name(name):
 
     e.g. Water's Edge -> waters-edge
     """
+    name = unicode(name)
     name = name.lower()
-    name = re.sub('[ _]+', '-', name)
-    name = re.sub(u'[^-éa-z0-9]', '', name)
+    name = re.sub(u'[ _]+', u'-', name)
+    name = re.sub(u'[^-éa-z0-9]', u'', name)
     return name
 
 def pokedex_img(src, **attr):

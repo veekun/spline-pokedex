@@ -314,13 +314,13 @@ class PokedexController(BaseController):
             # nothing; everything else gets the obvious corresponding icon
             image = None
             if isinstance(row, Pokemon):
-                image = "icons/{0}.png".format(row.id)
+                image = u"icons/{0}.png".format(row.id)
             elif isinstance(row, Move):
-                image = "chrome/types/{0}.png".format(row.type.name)
+                image = u"chrome/types/{0}.png".format(row.type.name)
             elif isinstance(row, Type):
-                path = "chrome/types/{0}.png".format(row.name)
+                path = u"chrome/types/{0}.png".format(row.name)
             elif isinstance(row, Item):
-                path = "items/{0}.png".format(
+                path = u"items/{0}.png".format(
                     pokedex_helpers.filename_from_name(row.name))
 
             if image:
