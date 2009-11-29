@@ -127,6 +127,8 @@ table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls td:hover { cursor: poin
 table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls td.js-sorted-by { background: #f0efe6; }
 table.dex-pokemon-moves tr:nth-child(2n) td.js-sorted-by { background: #f0efe6; }
 table.dex-pokemon-moves tr:nth-child(2n+1) td.js-sorted-by { background: #f6f4ea; }
+table.dex-pokemon-moves tr:nth-child(2n) td.better-move-reason { background: #afcfaf; }
+table.dex-pokemon-moves tr:nth-child(2n+1) td.better-move-reason { background: #c0d8c0; }
 
 .dex-pokemon-flavor-generation { position: absolute; line-height: 1.5; }
 dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation { padding-top: 1.5em; }

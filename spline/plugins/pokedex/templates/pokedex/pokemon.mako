@@ -522,14 +522,30 @@ ${lib.pokemon_page_header()}
 </tr>
 ## DATA
 % for move, version_group_data in method_list:
+% if move.type in c.pokemon.types:
+<tr class="better-move">
+% else:
 <tr>
+% endif
     % for column in c.move_columns:
     ${lib.pokemon_move_table_method_cell(column, method, version_group_data)}
     % endfor
 
     <td><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></td>
-    <td>${h.pokedex.type_link(move.type)}</td>
-    <td>${h.pokedex.damage_class_icon(move.damage_class)}</td>
+    % if move.type in c.pokemon.types:
+    <td class="better-move-reason">
+    % else:
+    <td>
+    % endif
+        ${h.pokedex.type_link(move.type)}
+    </td>
+    % if move.damage_class.name == c.better_damage_class:
+    <td class="better-move-reason">
+    % else:
+    <td>
+    % endif
+        ${h.pokedex.damage_class_icon(move.damage_class)}
+    </td>
     <td>${move.pp}</td>
     <td>${move.power}</td>
     <td>${move.accuracy}%</td>

@@ -573,6 +573,8 @@ class PokedexController(BaseController):
         total_stat_rows = pokedex_session.query(PokemonStat) \
                                          .filter_by(stat=c.pokemon.stats[0].stat) \
                                          .count()
+        physical_attack = None
+        special_attack = None
         for pokemon_stat in c.pokemon.stats:
             stat_info = c.stats[pokemon_stat.stat.name] = {}
             stat_total += pokemon_stat.base_stat
@@ -588,6 +590,17 @@ class PokedexController(BaseController):
             # Colors for the stat bars, based on percentile
             stat_info['background'] = bar_color(percentile, 0.9)
             stat_info['border'] = bar_color(percentile, 0.8)
+
+            if pokemon_stat.stat.name == u'Attack':
+                physical_attack = pokemon_stat.base_stat
+            elif pokemon_stat.stat.name == u'Special Attack':
+                special_attack = pokemon_stat.base_stat
+
+        c.better_damage_class = None
+        if physical_attack > special_attack:
+            c.better_damage_class = u'Physical'
+        elif physical_attack < special_attack:
+            c.better_damage_class = u'Special'
 
         # Percentile for the total
         # Need to make a derived table that fakes pokemon_id, total_stats
