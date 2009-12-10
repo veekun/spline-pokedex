@@ -668,12 +668,13 @@ class PokedexController(BaseController):
 
             # Find priority for this combination of slot/condition.
             # Priorities are the encounter_method_order at the top of the class
-            condition_group = None
-            if encounter.condition:
-                condition_group = encounter.condition.group.name
+            condition = None
+            if encounter.condition_values:
+                # XXX DON'T USE ONLY THE FIRST
+                condition = encounter.condition_values[0].condition.name
 
             priority = self.encounter_method_order.index(
-                           (encounter.slot.type.name, condition_group))
+                           (encounter.slot.terrain.name, condition))
 
             if not method_list or priority == method_list[0]['priority']:
                 # Same priority; just add this encounter to what we have
@@ -685,9 +686,9 @@ class PokedexController(BaseController):
                 # Better priority: better than what we have, so nuke them
                 method_list[0:len(method_list)] = []
 
-            # Find the dictionary for this type/condition and create/update it
-            method_dicts = filter(lambda x: x['condition'] == encounter.condition
-                                        and x['type'] == encounter.slot.type,
+            # Find the dictionary for this terrain/condition and create/update it
+            method_dicts = filter(lambda x: x['condition'] == (encounter.condition_values + [None])[0]  # XXX
+                                        and x['terrain'] == encounter.slot.terrain,
                                   method_list)
             if method_dicts:
                 method_dict = method_dicts[0]
@@ -697,8 +698,8 @@ class PokedexController(BaseController):
                 method_dict['max_level'] = max(method_dict['max_level'],
                                                encounter.max_level)
             else:
-                method_dict = dict(type=encounter.slot.type,
-                                   condition=encounter.condition,
+                method_dict = dict(terrain=encounter.slot.terrain,
+                                   condition=(encounter.condition_values + [None])[0],  # XXX
                                    min_level=encounter.min_level,
                                    max_level=encounter.max_level,
                                    rarity=encounter.slot.rarity,
@@ -719,14 +720,14 @@ class PokedexController(BaseController):
                         method_dict['level'] = "%(min_level)d–%(max_level)d" \
                                              % method_dict
 
-                    type = method_dict['type']
-                    condition = method_dict['condition']
+                    terrain = method_dict['terrain']
+                    condition_value = method_dict['condition']
 
-                    # Give each type/condition combo a helpful icon
+                    # Give each terrain/condition combo a helpful icon
                     if method_dict['condition']:
                         key = method_dict['condition'].name
                     else:
-                        key = method_dict['type'].name
+                        key = method_dict['terrain'].name
 
                     method_dict['name'] = key
                     method_dict['icon'] = self.encounter_method_icons \
