@@ -7,7 +7,7 @@ import logging
 import mimetypes
 
 import pokedex.db
-from pokedex.db.tables import Ability, EggGroup, Generation, Item, Language, Machine, Move, MoveFlagType, Pokemon, PokemonEggGroup, PokemonFormSprite, PokemonMove, PokemonStat, Type, VersionGroup
+from pokedex.db.tables import Ability, EggGroup, Generation, Item, Language, Machine, Move, MoveFlagType, Pokemon, PokemonEggGroup, PokemonFormSprite, PokemonMove, PokemonStat, Type, VersionGroup, PokemonType
 import pokedex.lookup
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c, url
@@ -1086,6 +1086,23 @@ class PokedexController(BaseController):
             c.type = db.get_by_name(Type, name)
         except NoResultFound:
             return self._not_found()
+        
+        ### Prev/next for header
+        max_id = pokedex_session.query(Type).count()
+        c.prev_type = pokedex_session.query(Type).get(
+            (c.type.id - 1 - 1) % max_id + 1)
+        c.next_type = pokedex_session.query(Type).get(
+            (c.type.id - 1 + 1) % max_id + 1)
+        
+        c.moves = pokedex_session.query(Move) \
+                                 .filter_by(type_id=c.type.id) \
+                                 .order_by(Move.name.asc())
+        
+        c.pokemon = pokedex_session.query(Pokemon) \
+                                   .join(PokemonType) \
+                                   .filter(PokemonType.type_id == c.type.id) \
+                                   .order_by(func.coalesce(Pokemon.forme_base_pokemon_id, Pokemon.id))
+        
         return render('/pokedex/type.mako')
 
 
