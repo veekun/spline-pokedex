@@ -17,7 +17,7 @@
 
 <h1>Essentials</h1>
 
-<div id="dex-page-portrait">
+<div class="dex-page-portrait">
     <p id="dex-page-name">${c.move.name}</p>
     <p id="dex-page-types">
         ${h.pokedex.type_link(c.move.type)}

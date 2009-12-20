@@ -69,15 +69,16 @@ col.dex-col-last-version{ border-right: 1px solid #b4c7e6; }
 .dex-size .dex-size-pokemon .dex-size-value { left: 0.25em; }
 
 /*** Individual pages ***/
-#dex-page-portrait { float: left; width: 15em; min-height: 10em; padding-bottom: 1em; text-align: center; }
-#dex-page-portrait p { margin: 0.25em 0; line-height: 1; }
+.dex-page-portrait { float: left; width: 15em; min-height: 10em; padding-bottom: 1em; text-align: center; }
+.dex-page-portrait p { margin: 0.25em 0; line-height: 1; }
+.dex-page-beside-portrait:after { display: block; clear: both; content: ""; }
 p#dex-page-name { font-size: 2em; margin: 0.12em 0; }
 #dex-pokemon-forme { font-size: 1.25em; font-weight: bold; }
 #dex-pokemon-portrait-sprite { margin: 0.33em; padding: 7px; background: url(/dex/media/chrome/sprite-frame.png) center center no-repeat; }
 
-ul#dex-page-damage { overflow: hidden /* new float context */; margin-bottom: 2em; }
-ul#dex-page-damage li { display: inline-block; text-align: center; padding: 0.125em; }
-ul#dex-page-damage li img { display: block; margin-bottom: 0.25em; }
+ul.dex-page-damage { overflow: hidden /* new float context */; margin-bottom: 2em; }
+ul.dex-page-damage li { display: inline-block; text-align: center; padding: 0.125em; }
+ul.dex-page-damage li img { display: block; margin-bottom: 0.25em; }
 
 ul.dex-pokemon-compatibility { max-height: 136px /* four rows of icons plus borders */; overflow: auto; }
 

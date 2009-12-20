@@ -14,7 +14,7 @@ ${lib.pokemon_page_header()}
 <h1>Essentials</h1>
 
 ## Portrait block
-<div id="dex-page-portrait">
+<div class="dex-page-portrait">
     <p id="dex-page-name">${c.pokemon.name}</p>
     % if c.pokemon.forme_name:
     <p id="dex-pokemon-forme">${c.pokemon.forme_name.capitalize()} Forme</p>
@@ -27,7 +27,7 @@ ${lib.pokemon_page_header()}
     </p>
 </div>
 
-<div id="dex-page-beside-portrait">
+<div class="dex-page-beside-portrait">
 <h2>Abilities</h2>
 <dl>
     % for ability in c.pokemon.abilities:
