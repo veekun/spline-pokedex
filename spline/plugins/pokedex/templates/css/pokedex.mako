@@ -33,9 +33,10 @@ col.dex-col-last-version{ border-right: 1px solid #b4c7e6; }
 
 /* Cool three-column layout */
 .dex-column-container { clear: both; overflow: hidden /* float context */; margin-top: 1em; }
-.dex-column { float: left; width: 32.333%; margin-left: 1%; }
-.dex-column:first-child { width: 33.333%; margin-left: 0; }
-.dex-column-2x { float: left; width: 66.666%; }
+.dex-column { float: left; width: 32.666%; margin-left: 1%; }
+.dex-column:first-child { margin-left: 0; }
+.dex-column-2x { float: left; width: 66.333%; margin-left: 1%; }
+.dex-column-2x:first-child { margin-left: 0; }
 
 /* Type damage */
 .dex-damage-taken-0   { font-weight: bold; color: #44c; }
