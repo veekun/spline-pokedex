@@ -1067,9 +1067,9 @@ class PokedexController(BaseController):
         c.pokemon = pokemon_methods.items()
         c.pokemon.sort(key=_pokemon_move_method_sort_key)
 
-        # Sort by Pokémon name
+        # Sort by Pokémon number
         for method, method_list in c.pokemon:
-            method_list.sort(key=lambda (pokemon, whatever): pokemon.name)
+            method_list.sort(key=lambda (pokemon, whatever): (pokemon.forme_base_pokemon_id or pokemon.id))
 
         # Finally, collapse identical columns within the same generation
         c.pokemon_columns, c.pokemon_divider_columns \
