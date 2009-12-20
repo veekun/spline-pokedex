@@ -144,9 +144,11 @@ pokedex.pokemon_moves = {
             // Add controls to the document
             $first_tr.before($controls);
 
-            // Initially filter to only the most recent games, i.e., the last
-            // column
-            $last_filter_control.click();
+            if ($last_filter_control) {
+                // Initially filter to only the most recent games, i.e., the last
+                // column
+                $last_filter_control.click();
+            }
         });
     },
 
