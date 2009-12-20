@@ -443,7 +443,7 @@ ${lib.pokemon_page_header()}
 % for location_area, version_encounters in \
       sorted(c.encounters.items(), key=lambda (k, v): (k.location.name, k.name)):
 <%
-    num_method_rows = max(map(lambda x: len(x), version_encounters.values())) 
+    num_method_rows = max(map(lambda x: len(x), version_encounters.values()))
 %>\
 % for row_idx in range(num_method_rows):
 % if is_alt_row:

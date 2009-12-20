@@ -29,7 +29,7 @@
 <div class="dex-page-beside-portrait">
     <h2>Summary</h2>
     <p>${h.literal(c.move.short_effect.as_html)}</p>
-    
+
     <h2>Damage Dealt</h2>
     <ul class="dex-page-damage">
         ## always sort ??? last

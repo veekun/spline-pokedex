@@ -86,7 +86,7 @@ def pokemon_link(pokemon, content=None, to_flavor=False, **attr):
 
     `pokemon`
         A name or a Pokémon object.
-    
+
     `content`
         Link text (or image, or whatever).
 

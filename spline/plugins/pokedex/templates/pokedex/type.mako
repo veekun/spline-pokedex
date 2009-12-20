@@ -38,7 +38,7 @@
         </li>
         % endfor
     </ul>
-    
+
     <h2>Damage Taken</h2>
     <ul class="dex-page-damage">
         % for type in sorted(c.type.target_efficacies, key=lambda type: (type.damage_type.id == 18, type.damage_type.name)):
@@ -124,7 +124,7 @@ through regular play. Eggs are purely ???-type before hatching, and are displaye
     % endif
     % if c.type.name == '???':
     <li><a href="http://bulbapedia.bulbagarden.net/wiki/%3F%3F%3F_(type)">Bulbapedia</a></li>
-    <li><a href="http://www.smogon.com/dp/types/questionquestionquestion">Smogon</a></li> 
+    <li><a href="http://www.smogon.com/dp/types/questionquestionquestion">Smogon</a></li>
     % else:
     <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.type.name.title()}_(type)">Bulbapedia</a></li>
     <li><a href="http://www.smogon.com/dp/types/${c.type.name}">Smogon</a></li>
