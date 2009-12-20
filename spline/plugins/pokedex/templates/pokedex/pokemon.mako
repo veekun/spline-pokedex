@@ -511,7 +511,7 @@ ${lib.pokemon_page_header()}
     % endfor
     <th>Move</th>
     <th>Type</th>
-    <th>Dmg</th>
+    <th>Class</th>
     <th>PP</th>
     <th>Power</th>
     <th>Acc</th>
@@ -585,6 +585,8 @@ ${lib.pokemon_page_header()}
     elif c.pokemon.name == 'Mr. Mime':
         ghpd_name = 'mr_mime'
         smogon_name = 'mr_mime'
+    elif c.pokemon.name == 'Mime Jr.':
+        smogon_name = 'mime_jr'
 %>
 <ul class="classic-list">
 % if c.pokemon.generation.id <= 1:
