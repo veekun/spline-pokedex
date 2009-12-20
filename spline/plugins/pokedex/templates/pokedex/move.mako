@@ -26,20 +26,20 @@
     <p>${h.pokedex.generation_icon(c.move.generation)}</p>
 </div>
 
-<div id="dex-page-beside-portrait">
-<h2>Summary</h2>
-<p>${h.literal(c.move.short_effect.as_html)}</p>
-</div>
-
-<h2>Damage Dealt</h2>
-<ul id="dex-page-damage">
-    % for type, damage_factor in sorted(c.type_efficacies.items(), \
-                                        key=lambda x: x[0].name):
-    <li class="dex-damage-dealt-${damage_factor}">
-        ${h.pokedex.type_link(type)} ${h.pokedex.type_efficacy_label[damage_factor]}
-    </li>
-    % endfor
-</ul>
+<div class="dex-page-beside-portrait">
+    <h2>Summary</h2>
+    <p>${h.literal(c.move.short_effect.as_html)}</p>
+    
+    <h2>Damage Dealt</h2>
+    <ul class="dex-page-damage">
+        ## always sort ??? last
+        % for type, damage_factor in sorted(c.type_efficacies.items(), \
+                                            key=lambda x: (x[0].id == 18, x[0].name)):
+        <li class="dex-damage-dealt-${damage_factor}">
+            ${h.pokedex.type_link(type)} ${h.pokedex.type_efficacy_label[damage_factor]}
+        </li>
+        % endfor
+    </ul>
 </div>
 
 <div class="dex-column-container">

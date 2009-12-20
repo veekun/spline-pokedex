@@ -39,9 +39,10 @@ ${lib.pokemon_page_header()}
 <h2>Damage Taken</h2>
 ## Boo not using <dl>  :(  But I can't get them to align horizontally with CSS2
 ## if the icon and value have no common element..
-<ul id="dex-page-damage">
+<ul class="dex-page-damage">
+    ## always sort ??? last
     % for type, damage_factor in sorted(c.type_efficacies.items(), \
-                                        key=lambda x: x[0].name):
+                                        key=lambda x: (x[0].id == 18, x[0].name)):
     <li class="dex-damage-taken-${damage_factor}">
         ${h.pokedex.type_link(type)} ${h.pokedex.type_efficacy_label[damage_factor]}
     </li>
