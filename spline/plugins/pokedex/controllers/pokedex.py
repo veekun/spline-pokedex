@@ -1069,7 +1069,7 @@ class PokedexController(BaseController):
 
         # Sort by Pokémon number
         for method, method_list in c.pokemon:
-            method_list.sort(key=lambda (pokemon, whatever): (pokemon.forme_base_pokemon_id or pokemon.id))
+            method_list.sort(key=lambda (pokemon, whatever): (pokemon.national_id, pokemon.forme_name))
 
         # Finally, collapse identical columns within the same generation
         c.pokemon_columns, c.pokemon_divider_columns \
@@ -1100,8 +1100,9 @@ class PokedexController(BaseController):
 
         c.pokemon = pokedex_session.query(Pokemon) \
                                    .join(PokemonType) \
-                                   .filter(PokemonType.type_id == c.type.id) \
-                                   .order_by(func.coalesce(Pokemon.forme_base_pokemon_id, Pokemon.id))
+                                   .filter(PokemonType.type_id == c.type.id)
+
+        c.pokemon = sorted(c.pokemon, key=lambda (pokemon): (pokemon.national_id, pokemon.forme_name))
 
         return render('/pokedex/type.mako')
 
