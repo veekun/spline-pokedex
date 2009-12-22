@@ -1,6 +1,7 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="lib.mako"/>
 <%! from spline.plugins.pokedex import db %>\
+<%! import re %>\
 
 <%def name="title()">\
 % if c.pokemon.forme_name:
@@ -11,7 +12,8 @@ ${c.pokemon.name} – Pokémon #${c.pokemon.national_id}\
 
 ${lib.pokemon_page_header()}
 
-<h1>Essentials</h1>
+
+<h1 id="essentials"><a href="#essentials" class="subtle">Essentials</a></h1>
 
 ## Portrait block
 <div class="dex-page-portrait">
@@ -180,7 +182,7 @@ ${lib.pokemon_page_header()}
 </div>
 </div>
 
-<h1>Evolution</h1>
+<h1 id="evolution"><a href="#evolution" class="subtle">Evolution</a></h1>
 <table class="dex-evolution-chain">
 <thead>
 <tr>
@@ -234,7 +236,7 @@ ${lib.pokemon_page_header()}
 </tbody>
 </table>
 % if c.pokemon.normal_form.form_group:
-<h2> ${c.pokemon.name} Forms </h2>
+<h2 id="forms"> <a href="#forms" class="subtle">${c.pokemon.name} Forms</a> </h2>
 <ul class="inline">
     % for form in [_.name for _ in c.pokemon.normal_form.form_sprites]:
 <%
@@ -248,7 +250,7 @@ ${lib.pokemon_page_header()}
 <p> ${c.pokemon.normal_form.form_group.description} </p>
 % endif
 
-<h1>Stats</h1>
+<h1 id="stats"><a href="#stats" class="subtle">Stats</a></h1>
 <%
     # Most people want to see the best they can get
     default_stat_level = 100
@@ -318,7 +320,7 @@ ${lib.pokemon_page_header()}
 </tr>
 </table>
 
-<h1>Flavor</h1>
+<h1 id="flavor"><a href="#flavor" class="subtle">Flavor</a></h1>
 
 <ul class="see-also">
 <li> <img src="${h.static_uri('spline', 'icons/arrow-000-medium.png')}" alt="See also:"> <a href="${url.current(action='pokemon_flavor')}">All versions' flavor text and sprites</a> </li>
@@ -419,7 +421,7 @@ ${lib.pokemon_page_header()}
 </div>
 </div>
 
-<h1>Locations</h1>
+<h1 id="locations"><a href="#locations" class="subtle">Locations</a></h1>
 <table class="dex-encounters">
 <tr class="header-row">
     <th></th>
@@ -493,7 +495,7 @@ ${lib.pokemon_page_header()}
 % endfor
 </table>
 
-<h1>Moves</h1>
+<h1 id="moves"><a href="#moves" class="subtle">Moves</a></h1>
 <table class="dex-pokemon-moves dex-pokemon-pokemon-moves striped-rows">
 ## COLUMNS
 % for i, column in enumerate(c.move_columns):
@@ -505,7 +507,10 @@ ${lib.pokemon_page_header()}
 % endfor
 ## HEADERS
 % for method, method_list in c.moves:
-<tr class="header-row">
+<%
+    method_id = re.sub('\W+', '-', method.name.lower()) + "-moves"
+%>\
+<tr class="header-row" id="${method_id}">
     % for column in c.move_columns:
     ${lib.pokemon_move_table_column_header(column)}
     % endfor
@@ -519,7 +524,7 @@ ${lib.pokemon_page_header()}
     <th>Effect</th>
 </tr>
 <tr class="subheader-row">
-    <th colspan="${len(c.move_columns) + 8}"><strong>${method.name}</strong>: ${method.description}</th>
+    <th colspan="${len(c.move_columns) + 8}"><a href="#${method_id}" class="subtle"><strong>${method.name}</strong></a>: ${method.description}</th>
 </tr>
 ## DATA
 % for move, version_group_data in method_list:
@@ -564,10 +569,7 @@ ${lib.pokemon_page_header()}
 % endfor
 </table>
 
-<h1>External Links</h1>
-<%!
-    import re
-%>\
+<h1 id="links"><a href="#links" class="subtle">External Links</a></h1>
 <%
     # Some sites don't believe in Unicode URLs.  Scoff, scoff.
     # And they all do it differently.  Ugh, ugh.

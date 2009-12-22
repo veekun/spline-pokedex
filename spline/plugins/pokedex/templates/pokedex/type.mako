@@ -15,7 +15,7 @@
     ${c.type.id}: ${h.pokedex.type_icon(c.type)}
 </div>
 
-<h1 id="essentials">Essentials</h1>
+<h1 id="essentials"><a href="#essentials" class="subtle">Essentials</a></h1>
 
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.type.name.title()}</p>
@@ -49,7 +49,7 @@
     </ul>
 </div>
 
-<h1 id="pokemon">Pokémon</h1>
+<h1 id="pokemon"><a href="#pokemon" class="subtle">Pokémon</a></h1>
 % if c.type.name == '???':
 <p>In Generation IV, pure <a href="${url.current(name="flying")}">flying</a>-types become ???-type during
 <a href="${url(controller='dex', action='moves', name='roost')}">Roost</a>. This can be accomplished with
@@ -80,7 +80,7 @@ through regular play. Eggs are purely ???-type before hatching, and are displaye
 </table>
 % endif
 
-<h1 id="moves">Moves</h1>
+<h1 id="moves"><a href="#moves" class="subtle">Moves</a></h1>
 <table class="dex-pokemon-moves striped-rows">
     <thead>
         <tr class="header-row">
@@ -117,7 +117,7 @@ through regular play. Eggs are purely ???-type before hatching, and are displaye
     </tbody>
 </table>
 
-<h1 id="links">External Links</h1>
+<h1 id="links"><a href="#links" class="subtle">External Links</a></h1>
 <ul class="classic-list">
     % if c.type.generation.id <= 1:
     <li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/comp/${c.type.name}.htm">Azure Heights</a></li>

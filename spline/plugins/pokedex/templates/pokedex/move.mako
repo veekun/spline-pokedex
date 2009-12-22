@@ -1,5 +1,6 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="lib.mako"/>
+<%! import re %>\
 
 <%def name="title()">${c.move.name} – Move #${c.move.id}</%def>
 
@@ -15,7 +16,7 @@
     ${c.move.id}: ${c.move.name}
 </div>
 
-<h1>Essentials</h1>
+<h1 id="essentials"><a href="#essentials" class="subtle">Essentials</a></h1>
 
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.move.name}</p>
@@ -134,7 +135,7 @@
 </div>
 
 
-<h1>Effect</h1>
+<h1 id="effect"><a href="#effect" class="subtle">Effect</a></h1>
 <div class="dex-effect">
 ${h.literal(c.move.effect.as_html)}
 </div>
@@ -154,7 +155,7 @@ ${h.literal(c.move.effect.as_html)}
 
 
 
-<h1>Contests</h1>
+<h1 id="contests"><a href="#contests" class="subtle">Contests</a></h1>
 <div class="dex-column-container">
 <div class="dex-column">
     <h2>${h.pokedex.generation_icon(3)} Contest</h2>
@@ -241,7 +242,7 @@ ${h.literal(c.move.effect.as_html)}
 </div>
 </div>
 
-<h1>Pokémon</h1>
+<h1 id="pokemon"><a href="#pokemon" class="subtle">Pokémon</a></h1>
 <table class="dex-pokemon-moves striped-rows">
 ## COLUMNS
 % for i, column in enumerate(c.pokemon_columns):
@@ -254,14 +255,17 @@ ${h.literal(c.move.effect.as_html)}
 ${lib.pokemon_table_columns()}
 ## HEADERS
 % for method, method_list in c.pokemon:
-<tr class="header-row">
+<%
+    method_id = re.sub("\W+", "-", method.name.lower()) + "-pokemon"
+%>\
+<tr class="header-row" id="${method_id}">
     % for column in c.pokemon_columns:
     ${lib.pokemon_move_table_column_header(column)}
     % endfor
     ${lib.pokemon_table_header()}
 </tr>
 <tr class="subheader-row">
-    <th colspan="${len(c.pokemon_columns) + 12}"><strong>${method.name}</strong>: ${method.description}</th>
+    <th colspan="${len(c.pokemon_columns) + 12}"><a href="#${method_id}" class="subtle"><strong>${method.name}</a></strong>: ${method.description}</th>
 </tr>
 ## DATA
 % for pokemon, version_group_data in method_list:
@@ -275,7 +279,7 @@ ${lib.pokemon_table_columns()}
 % endfor
 </table>
 
-<h1>External Links</h1>
+<h1 id="links"><a href="#links" class="subtle">External Links</a></h1>
 <ul class="classic-list">
 % if c.move.generation.id <= 1:
 <li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/attacks/${c.move.name[0].lower()}/${c.move.name.lower().replace(' ', '_')}.htm">Azure Heights</a></li>

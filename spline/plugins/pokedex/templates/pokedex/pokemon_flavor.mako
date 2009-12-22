@@ -5,7 +5,7 @@
 
 ${lib.pokemon_page_header()}
 
-<h1>Pokédex Description</h1>
+<h1 id="pokedex"><a href="#pokedex" class="subtle">Pokédex Description</a></h1>
 % for generation, version_texts in sorted(c.flavor_text.items(), \
                                           key=lambda (k, v): k.id):
 <div class="dex-pokemon-flavor-generation">${h.pokedex.generation_icon(generation)}</div>
@@ -23,7 +23,7 @@ ${lib.pokemon_page_header()}
 % endfor
 
 
-<h1>Main Game Portraits</h1>
+<h1 id="main-sprites"><a href="#main-sprites" class="subtle">Main Game Portraits</a></h1>
 % if c.forms:
 <h3>Forms</h3>
 <ul class="inline">
@@ -40,7 +40,7 @@ ${lib.pokemon_page_header()}
 % endif
 
 % if c.introduced_in.id <= 2:
-<h2>${h.pokedex.generation_icon(1)} Blue, Red &amp; Blue, Yellow</h2>
+<h2 id="gen-i-main-sprites"><a href="#gen-i-main-sprites">${h.pokedex.generation_icon(1)} Blue, Red &amp; Blue, Yellow</a></h2>
 <table>
 <tr class="header-row">
     <th></th>
@@ -65,7 +65,7 @@ ${lib.pokemon_page_header()}
 % endif
 
 % if c.introduced_in.id <= 4:
-<h2>${h.pokedex.generation_icon(2)} Gold &amp; Silver, Crystal</h2>
+<h2 id="gen-ii-main-sprites"><a href="#gen-ii-main-sprites">${h.pokedex.generation_icon(2)} Gold &amp; Silver, Crystal</a></h2>
 <table>
 <tr class="header-row">
     <th></th>
@@ -103,7 +103,7 @@ ${lib.pokemon_page_header()}
 <% show_frlg = (c.pokemon.generation_id == 1
                 or c.pokemon.name == u'Teddiursa'
                 or (c.pokemon.name == u'Deoxys' and c.form in ('attack', 'defense'))) %>\
-<h2>${h.pokedex.generation_icon(3)} Ruby &amp; Sapphire, Emerald, Fire Red &amp; Leaf Green</h2>
+<h2 id="gen-iii-main-sprites"><a href="#gen-iii-main-sprites" class="subtle">${h.pokedex.generation_icon(3)} Ruby &amp; Sapphire, Emerald, Fire Red &amp; Leaf Green</a></h2>
 ## Deoxys is a giant mess.
 ## Normal only exists in R/S; Speed only in Emerald; Attack only in LG; Defense only in FR.
 <table>
@@ -166,7 +166,7 @@ ${lib.pokemon_page_header()}
 % endif
 
 % if c.pokemon.generation_id <= 4:
-<h2>${h.pokedex.generation_icon(4)} Diamond &amp; Pearl, Platinum, Heart Gold &amp; Soul Silver</h2>
+<h2 id="gen-iv-main-sprites"><a href="#gen-iv-main-sprites" class="subtle">${h.pokedex.generation_icon(4)} Diamond &amp; Pearl, Platinum, Heart Gold &amp; Soul Silver</a></h2>
 <% dpp_rowspan = 1 + 2 + (3 if c.pokemon.has_gen4_fem_sprite else 0) %>\
 <table>
 <tr class="header-row">
@@ -344,7 +344,7 @@ ${lib.pokemon_page_header()}
 % endif
 
 
-<h1>Miscellaneous Game Art</h1>
+<h1 id="misc-sprites"><a href="#misc-sprites" class="subtle">Miscellaneous Game Art</a></h1>
 
 % if c.pokemon.generation_id <= 4:
 <h2> ${h.pokedex.version_icons(u'Heart Gold', u'Soul Silver')} Heart Gold &amp; Soul Silver Overworld </h2>
@@ -447,7 +447,7 @@ ${lib.pokemon_page_header()}
 
 
 
-<h1>Other Images</h1>
+<h1 id="other"><a href="#other" class="subtle">Other Images</a></h1>
 
 <h2>Sugimori Art</h2>
 <p> ${h.pokedex.pokedex_img('sugimori/%d.png' % c.pokemon.national_id)} </p>
