@@ -590,6 +590,8 @@ ${lib.pokemon_page_header()}
     if c.pokemon.forme_base_pokemon:
         if c.pokemon.forme_name == 'sandy':
             smogon_name += '-g'
+        elif c.pokemon.forme_name == 'mow':
+            smogon_name += '-c'
         elif c.pokemon.forme_name in ('fan', 'trash'):
             smogon_name += '-s'
         else:
