@@ -573,9 +573,6 @@ ${lib.pokemon_page_header()}
 <%
     # Some sites don't believe in Unicode URLs.  Scoff, scoff.
     # And they all do it differently.  Ugh, ugh.
-    lp_name = c.pokemon.name
-    ghpd_name = c.pokemon.name.lower()
-    smogon_name = c.pokemon.name.lower()
     if c.pokemon.name == u'Nidoran♀':
         lp_name = 'Nidoran(f)'
         ghpd_name = 'nidoran_f'
@@ -584,11 +581,19 @@ ${lib.pokemon_page_header()}
         lp_name = 'Nidoran(m)'
         ghpd_name = 'nidoran_m'
         smogon_name = 'nidoran-m'
-    elif c.pokemon.name == 'Mr. Mime':
-        ghpd_name = 'mr_mime'
-        smogon_name = 'mr_mime'
-    elif c.pokemon.name == 'Mime Jr.':
-        smogon_name = 'mime_jr'
+    else:
+        lp_name = c.pokemon.name
+        ghpd_name = re.sub(' ', '_', c.pokemon.name.lower())
+        ghpd_name = re.sub('[^\w-]', '', ghpd_name)
+        smogon_name = ghpd_name
+
+    if c.pokemon.forme_base_pokemon:
+        if c.pokemon.forme_name == 'sandy':
+            smogon_name += '-g'
+        elif c.pokemon.forme_name in ('fan', 'trash'):
+            smogon_name += '-s'
+        else:
+            smogon_name += '-' + c.pokemon.forme_name[0].lower()
 %>
 <ul class="classic-list">
 % if c.pokemon.generation.id <= 1:
