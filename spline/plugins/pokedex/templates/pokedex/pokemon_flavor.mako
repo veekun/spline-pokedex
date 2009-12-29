@@ -40,7 +40,7 @@ ${lib.pokemon_page_header()}
 % endif
 
 % if c.introduced_in.id <= 2:
-<h2 id="gen-i-main-sprites"><a href="#gen-i-main-sprites">${h.pokedex.generation_icon(1)} Blue, Red &amp; Blue, Yellow</a></h2>
+<h2 id="gen-i-main-sprites"><a href="#gen-i-main-sprites" class="subtle">${h.pokedex.generation_icon(1)} Blue, Red &amp; Blue, Yellow</a></h2>
 <table>
 <tr class="header-row">
     <th></th>
@@ -65,7 +65,7 @@ ${lib.pokemon_page_header()}
 % endif
 
 % if c.introduced_in.id <= 4:
-<h2 id="gen-ii-main-sprites"><a href="#gen-ii-main-sprites">${h.pokedex.generation_icon(2)} Gold &amp; Silver, Crystal</a></h2>
+<h2 id="gen-ii-main-sprites"><a href="#gen-ii-main-sprites" class="subtle">${h.pokedex.generation_icon(2)} Gold &amp; Silver, Crystal</a></h2>
 <table>
 <tr class="header-row">
     <th></th>
