@@ -422,6 +422,10 @@ ${lib.pokemon_page_header()}
 </div>
 
 <h1 id="locations"><a href="#locations" class="subtle">Locations</a></h1>
+<ul class="see-also">
+<li> <img src="${h.static_uri('spline', 'icons/overlay/map--arrow.png')}" alt="See also:"> <a href="${url.current(action='pokemon_locations')}">Ridiculously detailed breakdown</a> </li>
+</ul>
+
 <table class="dex-encounters">
 <tr class="header-row">
     <th></th>

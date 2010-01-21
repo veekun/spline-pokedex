@@ -7,6 +7,7 @@ import logging
 import mimetypes
 
 import pokedex.db
+import pokedex.db.tables as tables
 from pokedex.db.tables import Ability, EggGroup, Generation, Item, Language, Machine, Move, MoveFlagType, Pokemon, PokemonEggGroup, PokemonFormSprite, PokemonMove, PokemonStat, Type, VersionGroup, PokemonType
 import pokedex.lookup
 import pkg_resources
@@ -14,7 +15,7 @@ from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
 from pylons.decorators import jsonify
 from sqlalchemy import and_, or_, not_
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, join
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func
 
@@ -137,6 +138,15 @@ def _move_tutor_version_groups(table):
 
     return move_tutor_version_groups
 
+def level_range(a, b):
+    """If a and b are the same, returns 'L{a}'.  Otherwise, returns 'L{a}–{b}'.
+    """
+
+    if a == b:
+        return u"L{0}".format(a)
+    else:
+        return u"L{0}–{1}".format(a, b)
+
 
 class PokedexController(BaseController):
 
@@ -186,6 +196,31 @@ class PokedexController(BaseController):
         'Emerald': 'versions/emerald.png',
         'Fire Red': 'versions/fire-red.png',
         'Leaf Green': 'versions/leaf-green.png',
+    }
+
+    # Maps condition value names to representative icons
+    encounter_condition_value_icons = {
+        # Conditions
+        'Not during a swarm':   'swarm-no.png',
+        'During a swarm':       'swarm-yes.png',
+        'No fishing swarm':     'swarm-no.png',
+        'Fishing swarm':        'swarm-yes.png',
+        'No surfing swarm':     'swarm-no.png',
+        'Surfing swarm':        'swarm-yes.png',
+        'In the morning':       'time-morning.png',
+        'During the day':       'time-daytime.png',
+        'At night':             'time-night.png',
+        u'Not using PokéRadar': 'pokéradar-off.png',
+        u'Using PokéRadar':     'pokéradar-on.png',
+        'No game in slot 2':    'slot2-none.png',
+        'Ruby in slot 2':       'slot2-ruby.png',
+        'Sapphire in slot 2':   'slot2-sapphire.png',
+        'Emerald in slot 2':    'slot2-emerald.png',
+        'Fire Red in slot 2':   'slot2-fire-red.png',
+        'Leaf Green in slot 2': 'slot2-leaf-green.png',
+        'Radio off':            'radio-off.png',
+        'Hoenn radio':          'radio-hoenn.png',
+        'Sinnoh radio':         'radio-sinnoh.png',
     }
 
     def __before__(self, action, **params):
@@ -948,6 +983,92 @@ class PokedexController(BaseController):
                 gen_text.append(flavor_tuple)
 
         return render('/pokedex/pokemon_flavor.mako')
+
+
+    def pokemon_locations(self, name):
+        """Spits out a page listing detailed location information for this
+        Pokémon.
+        """
+        try:
+            c.pokemon = db.pokemon(name)
+        except NoResultFound:
+            return self._not_found()
+
+        ### Previous and next for the header
+        c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
+
+        # For the most part, our data represents exactly what we're going to
+        # show.  For a given area in a given game, this Pokémon is guaranteed
+        # to appear some x% of the time no matter what the state of the world
+        # is, and various things like swarms or the radar may add on to this
+        # percentage.
+
+        # Encounters are grouped by region -- <h1>s.
+        # Then by terrain -- table sections.
+        # Then by area -- table rows.
+        # Then by version -- table columns.
+        # Finally, condition values associated with levels/rarity.
+        q = pokedex_session.query(tables.Encounter) \
+            .filter(tables.Encounter.pokemon == c.pokemon)
+
+        # region => terrain => area => version => condition =>
+        #     condition_values => encounter_bits
+        grouped_encounters = defaultdict(
+            lambda: defaultdict(
+                lambda: defaultdict(
+                    lambda: defaultdict(
+                        lambda: defaultdict(
+                            lambda: defaultdict(
+                                list
+                            )
+                        )
+                    )
+                )
+            )
+        )
+        for encounter in q.all():
+            # Um.  Right.
+            region = u'Kanto'
+
+            # Fetches the list of encounters that match this region, version,
+            # terrain, etc.
+            # n.b.: conditions and values must be tuples because lists aren't
+            # hashable.
+            encounter_bits = grouped_encounters \
+                [region] \
+                [encounter.slot.terrain] \
+                [encounter.location_area] \
+                [encounter.version] \
+                [ tuple(cv.condition for cv in encounter.condition_values) ] \
+                [ tuple(encounter.condition_values) ]
+
+            # Combine "level 3-4, 50%" and "level 3-4, 20%" into "level 3-4, 70%".
+            existing_encounter = filter(lambda enc: enc['min_level'] == encounter.min_level
+                                                and enc['max_level'] == encounter.max_level,
+                                        encounter_bits)
+            if existing_encounter:
+                existing_encounter[0]['rarity'] += encounter.slot.rarity
+            else:
+                encounter_bits.append({
+                    'min_level': encounter.min_level,
+                    'max_level': encounter.max_level,
+                    'rarity': encounter.slot.rarity,
+                })
+
+        c.grouped_encounters = grouped_encounters
+
+        # Pass some data/functions
+        c.encounter_condition_value_icons = self.encounter_condition_value_icons
+        c.level_range = level_range
+
+        # Sticking this in here until regions are a real thing
+        c.region_versions = {
+            u'Kanto': pokedex_session.query(tables.Version)
+                                     .filter(tables.Version.id >= 12)
+                                     .order_by(tables.Version.id.asc()).all(),
+        }
+
+        return render('/pokedex/pokemon_locations.mako')
 
 
     def moves(self, name):

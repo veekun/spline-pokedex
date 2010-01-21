@@ -28,6 +28,7 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/dex/moves/{name}', controller='dex', action='moves')
     map.connect('/dex/pokemon/{name}', controller='dex', action='pokemon')
     map.connect('/dex/pokemon/{name}/flavor', controller='dex', action='pokemon_flavor')
+    map.connect('/dex/pokemon/{name}/locations', controller='dex', action='pokemon_locations')
     map.connect('/dex/types/{name}', controller='dex', action='types')
 
 def get_role(table):

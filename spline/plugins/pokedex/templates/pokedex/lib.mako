@@ -13,14 +13,15 @@
     ${h.pokedex.pokemon_sprite(prefix='icons', pokemon=c.pokemon)}
     <br>${c.pokemon.national_id}: ${c.pokemon.name}
     <ul class="inline-menu">
-      % for action, label in (('pokemon', u'Pokédex'), \
-                                ('pokemon_flavor', u'Flavor')):
+    % for action, label in (('pokemon', u'Pokédex'), \
+                            ('pokemon_flavor', u'Flavor'), \
+                            ('pokemon_locations', u'Locations')):
         % if action == request.environ['pylons.routes_dict']['action']:
         <li>${label}</li>
         % else:
         <li><a href="${url.current(action=action)}">${label}</a></li>
         % endif
-      % endfor
+    % endfor
     </ul>
 </div>
 </%def>

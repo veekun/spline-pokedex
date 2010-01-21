@@ -101,13 +101,21 @@ table.dex-pokemon-stats td.dex-pokemon-stats-pctile { text-align: right; }
 table.dex-pokemon-stats td.dex-pokemon-stats-result { text-align: right; }
 
 table.dex-encounters th.version { width: 8em; }
-table.dex-encounters td { vertical-align: middle; }
+table.dex-encounters td { width: 10em; vertical-align: top; }
 table.dex-encounters td.location { vertical-align: top; }
-table.dex-encounters td.icon { height: 24px; width: 24px; padding-left: 2em; vertical-align: middle; text-align: center; }
-.dex-location-area { font-size: 0.8em; font-style: italic; }
-.dex-rarity-bar { position: relative; font-size: 0.75em; height: 1em; line-height: 1; margin-top: 0.25em; background: #e8e8e8; border: 1px solid #96bbf2; }
-.dex-rarity-bar-fill { height: 100%; background: #96bbf2; }
-.dex-rarity-bar-value { position: absolute; height: 100%; top: 0; right: 0; color: #808080; vertical-align: bottom; }
+table.dex-encounters th.location { vertical-align: top; text-align: left; }
+.dex-location-area { font-size: 0.8em; font-style: italic; color: black; }
+.dex-encounter-condition-group { padding: 0.5em 0; }
+.dex-encounter-condition-group + .dex-encounter-condition-group { border-top: 1px solid #404040; }
+.dex-encounter-conditions + .dex-encounter-conditions { margin-top: 0.5em; }
+.dex-encounter-conditions .dex-encounter-icon { float: left; width: 24px; height: 24px; line-height: 24px; text-align: center; overflow: hidden;}
+.dex-encounter-conditions .dex-encounter-icon img { vertical-align: middle; }
+.dex-encounter-conditions .dex-encounter-rarity { float: right; }
+.dex-encounter-conditions .dex-rarity-bar { position: relative; overflow: auto; font-size: 0.75em; height: 1em; line-height: 1; margin-top: 0.25em; background: #e8e8e8; border: 1px solid #96bbf2; }
+.dex-encounter-conditions .dex-rarity-bar-fill { height: 100%; background: #96bbf2; }
+.dex-encounter-conditions .dex-rarity-bar-fills { float: left; height: 100%; background: #96bbf2; }
+.dex-encounter-conditions .dex-rarity-bar-fills + .dex-rarity-bar-fills { margin-left: -1px; border-left: 1px solid #b3cef6; }
+.dex-encounter-conditions .dex-rarity-bar-value { position: absolute; height: 100%; top: 0; right: 0; color: #808080; vertical-align: bottom; }
 
 table.dex-pokemon-moves {;}
 table.dex-pokemon-pokemon-moves { width: 100%; }
