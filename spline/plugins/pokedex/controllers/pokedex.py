@@ -1026,12 +1026,27 @@ class PokedexController(BaseController):
                 )
             )
         )
-        for encounter in q.all():
-            # Um.  Right.
-            region = u'Kanto'
 
+        # Locations cluster by region, primarily to avoid having a lot of rows
+        # where one version group or the other is blank; that doesn't make for
+        # fun reading.  To put the correct version headers in each region
+        # table, we need to know what versions correspond to which regions.
+        # Normally, this can be done by examining region.version_groups.
+        # However, some regions (Kanto) appear in a ridiculous number of games.
+        # To avoid an ultra-wide table when not necessary, only *generations*
+        # that actually contain this Pokémon should appear.
+        # So if the Pokémon appears in Kanto in Crystal, show all of G/S/C.  If
+        # it doesn't appear in any of the three, show none of them.
+        # Last but not least, show generations in reverse order, so the more
+        # important (i.e., recent) versions are on the left.
+        # Got all that?
+        region_generations = defaultdict(set)
+
+        for encounter in q.all():
             # Fetches the list of encounters that match this region, version,
             # terrain, etc.
+            region = encounter.location_area.location.region
+
             # n.b.: conditions and values must be tuples because lists aren't
             # hashable.
             encounter_bits = grouped_encounters \
@@ -1055,18 +1070,25 @@ class PokedexController(BaseController):
                     'rarity': encounter.slot.rarity,
                 })
 
+            # Remember that this generation appears in this region
+            region_generations[region].add(encounter.version.version_group.generation)
+
         c.grouped_encounters = grouped_encounters
 
         # Pass some data/functions
         c.encounter_condition_value_icons = self.encounter_condition_value_icons
         c.level_range = level_range
 
-        # Sticking this in here until regions are a real thing
-        c.region_versions = {
-            u'Kanto': pokedex_session.query(tables.Version)
-                                     .filter(tables.Version.id >= 12)
-                                     .order_by(tables.Version.id.asc()).all(),
-        }
+        # See above.  Versions for each region are those in that region that
+        # are part of a generation where this Pokémon appears -- in reverse
+        # generation order.
+        c.region_versions = defaultdict(list)
+        for region, generations in sorted(region_generations.items(),
+                                          key=lambda (k, v): - k.generation.id):
+            for version_group in region.version_groups:
+                if version_group.generation not in generations:
+                    continue
+                c.region_versions[region].extend(version_group.versions)
 
         return render('/pokedex/pokemon_locations.mako')
 

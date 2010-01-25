@@ -5,14 +5,10 @@
 
 ${lib.pokemon_page_header()}
 
+## Sort regions by the generation that introduced them
 % for region, terrain_area_version_condition_encounters \
-   in sorted( c.grouped_encounters.items(), key=lambda (k, v): k):
-<h1>${region}</h1>
-
-## Within a region is some number of versions.  Which is great and all, except
-## regions aren't actual objects yet so I don't know what they are.  So, this
-## is hardcoded in the controller for now.
-<% region_versions = c.region_versions[region] %>
+   in sorted( c.grouped_encounters.items(), key=lambda (k, v): k.generation.id):
+<h1>${region.name}</h1>
 
 <table class="dex-encounters striped-rows">
     ## Draw a divider to separate terrain, in id order.  Why not?
@@ -23,7 +19,7 @@ ${lib.pokemon_page_header()}
 
     <tr class="header-row">
         <th></th>
-        % for version in region_versions:
+        % for version in c.region_versions[region]:
         <th>${h.pokedex.version_icons(version)} ${version.name}</th>
         % endfor
     </tr>
@@ -42,7 +38,7 @@ ${lib.pokemon_page_header()}
             <div class="dex-location-area">${location_area.name}</div>
             % endif
         </th>
-        % for version in region_versions:
+        % for version in c.region_versions[region]:
         <% condition_encounters = version_condition_encounters[version] %>
         <td>
             ## Sort conditions by number of conditions (so "default" comes
