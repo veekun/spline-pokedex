@@ -63,7 +63,7 @@ ${lib.pokemon_page_header()}
         <dd>${c.pokemon.gen1_internal_id} (<code>0x${"%02x" % c.pokemon.gen1_internal_id}</code>)</dd>
         % endif
         % for dex_number in c.pokemon.normal_form.dex_numbers:
-        <dt>${dex_number.generation.main_region} ${h.pokedex.generation_icon(dex_number.generation)}</dt>
+        <dt>${dex_number.generation.main_region.name} ${h.pokedex.generation_icon(dex_number.generation)}</dt>
         <dd>
             ${dex_number.pokedex_number}
             ## XXX should this be in the db somehow?
