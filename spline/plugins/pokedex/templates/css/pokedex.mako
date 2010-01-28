@@ -100,6 +100,12 @@ table.dex-pokemon-stats .dex-pokemon-stats-bar { padding: 0.33em; border: 1px so
 table.dex-pokemon-stats td.dex-pokemon-stats-pctile { text-align: right; }
 table.dex-pokemon-stats td.dex-pokemon-stats-result { text-align: right; }
 
+ul.dex-simple-encounters { display: inline; }
+ul.dex-simple-encounters li { display: inline; }
+ul.dex-simple-encounters li:after { content: '; '; }
+ul.dex-simple-encounters li:last-child:after { content: ''; }
+
+/* This is actually the pokemon-locations page */
 table.dex-encounters th.version { width: 8em; }
 table.dex-encounters td { width: 10em; vertical-align: top; }
 table.dex-encounters td.location { vertical-align: top; }

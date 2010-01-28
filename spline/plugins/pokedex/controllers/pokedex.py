@@ -147,6 +147,40 @@ def level_range(a, b):
     else:
         return u"L{0}–{1}".format(a, b)
 
+class CombinedEncounter(object):
+    """Represents several encounter rows, collapsed together.  Rarities and
+    level ranges are combined correctly.
+
+    Assumed to have the same terrain.  Also location and area and so forth, but
+    those aren't actually needed.
+    """
+    def __init__(self, encounter=None):
+        self.terrain = None
+        self.rarity = 0
+        self.min_level = 0
+        self.max_level = 0
+
+        if encounter:
+            self.combine_with(encounter)
+
+    def combine_with(self, encounter):
+        if self.terrain and self.terrain != encounter.slot.terrain:
+            raise ValueError(
+                "Can't combine terrain {0} with {1}"
+                .format(self.terrain.name, encounter.slot.terrain.name)
+            )
+
+        self.rarity += encounter.slot.rarity
+        self.max_level = max(self.max_level, encounter.max_level)
+
+        if not self.min_level:
+            self.min_level = encounter.min_level
+        else:
+            self.min_level = min(self.min_level, encounter.min_level)
+
+    @property
+    def level(self):
+        return level_range(self.min_level, self.max_level)
 
 class PokedexController(BaseController):
 
@@ -159,43 +193,13 @@ class PokedexController(BaseController):
         Type: 'type',
     }
 
-    # List of (slot_type.name, condition_group.name)
-    # These are ordered roughly in increasing order of inconvenience and when
-    # in the game they become available -- i.e. it's arbitrary
-    encounter_method_order = [
-        ('Walking in grass/caves', None),
-        ('Walking in grass/caves', u'Time of day'),
-        ('Rock Smash', None),
-        ('Fishing with Old Rod', None),
-        ('Fishing with Good Rod', None),
-        ('Surfing', None),
-        ('Fishing with Super Rod', None),
-        ('Walking in grass/caves', u'Swarm'),
-        ('Walking in grass/caves', u'Gen 3 game in slot 2'),
-        ('Walking in grass/caves', u'PokéRadar'),
-    ]
-
-    # Dict of type/condition name => icon path
-    # Key is condition name if one exists; otherwise type name
-    encounter_method_icons = {
-        # Encounter types, no special conditions
+    # Dict of terrain name => icon path
+    encounter_terrain_icons = {
         'Surfing': 'chrome/surf.png',
-        'Fishing with Old Rod': 'items/old-rod.png',
-        'Fishing with Good Rod': 'items/good-rod.png',
-        'Fishing with Super Rod': 'items/super-rod.png',
-        'Walking in grass/caves': 'chrome/grass.png',
-
-        # Conditions
-        'During a swarm': 'items/teachy-tv.png',
-        'Morning': 'chrome/morning.png',
-        'Day': 'chrome/daytime.png',
-        'Night': 'chrome/night.png',
-        u'Using PokéRadar': 'items/poké-radar.png',
-        'Ruby': 'versions/ruby.png',
-        'Sapphire': 'versions/sapphire.png',
-        'Emerald': 'versions/emerald.png',
-        'Fire Red': 'versions/fire-red.png',
-        'Leaf Green': 'versions/leaf-green.png',
+        'Fishing with an Old Rod': 'items/old-rod.png',
+        'Fishing with a Good Rod': 'items/good-rod.png',
+        'Fishing with a Super Rod': 'items/super-rod.png',
+        'Walking in tall grass or a cave': 'chrome/grass.png',
     }
 
     # Maps condition value names to representative icons
@@ -672,118 +676,50 @@ class PokedexController(BaseController):
         for pokemon_flavor_text in c.pokemon.normal_form.flavor_text:
             c.flavor_text[pokemon_flavor_text.version.name] = pokemon_flavor_text.flavor_text
 
-        ### Encounters
-        # The table is sorted by location, then area, with each row containing
-        # Diamond, Pearl, then Platinum locations.  Thus we build a dictionary:
-        #   encounters[location_area][version]
-        #       = [dict(type=type, condition=condition,
-        #               rarity=30, level="2-3"), ...]
-        encounters = {}
+        ### Encounters -- briefly
+        # One row per version, then a list of places the Pokémon appears.
+        # version => terrain => location_area => conditions => CombinedEncounters
+        c.locations = defaultdict(
+            lambda: defaultdict(
+                lambda: defaultdict(
+                    lambda: defaultdict(
+                        CombinedEncounter
+                    )
+                )
+            )
+        )
 
-        # We want to filter each group of encounters down to just the one(s)
-        # with the LEAST interesting catch method.  That is, if something shows
-        # up during the day walking around, we don't care if it also shows up
-        # while using the PokéRadar.
-        # Note that we effectively HAVE to do this to avoid a lot of mucking
-        # around.  If, say, a Pokémon appears in a condition-less slot with a
-        # rarity of 10%, but ALSO appears another 5% of the time when the
-        # PokéRadar is in use, we will naively report that as 5% from
-        # PokéRadar.  But since we're discarding PokéRadar values as long as
-        # the Pokémon still appears normally, this can't happen.
-        # We accomplish all this by only tracking the least-interesting methods
-        # seen so far, and wiping the list if we see an even less interesting
-        # one later for a given area/version.
-        # XXX: Note that this approach also strips out times of day, even if
-        # there are entries for all of morning/day/night.  Does that happen?
-        # (Don't think so.)  Is there a sane fix?
         for encounter in c.pokemon.encounters:
-            # Long way to say encounters[location_area][version], with defaults
-            method_list = encounters.setdefault(encounter.location_area, {}) \
-                                    .setdefault(encounter.version.name, [])
+            condition_values = [cv for cv in encounter.condition_values
+                                   if not cv.is_default]
+            c.locations[encounter.version] \
+                       [encounter.slot.terrain] \
+                       [encounter.location_area] \
+                       [tuple(condition_values)].combine_with(encounter)
 
-            # Find priority for this combination of slot/condition.
-            # Priorities are the encounter_method_order at the top of the class
-            condition = None
-            if encounter.condition_values:
-                # XXX DON'T USE ONLY THE FIRST
-                condition = encounter.condition_values[0].condition.name
+        # Strip each version+location down to just the condition values that
+        # are the most common per terrain
+        # Results in:
+        # version => location_area => terrain => (conditions, combined_encounter)
+        for version, terrain_etc in c.locations.items():
+            for terrain, area_condition_encounters \
+                in terrain_etc.items():
+                for location_area, condition_encounters \
+                    in area_condition_encounters.items():
 
-            priority = self.encounter_method_order.index(
-                           (encounter.slot.terrain.name, condition))
+                    # Sort these by rarity
+                    condition_encounter_items = condition_encounters.items()
+                    condition_encounter_items.sort(
+                        key=lambda (conditions, combined_encounter):
+                            combined_encounter.rarity
+                    )
 
-            if not method_list or priority == method_list[0]['priority']:
-                # Same priority; just add this encounter to what we have
-                pass
-            elif priority > method_list[0]['priority']:
-                # Worse priority: already have something better, so skip this
-                continue
-            elif priority < method_list[0]['priority']:
-                # Better priority: better than what we have, so nuke them
-                method_list[0:len(method_list)] = []
+                    # Use the last one, which is most common
+                    area_condition_encounters[location_area] \
+                        = condition_encounter_items[-1]
 
-            # Find the dictionary for this terrain/condition and create/update it
-            method_dicts = filter(lambda x: x['condition'] == (encounter.condition_values + [None])[0]  # XXX
-                                        and x['terrain'] == encounter.slot.terrain,
-                                  method_list)
-            if method_dicts:
-                method_dict = method_dicts[0]
-                method_dict['rarity'] += encounter.slot.rarity
-                method_dict['min_level'] = min(method_dict['min_level'],
-                                               encounter.min_level)
-                method_dict['max_level'] = max(method_dict['max_level'],
-                                               encounter.max_level)
-            else:
-                method_dict = dict(terrain=encounter.slot.terrain,
-                                   condition=(encounter.condition_values + [None])[0],  # XXX
-                                   min_level=encounter.min_level,
-                                   max_level=encounter.max_level,
-                                   rarity=encounter.slot.rarity,
-                                   priority=priority,
-                                   )
-                method_list.append(method_dict)
-
-        # Do some post-formatting on the method dictionaries: add icons
-        # representing each method, and collapse the level range into a single
-        # string
-        for version_encounters in encounters.values():
-            for method_list in version_encounters.values():
-                for method_dict in method_list:
-                    # Construct a level string; collapse "2 - 2" into "2"
-                    if method_dict['min_level'] == method_dict['max_level']:
-                        method_dict['level'] = str(method_dict['min_level'])
-                    else:
-                        method_dict['level'] = "%(min_level)d–%(max_level)d" \
-                                             % method_dict
-
-                    terrain = method_dict['terrain']
-                    condition_value = method_dict['condition']
-
-                    # Give each terrain/condition combo a helpful icon
-                    if method_dict['condition']:
-                        key = method_dict['condition'].name
-                    else:
-                        key = method_dict['terrain'].name
-
-                    method_dict['name'] = key
-                    method_dict['icon'] = self.encounter_method_icons \
-                                              .get(key, 'icons/0.png')
-
-                # Sort the method dicts so they come out in consistent order
-                method_list.sort(key=lambda x: x['name'])
-
-                # Merge identical RSEFL into one Gen3 row.  The following
-                # approach assumes that RSEFL will only appear alone, which is
-                # true since only one condition can appear
-                condition_names = [x['condition'].name for x in method_list
-                                                       if x['condition']]
-                if set(condition_names) == set(['Ruby', 'Sapphire', 'Emerald',
-                                           'Fire Red', 'Leaf Green']):
-                    del method_list[1:]
-                    method_list[0]['icon'] = 'versions/generation-3.png'
-                    method_list[0]['name'] = 'Gen 3 game in slot 2'
-
-        # And finally stuff this monstrosity into the template stash
-        c.encounters = encounters
+        # Used for prettiness
+        c.encounter_terrain_icons = self.encounter_terrain_icons
 
         ### Moves
         # Oh no.

@@ -426,78 +426,30 @@ ${lib.pokemon_page_header()}
 <li> <img src="${h.static_uri('spline', 'icons/overlay/map--arrow.png')}" alt="See also:"> <a href="${url.current(action='pokemon_locations')}">Ridiculously detailed breakdown</a> </li>
 </ul>
 
-<table class="dex-encounters">
-<tr class="header-row">
-    <th></th>
-    % for version in db.generation(4).versions:
-    <th><!-- method --></th>
-    <th class="version">${h.pokedex.version_icons(version)}</th>
-    % endfor
-</tr>
-## Show a dummy row if there's nothing, else we have a header and no data
-% if not len(c.encounters):
-<tr>
-    <td colspan="7">No appearances</td>
-</tr>
-% endif
-## Each version/area combo might have multiple methods (i.e. day + night), so
-## we have to iterate over those too, being careful to show one big cell with
-## the area name in it
-<%
-    is_alt_row = False
-%>\
-% for location_area, version_encounters in \
-      sorted(c.encounters.items(), key=lambda (k, v): (k.location.name, k.name)):
-<%
-    num_method_rows = max(map(lambda x: len(x), version_encounters.values()))
-%>\
-% for row_idx in range(num_method_rows):
-% if is_alt_row:
-<tr class="color2">
-% else:
-<tr class="color1">
-% endif
-    ## We're doing delicious rowspan hackery, so only show the location label
-    ## for the first physical row
-    % if row_idx == 0:
-    <td rowspan="${num_method_rows}" class="location">
-        ${location_area.location.name}
-        % if location_area.name:
-        <div class="dex-location-area">${location_area.name}</div>
-        % endif
-    </td>
-    % endif
-
-    ## Two columns per version, to keep the width constant: method and levels
-    % for version in db.generation(4).versions:
-    <%
-        version_encounters.setdefault(version.name, {})
-        if len(version_encounters[version.name]) <= row_idx:
-            context.write("<td class='icon'></td><td class='version'></td>")
-            continue
-        method_dict = version_encounters[version.name][row_idx]
-    %>\
-    <td class="icon">
-        % if method_dict['icon']:
-        ${h.pokedex.pokedex_img(method_dict['icon'], alt=method_dict['name'], \
-                                               title=method_dict['name'])}
-        % endif
-    </td>
-    <td title="${method_dict['rarity']}%">
-        ${method_dict['level']}
-        <div class="dex-rarity-bar">
-            <div class="dex-rarity-bar-fill" style="width: ${method_dict['rarity']}%;"></div>
-            <div class="dex-rarity-bar-value">${method_dict['rarity']}%</div>
+<dl>
+    ## Sort versions by order, which happens to be id
+    % for version, terrain_etc in sorted(c.locations.items(), \
+                                         key=lambda (k, v): k.id):
+    <dt>${version.name} ${h.pokedex.version_icons(version)}</dt>
+    <dd>
+        ## Sort terrain by name
+        % for terrain, area_condition_encounters in sorted(terrain_etc.items(), \
+                                                           key=lambda (k, v): k.name):
+        <div>
+            ${h.pokedex.pokedex_img(c.encounter_terrain_icons[terrain.name], alt=terrain.name)}
+            <ul class="dex-simple-encounters">
+                ## Sort locations by name
+                % for location_area, (conditions, combined_encounter) \
+                    in sorted(area_condition_encounters.items(), \
+                              key=lambda (k, v): (k.location.name, k.name)):
+                <li title="${combined_encounter.level} ${combined_encounter.rarity}% ${';'.join(_.name for _ in conditions)}">${location_area.location.name}${', ' + location_area.name if location_area.name else ''}</li>
+                % endfor
+            </ul>
         </div>
-    </td>
+        % endfor
+    </dd>
     % endfor
-</tr>
-% endfor
-<%
-    is_alt_row = not is_alt_row
-%>\
-% endfor
-</table>
+</dl>
 
 <h1 id="moves"><a href="#moves" class="subtle">Moves</a></h1>
 <table class="dex-pokemon-moves dex-pokemon-pokemon-moves striped-rows">
