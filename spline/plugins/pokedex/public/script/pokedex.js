@@ -85,7 +85,8 @@ pokedex.pokemon_moves = {
                 {
                     var $control = $(
                         '<td class="js-dex-pokemon-moves-filter-link" colspan="' + vg_width + '">'
-                        + '<img src="/static/spline/icons/funnel.png" alt="Filter" title="Filter">'
+                        + '<img src="/static/spline/icons/table-select-column.png" alt="Filter" title="Filter">'
+                        + '<div class="js-label">Hide<br>others</div>'
                         + '</td>'
                     );
 
@@ -197,10 +198,11 @@ pokedex.pokemon_moves = {
         $td.unbind('click', pokedex.pokemon_moves.unfilter);
         $td.click(pokedex.pokemon_moves.filter_columns);
         $td.find('img').attr({
-            'src':   '/static/spline/icons/funnel.png',
+            'src':   '/static/spline/icons/table-select-column.png',
             'alt':   'Filter',
             'title': 'Filter'
         });
+        $td.find('.js-label').html("Hide<br>others");
     },
 
     // Reset sorting
@@ -321,14 +323,14 @@ pokedex.pokemon_moves = {
            .css('display', 'none');
 
         // Set the lone remaining filter icon to unfilter
-        var $img = $td.find('img');
         $td.unbind('click', pokedex.pokemon_moves.filter_columns);
         $td.click(pokedex.pokemon_moves.unfilter);
-        $img.attr({
-            'src':   '/static/spline/icons/overlay/funnel--minus.png',
+        $td.find('img').attr({
+            'src':   '/static/spline/icons/table-select-all.png',
             'alt':   'Unfilter',
             'title': 'Unfilter'
         });
+        $td.find('.js-label').text("Show all");
     },
 
     // Sort the table by the selected column
