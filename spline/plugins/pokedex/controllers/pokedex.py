@@ -195,11 +195,12 @@ class PokedexController(BaseController):
 
     # Dict of terrain name => icon path
     encounter_terrain_icons = {
-        'Surfing': 'chrome/surf.png',
-        'Fishing with an Old Rod': 'items/old-rod.png',
-        'Fishing with a Good Rod': 'items/good-rod.png',
-        'Fishing with a Super Rod': 'items/super-rod.png',
-        'Walking in tall grass or a cave': 'chrome/grass.png',
+        'Surfing':                          'surfing.png',
+        'Fishing with an Old Rod':          'old-rod.png',
+        'Fishing with a Good Rod':          'good-rod.png',
+        'Fishing with a Super Rod':         'super-rod.png',
+        'Walking in tall grass or a cave':  'grass.png',
+        'Smashing rocks':                   'rock-smash.png',
     }
 
     # Maps condition value names to representative icons

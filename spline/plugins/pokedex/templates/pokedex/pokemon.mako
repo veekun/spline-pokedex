@@ -436,7 +436,8 @@ ${lib.pokemon_page_header()}
         % for terrain, area_condition_encounters in sorted(terrain_etc.items(), \
                                                            key=lambda (k, v): k.name):
         <div>
-            ${h.pokedex.pokedex_img(c.encounter_terrain_icons[terrain.name], alt=terrain.name)}
+            ${h.pokedex.pokedex_img('encounters/' + c.encounter_terrain_icons.get(terrain.name, 'unknown.png'), \
+                                    alt=terrain.name)}
             <ul class="dex-simple-encounters">
                 ## Sort locations by name
                 % for location_area, (conditions, combined_encounter) \
