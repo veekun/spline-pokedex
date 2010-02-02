@@ -25,6 +25,7 @@ def add_routes_hook(map, *args, **kwargs):
 
     map.connect('/dex/abilities/{name}', controller='dex', action='abilities')
     map.connect('/dex/items/{name}', controller='dex', action='items')
+    map.connect('/dex/locations/{name}', controller='dex', action='locations')
     map.connect('/dex/moves/{name}', controller='dex', action='moves')
     map.connect('/dex/pokemon/{name}', controller='dex', action='pokemon')
     map.connect('/dex/pokemon/{name}/flavor', controller='dex', action='pokemon_flavor')

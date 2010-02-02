@@ -1029,7 +1029,6 @@ class PokedexController(BaseController):
 
         return render('/pokedex/pokemon_locations.mako')
 
-
     def moves(self, name):
         try:
             c.move = db.get_by_name(Move, name)
@@ -1203,3 +1202,91 @@ class PokedexController(BaseController):
         return render('/pokedex/item.mako')
 
 
+    def locations(self, name):
+        # Note that it isn't against the rules for multiple locations to have
+        # the same name.  To avoid complications, the name is stored in
+        # c.location_name, and after that we only deal with areas.
+        c.locations = pokedex_session.query(tables.Location) \
+            .filter(func.lower(tables.Location.name) == name) \
+            .all()
+
+        if not c.locations:
+            return self._not_found()
+
+        c.location_name = c.locations[0].name
+
+        # TODO: Sort locations/areas by generation
+
+        # Get all the areas in any of these locations
+        c.areas = []
+        for location in c.locations:
+            c.areas.extend(location.areas)
+        c.areas.sort(key=lambda area: area.name)
+
+        # For the most part, our data represents exactly what we're going to
+        # show.  For a given area in a given game, this Pokémon is guaranteed
+        # to appear some x% of the time no matter what the state of the world
+        # is, and various things like swarms or the radar may add on to this
+        # percentage.
+
+        # Encounters are grouped by area -- <h2>s.
+        # Then by terrain -- table sections.
+        # Then by pokemon -- table rows.
+        # Then by version -- table columns.
+        # Finally, condition values associated with levels/rarity.
+        q = pokedex_session.query(tables.Encounter) \
+            .filter(tables.Encounter.location_area_id.in_(_.id for _ in c.areas))
+
+        # area => terrain => pokemon => version => condition =>
+        #     condition_values => encounter_bits
+        grouped_encounters = defaultdict(
+            lambda: defaultdict(
+                lambda: defaultdict(
+                    lambda: defaultdict(
+                        lambda: defaultdict(
+                            lambda: defaultdict(
+                                list
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        for encounter in q.all():
+            # Fetches the list of encounters that match this region, version,
+            # terrain, etc.
+
+            # n.b.: conditions and values must be tuples because lists aren't
+            # hashable.
+            encounter_bits = grouped_encounters \
+                [encounter.location_area] \
+                [encounter.slot.terrain] \
+                [encounter.pokemon] \
+                [encounter.version] \
+                [ tuple(cv.condition for cv in encounter.condition_values) ] \
+                [ tuple(encounter.condition_values) ]
+
+            # Combine "level 3-4, 50%" and "level 3-4, 20%" into "level 3-4, 70%".
+            existing_encounter = filter(lambda enc: enc['min_level'] == encounter.min_level
+                                                and enc['max_level'] == encounter.max_level,
+                                        encounter_bits)
+            if existing_encounter:
+                existing_encounter[0]['rarity'] += encounter.slot.rarity
+            else:
+                encounter_bits.append({
+                    'min_level': encounter.min_level,
+                    'max_level': encounter.max_level,
+                    'rarity': encounter.slot.rarity,
+                })
+
+        c.grouped_encounters = grouped_encounters
+
+        # Pass some data/functions
+        c.encounter_condition_value_icons = self.encounter_condition_value_icons
+        c.level_range = level_range
+
+        # FIXME
+        c.versions = pokedex_session.query(tables.Version).filter(tables.Version.id >= 12).all()
+
+        return render('/pokedex/location.mako')

@@ -426,7 +426,7 @@ ${lib.pokemon_page_header()}
 <li> <img src="${h.static_uri('spline', 'icons/overlay/map--arrow.png')}" alt="See also:"> <a href="${url.current(action='pokemon_locations')}">Ridiculously detailed breakdown</a> </li>
 </ul>
 
-<dl>
+<dl class="dex-simple-encounters">
     ## Sort versions by order, which happens to be id
     % for version, terrain_etc in sorted(c.locations.items(), \
                                          key=lambda (k, v): k.id):
@@ -434,16 +434,20 @@ ${lib.pokemon_page_header()}
     <dd>
         ## Sort terrain by name
         % for terrain, area_condition_encounters in sorted(terrain_etc.items(), \
-                                                           key=lambda (k, v): k.name):
-        <div>
+                                                           key=lambda (k, v): k.id):
+        <div class="dex-simple-encounters-terrain">
             ${h.pokedex.pokedex_img('encounters/' + c.encounter_terrain_icons.get(terrain.name, 'unknown.png'), \
                                     alt=terrain.name)}
-            <ul class="dex-simple-encounters">
+            <ul>
                 ## Sort locations by name
                 % for location_area, (conditions, combined_encounter) \
                     in sorted(area_condition_encounters.items(), \
                               key=lambda (k, v): (k.location.name, k.name)):
-                <li title="${combined_encounter.level} ${combined_encounter.rarity}% ${';'.join(_.name for _ in conditions)}">${location_area.location.name}${', ' + location_area.name if location_area.name else ''}</li>
+                <li title="${combined_encounter.level} ${combined_encounter.rarity}% ${';'.join(_.name for _ in conditions)}">
+                    <a href="${url(controller='dex', action='locations', name=location_area.location.name.lower())}">
+                        ${location_area.location.name}${', ' + location_area.name if location_area.name else ''}
+                    </a>
+                </li>
                 % endfor
             </ul>
         </div>
