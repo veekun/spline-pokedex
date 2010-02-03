@@ -444,7 +444,7 @@ ${lib.pokemon_page_header()}
                     in sorted(area_condition_encounters.items(), \
                               key=lambda (k, v): (k.location.name, k.name)):
                 <li title="${combined_encounter.level} ${combined_encounter.rarity}% ${';'.join(_.name for _ in conditions)}">
-                    <a href="${url(controller='dex', action='locations', name=location_area.location.name.lower())}">
+                    <a href="${url(controller="dex", action="locations", name=location_area.location.name.lower())}${'#area:' + location_area.name if location_area.name else ''}">
                         ${location_area.location.name}${', ' + location_area.name if location_area.name else ''}
                     </a>
                 </li>

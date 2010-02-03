@@ -7,7 +7,9 @@
 
 % for location_area in c.areas:
 % if location_area.name:
-<h1>${location_area.name}</h1>
+<h2 id="area:${location_area.name}">
+    <a href="#area:${location_area.name}" class="subtle">${location_area.name}</a>
+</h2>
 % endif
 
 <table class="dex-encounters striped-rows">

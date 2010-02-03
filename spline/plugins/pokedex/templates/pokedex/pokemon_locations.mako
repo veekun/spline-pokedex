@@ -33,7 +33,9 @@ ${lib.pokemon_page_header()}
                  key=lambda (k, v): (k.location.name, k.name)):
     <tr>
         <th class="location">
-            ${location_area.location.name}
+            <a href="${url(controller="dex", action="locations", name=location_area.location.name.lower())}${'#area:' + location_area.name if location_area.name else ''}">
+                ${location_area.location.name}
+            </a>
             % if location_area.name:
             <div class="dex-location-area">${location_area.name}</div>
             % endif
