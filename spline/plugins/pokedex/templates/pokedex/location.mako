@@ -35,7 +35,14 @@
                  key=lambda (k, v): k.name):
     <tr>
         <th class="location">
-            ${pokemon.name}
+            ${h.pokedex.pokemon_link(
+                pokemon,
+                h.literal("""{0} {1}""".format(
+                    h.pokedex.pokemon_sprite(pokemon, prefix='icons'),
+                    pokemon.name,
+                )),
+                class_='dex-icon-link',
+            )}
         </th>
         % for version in c.versions:
         <% condition_encounters = version_condition_encounters[version] %>
@@ -60,7 +67,7 @@
                 % for condition_value in condition_values:
                 <div class="dex-encounter-icon">
                     ${h.pokedex.pokedex_img('encounters/' \
-                                            + c.encounter_condition_value_icons.get(condition_value.name, ''), \
+                                            + c.encounter_condition_value_icons.get(condition_value.name, 'unknown.png'), \
                                             alt=condition_value.name, \
                                             title=condition_value.name)}
                 </div>

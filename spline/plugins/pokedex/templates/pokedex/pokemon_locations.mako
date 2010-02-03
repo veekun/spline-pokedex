@@ -63,7 +63,7 @@ ${lib.pokemon_page_header()}
                 % for condition_value in condition_values:
                 <div class="dex-encounter-icon">
                     ${h.pokedex.pokedex_img('encounters/' \
-                                            + c.encounter_condition_value_icons.get(condition_value.name, ''), \
+                                            + c.encounter_condition_value_icons.get(condition_value.name, 'unknown.png'), \
                                             alt=condition_value.name, \
                                             title=condition_value.name)}
                 </div>
