@@ -37,7 +37,7 @@
         <th class="location">
             ${h.pokedex.pokemon_link(
                 pokemon,
-                h.literal("""{0} {1}""".format(
+                h.literal(u"""{0} {1}""".format(
                     h.pokedex.pokemon_sprite(pokemon, prefix='icons'),
                     pokemon.name,
                 )),
