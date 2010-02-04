@@ -29,7 +29,10 @@ col.dex-col-stat-bar    { width: auto; }
 col.dex-col-stat-pctile { width: 5em; }
 col.dex-col-stat-result { width: 5em; }
 col.dex-col-version     { width: 3.5em; }  /* two versions (32px < 33px == 3em) plus 0.17em padding < 3.5em */
-col.dex-col-last-version{ border-right: 1px solid #b4c7e6; }
+col.dex-col-encounter-name { width: 10em; }
+col.dex-col-encounter-version { width: 12em; }
+col.dex-col-first-version { border-left:  1px solid #b4c7e6; }
+col.dex-col-last-version  { border-right: 1px solid #b4c7e6; }
 
 /* Cool three-column layout */
 .dex-column-container { clear: both; overflow: hidden /* float context */; margin-top: 1em; }
@@ -107,9 +110,8 @@ dl.dex-simple-encounters ul li { display: inline; }
 dl.dex-simple-encounters ul li:after { content: '; '; }
 dl.dex-simple-encounters ul li:last-child:after { content: ''; }
 
-/* This is actually the pokemon-locations page */
-table.dex-encounters th.version { width: 8em; }
-table.dex-encounters td { width: 10em; vertical-align: top; }
+/* This is actually the locations page */
+table.dex-encounters td { padding-left: 0.5em; padding-right: 0.5em; vertical-align: top; }
 table.dex-encounters td.location { vertical-align: top; }
 table.dex-encounters th.location { vertical-align: top; text-align: left; }
 .dex-location-area { font-size: 0.8em; font-style: italic; color: black; }
@@ -119,10 +121,11 @@ table.dex-encounters th.location { vertical-align: top; text-align: left; }
 .dex-encounter-conditions .dex-encounter-icon { float: left; width: 24px; height: 24px; line-height: 24px; text-align: center; overflow: hidden;}
 .dex-encounter-conditions .dex-encounter-icon img { vertical-align: middle; }
 .dex-encounter-conditions .dex-encounter-rarity { float: right; }
-.dex-encounter-conditions .dex-rarity-bar { position: relative; overflow: auto; font-size: 0.75em; height: 1em; line-height: 1; margin-top: 0.25em; background: #e8e8e8; border: 1px solid #96bbf2; }
+.dex-encounter-conditions .dex-rarity-bar { position: relative; overflow: auto; font-size: 0.83em; height: 1em; line-height: 1; margin-top: 0.25em; background: #e8e8e8; border: 1px solid #96bbf2; }
 .dex-encounter-conditions .dex-rarity-bar-fill { height: 100%; background: #96bbf2; }
 .dex-encounter-conditions .dex-rarity-bar-fills { float: left; height: 100%; background: #96bbf2; }
 .dex-encounter-conditions .dex-rarity-bar-fills + .dex-rarity-bar-fills { margin-left: -1px; border-left: 1px solid #b3cef6; }
+.dex-encounter-conditions .dex-rarity-bar-fills:hover { background: #668dcc; }
 .dex-encounter-conditions .dex-rarity-bar-value { position: absolute; height: 100%; top: 0; right: 0; color: #808080; vertical-align: bottom; }
 
 table.dex-pokemon-moves {;}

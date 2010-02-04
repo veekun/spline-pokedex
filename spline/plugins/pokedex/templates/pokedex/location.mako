@@ -13,6 +13,21 @@
 % endif
 
 <table class="dex-encounters striped-rows">
+    ## Spit out <col> tags.  Zip cleverness lets us compare the current version
+    ## to the one before it
+    <col class="dex-col-name">
+    % for version, prior_version in zip( \
+        c.group_versions[location_area], \
+        [None] + c.group_versions[location_area] \
+    ):
+    % if not prior_version or prior_version.version_group.generation \
+                                 != version.version_group.generation:
+    <col class="dex-col-encounter-version dex-col-first-version">
+    % else:
+    <col class="dex-col-encounter-version">
+    % endif
+    % endfor
+
     ## Draw a divider to separate terrain, in id order.  Why not?
     ## Include the versions header, too.
     % for terrain, pokemon_version_condition_encounters \
@@ -21,12 +36,15 @@
 
     <tr class="header-row">
         <th></th>
-        % for version in c.versions:
+        % for version in c.group_versions[location_area]:
         <th>${h.pokedex.version_icons(version)} ${version.name}</th>
         % endfor
     </tr>
     <tr class="subheader-row">
-        <th colspan="100">${terrain.name}</th>
+        <th colspan="100">
+            ${h.pokedex.pokedex_img('encounters/' + c.encounter_terrain_icons.get(terrain.name, 'unknown.png'))}
+            ${terrain.name}
+        </th>
     </tr>
 
     ## One row per Pokémon, sorted by name
@@ -44,7 +62,7 @@
                 class_='dex-icon-link',
             )}
         </th>
-        % for version in c.versions:
+        % for version in c.group_versions[location_area]:
         <% condition_encounters = version_condition_encounters[version] %>
         <td>
             ## Sort conditions by number of conditions (so "default" comes

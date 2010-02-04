@@ -1013,6 +1013,7 @@ class PokedexController(BaseController):
         c.grouped_encounters = grouped_encounters
 
         # Pass some data/functions
+        c.encounter_terrain_icons = self.encounter_terrain_icons
         c.encounter_condition_value_icons = self.encounter_condition_value_icons
         c.level_range = level_range
 
@@ -1020,12 +1021,11 @@ class PokedexController(BaseController):
         # are part of a generation where this Pokémon appears -- in reverse
         # generation order.
         c.region_versions = defaultdict(list)
-        for region, generations in sorted(region_generations.items(),
-                                          key=lambda (k, v): - k.generation.id):
+        for region, generations in region_generations.items():
             for version_group in region.version_groups:
                 if version_group.generation not in generations:
                     continue
-                c.region_versions[region].extend(version_group.versions)
+                c.region_versions[region][0:0] = version_group.versions
 
         return render('/pokedex/pokemon_locations.mako')
 
@@ -1253,6 +1253,15 @@ class PokedexController(BaseController):
             )
         )
 
+        # To avoid an ultra-wide table when not necessary, only *generations*
+        # that actually contain this Pokémon should appear.
+        # So if the Pokémon appears in Kanto in Crystal, show all of G/S/C.  If
+        # it doesn't appear in any of the three, show none of them.
+        # Last but not least, show generations in reverse order, so the more
+        # important (i.e., recent) versions are on the left.
+        # Got all that?
+        area_generations = defaultdict(set)
+
         for encounter in q.all():
             # Fetches the list of encounters that match this region, version,
             # terrain, etc.
@@ -1280,13 +1289,24 @@ class PokedexController(BaseController):
                     'rarity': encounter.slot.rarity,
                 })
 
+            # Remember that this generation appears in this area
+            area_generations[encounter.location_area].add(encounter.version.version_group.generation)
+
         c.grouped_encounters = grouped_encounters
 
         # Pass some data/functions
+        c.encounter_terrain_icons = self.encounter_terrain_icons
         c.encounter_condition_value_icons = self.encounter_condition_value_icons
         c.level_range = level_range
 
-        # FIXME
-        c.versions = pokedex_session.query(tables.Version).filter(tables.Version.id >= 12).all()
+        # See above.  Versions for each major group are those that are part of
+        # a generation where this Pokémon appears -- in reverse generation
+        # order.
+        c.group_versions = defaultdict(list)
+        for area, generations in area_generations.items():
+            for version_group in area.location.region.version_groups:
+                if version_group.generation not in generations:
+                    continue
+                c.group_versions[area][0:0] = version_group.versions
 
         return render('/pokedex/location.mako')

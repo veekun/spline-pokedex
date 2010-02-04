@@ -24,7 +24,10 @@ ${lib.pokemon_page_header()}
         % endfor
     </tr>
     <tr class="subheader-row">
-        <th colspan="100">${terrain.name}</th>
+        <th colspan="100">
+            ${h.pokedex.pokedex_img('encounters/' + c.encounter_terrain_icons.get(terrain.name, 'unknown.png'))}
+            ${terrain.name}
+        </th>
     </tr>
 
     ## One row per location-area, sorted by name
