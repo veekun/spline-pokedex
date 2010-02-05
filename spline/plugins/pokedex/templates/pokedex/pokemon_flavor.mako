@@ -40,7 +40,7 @@ ${lib.pokemon_page_header()}
 % endif
 
 % if c.introduced_in.id <= 2:
-<h2 id="gen-i-main-sprites"><a href="#gen-i-main-sprites" class="subtle">${h.pokedex.generation_icon(1)} Blue, Red &amp; Blue, Yellow</a></h2>
+<h2 id="main-sprites:gen-i"><a href="#main-sprites:gen-i" class="subtle">${h.pokedex.generation_icon(1)} Blue, Red &amp; Blue, Yellow</a></h2>
 <table>
 <tr class="header-row">
     <th></th>
@@ -65,7 +65,7 @@ ${lib.pokemon_page_header()}
 % endif
 
 % if c.introduced_in.id <= 4:
-<h2 id="gen-ii-main-sprites"><a href="#gen-ii-main-sprites" class="subtle">${h.pokedex.generation_icon(2)} Gold &amp; Silver, Crystal</a></h2>
+<h2 id="main-sprites:gen-ii"><a href="#main-sprites:gen-ii" class="subtle">${h.pokedex.generation_icon(2)} Gold &amp; Silver, Crystal</a></h2>
 <table>
 <tr class="header-row">
     <th></th>
@@ -103,7 +103,7 @@ ${lib.pokemon_page_header()}
 <% show_frlg = (c.pokemon.generation_id == 1
                 or c.pokemon.name == u'Teddiursa'
                 or (c.pokemon.name == u'Deoxys' and c.form in ('attack', 'defense'))) %>\
-<h2 id="gen-iii-main-sprites"><a href="#gen-iii-main-sprites" class="subtle">${h.pokedex.generation_icon(3)} Ruby &amp; Sapphire, Emerald, Fire Red &amp; Leaf Green</a></h2>
+<h2 id="main-sprites:gen-iii"><a href="#main-sprites:gen-iii" class="subtle">${h.pokedex.generation_icon(3)} Ruby &amp; Sapphire, Emerald, Fire Red &amp; Leaf Green</a></h2>
 ## Deoxys is a giant mess.
 ## Normal only exists in R/S; Speed only in Emerald; Attack only in LG; Defense only in FR.
 <table>
@@ -166,7 +166,7 @@ ${lib.pokemon_page_header()}
 % endif
 
 % if c.pokemon.generation_id <= 4:
-<h2 id="gen-iv-main-sprites"><a href="#gen-iv-main-sprites" class="subtle">${h.pokedex.generation_icon(4)} Diamond &amp; Pearl, Platinum, Heart Gold &amp; Soul Silver</a></h2>
+<h2 id="main-sprites:gen-iv"><a href="#main-sprites:gen-iv" class="subtle">${h.pokedex.generation_icon(4)} Diamond &amp; Pearl, Platinum, Heart Gold &amp; Soul Silver</a></h2>
 <% dpp_rowspan = 1 + 2 + (3 if c.pokemon.has_gen4_fem_sprite else 0) %>\
 <table>
 <tr class="header-row">

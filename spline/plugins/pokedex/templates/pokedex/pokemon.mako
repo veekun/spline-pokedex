@@ -469,7 +469,7 @@ ${lib.pokemon_page_header()}
 ## HEADERS
 % for method, method_list in c.moves:
 <%
-    method_id = re.sub('\W+', '-', method.name.lower()) + "-moves"
+    method_id = "moves:" + re.sub('\W+', '-', method.name.lower())
 %>\
 <tr class="header-row" id="${method_id}">
     % for column in c.move_columns:

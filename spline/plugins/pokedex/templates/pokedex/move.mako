@@ -256,7 +256,7 @@ ${lib.pokemon_table_columns()}
 ## HEADERS
 % for method, method_list in c.pokemon:
 <%
-    method_id = re.sub("\W+", "-", method.name.lower()) + "-pokemon"
+    method_id = "pokemon:" + re.sub("\W+", "-", method.name.lower())
 %>\
 <tr class="header-row" id="${method_id}">
     % for column in c.pokemon_columns:
