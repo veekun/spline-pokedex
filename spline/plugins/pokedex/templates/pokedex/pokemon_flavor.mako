@@ -1,7 +1,16 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="lib.mako"/>
 
-<%def name="title()">${c.pokemon.name}</%def>
+<%def name="title()">\
+% if c.pokemon.name == 'Unown' and c.form:
+Unown ${c.form.capitalize()} \
+% elif c.form:
+${c.form.title()} ${c.pokemon.name} \
+% else:
+${c.pokemon.name} \
+% endif
+— Pokémon #${c.pokemon.national_id} — Flavor\
+</%def>
 
 ${lib.pokemon_page_header()}
 

@@ -1,7 +1,7 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="lib.mako"/>
 
-<%def name="title()">${c.pokemon.name}</%def>
+<%def name="title()">${c.pokemon.name} — Pokémon #${c.pokemon.national_id} — Locations</%def>
 
 ${lib.pokemon_page_header()}
 
