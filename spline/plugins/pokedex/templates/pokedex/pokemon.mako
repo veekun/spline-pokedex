@@ -55,22 +55,41 @@ ${lib.pokemon_page_header()}
 <div class="dex-column-container">
 <div class="dex-column">
     <h2>Pokédex Numbers</h2>
+<%
+    dex_numbers = {} # dex => [number, generation]; generation is None if no generation is to be shown
+    to_show = ('National', 'Kanto', 'New', 'Hoenn', 'Sinnoh', 'Johto') # 'New' is GSC Johto dex
+
+    for number in c.pokemon.normal_form.dex_numbers:
+        dex_name = number.pokedex.name
+        if dex_name in to_show:
+            if number.pokedex.id == 6 and 'Sinnoh' in dex_numbers.keys():
+                # Prefer D/P Sinnoh dex over Platinum: Pt won't usurp an existing D/P entry, but a D/P entry will clobber Pt.
+                continue
+
+            generations = [group.generation.id for group in number.pokedex.version_groups]
+            if generations:
+                shown_generation = min(generations)
+            else:
+                shown_generation = None
+
+            dex_numbers[dex_name] = [number.pokedex_number, shown_generation]
+
+            if number.pokedex.id == 6: # Platinum Sinnoh dex
+                # We want the Platinum version icon to stay a literal, or else we end up with "&lt;img ...", so we can't put it in the format string.
+                dex_numbers[dex_name][0] = '{0} '.format(dex_numbers[dex_name][0]) + h.pokedex.version_icons(u'Platinum')
+%>
     <dl>
         <dt>Introduced in</dt>
         <dd>${h.pokedex.generation_icon(c.pokemon.generation)}</dd>
-        % if c.pokemon.generation == db.generation(1):
-        <dt>Internal id for ${h.pokedex.version_icons(u'Red', u'Blue')}</dt>
-        <dd>${c.pokemon.gen1_internal_id} (<code>0x${"%02x" % c.pokemon.gen1_internal_id}</code>)</dd>
+        % for dex_name in sorted(dex_numbers.keys(), key=to_show.index):
+        % if dex_name == 'New':
+        <dt>Johto ${h.pokedex.generation_icon(2)}</dt>
+        % elif dex_numbers[dex_name][1]:
+        <dt>${dex_name} ${h.pokedex.generation_icon(dex_numbers[dex_name][1])}</dt>
+        % else:
+        <dt>${dex_name}</dt>
         % endif
-        % for dex_number in c.pokemon.normal_form.dex_numbers:
-        <dt>${dex_number.generation.main_region.name} ${h.pokedex.generation_icon(dex_number.generation)}</dt>
-        <dd>
-            ${dex_number.pokedex_number}
-            ## XXX should this be in the db somehow?
-            % if dex_number.generation.id == 4 and dex_number.pokedex_number > 151:
-            ${h.pokedex.version_icons(u'Platinum')}
-            % endif
-        </dd>
+        <dd>${dex_numbers[dex_name][0]}</dd>
         % endfor
     </dl>
 
