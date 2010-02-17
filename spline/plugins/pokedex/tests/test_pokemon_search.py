@@ -92,6 +92,7 @@ class TestPokemonSearchController(TestController):
             'wildcards',
         )
 
+
     def test_color(self):
         """Checks searching by color."""
         self.check_search(
@@ -100,6 +101,7 @@ class TestPokemonSearchController(TestController):
                 # etc.
             'color',
         )
+
 
     def test_ability(self):
         """Checks searching by ability."""
@@ -110,6 +112,7 @@ class TestPokemonSearchController(TestController):
             exact=True,
         )
 
+
     def test_habitat(self):
         """Checks searching by FR/LG habitat."""
         # I actually checked this by looking at the old search's results.  Hm.
@@ -118,6 +121,7 @@ class TestPokemonSearchController(TestController):
             [ u'Abra', u'Eevee', u'Hitmonlee', u'Muk', u'Persian', u'Voltorb' ],
             'habitat',
         )
+
 
     def test_evolution_stage(self):
         """Checks the evolution stage searches:
@@ -205,6 +209,7 @@ class TestPokemonSearchController(TestController):
             exact=True,
         )
 
+
     def test_gender_distribution(self):
         """Checks searching by gender frequency.
 
@@ -214,30 +219,115 @@ class TestPokemonSearchController(TestController):
         eighths-female.
         """
         self.check_search(
-            dict(gender_rate_constraint=u'less_equal', gender_rate=u'1'),
+            dict(gender_rate_operator=u'less_equal', gender_rate=u'1'),
             [ u'Bulbasaur', u'Chikorita', u'Tauros' ],
             'mostly male',
         )
         self.check_search(
-            dict(gender_rate_constraint=u'more_equal', gender_rate=u'6'),
+            dict(gender_rate_operator=u'more_equal', gender_rate=u'6'),
             [ u'Clefairy', u'Kangaskhan', u'Miltank' ],
             'mostly female',
         )
         self.check_search(
-            dict(gender_rate_constraint=u'equal', gender_rate=u'4'),
+            dict(gender_rate_operator=u'equal', gender_rate=u'4'),
             [ u'Absol', u'Castform', u'Delibird', u'Grimer', u'Teddiursa' ],
             'half and half',
         )
         self.check_search(
-            dict(gender_rate_constraint=u'equal', gender_rate=u'-1'),
+            dict(gender_rate_operator=u'equal', gender_rate=u'-1'),
             [ u'Magneton', u'Voltorb' ],
             'no gender',
         )
 
         # Check that "<= 0" doesn't include genderless (-1)
-        res = self.do_search(gender_rate_constraint=u'less_equal',
+        res = self.do_search(gender_rate_operator=u'less_equal',
                              gender_rate=u'0')
         self.assertFalse(any(_.name == u'Voltorb' for _ in res.c.results))
 
-    # still to go: egg groups, generation, regional pokedex, type, move, stats,
-    #              effort, size, held item
+
+    def test_egg_groups(self):
+        """Checks searching by egg groups."""
+        self.check_search(
+            dict(egg_group_operator=u'all', egg_group=u'15'),
+            [ u'Latias', u'Mew' ],
+            'no eggs',
+        )
+        # 6 + 11 == Fairy + Indeterminate
+        self.check_search(
+            dict(egg_group_operator=u'all', egg_group=[u'6', u'11']),
+            [ u'Castform' ],
+            'fairy + indeterm; only one result',
+            exact=True,
+        )
+        # Water 1; Water 3
+        self.check_search(
+            dict(egg_group_operator=u'any', egg_group=[u'2', u'9']),
+            [ u'Bidoof', u'Corsola', u'Krabby' ],
+            'water 1 OR water 3',
+        )
+
+
+    def test_generation(self):
+        """Checks searching by generation introduced."""
+        self.check_search(
+            dict(generation=u'1'),
+            [ u'Eevee', u'Pikachu', u'Shellder' ],
+            'introduced in Kanto',
+        )
+        self.check_search(
+            dict(generation=u'5'),
+            [ u'Lucario', u'Munchlax', u'Roserade' ],
+            'introduced in Sinnoh',
+        )
+
+        # and several at once for good measure
+        self.check_search(
+            dict(generation=[u'1', u'4']),
+            [ u'Eevee', u'Pikachu', u'Shellder', u'Lucario', u'Munchlax', u'Roserade' ],
+            'introduced in Kanto or Sinnoh',
+        )
+
+
+    def test_pokedex(self):
+        u"""Checks searching by Pokédex."""
+        # TODO: zhorken is rewriting this atm
+        pass
+
+
+    def test_type(self):
+        """Checks searching by type.
+
+        There are three options for type:
+        - must have at least one of the selected types
+        - must have exactly the selected type combination
+        - must have only the selected types
+        """
+        self.check_search(
+            dict(type_operator=u'any', type=[u'dark', u'steel']),
+            [ u'Houndoom', u'Magnemite', u'Murkrow', u'Steelix' ],
+            'one-of some types',
+        )
+        self.check_search(
+            dict(type_operator=u'exact', type=[u'dragon', u'ground']),
+            [ u'Flygon', u'Gabite', u'Garchomp', u'Gible', u'Vibrava' ],
+            'exact type combo',
+            exact=True,
+        )
+        self.check_search(
+            dict(type_operator=u'only', type=[u'ice', u'steel']),
+            [
+                u'Mawile', u'Registeel',                        # pure steel
+                u'Glaceon', u'Glalie', u'Regice', u'Snorunt',   # pure ice
+            ],
+            'only selected types',
+        )
+
+        # Make sure the default selection doesn't affect results
+        self.check_search(
+            dict(type_operator=u'any', name=u'eevee'),
+            [ u'Eevee' ],
+            'empty type selection doesn\'t affect results',
+        )
+
+
+    # still to go: move, stats, effort, size, held item
