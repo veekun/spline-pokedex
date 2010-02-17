@@ -467,50 +467,64 @@ class PokedexController(BaseController):
             c.compatible_families = q.all()
 
         ### Wild held items
-        # Stored separately per version due to *rizer shenanigans (grumble),
-        # so in some 99.9% of cases we want to merge them all into a single
-        # per-generation list.
-        # I also want to look to the future (past?) and expect supporting held
-        # items from older games, so I'm trying not to assume gen-4-only here.
-        # Thus we have to store these as:
-        #   generation => { version => [ (item, rarity), ... ] }
+        # Stored separately per version due to *rizer shenanigans (grumble).
+        # Items also sometimes change over version groups within a generation.
+        # So in some 99.9% of cases we want to merge them to some extent,
+        # usually collapsing an entire version group or an entire generation.
+        # Thus we store these as:
+        #   generation => { (version, ...) => [ (item, rarity), ... ] }
         # In the case of all versions within a generation being merged, the
-        # key is None instead of a version object.
+        # key is None instead of a tuple of version objects.
         c.held_items = {}
+        generations = [db.generation(gen) for gen in (3, 4)
+                       if gen >= c.pokemon.generation.id]
         version_held_items = {}  # version => [ (item, rarity), ... ]
+
+        for generation in generations:
+            for version in generation.versions:
+                version_held_items[version] = []
+
         for pokemon_item in c.pokemon.items:
-            version_held_items.setdefault(pokemon_item.version, []) \
+            version_held_items[pokemon_item.version] \
                               .append((pokemon_item.item, pokemon_item.rarity))
-        for generation in [db.generation(4)]:
-            # Figure out if we can merge the versions for this gen, i.e., if
-            # every list of (item, rarity) tuples is identical
-            can_merge = True
-            first_held_items = version_held_items.setdefault(generation.versions[0], [])
-            for version in generation.versions[1:]:
-                # XXX HG/SS aren't out yet, and we don't want to show 'None'
-                # rows because that's not really correct.  So skip them
-                if version.name in (u'Heart Gold', u'Soul Silver'):
-                    continue
 
-                version_held_items.setdefault(version, [])
-                if version_held_items[version] != first_held_items:
-                    can_merge = False
-                    break
+        for generation in generations:
+            # Figure out if we can merge some of the versions for this gen,
+            # i.e., if any lists of (item, rarity) tuples are identical to any
+            # others.
+            version_lists = [[version] for version in generation.versions]
 
-            # Copy appropriate per-version item lists to the final dictionary.
-            # If we can merge, stick any version's list under the key None;
-            # otherwise, we have to copy them all
-            if can_merge:
-                c.held_items[generation] = { None: first_held_items }
+            i = 0
+            while i < len(version_lists) - 1: # could be shrinking
+               j = i + 1
+               while j < len(version_lists):
+                   if version_held_items[version_lists[i][0]] == \
+                      version_held_items[version_lists[j][0]]:
+                       version_lists[i] += version_lists[j]
+                       del version_lists[j]
+                   else:
+                       # We only need to go on if we didn't just delete the
+                       # one we were looking at.
+                       j += 1
+               i += 1
+
+            # Copy item lists to the final dictionary.  If all versions have
+            # been merged, stick any version's list under the key None;
+            # otherwise, pick any version from each set of versions and stick
+            # its list under a tuple of all those versions.
+            if len(version_lists) == 1:
+                # XXX Gen IV won't trigger this until we get HG/SS items
+                # unless the Pokémon doesn't hold anything in DPPt.
+                c.held_items[generation] = { None: version_held_items.get(version_lists[0][0]) }
             else:
-                version_dict = {}
-                c.held_items[generation] = version_dict
-                for version in generation.versions:
-                    # XXX HG/SS aren't out yet, and we don't want to show 'None'
-                    # rows because that's not really correct.  So skip them
-                    if version.name in (u'Heart Gold', u'Soul Silver'):
+                c.held_items[generation] = {}
+                for versions in version_lists:
+                    # XXX We don't have HG/SS items yet, and we don't want to
+                    # show 'None' rows because that's not really correct.  So
+                    # skip them.
+                    if any([version.name in (u'Heart Gold', u'Soul Silver') for version in versions]):
                         continue
-                    version_dict[version] = version_held_items.get(version, [])
+                    c.held_items[generation][tuple(versions)] = version_held_items[versions[0]]
 
         ### Evolution
         # Format is a matrix as follows:
