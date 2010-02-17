@@ -151,31 +151,33 @@ ${lib.pokemon_page_header()}
         <dd>${c.pokemon.evolution_chain.growth_rate.name}</dd>
         <dt>Wild held items</dt>
         <dd>
-            % for generation, version_dict in c.held_items.items():
-## I only have gen4 data now, so showing a generation isn't very useful
-##            <h3>${h.pokedex.generation_icon(generation)}</h3>
+            % for generation, version_dict in sorted(c.held_items.items(), key=lambda x: x[0].id):
+            <h3>${h.pokedex.generation_icon(generation)}</h3><table><tbody>
             ## "x and y" returns x if x is false; x might be None here and we'd
             ## rather not try to get None.id
-            % for version, item_records in sorted(version_dict.items(), \
-                                                  key=lambda (k,v): k and k.id):
+            % for versions, item_records in sorted(version_dict.items(), \
+                                                  key=lambda (k,v): k and k[0].id):
                 % if not len(item_records):
-                <p>
-                    % if version:
-                    ${h.pokedex.version_icons(version)}
-                    % endif
-                    None
-                </p>
+                <tr>
+                % if versions:
+                <td>${h.pokedex.version_icons(*versions)}</td>
+                % endif
+                <td>None</td>
+                </tr>
                 % endif
                 % for item, rarity in item_records:
-                <p>
-                    % if version:
-                    ${h.pokedex.version_icons(version)}
-                    % endif
+                <tr>
+                % if versions:
+                <td>${h.pokedex.version_icons(*versions)}</td>
+                % endif
+                <td>
                     <span class="dex-pokemon-item-rarity">${rarity}%</span>
                     ${h.pokedex.item_link(item)}
-                </p>
+                </td>
+                </tr>
                 % endfor
             % endfor
+            </tbody></table>
             % endfor
         </dd>
     </dl>
