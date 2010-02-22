@@ -1,5 +1,6 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="lib.mako"/>
+<%from pokedex.db import rst%>
 
 <%def name="title()">${c.type.name.title()} — Type #${c.type.id}</%def>
 
@@ -51,17 +52,15 @@
 
 <h1 id="pokemon"><a href="#pokemon" class="subtle">Pokémon</a></h1>
 % if c.type.name == '???':
-<p>In Generation IV, pure <a href="${url.current(name="flying")}">flying</a>-types become ???-type during
-<a href="${url(controller='dex', action='moves', name='roost')}">Roost</a>. This can be accomplished with
-<a href="${url(controller='dex', action='moves', name='conversion')}">Conversion</a>, <a href="${url(controller='dex', action='moves', name='conversion2')}">Conversion2</a>, or
-the ability <a href="${url(controller='dex', action='abilities', name='color change')}">Color Change</a>. A Pokémon can legitimately have both Roost and one of these only through
-the use of <a href="${url(controller='dex', action='moves', name='sketch')}">Sketch</a>, <a href="${url(controller='dex', action='moves', name='mimic')}">Mimic</a>,
-<a href="${url(controller='dex', action='moves', name='skill swap')}">Skill Swap</a>, or <a href="${url(controller='dex', action='moves', name='role play')}">Role Play</a>. (The
-ability <a href="${url(controller='dex', action='abilities', name='multitype')}">Multitype</a> also allows
-<a href="${url(controller='dex', action='pokemon', name='arceus')}">Arceus</a> to become purely flying-type, but Multitype cannot be copied and Arceus does not learn Roost.)</p>
+${h.literal(rst.RstString(u"""In Generation IV, pure :type:`flying`-types become ???-type during :move:`Roost`. This can be
+accomplished with :move:`Conversion`, :move:`Conversion2`, or the ability :ability:`Color Change`. A Pokémon can legitimately have
+both Roost and one of these only through the use of :move:`Mimic`, :move:`Sketch`, :move:`Role Play`, or :move:`Skill Swap`.  (No
+Pokémon that has :ability:`Trace` or :ability:`Multitype` learns Roost, and Multitype cannot be copied.)
 
-<p>There are <a href="${url(controller='dex', action='pokemon_flavor', name='arceus', form='???')}">sprites for a ???-type Arceus</a> even though Arceus cannot become ???-type
-through regular play. Eggs are purely ???-type before hatching, and are displayed as such in the Generation III status screen.</p>
+There are `sprites for a ???-type Arceus <{arceus_link}>`_ even though Arceus cannot become ???-type through regular play. Eggs are
+purely ???-type before hatching, and are displayed as such in the Generation III status screen.""".format(
+    arceus_link=url(controller='dex', action='pokemon_flavor', name='arceus', form='???')
+)).as_html)}
 % else:
 <table class="dex-pokemon-moves striped-rows">
     ${lib.pokemon_table_columns()}
