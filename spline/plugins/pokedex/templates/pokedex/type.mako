@@ -1,7 +1,7 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="lib.mako"/>
 
-<%def name="title()">${c.type.name.title()} – Type #${c.type.id}</%def>
+<%def name="title()">${c.type.name.title()} — Type #${c.type.id}</%def>
 
 <div id="dex-header">
     <a href="${url.current(name=c.prev_type.name)}" id="dex-header-prev" class="dex-box-link">

@@ -1,7 +1,7 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="lib.mako"/>
 
-<%def name="title()">${c.location_name} – Location</%def>
+<%def name="title()">${c.location_name} — Location</%def>
 
 <h1>${c.location_name}</h1>
 
