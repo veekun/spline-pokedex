@@ -330,4 +330,188 @@ class TestPokemonSearchController(TestController):
         )
 
 
-    # still to go: move, stats, effort, size, held item
+    def test_move(self):
+        """Checks searching by move.
+
+        Besides a move name, moves have several ancillary settings:
+        - Whether to search for the exact move, an identical move, or any
+          similar move.
+        - The version(s) to search.
+        - The method(s) by which the move is learned.
+        """
+        self.check_search(
+            dict(move=u'Transform'),
+            [ u'Ditto', u'Mew' ],
+            'simple search by move',
+            exact=True,
+        )
+
+        # Try searching for identical moves -- that is, moves with the same
+        # effect id.
+        self.check_search(
+            dict(move=u'Thief', move_fuzz=u'same_effect'),
+            [
+                # These can learn Thief
+                u'Abra', u'Bidoof', u'Ekans', u'Meowth', u'Pidgey',
+                # These can learn Covet, which is identical
+                u'Cleffa', u'Cyndaquil', u'Slakoth',
+            ],
+            'search by identical move',
+        )
+
+        # Restrict by version
+        self.check_search(
+            dict(move=u'Roar of Time', move_version=u'1'),
+            [],
+            'gen 4 moves aren\'t learned in gen 1',
+            exact=True,
+        )
+        self.check_search(
+            dict(move=u'SolarBeam',
+                 move_version=[u'diamond', u'platinum', u'heart_gold'],
+                 name=u'Bulbasaur'),
+            [],
+            'Bulbasaur lost SolarBeam in gen 4',
+            exact=True,
+        )
+
+        # Restrict by method
+        self.check_search(
+            dict(move=u'Volt Tackle'),
+            [ u'Pichu' ],
+            'Pichu learns Volt Tackle...',
+            exact=True,
+        )
+        self.check_search(
+            dict(move=u'Volt Tackle',
+                 move_method=[u'level', u'tutor', u'machine', u'egg']),
+            [],
+            '...but not by normal means',
+            exact=True,
+        )
+
+        # Simple combo
+        self.check_search(
+            dict(move=u'Frenzy Plant',
+                 move_method=u'tutor',
+                 move_version=u'fire_red'),
+            [ u'Venusaur' ],
+            'only Venusaur gets elemental beam in FR',
+            exact=True,
+        )
+
+
+    def test_range_parsing(self):
+        u"""Checks to make sure that stats, effort, and size searching can
+        parse number ranges.
+
+        They can be any of the following, joined by commas, with space ignored:
+        - n
+        - n-m
+        - n–m
+        - n+ or +m
+        - n- or -m  (negative numbers are impossible)
+
+        In the case of size, there's extra parsing to do for units; however,
+        that won't conflict with any of the above rules.
+        """
+
+        # For the ultimate simplicity, test this against national dex number
+        self.check_search(
+            dict(id=u'133'),
+            [ u'Eevee' ],
+            'range: exact number',
+            exact=True,
+        )
+        self.check_search(
+            dict(id=u'133, 352'),
+            [ u'Eevee', u'Kecleon' ],
+            'range: several exact numbers',
+            exact=True,
+        )
+        self.check_search(
+            dict(id=u'133-135'),
+            [ u'Eevee', u'Flareon', u'Jolteon' ],
+            'range: n-m',
+            exact=True,
+        )
+
+        self.check_search(
+            dict(id=u'492+'),
+            [ (u'Shaymin', u'land'), (u'Shaymin', u'sky'), u'Arceus' ],
+            'range: n+',
+            exact=True,
+        )
+        self.check_search(
+            dict(id=u'492-'),
+            [ (u'Shaymin', u'land'), (u'Shaymin', u'sky'), u'Arceus' ],
+            'range: n-',
+            exact=True,
+        )
+
+        self.check_search(
+            dict(id=u'+3'),
+            [ u'Bulbasaur', u'Ivysaur', u'Venusaur' ],
+            'range: +m',
+            exact=True,
+        )
+        self.check_search(
+            dict(id=u'–3'),
+            [ u'Bulbasaur', u'Ivysaur', u'Venusaur' ],
+            'range: endash-m',
+            exact=True,
+        )
+
+    def test_stats(self):
+        """Check that searching by stats works correctly."""
+        self.check_search(
+            dict(stat_hp=u'1,255'),
+            [ u'Blissey', u'Shedinja' ],
+            'HP of 1 or 255',
+            exact=True,
+        )
+        self.check_search(
+            dict(stat_special_attack=u'130-131'),
+            [ u'Espeon', u'Gengar', u'Glaceon', u'Heatran', u'Latios', u'Magnezone' ],
+            'special attack of 130',
+            exact=True,
+        )
+
+    def test_effort(self):
+        """Check that searching by effort works correctly."""
+        self.check_search(
+            dict(effort_special_attack=u'2', effort_special_defense=u'1'),
+            [ u'Butterfree', u'Togekiss', u'Venusaur' ],
+            'effort',
+            exact=True,
+        )
+
+    def test_size(self):
+        """Check that searching by size works correctly."""
+        # XXX what should a size with no units do?  default american units?
+        self.check_search(
+            dict(height=u'0m-8in'),
+            [ u'Natu' ],
+            'dumb height range',
+        )
+
+        self.check_search(
+            dict(weight=u'450lb–210kg'),
+            [ u'Rayquaza' ],
+            'dumb weight range',
+        )
+
+        self.check_search(
+            dict(weight=u'14.3 lb'),
+            [ u'Eevee' ],
+            'converted units match',
+        )
+
+    def test_held_item(self):
+        """Check that searching by held item works correctly."""
+        self.check_search(
+            dict(held_item=u'magmarizer'),
+            [ u'Magby', u'Magmar', u'Magmortar' ],
+            'simple held-item search',
+            exact=True,
+        )
