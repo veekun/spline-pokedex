@@ -12,6 +12,7 @@ import pokedex.db
 import pokedex.db.tables as tables
 import pokedex.lookup
 import spline.plugins.pokedex.controllers.pokedex
+import spline.plugins.pokedex.controllers.pokedex_search
 from spline.plugins.pokedex import helpers as pokedex_helpers
 from spline.plugins.pokedex.db import get_by_name, pokedex_session
 import spline.lib.helpers as h
@@ -22,6 +23,9 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/dex/media/*path', controller='dex', action='media')
     map.connect('/dex/lookup', controller='dex', action='lookup')
     map.connect('/dex/suggest', controller='dex', action='suggest')
+
+    # These are more specific than the general pages below, so must be first
+    map.connect('/dex/pokemon/search', controller='dex_search', action='pokemon_search')
 
     map.connect('/dex/abilities/{name}', controller='dex', action='abilities')
     map.connect('/dex/items/{name}', controller='dex', action='items')
@@ -87,6 +91,7 @@ class PokedexPlugin(PluginBase):
     def controllers(self):
         return {
             'dex': controllers.pokedex.PokedexController,
+            'dex_search': controllers.pokedex_search.PokedexSearchController,
         }
 
     def template_dirs(self):
@@ -110,7 +115,7 @@ class PokedexPlugin(PluginBase):
     def links(self):
         return [
             PluginLink(u'Pokédex', url('/dex'), children=[
-                PluginLink(u'Eevee', url(controller='dex', action='pokemon', name='eevee')),
+                PluginLink(u'Pokémon search', url(controller='dex_search', action='pokemon_search')),
             ]),
         ]
 
