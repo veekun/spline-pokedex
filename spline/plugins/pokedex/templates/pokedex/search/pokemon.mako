@@ -3,13 +3,24 @@
 
 <%def name="title()">Pokémon Search</%def>
 
+<%def name="field(name)">
+    <dt>${c.form[name].label() | n}</dt>
+    <dd>${c.form[name]() | n}</dd>
+    % for error in c.form[name].errors:
+    <dd class="error">${error}</dd>
+    % endfor
+</%def>
+
 
 ${h.form(url.current(), method='GET')}
 <h1>Pokémon Search</h1>
 
+<h2>Essentials and flavor</h2>
 <dl class="standard-form">
-    <dt>${c.form.name.label() | n}</dt>
-    <dd>${c.form.name() | n}</dd>
+    ${field('name')}
+    ${field('ability')}
+    ${field('color')}
+    ${field('habitat')}
 </dl>
 
 
