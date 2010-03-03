@@ -27,28 +27,46 @@ from spline.plugins.pokedex.db import pokedex_session
 
 log = logging.getLogger(__name__)
 
-class TextField(fields.TextField):
-    """Represents a regular ol' text field, with the slight change that the
-    default value is empty string rather than None.  This actually matches what
-    the client will send by default, and allows for deciding whether something
-    was actually typed by comparing the client value to the default.
-    """
-    def __init__(self, *args, **kwargs):
-        if 'default' not in kwargs:
-            kwargs['default'] = u''
-        super(TextField, self).__init__(*args, **kwargs)
-
 class PokemonSearchForm(Form):
-    name = TextField('Name')
+    # Defaults are set to match what the client will actually send if the field
+    # is left blank
+    shorten = fields.HiddenField(default=u'')
+
+    name = fields.TextField('Name', default=u'')
+
+    @property
+    def cleansed_data(self):
+        """Returns a dictionary of form data, with any blank values removed.
+        That is, fields whose values are equal to their defaults are omitted.
+        """
+        data = dict()
+        for name, field in self._fields:
+            if field.data == field._default:
+                continue
+
+            data[name] = field.data
+
+        return data
 
 
 class PokedexSearchController(BaseController):
 
     def pokemon_search(self):
         c.form = PokemonSearchForm(request.params)
-        if not c.form.validate():
+        validates = c.form.validate()
+        data = c.form.cleansed_data
+
+        # If this is the first time the form was submitted, redirect to a URL
+        # with only non-default values
+        if validates and data and data.get('shorten', None):
+            del data['shorten']
+            redirect_to(url.current(**data))
+
+        if not validates or not data:
             # Either blank, or errortastic.  Skip the logic and just send the
             # form back
+            c.search_performed = False
+
             return render('/pokedex/search/pokemon.mako')
 
         # Let the template know we're actually doing something
