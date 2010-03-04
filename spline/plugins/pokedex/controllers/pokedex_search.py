@@ -127,6 +127,10 @@ class PokedexSearchController(BaseController):
         if c.form.color.data:
             query = query.filter( tables.Pokemon.color_id == c.form.color.data.id )
 
+        # Habitat
+        if c.form.habitat.data:
+            query = query.filter( tables.Pokemon.habitat_id == c.form.habitat.data.id )
+
         # Ability
         if c.form.ability.data:
             query = query.filter( tables.Pokemon.abilities.any(
