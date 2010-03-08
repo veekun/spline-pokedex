@@ -19,6 +19,11 @@ class TestPokemonSearchController(TestController):
 
         results = self.do_search(**criteria).c.results
 
+        self.assert_(
+            len(results) < 490,
+            u"doesn't look like we got every single Pokémon: {0}".format(message)
+        )
+
         leftover_results = []
         leftover_expected = []
 

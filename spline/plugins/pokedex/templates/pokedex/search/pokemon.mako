@@ -21,6 +21,15 @@ ${h.form(url.current(), method='GET')}
     ${field('ability')}
     ${field('color')}
     ${field('habitat')}
+    <dt>${c.form.gender_rate.label() | n}</dt>
+    <dd>${c.form.gender_rate_operator() | n} ${c.form.gender_rate() | n}</dd>
+    <dt>${c.form.egg_group.label() | n}</dt>
+    <dd>
+        ${c.form.egg_group_operator() | n}
+        % for widget in c.form.egg_group:
+        ${widget() | n}
+        % endfor
+    </dd>
 </dl>
 
 
