@@ -60,24 +60,20 @@ def pokemon_sprite(pokemon, prefix='platinum', **attr):
 
     # Kinda gross, but it's entirely valid to pass None as a form
     form = attr.pop('form', pokemon.forme_name)
-    if form == pokemon.forme_name and not pokemon.forme_base_pokemon_id:
-        # Don't use default form's name as part of the filename
-        form = None
 
     if 'crystal' in prefix or 'animated' in prefix:
         ext = 'gif'
     else:
         ext = 'png'
 
-    if form:
-        alt_text = "%s (%s)" % (pokemon.name, form)
-        filename = '%d-%s.%s' % (pokemon.national_id, form, ext)
-    else:
-        alt_text = pokemon.name
-        filename = '%d.%s' % (pokemon.national_id, ext)
-
+    alt_text = pokemon.full_name
     attr.setdefault('alt', alt_text)
     attr.setdefault('title', alt_text)
+
+    if form:
+        filename = '%d-%s.%s' % (pokemon.national_id, form, ext)
+    else:
+        filename = '%d.%s' % (pokemon.national_id, ext)
 
     return pokedex_img("%s/%s" % (prefix, filename), **attr)
 

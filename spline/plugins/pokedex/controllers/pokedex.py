@@ -879,17 +879,40 @@ class PokedexController(BaseController):
         except NoResultFound:
             return self._not_found()
 
-        # Deal with forms.  Sprite forms, remember!
+        # Deal with forms.  Remember, this could be either a physical form or
+        # an aesthetic form!
         c.form = request.params.get('form', None)
+        form_sprites = c.pokemon.form_sprites
+
+        # If we don't have a form name, but this Pokémon has forms, we need to
+        # know the default
+        if not c.form and c.pokemon.forme_name:
+            # If there's a physical form name, just use that.  Don't redirect,
+            # as the physical form name is universally treated as the "default"
+            # and thus interchangeable with the plain Pokémon name -- that is,
+            # Normal Deoxys will always be /dex/pokemon/deoxys and vice versa
+            c.form = c.pokemon.forme_name
+
+        elif not c.form \
+            and form_sprites and not any(_.name == '' for _ in form_sprites):
+            # If there are aesthetic forms, but not one without a name, and we
+            # didn't GET a name, then redirect to the default.  In this case,
+            # you can't see flavor for "just Unown"; there's no such thing.
+            # You have to pick one, and if you don't, then I'll pick one for
+            # you
+            redirect_to(form=c.pokemon.default_form_sprite.name)
+
         c.forms = [_.name for _ in c.pokemon.form_sprites]
         c.forms.sort()
 
+
+        # Every form should have a recorded sprite; find it
         if c.form:
             try:
-                spr_form = pokedex_session.query(PokemonFormSprite) \
-                                          .filter_by(pokemon_id=c.pokemon.id,
-                                                     name=c.form) \
-                                          .one()
+                spr_form = pokedex_session \
+                    .query(PokemonFormSprite) \
+                    .filter_by(pokemon_id=c.pokemon.id, name=c.form) \
+                    .one()
             except NoResultFound:
                 # Not a valid form!
                 abort(404)
@@ -898,10 +921,15 @@ class PokedexController(BaseController):
         else:
             c.introduced_in = c.pokemon.generation.version_groups[0]
 
-        if c.form:
-            c.sprite_filename = u"%d-%s" % (c.pokemon.id, c.form)
-        else:
-            c.sprite_filename = unicode(c.pokemon.id)
+        # Figure out if a sprite form appears in the overworld.  If this isn't
+        # a sprite form, the answer is obviously yes
+        c.appears_in_overworld = True
+        default_form_sprite = c.pokemon.default_form_sprite
+        if c.pokemon.form_group and c.pokemon.form_group.is_battle_only \
+            and default_form_sprite and c.form != default_form_sprite.name:
+            # That is, if this Pokémon's forms aren't battle-only, and it's not
+            # the default
+            c.appears_in_overworld = False
 
         ### Previous and next for the header
         c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)

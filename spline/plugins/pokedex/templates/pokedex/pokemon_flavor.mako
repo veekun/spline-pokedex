@@ -4,10 +4,8 @@
 <%def name="title()">\
 % if c.pokemon.name == 'Unown' and c.form:
 Unown ${c.form.capitalize()} \
-% elif c.form:
-${c.form.title()} ${c.pokemon.name} \
 % else:
-${c.pokemon.name} \
+${c.pokemon.full_name} \
 % endif
 — Pokémon #${c.pokemon.national_id} — Flavor\
 </%def>
@@ -107,14 +105,14 @@ ${lib.pokemon_page_header()}
 % endif
 
 % if c.introduced_in.id <= 7:
-<% show_rusa = not (c.pokemon.name == u'Deoxys' and c.form) %>\
-<% show_emerald = not (c.pokemon.name == u'Deoxys' and c.form != 'speed') %>\
+<% show_rusa = (c.pokemon.name != u'Deoxys' or c.form == u'normal') %>\
+<% show_emerald = (c.pokemon.name != u'Deoxys' or c.form in (u'speed', u'normal')) %>\
 <% show_frlg = (c.pokemon.generation_id == 1
                 or c.pokemon.name == u'Teddiursa'
-                or (c.pokemon.name == u'Deoxys' and c.form in ('attack', 'defense'))) %>\
+                or (c.pokemon.name == u'Deoxys' and c.form in (u'attack', u'defense', u'normal'))) %>\
 <h2 id="main-sprites:gen-iii"><a href="#main-sprites:gen-iii" class="subtle">${h.pokedex.generation_icon(3)} Ruby &amp; Sapphire, Emerald, Fire Red &amp; Leaf Green</a></h2>
-## Deoxys is a giant mess.
-## Normal only exists in R/S; Speed only in Emerald; Attack only in LG; Defense only in FR.
+## Deoxys is a bit of a mess.
+## Normal exists everywhere.  Speed only in Emerald; Attack only in LG; Defense only in FR.
 <table>
 <tr class="header-row">
     <th></th>
@@ -142,7 +140,10 @@ ${lib.pokemon_page_header()}
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald/frame2', form=c.form)}
+        ## Emerald animations don't exist for forms that only exist after a battle starts
+        % if c.appears_in_overworld:
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald/animated', form=c.form)}
+        % endif
     </td>
 % endif
 
@@ -162,7 +163,9 @@ ${lib.pokemon_page_header()}
     <td>
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald/shiny', form=c.form)}
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald/shiny/frame2', form=c.form)}
+        % if c.appears_in_overworld:
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald/shiny/animated', form=c.form)}
+        % endif
     </td>
 % endif
 
@@ -353,6 +356,8 @@ ${lib.pokemon_page_header()}
 % endif
 
 
+## Overworld sprites can't exist for alternate formes that are in-battle only
+% if c.appears_in_overworld:
 <h1 id="misc-sprites"><a href="#misc-sprites" class="subtle">Miscellaneous Game Art</a></h1>
 
 % if c.pokemon.generation_id <= 4:
@@ -453,6 +458,8 @@ ${lib.pokemon_page_header()}
 % endif
 </table>
 % endif
+
+% endif  ## appears_in_overworld
 
 
 
