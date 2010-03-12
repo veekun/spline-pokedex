@@ -32,6 +32,24 @@ ${h.form(url.current(), method='GET')}
     </dd>
 </dl>
 
+<h2>Evolution</h2>
+<div class="dex-column-container">
+<div class="dex-column">
+    <dl class="standard-form">
+        ${field('evolution_stage')}
+    </dl>
+</div>
+<div class="dex-column">
+    <dl class="standard-form">
+        ${field('evolution_position')}
+    </dl>
+</div>
+<div class="dex-column">
+    <dl class="standard-form">
+        ${field('evolution_special')}
+    </dl>
+</div>
+</div>
 
 <p>
     ## Always shorten when the form is submitted!

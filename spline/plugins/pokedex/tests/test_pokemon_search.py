@@ -138,8 +138,12 @@ class TestPokemonSearchController(TestController):
         And the evolution position searches:
         - not evolved
         - middle evolution
-        - branching evolution
         - fully evolved
+        - only evolution
+
+        And some special things:
+        - branching evolution
+        - branched evolution
         """
         # Actual stages
         self.check_search(
@@ -159,7 +163,7 @@ class TestPokemonSearchController(TestController):
         )
         self.check_search(
             dict(evolution_stage=u'stage2'),
-            [ u'Charizard', u'Dragonite', u'Feraligatr', u'Staraptor', u'Tyrannitar', u'Vileplume' ],
+            [ u'Charizard', u'Dragonite', u'Feraligatr', u'Staraptor', u'Tyranitar', u'Vileplume' ],
             u'stage 2 Pokémon',
         )
 
@@ -180,38 +184,57 @@ class TestPokemonSearchController(TestController):
             u'middle evolution',
         )
         self.check_search(
-            dict(evolution_position=u'branch'),
-            [ u'Kirlia', u'Nincada' ],
-            u'branching evolution',
+            dict(evolution_position=u'only'),
+            [ u'Ditto', u'Farfetch\'d', u'Latias', u'Mew', u'Tauros' ],
+            u'only evolution',
         )
 
-        # Some combinations of relative positions
+        # Special stuff
+        self.check_search(
+            dict(evolution_special=u'branching'),
+            [ u'Eevee', u'Tyrogue' ],
+            u'branching evolution',
+        )
+        self.check_search(
+            dict(evolution_special=u'branched'),
+            [
+                u'Gardevoir', u'Gallade',
+                u'Ninjask',   u'Shedinja',
+            ],
+            u'branched evolution',
+        )
+
+        # Some combinations of options
         self.check_search(
             dict(evolution_position=[u'first', u'last']),
             [ u'Jirachi', u'Kecleon', u'Latias', u'Mew', u'Shuckle' ],
             u'only evolution',
         )
         self.check_search(
-            dict(evolution_position=[u'first', u'branch']),
-            [ u'Nincada' ],
-            u'first evolution branches',
-        )
-        self.check_search(
-            dict(evolution_position=[u'middle', u'branch']),
-            [ u'Kirlia' ],
-            u'middle evolution branches',
-        )
-        self.check_search(
-            dict(evolution_position=[u'last', u'branch']),
+            dict(evolution_position=u'last', evolution_special=u'branching'),
             [],
-            u'last evolution branches (impossible)',
+            u'last evolution branching (impossible)',
+        )
+        self.check_search(
+            dict(evolution_position=u'first', evolution_special=u'branched'),
+            [],
+            u'first evolution branched (impossible)',
+        )
+        self.check_search(
+            dict(evolution_position=u'middle', evolution_special=u'branched'),
+            [ u'Silcoon', u'Cascoon' ],
+            u'middle evolution branched',
             exact=True,
+        )
+        self.check_search(
+            dict(evolution_position=u'last', evolution_special=u'branched'),
+            [ u'Jolteon', u'Bellossom' ],
+            u'last evolution branched',
         )
         self.check_search(
             dict(evolution_position=[u'middle', u'last']),
-            [],
-            u'middle and last evolution (impossible)',
-            exact=True,
+            [ u'Charmeleon', u'Charizard' ],
+            u'middle or last evolution',
         )
 
 

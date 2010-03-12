@@ -9,6 +9,7 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 import pokedex.db.tables as tables
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
+from sqlalchemy.orm import aliased
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func, and_, or_
 
@@ -139,6 +140,29 @@ class PokemonSearchForm(Form):
         label_attr='name',
         allow_blank=True,
         pk_attr='name',
+    )
+
+    evolution_stage = fields.CheckboxMultiSelectField('Stage',
+        choices=[
+            (u'baby',   u'baby'),
+            (u'basic',  u'basic'),
+            (u'stage1', u'stage 1'),
+            (u'stage2', u'stage 2'),
+        ],
+    )
+    evolution_position = fields.CheckboxMultiSelectField('Position',
+        choices=[
+            (u'first',  u'First evolution'),
+            (u'middle', u'Middle evolution'),
+            (u'last',   u'Final evolution'),
+            (u'only',   u'Only evolution'),
+        ],
+    )
+    evolution_special = fields.CheckboxMultiSelectField('Special',
+        choices=[
+            (u'branching', u'Branching evolution (e.g., Tyrogue)'),
+            (u'branched',  u'Branched evolution (e.g., Shedinja)'),
+        ],
     )
 
     gender_rate_operator = fields.SelectField(
@@ -283,7 +307,150 @@ class PokedexSearchController(BaseController):
 
             query = query.filter(clause)
 
+        # Evolution stuff
+        # Try to limit our joins without duplicating too much code
+        # Stage and position generally need to know parents:
+        if c.form.evolution_stage.data or c.form.evolution_position.data:
+            # NOTE: This makes the assumption that evolution chains are never
+            # more than three Pokémon long.  So far, this is pretty safe, as in
+            # 10+ years no Pokémon has ever been able to evolve more than
+            # twice.  If this changes, then either this query will need a
+            # greatgrandparent, or (likely) the table structure will change
+            parent_pokemon = aliased(tables.Pokemon)
+            grandparent_pokemon = aliased(tables.Pokemon)
 
+            # Make it an outer join; could be a search for e.g. 'baby', which
+            # definitely doesn't want inner
+            query = query.outerjoin((
+                parent_pokemon,
+                tables.Pokemon.evolution_parent_pokemon_id == parent_pokemon.id
+            )) \
+            .outerjoin((
+                grandparent_pokemon,
+                parent_pokemon.evolution_parent_pokemon_id == grandparent_pokemon.id
+            ))
+
+        # ...whereas position and special tend to need children
+        if c.form.evolution_position.data or c.form.evolution_special.data:
+            child_pokemon = aliased(tables.Pokemon)
+            child_subquery = pokedex_session.query(
+                child_pokemon.evolution_parent_pokemon_id.label('parent_id'),
+                func.count('*').label('child_count'),
+            ) \
+                .group_by(child_pokemon.evolution_parent_pokemon_id) \
+                .subquery()
+
+            query = query.outerjoin((
+                child_subquery,
+                tables.Pokemon.id == child_subquery.c.parent_id
+            ))
+
+        if c.form.evolution_stage.data:
+            # Collect clauses for the requested stages and add to the query
+            clauses = []
+            if u'baby' in c.form.evolution_stage.data:
+                # Baby form: is_baby.  Cool, easy.
+                clauses.append( tables.Pokemon.is_baby == True )
+
+            if u'basic' in c.form.evolution_stage.data:
+                # Basic: this is not a baby.  Either there's no parent, or
+                # parent is a baby
+                clauses.append(
+                    and_(
+                        tables.Pokemon.is_baby == False,
+                        or_(
+                            parent_pokemon.id == None,
+                            parent_pokemon.is_baby == True,
+                        )
+                    )
+                )
+
+            if u'stage1' in c.form.evolution_stage.data:
+                # Stage 1: parent exists and is not a baby.  Grandparent either
+                # doesn't exist or is a baby
+                clauses.append(
+                    and_(
+                        parent_pokemon.id != None,
+                        parent_pokemon.is_baby == False,
+                        or_(
+                            grandparent_pokemon.id == None,
+                            grandparent_pokemon.is_baby == True,
+                        ),
+                    )
+                )
+
+            if u'stage2' in c.form.evolution_stage.data:
+                # Stage 2: grandparent exists and is not a baby
+                clauses.append(
+                    and_(
+                        grandparent_pokemon.id != None,
+                        grandparent_pokemon.is_baby == False,
+                    )
+                )
+
+            query = query.filter(or_(*clauses))
+
+        if c.form.evolution_position.data:
+            # Same story
+            clauses = []
+
+            if u'first' in c.form.evolution_position.data:
+                # No parent
+                clauses.append( parent_pokemon.id == None )
+
+            if u'middle' in c.form.evolution_position.data:
+                # Has a parent AND a child
+                clauses.append(
+                    and_(
+                        parent_pokemon.id != None,
+                        child_subquery.c.child_count != None,
+                    )
+                )
+
+            if u'last' in c.form.evolution_position.data:
+                # No children
+                clauses.append( child_subquery.c.child_count == None )
+
+            if u'only' in c.form.evolution_position.data:
+                # No parent; children
+                clauses.append( 
+                    and_(
+                        parent_pokemon.id == None,
+                        child_subquery.c.child_count == None,
+                    )
+                )
+
+            query = query.filter(or_(*clauses))
+
+        if c.form.evolution_special.data:
+            clauses = []
+
+            if u'branching' in c.form.evolution_special.data:
+                # Branching means: multiple children.  Easy!
+                clauses.append( child_subquery.c.child_count > 1 )
+
+            if u'branched' in c.form.evolution_special.data:
+                # Need to join to..  siblings.  Ugh.
+                sibling_pokemon = aliased(tables.Pokemon)
+                sibling_subquery = pokedex_session.query(
+                    sibling_pokemon.evolution_parent_pokemon_id.label('parent_id'),
+                    func.count('*').label('sibling_count'),
+                ) \
+                    .group_by(sibling_pokemon.evolution_parent_pokemon_id) \
+                    .subquery()
+
+                query = query.outerjoin((
+                    sibling_subquery,
+                    tables.Pokemon.evolution_parent_pokemon_id
+                        == sibling_subquery.c.parent_id
+                ))
+
+                clauses.append( sibling_subquery.c.sibling_count > 1 )
+
+            query = query.filter(or_(*clauses))
+
+
+        ### Run the query!
         c.results = query.all()
 
         return render('/pokedex/search/pokemon.mako')
