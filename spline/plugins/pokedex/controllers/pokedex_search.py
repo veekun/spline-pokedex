@@ -260,18 +260,18 @@ class PokedexSearchController(BaseController):
                 if '*' not in string and '?' not in string:
                     string = "*{0}*".format(string)
 
-                # LIKE wildcards should be escaped: % -> \%, _ -> \_, \ -> \\
+                # LIKE wildcards should be escaped: % -> ^%, _ -> ^_, ^ -> ^^
                 # Our wildcards should be changed: * -> %, ? -> _
                 # And all at once.
                 translations = {
-                    '%': '\\%',     '_': '\\_',     '\\': '\\\\',
+                    '%': '^%',      '_': '^_',      '^': '^^',
                     '*': '%',       '?': '_',
                 }
-                string = re.sub(r'([%_*?\\])',
+                string = re.sub(r'([%_*?^])',
                                 lambda match: translations[match.group(0)],
                                 string)
 
-                return func.lower(column).like(string)
+                return func.lower(column).like(string, escape='^')
 
             if ' ' in name:
                 # Hmm.  If there's a space, it might be a form name
