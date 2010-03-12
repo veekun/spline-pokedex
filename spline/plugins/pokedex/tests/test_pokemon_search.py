@@ -96,6 +96,18 @@ class TestPokemonSearchController(TestController):
             [ u'Flareon', u'Kecleon', u'Lumineon', u'Empoleon' ], # etc.
             'wildcards',
         )
+        self.check_search(
+            dict(name=u'feralig?tr'),
+            [ u'Feraligatr' ],
+            'more wildcards!',
+            exact=True,
+        )
+        self.check_search(
+            dict(name=u'pikac?'),
+            [],
+            'wildcards are trusted',
+            exact=True,
+        )
 
 
     def test_color(self):

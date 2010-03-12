@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division
 
 import logging
+import re
 
 from wtforms import Form, ValidationError, fields, widgets
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -247,24 +248,60 @@ class PokedexSearchController(BaseController):
         c.search_performed = True
 
         ### Do the searching!
-        query = pokedex_session.query(tables.Pokemon)
+        me = tables.Pokemon
+        query = pokedex_session.query(me)
 
         # Name
         if c.form.name.data:
-            name_like = u"%{0}%".format(c.form.name.data.lower())
-            query = query.filter( func.lower(tables.Pokemon.name).like(name_like) )
+            name = c.form.name.data.strip().lower()
+
+            def ilike(column, string):
+                # If there are no wildcards, assume it's a partial match
+                if '*' not in string and '?' not in string:
+                    string = "*{0}*".format(string)
+
+                # LIKE wildcards should be escaped: % -> \%, _ -> \_, \ -> \\
+                # Our wildcards should be changed: * -> %, ? -> _
+                # And all at once.
+                translations = {
+                    '%': '\\%',     '_': '\\_',     '\\': '\\\\',
+                    '*': '%',       '?': '_',
+                }
+                string = re.sub(r'([%_*?\\])',
+                                lambda match: translations[match.group(0)],
+                                string)
+
+                return func.lower(column).like(string)
+
+            if ' ' in name:
+                # Hmm.  If there's a space, it might be a form name
+                form_name, name_sans_form = name.split(' ', 2)
+                query = query.filter(
+                    or_(
+                        # Either it was a form name...
+                        and_(
+                            ilike( me.forme_name, form_name ),
+                            ilike( me.name, name_sans_form ),
+                        ),
+                        # ...or not.
+                        ilike( me.name, name ),
+                    )
+                )
+            else:
+                # Busines as usual
+                query = query.filter( ilike(me.name, name) )
 
         # Color
         if c.form.color.data:
-            query = query.filter( tables.Pokemon.color_id == c.form.color.data.id )
+            query = query.filter( me.color_id == c.form.color.data.id )
 
         # Habitat
         if c.form.habitat.data:
-            query = query.filter( tables.Pokemon.habitat_id == c.form.habitat.data.id )
+            query = query.filter( me.habitat_id == c.form.habitat.data.id )
 
         # Ability
         if c.form.ability.data:
-            query = query.filter( tables.Pokemon.abilities.any(
+            query = query.filter( me.abilities.any(
                                     tables.Ability.id == c.form.ability.data.id
                                   )
                                 )
@@ -276,16 +313,16 @@ class PokedexSearchController(BaseController):
 
             # Genderless ignores the operator
             if gender_rate == -1 or gender_rate_op == 'equal':
-                clause = tables.Pokemon.gender_rate == gender_rate
+                clause = me.gender_rate == gender_rate
             elif gender_rate_op == 'less_equal':
-                clause = tables.Pokemon.gender_rate <= gender_rate
+                clause = me.gender_rate <= gender_rate
             elif gender_rate_op == 'more_equal':
-                clause = tables.Pokemon.gender_rate >= gender_rate
+                clause = me.gender_rate >= gender_rate
 
             if gender_rate != -1:
                 # No amount of math should make "<= 1/4 female" include
                 # genderless
-                clause = and_(clause, tables.Pokemon.gender_rate != -1)
+                clause = and_(clause, me.gender_rate != -1)
 
             query = query.filter(clause)
 
@@ -295,7 +332,7 @@ class PokedexSearchController(BaseController):
             for egg_group in c.form.egg_group.data:
                 if not egg_group:
                     continue
-                subclause = tables.Pokemon.egg_groups.any(
+                subclause = me.egg_groups.any(
                     tables.EggGroup.id == egg_group.id
                 )
                 clauses.append(subclause)
@@ -323,7 +360,7 @@ class PokedexSearchController(BaseController):
             # definitely doesn't want inner
             query = query.outerjoin((
                 parent_pokemon,
-                tables.Pokemon.evolution_parent_pokemon_id == parent_pokemon.id
+                me.evolution_parent_pokemon_id == parent_pokemon.id
             )) \
             .outerjoin((
                 grandparent_pokemon,
@@ -342,7 +379,7 @@ class PokedexSearchController(BaseController):
 
             query = query.outerjoin((
                 child_subquery,
-                tables.Pokemon.id == child_subquery.c.parent_id
+                me.id == child_subquery.c.parent_id
             ))
 
         if c.form.evolution_stage.data:
@@ -350,14 +387,14 @@ class PokedexSearchController(BaseController):
             clauses = []
             if u'baby' in c.form.evolution_stage.data:
                 # Baby form: is_baby.  Cool, easy.
-                clauses.append( tables.Pokemon.is_baby == True )
+                clauses.append( me.is_baby == True )
 
             if u'basic' in c.form.evolution_stage.data:
                 # Basic: this is not a baby.  Either there's no parent, or
                 # parent is a baby
                 clauses.append(
                     and_(
-                        tables.Pokemon.is_baby == False,
+                        me.is_baby == False,
                         or_(
                             parent_pokemon.id == None,
                             parent_pokemon.is_baby == True,
@@ -441,7 +478,7 @@ class PokedexSearchController(BaseController):
 
                 query = query.outerjoin((
                     sibling_subquery,
-                    tables.Pokemon.evolution_parent_pokemon_id
+                    me.evolution_parent_pokemon_id
                         == sibling_subquery.c.parent_id
                 ))
 
