@@ -28,7 +28,11 @@
     ${h.pokedex.damage_class_icon(object.damage_class)}
     % endif
 \
+    % if object.__tablename__ == 'pokemon':
+    ${object.full_name}
+    % else:
     ${object.name}
+    % endif
     </a>
     % if result.language:
     (<img src="${h.static_uri('spline', "flags/{0}.png".format(result.iso3166))}" alt="${result.language}" title="${result.language}"> ${result.name})
