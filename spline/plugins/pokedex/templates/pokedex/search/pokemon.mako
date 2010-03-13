@@ -82,10 +82,17 @@ ${h.end_form()}
 <h1>Results</h1>
 <p><a href="${url.current()}">Clear form</a></p>
 
-<ul>
-    % for result in c.results:
-    <li>${h.pokedex.pokemon_link(result)}</li>
-    % endfor
-</ul>
+## Generic Pokémon table, for now.  Cooler stuff later
+<table class="dex-pokemon-moves striped-rows">
+${lib.pokemon_table_columns()}
+<tr class="header-row">
+    ${lib.pokemon_table_header()}
+</tr>
+% for result in c.results:
+<tr>
+    ${lib.pokemon_table_row(result)}
+</tr>
+% endfor
+</table>
 
 % endif
