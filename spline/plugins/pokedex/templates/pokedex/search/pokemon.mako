@@ -32,6 +32,25 @@ ${h.form(url.current(), method='GET')}
     </dd>
 </dl>
 
+<h2>Type</h2>
+<p>Type must be ${c.form.type_operator() | n}.</p>
+% for error in c.form.type_operator.errors:
+<p class="error">${error}</p>
+% endfor
+## Umm.  This class is increasingly misnamed.
+<ul class="dex-page-damage">
+    ## always sort ??? last
+    % for a_field in sorted(c.form.type, key=lambda field: field.label.text):
+    <li> <label>
+        ${h.pokedex.type_icon(a_field.label.text)}
+        ${a_field() | n}
+    </label> </li>
+    % endfor
+</ul>
+% for error in c.form.type.errors:
+<p class="error">${error}</p>
+% endfor
+
 <h2>Evolution</h2>
 <div class="dex-column-container">
 <div class="dex-column">

@@ -141,7 +141,9 @@ def damage_class_icon(damage_class):
 
 
 def type_icon(type):
-    return pokedex_img('chrome/types/%s.png' % type.name, alt=type.name)
+    if not isinstance(type, basestring):
+        type = type.name
+    return pokedex_img('chrome/types/%s.png' % type, alt=type)
 
 def type_link(type):
     return h.HTML.a(

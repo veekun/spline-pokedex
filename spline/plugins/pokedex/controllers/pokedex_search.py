@@ -5,14 +5,14 @@ import logging
 import re
 
 from wtforms import Form, ValidationError, fields, widgets
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField, QueryCheckboxMultipleSelectField
 
 import pokedex.db.tables as tables
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql import func, and_, or_
+from sqlalchemy.sql import func, and_, not_, or_
 
 from spline.lib.base import BaseController, render
 
@@ -123,6 +123,7 @@ class PokemonSearchForm(Form):
     # is left blank
     shorten = fields.HiddenField(default=u'')
 
+    # Core stuff
     name = fields.TextField('Name', default=u'')
     ability = QueryTextField('Ability',
         query_factory=
@@ -130,42 +131,25 @@ class PokemonSearchForm(Form):
                 .filter( func.lower(tables.Ability.name) == value.lower() ),
         label_attr='name',
     )
-    color = QuerySelectField('Color',
-        query_factory=lambda: pokedex_session.query(tables.PokemonColor),
-        label_attr='name',
-        allow_blank=True,
-        pk_attr='name',
+
+    # Type
+    type_operator = fields.SelectField(
+        choices=[
+            (u'any',   'at least one of these types'),
+            (u'exact', 'exactly these types'),
+            (u'only',  'only these types'),
+        ],
+        default=u'any',
     )
-    habitat = QuerySelectField('Habitat',
-        query_factory=lambda: pokedex_session.query(tables.PokemonHabitat),
+    type = QueryCheckboxMultipleSelectField(
+        'Type',
+        query_factory=lambda: pokedex_session.query(tables.Type),
         label_attr='name',
+        get_pk=lambda table: table.name,
         allow_blank=True,
-        pk_attr='name',
     )
 
-    evolution_stage = fields.CheckboxMultiSelectField('Stage',
-        choices=[
-            (u'baby',   u'baby'),
-            (u'basic',  u'basic'),
-            (u'stage1', u'stage 1'),
-            (u'stage2', u'stage 2'),
-        ],
-    )
-    evolution_position = fields.CheckboxMultiSelectField('Position',
-        choices=[
-            (u'first',  u'First evolution'),
-            (u'middle', u'Middle evolution'),
-            (u'last',   u'Final evolution'),
-            (u'only',   u'Only evolution'),
-        ],
-    )
-    evolution_special = fields.CheckboxMultiSelectField('Special',
-        choices=[
-            (u'branching', u'Branching evolution (e.g., Tyrogue)'),
-            (u'branched',  u'Branched evolution (e.g., Shedinja)'),
-        ],
-    )
-
+    # Breeding
     gender_rate_operator = fields.SelectField(
         choices=[
             (u'more_equal', u'at least'),
@@ -204,6 +188,45 @@ class PokemonSearchForm(Form):
         ),
         count=2,
     )
+
+    # Evolution
+    evolution_stage = fields.CheckboxMultiSelectField('Stage',
+        choices=[
+            (u'baby',   u'baby'),
+            (u'basic',  u'basic'),
+            (u'stage1', u'stage 1'),
+            (u'stage2', u'stage 2'),
+        ],
+    )
+    evolution_position = fields.CheckboxMultiSelectField('Position',
+        choices=[
+            (u'first',  u'First evolution'),
+            (u'middle', u'Middle evolution'),
+            (u'last',   u'Final evolution'),
+            (u'only',   u'Only evolution'),
+        ],
+    )
+    evolution_special = fields.CheckboxMultiSelectField('Special',
+        choices=[
+            (u'branching', u'Branching evolution (e.g., Tyrogue)'),
+            (u'branched',  u'Branched evolution (e.g., Shedinja)'),
+        ],
+    )
+
+    # Flavor
+    color = QuerySelectField('Color',
+        query_factory=lambda: pokedex_session.query(tables.PokemonColor),
+        label_attr='name',
+        allow_blank=True,
+        get_pk=lambda table: table.name,
+    )
+    habitat = QuerySelectField('Habitat',
+        query_factory=lambda: pokedex_session.query(tables.PokemonHabitat),
+        label_attr='name',
+        allow_blank=True,
+        get_pk=lambda table: table.name,
+    )
+
 
 
     def cleanse_data(self, data):
@@ -291,20 +314,42 @@ class PokedexSearchController(BaseController):
                 # Busines as usual
                 query = query.filter( ilike(me.name, name) )
 
-        # Color
-        if c.form.color.data:
-            query = query.filter( me.color_id == c.form.color.data.id )
-
-        # Habitat
-        if c.form.habitat.data:
-            query = query.filter( me.habitat_id == c.form.habitat.data.id )
-
         # Ability
         if c.form.ability.data:
             query = query.filter( me.abilities.any(
                                     tables.Ability.id == c.form.ability.data.id
                                   )
                                 )
+
+        # Type
+        if c.form.type.data:
+            type_ids = [_.id for _ in c.form.type.data]
+
+            if c.form.type_operator.data == u'any':
+                # Well, this is easy; be lazy and use EXISTS
+                query = query.filter(
+                    me.types.any( tables.Type.id.in_(type_ids) )
+                )
+
+            elif c.form.type_operator.data == u'only':
+                # None of this Pokémon's types can be not selected.  Right.
+                query = query.filter(
+                    ~ me.types.any( ~ tables.Type.id.in_(type_ids) )
+                )
+
+            elif c.form.type_operator.data == u'exact':
+                # This one is interesting, and not quite so easy to express
+                # with set operations.  It's like 'only', except every selected
+                # type also must be one of the Pokémon's types.  Thus we
+                # combine the above two approaches:
+                query = query.filter(
+                    ~ me.types.any( ~ tables.Type.id.in_(type_ids) )
+                )
+
+                for type_id in type_ids:
+                    query = query.filter(
+                        me.types.any( tables.Type.id == type_id )
+                    )
 
         # Gender distribution
         if c.form.gender_rate.data:
@@ -485,6 +530,14 @@ class PokedexSearchController(BaseController):
                 clauses.append( sibling_subquery.c.sibling_count > 1 )
 
             query = query.filter(or_(*clauses))
+
+        # Color
+        if c.form.color.data:
+            query = query.filter( me.color_id == c.form.color.data.id )
+
+        # Habitat
+        if c.form.habitat.data:
+            query = query.filter( me.habitat_id == c.form.habitat.data.id )
 
 
         ### Run the query!
