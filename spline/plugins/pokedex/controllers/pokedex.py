@@ -513,17 +513,10 @@ class PokedexController(BaseController):
             # otherwise, pick any version from each set of versions and stick
             # its list under a tuple of all those versions.
             if len(version_lists) == 1:
-                # XXX Gen IV won't trigger this until we get HG/SS items
-                # unless the Pokémon doesn't hold anything in DPPt.
                 c.held_items[generation] = { None: version_held_items.get(version_lists[0][0]) }
             else:
                 c.held_items[generation] = {}
                 for versions in version_lists:
-                    # XXX We don't have HG/SS items yet, and we don't want to
-                    # show 'None' rows because that's not really correct.  So
-                    # skip them.
-                    if any([version.name in (u'Heart Gold', u'Soul Silver') for version in versions]):
-                        continue
                     c.held_items[generation][tuple(versions)] = version_held_items[versions[0]]
 
         ### Evolution
