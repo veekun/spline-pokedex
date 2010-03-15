@@ -1,1 +1,56 @@
-<p>Hey.  This is my Pokédex.</p>
+<%inherit file="/base.mako" />
+<%def name="title()">Pokédex Introduction</%def>
+
+${h.h1('Introduction')}
+<img style="float: right;"
+     src="${h.static_uri('local', 'images/engiveer.png')}"
+     alt="UNDER CONSTRUCTION LOL"
+     title="I solve practical problems">
+
+<p>There's not much to say at the moment.  The Pokédex is still being rebuilt from <a href="http://old.veekun.com/">the ashes</a>.  This would be a jumping-off point for parts of the Pokédex, but the various lists don't exist yet!</p>
+
+<p>The <a href="http://old.veekun.com/dex">old Pokédex</a> is, for now, still available.</p>
+
+
+${h.h1('Finding Stuff')}
+<p>You can look up Pokémon, moves, types, abilities, and items in the Pokédex.  Just type what you want to see, and it'll figure it out from there.</p>
+
+<h2>Specifics</h2>
+<p>Lookup works the same way anywhere you can type a name.  Keep in mind that "lookup" is used to mean entering a name to find something(s) specific.  "Searching" is <a href="${url(controller='dex_search', action='pokemon_search')}">a bit more complicated</a>.</p>
+
+<p>Case (${lookup_examples(u'kecleon')} vs ${lookup_examples(u'KECLEON')}) and extra spaces are ignored.</p>
+
+<p>If you enter something that's misspelled or could be one of several pages, you'll get a list of up to 10 guesses or matches to choose from.</p>
+
+<p>You can specify what sort of thing you're looking for by putting one or more before a colon, e.g. ${lookup_examples(u'pokemon:Kangaskhan')} or ${lookup_examples(u'item,move:metronome')}.  This is mostly useful when looking things up by national id (${lookup_examples(u'pokemon:151')}), because moves and types have ids, too.  It's also helpful when looking up something ambiguous (${lookup_examples(u'move:Psychic')} vs ${lookup_examples(u'type:psychic')}) if you want to skip the disambiguation page.</p>
+
+
+<p>Lookup understands the following:</p>
+
+<%def name="lookup_examples(*examples)">\
+% for i, example in enumerate(examples):
+% if i > 0:
+;
+% endif
+<a href="${url(controller='dex', action='lookup', lookup=example)}"><code>${example}</code></a>\
+% endfor
+</%def>
+
+<dl>
+    <dt>National IDs</dt>
+    <dd>${lookup_examples(u'pokemon:352', u'move:1')}</dd>
+    <dt>Names</dt>
+    <dd>${lookup_examples(u'Eevee', u'Rough Skin', u'Super Rod', u'Route 202')}</dd>
+    <dt>Pokémon forms</dt>
+    <dd>${lookup_examples(u'Speed Deoxys', u'Wash Rotom')}</dd>
+    <dt>Foreign names</dt>
+    <dd>${lookup_examples(u'イーブイ', u'Iibui', u'Eivui', u'Évoli', u'이브이')}</dd>
+    <dt>Misspelled names</dt>
+    <dd>${lookup_examples(u'Dragontie', u'Synthesys', u'psychich', u'Thunder Shock')}</dd>
+    <dt>Wildcards</dt>
+    <dd>${lookup_examples(u'pokemon:????', u'move:thunder*', u'item:* ball')}</dd>
+    <dt>"Random"</dt>
+    <dd>${lookup_examples(u'pokemon:random', u'move:random', u'random')}</dd>
+    <dt>Magic words</dt>
+    <dd>???<!-- obdurate --></dd>
+</dl>

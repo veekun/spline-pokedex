@@ -40,3 +40,5 @@
 </li>
 % endfor
 </ul>
+
+<p><a href="${url('/dex')}">Need help?</a></p>
