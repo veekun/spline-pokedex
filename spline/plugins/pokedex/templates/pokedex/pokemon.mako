@@ -354,7 +354,7 @@ ${h.h1('Flavor')}
         if session.get('cheat_obdurate', False):
             class_ = ' class="dex-obdurate"'
 %>\
-        % for version_name in u'Diamond', u'Pearl', u'Platinum':
+        % for version_name in u'Diamond', u'Pearl', u'Platinum', u'Heart Gold', u'Soul Silver':
         <dt>${h.pokedex.version_icons(version_name)}</dt>
         <dd${h.literal(class_)}>${c.flavor_text[version_name]}</dd>
         % endfor
