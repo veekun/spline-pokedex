@@ -12,7 +12,7 @@ ${c.pokemon.full_name} \
 
 ${lib.pokemon_page_header()}
 
-<h1 id="pokedex"><a href="#pokedex" class="subtle">Pokédex Description</a></h1>
+${h.h1(u'Pokédex Description', id='pokedex')}
 % for generation, version_texts in sorted(c.flavor_text.items(), \
                                           key=lambda (k, v): k.id):
 <div class="dex-pokemon-flavor-generation">${h.pokedex.generation_icon(generation)}</div>
@@ -30,7 +30,7 @@ ${lib.pokemon_page_header()}
 % endfor
 
 
-<h1 id="main-sprites"><a href="#main-sprites" class="subtle">Main Game Portraits</a></h1>
+${h.h1('Main Game Portraits', id='main-sprites')}
 % if c.forms:
 <h3>Forms</h3>
 <ul class="inline">
@@ -358,7 +358,7 @@ ${lib.pokemon_page_header()}
 
 ## Overworld sprites can't exist for alternate formes that are in-battle only
 % if c.appears_in_overworld:
-<h1 id="misc-sprites"><a href="#misc-sprites" class="subtle">Miscellaneous Game Art</a></h1>
+${h.h1('Miscellaneous Game Art', id='misc-sprites')}
 
 % if c.pokemon.generation_id <= 4:
 <h2> ${h.pokedex.version_icons(u'Heart Gold', u'Soul Silver')} Heart Gold &amp; Soul Silver Overworld </h2>
@@ -463,7 +463,7 @@ ${lib.pokemon_page_header()}
 
 
 
-<h1 id="other"><a href="#other" class="subtle">Other Images</a></h1>
+${h.h1('Other Images', id='other')}
 
 <h2>Sugimori Art</h2>
 <p> ${h.pokedex.pokedex_img('sugimori/%d.png' % c.pokemon.national_id)} </p>

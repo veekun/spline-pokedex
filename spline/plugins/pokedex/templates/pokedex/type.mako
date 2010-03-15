@@ -16,7 +16,7 @@
     ${c.type.id}: ${h.pokedex.type_icon(c.type)}
 </div>
 
-<h1 id="essentials"><a href="#essentials" class="subtle">Essentials</a></h1>
+${h.h1('Essentials')}
 
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.type.name.title()}</p>
@@ -50,7 +50,7 @@
     </ul>
 </div>
 
-<h1 id="pokemon"><a href="#pokemon" class="subtle">Pokémon</a></h1>
+${h.h1(u'Pokémon', id='pokemon')}
 % if c.type.name == '???':
 ${h.literal(rst.RstString(u"""In Generation IV, pure :type:`flying`-types become ???-type during :move:`Roost`. This can be
 accomplished with :move:`Conversion`, :move:`Conversion2`, or the ability :ability:`Color Change`. A Pokémon can legitimately have
@@ -79,7 +79,7 @@ purely ???-type before hatching, and are displayed as such in the Generation III
 </table>
 % endif
 
-<h1 id="moves"><a href="#moves" class="subtle">Moves</a></h1>
+${h.h1('Moves')}
 <table class="dex-pokemon-moves striped-rows">
     <thead>
         <tr class="header-row">
@@ -116,7 +116,7 @@ purely ???-type before hatching, and are displayed as such in the Generation III
     </tbody>
 </table>
 
-<h1 id="links"><a href="#links" class="subtle">External Links</a></h1>
+${h.h1('External Links', id='links')}
 <ul class="classic-list">
     % if c.type.generation.id <= 1:
     <li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/comp/${c.type.name}.htm">Azure Heights</a></li>

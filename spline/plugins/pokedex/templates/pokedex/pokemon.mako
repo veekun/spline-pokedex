@@ -13,7 +13,7 @@ ${c.pokemon.name} — Pokémon #${c.pokemon.national_id}\
 ${lib.pokemon_page_header()}
 
 
-<h1 id="essentials"><a href="#essentials" class="subtle">Essentials</a></h1>
+${h.h1('Essentials')}
 
 ## Portrait block
 <div class="dex-page-portrait">
@@ -202,7 +202,7 @@ ${lib.pokemon_page_header()}
 </div>
 </div>
 
-<h1 id="evolution"><a href="#evolution" class="subtle">Evolution</a></h1>
+${h.h1('Evolution')}
 <table class="dex-evolution-chain">
 <thead>
 <tr>
@@ -270,7 +270,7 @@ ${lib.pokemon_page_header()}
 <p> ${c.pokemon.normal_form.form_group.description} </p>
 % endif
 
-<h1 id="stats"><a href="#stats" class="subtle">Stats</a></h1>
+${h.h1('Stats')}
 <%
     # Most people want to see the best they can get
     default_stat_level = 100
@@ -340,8 +340,7 @@ ${lib.pokemon_page_header()}
 </tr>
 </table>
 
-<h1 id="flavor"><a href="#flavor" class="subtle">Flavor</a></h1>
-
+${h.h1('Flavor')}
 <ul class="see-also">
 <li> <img src="${h.static_uri('spline', 'icons/arrow-000-medium.png')}" alt="See also:"> <a href="${url.current(action='pokemon_flavor')}">All versions' flavor text and sprites</a> </li>
 </ul>
@@ -441,7 +440,7 @@ ${lib.pokemon_page_header()}
 </div>
 </div>
 
-<h1 id="locations"><a href="#locations" class="subtle">Locations</a></h1>
+${h.h1('Locations')}
 <ul class="see-also">
 <li> <img src="${h.static_uri('spline', 'icons/overlay/map--arrow.png')}" alt="See also:"> <a href="${url.current(action='pokemon_locations')}">Ridiculously detailed breakdown</a> </li>
 </ul>
@@ -476,7 +475,7 @@ ${lib.pokemon_page_header()}
     % endfor
 </dl>
 
-<h1 id="moves"><a href="#moves" class="subtle">Moves</a></h1>
+${h.h1('Moves')}
 <table class="dex-pokemon-moves dex-pokemon-pokemon-moves striped-rows">
 ## COLUMNS
 % for i, column in enumerate(c.move_columns):
@@ -550,7 +549,7 @@ ${lib.pokemon_page_header()}
 % endfor
 </table>
 
-<h1 id="links"><a href="#links" class="subtle">External Links</a></h1>
+${h.h1('External Links', id='links')}
 <%
     # Some sites don't believe in Unicode URLs.  Scoff, scoff.
     # And they all do it differently.  Ugh, ugh.

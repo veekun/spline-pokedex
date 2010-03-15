@@ -16,7 +16,7 @@
     ${c.move.id}: ${c.move.name}
 </div>
 
-<h1 id="essentials"><a href="#essentials" class="subtle">Essentials</a></h1>
+${h.h1('Essentials')}
 
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.move.name}</p>
@@ -29,7 +29,7 @@
 
 <div class="dex-page-beside-portrait">
     <h2>Summary</h2>
-    <p>${h.literal(c.move.short_effect.as_html)}</p>
+    ${h.literal(c.move.short_effect.as_html)}
 
     <h2>Damage Dealt</h2>
     <ul class="dex-page-damage">
@@ -134,7 +134,7 @@
 </div>
 
 
-<h1 id="effect"><a href="#effect" class="subtle">Effect</a></h1>
+${h.h1('Effect')}
 <div class="dex-effect">
 ${h.literal(c.move.effect.as_html)}
 </div>
@@ -154,7 +154,7 @@ ${h.literal(c.move.effect.as_html)}
 
 
 
-<h1 id="contests"><a href="#contests" class="subtle">Contests</a></h1>
+${h.h1('Contests')}
 <div class="dex-column-container">
 <div class="dex-column">
     <h2>${h.pokedex.generation_icon(3)} Contest</h2>
@@ -241,7 +241,7 @@ ${h.literal(c.move.effect.as_html)}
 </div>
 </div>
 
-<h1 id="pokemon"><a href="#pokemon" class="subtle">Pokémon</a></h1>
+${h.h1(u'Pokémon', id='pokemon')}
 <table class="dex-pokemon-moves striped-rows">
 ## COLUMNS
 % for i, column in enumerate(c.pokemon_columns):
@@ -278,7 +278,7 @@ ${lib.pokemon_table_columns()}
 % endfor
 </table>
 
-<h1 id="links"><a href="#links" class="subtle">External Links</a></h1>
+${h.h1('External Links', id='links')}
 <ul class="classic-list">
 % if c.move.generation.id <= 1:
 <li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/attacks/${c.move.name[0].lower()}/${c.move.name.lower().replace(' ', '_')}.htm">Azure Heights</a></li>
