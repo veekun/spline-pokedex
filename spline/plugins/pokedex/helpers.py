@@ -66,7 +66,13 @@ def pokemon_sprite(pokemon, prefix='platinum', **attr):
     else:
         ext = 'png'
 
-    alt_text = pokemon.full_name
+    if form:
+        # Use the overridden form name
+        alt_text = "{0} {1}".format(form.title(), pokemon.name)
+    else:
+        # Use the Pokémon's default full-name
+        alt_text = pokemon.full_name
+
     attr.setdefault('alt', alt_text)
     attr.setdefault('title', alt_text)
 

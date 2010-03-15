@@ -392,7 +392,7 @@ ${h.h1('Flavor')}
         <dd>${h.pokedex.pokedex_img('chrome/habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.habitat))} ${c.pokemon.habitat}</dd>
         % endif
         <dt>Pawprint</dt>
-        <dd>${h.pokedex.pokemon_sprite(c.pokemon.normal_form, prefix='pawprints')}</dd>
+        <dd>${h.pokedex.pokemon_sprite(c.pokemon, prefix='pawprints', form=None)}</dd>
         <dt>Shape</dt>
         <dd>
             ${h.pokedex.pokedex_img('chrome/shapes/%d.png' % c.pokemon.shape.id, alt='')}
