@@ -2,7 +2,7 @@
 <%namespace name="lib" file="lib.mako"/>
 <%! import re %>\
 
-<%def name="title()">${c.move.name} — Move #${c.move.id}</%def>
+<%def name="title()">${c.move.name} – Move #${c.move.id}</%def>
 
 <div id="dex-header">
     <a href="${url.current(name=c.prev_move.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">

@@ -7,7 +7,7 @@ Unown ${c.form.capitalize()} \
 % else:
 ${c.pokemon.full_name} \
 % endif
-— Pokémon #${c.pokemon.national_id} — Flavor\
+– Pokémon #${c.pokemon.national_id} – Flavor\
 </%def>
 
 ${lib.pokemon_page_header()}

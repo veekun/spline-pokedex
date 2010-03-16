@@ -7,7 +7,7 @@
 % if c.pokemon.forme_name:
 ${c.pokemon.forme_name.capitalize()} \
 % endif
-${c.pokemon.name} — Pokémon #${c.pokemon.national_id}\
+${c.pokemon.name} – Pokémon #${c.pokemon.national_id}\
 </%def>
 
 ${lib.pokemon_page_header()}
