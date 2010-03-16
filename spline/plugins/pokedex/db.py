@@ -7,8 +7,13 @@ from pokedex.db import tables
 import pylons
 from sqlalchemy.sql import func
 
-# DB session for everyone to use
-pokedex_session = pokedex.db.connect(pylons.config['pokedex_db_url'])
+from spline.lib.base import SQLATimerProxy
+
+# DB session for everyone to use.
+# This uses the same timer proxy as the main engine, so Pokédex queries are
+# counted towards the db time in the footer
+pokedex_session = pokedex.db.connect(pylons.config['pokedex_db_url'],
+                                     engine_args={'proxy': SQLATimerProxy()})
 
 # Quick access to a few database objects
 def get_by_name(table, name):
