@@ -1116,7 +1116,16 @@ class PokedexController(BaseController):
 
     def moves(self, name):
         try:
-            c.move = db.get_by_name(Move, name)
+            c.move = db.get_by_name_query(Move, name) \
+                .options(
+                    eagerload('damage_class'),
+                    eagerload('type.damage_efficacies'),
+                    eagerload('type.damage_efficacies.target_type'),
+                    eagerload('move_effect'),
+                    eagerload('contest_effect'),
+                    eagerload('super_contest_effect'),
+                ) \
+                .one()
         except NoResultFound:
             return self._not_found()
 
@@ -1127,6 +1136,13 @@ class PokedexController(BaseController):
         c.next_move = pokedex_session.query(Move).get(
             (c.move.id - 1 + 1) % max_id + 1)
 
+        return self.cache_content(
+            key=name,
+            template='/pokedex/move.mako',
+            do_work=self._do_moves,
+        )
+
+    def _do_moves(self, name):
         ### Type efficacy
         c.type_efficacies = {}
         for type_efficacy in c.move.type.damage_efficacies:
@@ -1188,10 +1204,20 @@ class PokedexController(BaseController):
         #     ( method, [ (pokemon, { version_group => data, ... }), ... ] )
         pokemon_methods = defaultdict(list)
         q = pokedex_session.query(PokemonMove) \
-                           .filter_by(move_id=c.move.id) \
-                           .order_by(PokemonMove.level.asc(),
-                                     PokemonMove.order.asc(),
-                                     PokemonMove.version_group_id.asc())
+            .options(
+                eagerload_all('version_group'),
+                eagerload_all('pokemon'),
+
+                # Pokémon table trappings
+                eagerload_all('pokemon.abilities'),
+                eagerload_all('pokemon.egg_groups'),
+                eagerload_all('pokemon.types'),
+                eagerload('pokemon.stats.stat'),
+            ) \
+            .filter_by(move=c.move) \
+            .order_by(PokemonMove.level.asc(),
+                      PokemonMove.order.asc(),
+                      PokemonMove.version_group_id.asc())
         for pokemon_move in q:
             method_list = pokemon_methods[pokemon_move.method]
             this_vg = pokemon_move.version_group
@@ -1242,7 +1268,7 @@ class PokedexController(BaseController):
         # Grab list of all the version groups with tutor moves
         c.move_tutor_version_groups = _move_tutor_version_groups(c.pokemon)
 
-        return render('/pokedex/move.mako')
+        return
 
 
     def types(self, name):

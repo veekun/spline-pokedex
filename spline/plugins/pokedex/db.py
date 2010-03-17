@@ -16,7 +16,7 @@ pokedex_session = pokedex.db.connect(pylons.config['pokedex_db_url'],
                                      engine_args={'proxy': SQLATimerProxy()})
 
 # Quick access to a few database objects
-def get_by_name(table, name):
+def get_by_name_query(table, name):
     """Finds a single row in the given table by name, ignoring case.
 
     Don't use this for Pokémon!  Use `pokemon()`, as it knows about forms.
@@ -24,7 +24,14 @@ def get_by_name(table, name):
     q = pokedex_session.query(table).filter(func.lower(table.name)
                                             == name.lower())
 
-    return q.one()
+    return q
+
+def get_by_name(table, name):
+    """Same as above, except actally performs the query, which is lame.
+
+    Use the above if at all possible.
+    """
+    return get_by_name_query(table, name).one()
 
 def pokemon_query(name, form=None):
     """Returns a query that will look for the named Pokémon."""

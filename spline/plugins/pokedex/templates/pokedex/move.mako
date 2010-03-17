@@ -1,5 +1,6 @@
 <%inherit file="/base.mako"/>
-<%namespace name="lib" file="lib.mako"/>
+<%namespace name="lib" file="/lib.mako"/>
+<%namespace name="dexlib" file="lib.mako"/>
 <%! import re %>\
 
 <%def name="title()">${c.move.name} – Move #${c.move.id}</%def>
@@ -16,6 +17,7 @@
     ${c.move.id}: ${c.move.name}
 </div>
 
+<%lib:cache_content>
 ${h.h1('Essentials')}
 
 <div class="dex-page-portrait">
@@ -251,7 +253,7 @@ ${h.h1(u'Pokémon', id='pokemon')}
 <col class="dex-col-version">
 % endif
 % endfor
-${lib.pokemon_table_columns()}
+${dexlib.pokemon_table_columns()}
 ## HEADERS
 % for method, method_list in c.pokemon:
 <%
@@ -259,9 +261,9 @@ ${lib.pokemon_table_columns()}
 %>\
 <tr class="header-row" id="${method_id}">
     % for column in c.pokemon_columns:
-    ${lib.pokemon_move_table_column_header(column)}
+    ${dexlib.pokemon_move_table_column_header(column)}
     % endfor
-    ${lib.pokemon_table_header()}
+    ${dexlib.pokemon_table_header()}
 </tr>
 <tr class="subheader-row">
     <th colspan="${len(c.pokemon_columns) + 12}"><a href="#${method_id}" class="subtle"><strong>${method.name}</a></strong>: ${method.description}</th>
@@ -270,9 +272,9 @@ ${lib.pokemon_table_columns()}
 % for pokemon, version_group_data in method_list:
 <tr>
     % for column in c.pokemon_columns:
-    ${lib.pokemon_move_table_method_cell(column, method, version_group_data)}
+    ${dexlib.pokemon_move_table_method_cell(column, method, version_group_data)}
     % endfor
-    ${lib.pokemon_table_row(pokemon)}
+    ${dexlib.pokemon_table_row(pokemon)}
 </tr>
 % endfor
 % endfor
@@ -289,3 +291,4 @@ ${h.h1('External Links', id='links')}
 <li><a href="http://www.serebii.net/attackdex-dp/${c.move.name.lower().replace(' ', '')}.shtml">Serebii</a></li>
 <li><a href="http://www.smogon.com/dp/moves/${c.move.name.lower().replace(' ', '_')}">Smogon</a></li>
 </ul>
+</%lib:cache_content>
