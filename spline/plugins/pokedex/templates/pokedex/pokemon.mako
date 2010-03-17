@@ -1,5 +1,6 @@
 <%inherit file="/base.mako"/>
-<%namespace name="lib" file="lib.mako"/>
+<%namespace name="lib" file="/lib.mako"/>
+<%namespace name="dexlib" file="lib.mako"/>
 <%! from spline.plugins.pokedex import db %>\
 <%! import re %>\
 
@@ -10,9 +11,10 @@ ${c.pokemon.forme_name.capitalize()} \
 ${c.pokemon.name} – Pokémon #${c.pokemon.national_id}\
 </%def>
 
-${lib.pokemon_page_header()}
+${dexlib.pokemon_page_header()}
 
 
+<%lib:cache_content>
 ${h.h1('Essentials')}
 
 ## Portrait block
@@ -492,7 +494,7 @@ ${h.h1('Moves')}
 %>\
 <tr class="header-row" id="${method_id}">
     % for column in c.move_columns:
-    ${lib.pokemon_move_table_column_header(column)}
+    ${dexlib.pokemon_move_table_column_header(column)}
     % endfor
     <th>Move</th>
     <th>Type</th>
@@ -514,7 +516,7 @@ ${h.h1('Moves')}
 <tr>
 % endif
     % for column in c.move_columns:
-    ${lib.pokemon_move_table_method_cell(column, method, version_group_data)}
+    ${dexlib.pokemon_move_table_method_cell(column, method, version_group_data)}
     % endfor
 
     <td><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></td>
@@ -590,3 +592,4 @@ ${h.h1('External Links', id='links')}
 <li><a href="http://www.serebii.net/pokedex-dp/${"%03d" % c.pokemon.national_id}.shtml">Serebii</a></li>
 <li><a href="http://www.smogon.com/dp/pokemon/${smogon_name}">Smogon</a></li>
 </ul>
+</%lib:cache_content>

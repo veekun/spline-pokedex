@@ -433,6 +433,14 @@ class PokedexController(BaseController):
         ### Previous and next for the header
         c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
 
+        # Let's cache this bitch
+        return self.cache_content(
+            key=(name, form),
+            template='/pokedex/pokemon.mako',
+            do_work=self._do_pokemon,
+        )
+
+    def _do_pokemon(self, (name, form)):
         ### Type efficacy
         c.type_efficacies = defaultdict(lambda: 100)
         for target_type in c.pokemon.types:
@@ -905,7 +913,7 @@ class PokedexController(BaseController):
         # Grab list of all the version groups with tutor moves
         c.move_tutor_version_groups = _move_tutor_version_groups(c.moves)
 
-        return render('/pokedex/pokemon.mako')
+        return
 
 
     def pokemon_flavor(self, name=None):
