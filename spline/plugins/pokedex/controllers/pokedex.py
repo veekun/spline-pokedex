@@ -15,7 +15,7 @@ from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
 from pylons.decorators import jsonify
 from sqlalchemy import and_, or_, not_
-from sqlalchemy.orm import aliased, join
+from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func
 
@@ -400,7 +400,30 @@ class PokedexController(BaseController):
     def pokemon(self, name=None):
         form = request.params.get('form', None)
         try:
-            c.pokemon = db.pokemon(name, form=form)
+            pokemon_q = db.pokemon_query(name, form=form)
+
+            # Need to eagerload some, uh, little stuff
+            pokemon_q = pokemon_q.options(
+                eagerload('evolution_chain.pokemon'),
+                eagerload('evolution_chain.pokemon.evolution_method'),
+                eagerload('evolution_chain.pokemon.evolution_parent'),
+                eagerload('generation'),
+                eagerload('items.item'),
+                eagerload('items.version'),
+                eagerload('pokemon_color'),
+                eagerload('pokemon_habitat'),
+                eagerload('shape'),
+                eagerload('stats.stat'),
+                eagerload('types.target_efficacies'),
+                eagerload('types.target_efficacies.damage_type'),
+
+                # XXX SQLAlchemy totally barfs if I try to eagerload things
+                # that are only on the normal_form.  No idea why.  This
+                # includes: dex_numbers, foreign_names, flavor_text
+            )
+
+            # Alright, execute
+            c.pokemon = pokemon_q.one()
         except NoResultFound:
             return self._not_found()
 
@@ -476,8 +499,11 @@ class PokedexController(BaseController):
         # In the case of all versions within a generation being merged, the
         # key is None instead of a tuple of version objects.
         c.held_items = {}
-        generations = [db.generation(gen) for gen in (3, 4)
-                       if gen >= c.pokemon.generation.id]
+        generations = pokedex_session.query(tables.Generation) \
+            .options( eagerload('versions') ) \
+            .filter(tables.Generation.id >= 3) \
+            .filter(tables.Generation.id >= c.pokemon.generation.id) \
+            .all()
         version_held_items = {}  # version => [ (item, rarity), ... ]
 
         for generation in generations:
@@ -614,6 +640,7 @@ class PokedexController(BaseController):
             c.evolution_table.append(current_path)
 
         ### Stats
+        # This takes a lot of queries  :(
         c.stats = {}  # stat_name => { border, background, percentile }
                       #              (also 'value' for total)
         stat_total = 0
@@ -697,7 +724,15 @@ class PokedexController(BaseController):
             )
         )
 
-        for encounter in c.pokemon.encounters:
+        q = pokedex_session.query(tables.Encounter) \
+            .filter_by(pokemon=c.pokemon) \
+            .options(
+                eagerload_all('condition_value_map.condition_value'),
+                eagerload_all('version'),
+                eagerload_all('slot.terrain'),
+                eagerload_all('location_area.location'),
+            )
+        for encounter in q:
             condition_values = [cv for cv in encounter.condition_values
                                    if not cv.is_default]
             c.locations[encounter.version] \
@@ -748,6 +783,13 @@ class PokedexController(BaseController):
         q = pokedex_session.query(PokemonMove) \
                            .filter_by(pokemon_id=c.pokemon.id) \
                            .outerjoin((Machine, PokemonMove.machine)) \
+                           .options(
+                                contains_eager(PokemonMove.machine),
+                                eagerload_all('move.damage_class'),
+                                eagerload_all('move.move_effect'),
+                                eagerload_all('move.type'),
+                                eagerload_all('version_group'),
+                            ) \
                            .order_by(PokemonMove.level.asc(),
                                      Machine.machine_number.asc(),
                                      PokemonMove.order.asc(),

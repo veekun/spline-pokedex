@@ -26,7 +26,9 @@ def get_by_name(table, name):
 
     return q.one()
 
-def pokemon(name, form=None):
+def pokemon_query(name, form=None):
+    """Returns a query that will look for the named Pokémon."""
+
     # Force case-insensitive matching the heavy-handed way
     q = pokedex_session.query(tables.Pokemon) \
                        .filter(func.lower(tables.Pokemon.name) == name.lower())
@@ -42,8 +44,13 @@ def pokemon(name, form=None):
         # Pokémon, whether or not it has a name
         q = q.filter_by(forme_base_pokemon_id=None)
 
+    return q
+
+def pokemon(name, form=None):
+    # TODO: make this go away
+
     # If this raises because the data is bogus, it's the caller's fault
-    return q.one()
+    return pokemon_query(name, form).one()
 
 def generation(id):
     return pokedex_session.query(tables.Generation).get(id)
