@@ -444,7 +444,7 @@ ${h.h1('Flavor')}
 
 ${h.h1('Locations')}
 <ul class="see-also">
-<li> <img src="${h.static_uri('spline', 'icons/overlay/map--arrow.png')}" alt="See also:"> <a href="${url.current(action='pokemon_locations')}">Ridiculously detailed breakdown</a> </li>
+<li> <img src="${h.static_uri('spline', 'icons/map--arrow.png')}" alt="See also:"> <a href="${url.current(action='pokemon_locations')}">Ridiculously detailed breakdown</a> </li>
 </ul>
 
 <dl class="dex-simple-encounters">

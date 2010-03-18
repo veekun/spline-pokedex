@@ -472,7 +472,7 @@ pokedex.pokemon_moves = {
         $td.unbind('click', pokedex.pokemon_moves.sort_rows);
         $td.click(pokedex.pokemon_moves.unsort);
         $img.attr({
-            'src':   '/static/spline/icons/overlay/sort--minus.png',
+            'src':   '/static/spline/icons/sort--minus.png',
             'alt':   'Unsort',
             'title': 'Unsort'
         });
