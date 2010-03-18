@@ -22,7 +22,7 @@ from sqlalchemy.sql import func
 from spline import model
 from spline.model import meta
 from spline.lib.base import BaseController, render
-from spline.lib import helpers
+from spline.lib import helpers as h
 
 from spline.plugins.pokedex import db, helpers as pokedex_helpers
 from spline.plugins.pokedex.db import pokedex_session
@@ -292,8 +292,9 @@ class PokedexController(BaseController):
             if not results[0].exact:
                 # Wasn't an exact match, but we can only figure out one thing
                 # the user might have meant, so redirect to it anyway
-                # XXX add an informative message here
-                pass
+                h.flash(u"""Nothing in the Pokédex is exactly called "{0}".  """
+                        u"""This is the only close match.""".format(name),
+                        icon='spell-check-error')
 
             # Using the table name as an action directly looks kinda gross, but
             # I can't think of anywhere I've ever broken this convention, and
@@ -370,7 +371,7 @@ class PokedexController(BaseController):
             # Give a country icon so JavaScript doesn't have to hardcore Spline
             # paths.  Don't *think* we need to give the long language name...
             meta['language'] = suggestion.iso3166
-            meta['language_icon'] = helpers.static_uri(
+            meta['language_icon'] = h.static_uri(
                 'spline',
                 'flags/{0}.png'.format(suggestion.iso3166)
             )
