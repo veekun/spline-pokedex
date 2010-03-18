@@ -340,7 +340,10 @@ class PokedexController(BaseController):
         if not prefix:
             return []
 
-        suggestions = pokedex.lookup.prefix_lookup(prefix)
+        suggestions = pokedex.lookup.prefix_lookup(
+            prefix,
+            session=pokedex_session,
+        )
 
         names = []     # actual terms that will appear in the list
         metadata = []  # parallel array of metadata my suggest widget uses
