@@ -3,6 +3,7 @@ var pokedex_suggestions = {
     'previous_input':   "",    // don't double request the same string
     '$lookup_element':  null,  // where the dropdown box is right now
     'request':          null,  // ajax request, for canceling
+    'page_height':      8,     // number of elements pgup/pgdn should scroll
 
     // Use a wrapper to set a small delay on the ajax request; otherwise we'll
     // ping the server after every keypress, even if the user wasn't finished
@@ -130,7 +131,7 @@ var pokedex_suggestions = {
         pokedex_suggestions.$lookup_element = $lookup;
 
         // If a letter was pressed it should be handled normally
-        if (e.keyCode == 32 || e.keyCode >= 48)
+        if (e.keyCode == KeyEvent.DOM_VK_SPACE || e.keyCode >= KeyEvent.DOM_VK_0)
             return;
 
         var $suggest_box = $('#dex-suggestions');
@@ -143,13 +144,22 @@ var pokedex_suggestions = {
             pokedex_suggestions.move_results();
         }
 
+
+        // Number of lines to scroll in the case of up/down/pgup/pgdn
+        var lines = (e.keyCode == KeyEvent.DOM_VK_PAGE_DOWN ||
+                     e.keyCode == KeyEvent.DOM_VK_PAGE_UP)
+                  ? pokedex_suggestions.page_height
+                  : 1;
+
         // Handle keypress
-        if (e.keyCode == 27) {  // esc
+        if (e.keyCode == KeyEvent.DOM_VK_ESCAPE) {
             pokedex_suggestions.hide();
         }
-        // These two cases are used for moving the selection highlight up
+        // These four cases are used for moving the selection highlight up
         // and down the fake listbox
-        else if (e.keyCode == 38) {  // up
+        else if (e.keyCode == KeyEvent.DOM_VK_UP
+              || e.keyCode == KeyEvent.DOM_VK_PAGE_UP)
+        {
             // If the suggestion list isn't visible, show it
             if ($suggest_box.css('visibility') == "hidden") {
                 $suggest_box.css('visibility', 'visible');
@@ -157,9 +167,15 @@ var pokedex_suggestions = {
             }
 
             // Select the previous suggestion, defaulting to the last
-            var $prev;
+            var $prev = $selected;
             if ($selected.length) {
-                $prev = $selected.prev();
+                for (var i = 0; i < lines; i++) {
+                    $prev = $prev.prev();
+                }
+
+                // Don't jump from second into the void
+                if (! $prev.length && ! $selected.is(':first-child'))
+                    $prev = $suggest_box.children(':first-child');
             }
             else {
                 $prev = $suggest_box.children(':last-child');
@@ -174,7 +190,9 @@ var pokedex_suggestions = {
                 e.preventDefault();
             }
         }
-        else if (e.keyCode == 40) {  // down
+        else if (e.keyCode == KeyEvent.DOM_VK_DOWN
+              || e.keyCode == KeyEvent.DOM_VK_PAGE_DOWN)
+        {
             // If the suggestion list isn't visible, show it
             if ($suggest_box.css('visibility') == "hidden") {
                 $suggest_box.css('visibility', 'visible');
@@ -182,9 +200,15 @@ var pokedex_suggestions = {
             }
 
             // Select the next suggestion, defaulting to the first
-            var $next;
+            var $next = $selected;
             if ($selected.length) {
-                $next = $selected.next();
+                for (var i = 0; i < lines; i++) {
+                    $next = $next.next();
+                }
+
+                // Don't jump from second-to-last into the void
+                if (! $next.length && ! $selected.is(':last-child'))
+                    $next = $suggest_box.children(':last-child');
             }
             else {
                 $next = $suggest_box.children(':first-child');
@@ -200,7 +224,7 @@ var pokedex_suggestions = {
             }
         }
         // Select the highlighted entry if there be one, otherwise submit
-        else if (e.keyCode == 13) {  // enter
+        else if (e.keyCode == KeyEvent.DOM_VK_ENTER) {  // enter
             // If the suggestion list isn't visible, do nothing special
             if ($suggest_box.css('visibility') == "hidden"
                 || ! $selected.length)
