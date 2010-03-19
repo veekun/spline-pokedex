@@ -1,6 +1,13 @@
 <%inherit file="/base.mako" />
 <%def name="title()">Pokédex Introduction</%def>
 
+<form id="big-pokedex-lookup" method="GET" action="${url(controller='dex', action='lookup')}">
+<p>
+    <input type="text" name="lookup" class="dex-lookup js-dex-suggest"/>
+    <input type="submit" value="Look up"/>
+</p>
+</form>
+
 ${h.h1('Introduction')}
 <img style="float: right;"
      src="${h.static_uri('local', 'images/engiveer.png')}"
@@ -13,6 +20,7 @@ ${h.h1('Introduction')}
 
 
 ${h.h1('Finding Stuff')}
+
 <p>You can look up Pokémon, moves, types, abilities, and items in the Pokédex.  Just type what you want to see, and it'll figure it out from there.</p>
 
 <h2>Specifics</h2>

@@ -169,6 +169,11 @@ th { vertical-align: middle; }
 .dex-effect a { font-weight: normal; }
 
 
+/* Static page stuff */
+#big-pokedex-lookup { font-size: 2em; text-align: center; }
+#big-pokedex-lookup input { font-size: 1em; }
+
+
 #dex-cheat-unlocked { overflow: hidden /* float containment */; width: 60%; margin: auto; margin-top: 10em; }
 #dex-cheat-unlocked .dex-cheat-unlocked-left { float: left; }
 #dex-cheat-unlocked .dex-cheat-unlocked-right { float: right; }
