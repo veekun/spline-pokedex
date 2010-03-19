@@ -124,14 +124,13 @@ var pokedex_suggestions = {
 
     // Handle keypresses in a suggest box.  Used to detect navigation keys and
     // move the selection within the menu as appropriate
-    'keypress': function(e) {
+    'keydown': function(e) {
         var $lookup = $(e.target);
         var $previous_element = pokedex_suggestions.$lookup_element;
         pokedex_suggestions.$lookup_element = $lookup;
 
-        // charCode means a letter was pressed, in which case it should be
-        // handled normally
-        if (e.charCode)
+        // If a letter was pressed it should be handled normally
+        if (e.keyCode == 32 || e.keyCode >= 48)
             return;
 
         var $suggest_box = $('#dex-suggestions');
@@ -270,7 +269,7 @@ $(document).ready(function() {
     $(".js-dex-suggest")
         .attr("autocomplete", "off")
         .keyup(pokedex_suggestions.change_wrapper)
-        .keypress(pokedex_suggestions.keypress)
+        .keydown(pokedex_suggestions.keydown)
         .blur(function(){ window.setTimeout(pokedex_suggestions.hide, 100) });
 
     $(document).resize(pokedex_suggestions.move_results);
