@@ -5,7 +5,7 @@ import logging
 import re
 
 from wtforms import Form, ValidationError, fields, widgets
-from wtforms.ext.sqlalchemy.fields import QuerySelectField, QueryCheckboxMultipleSelectField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField, QueryTextField, QueryCheckboxMultipleSelectField
 
 import pokedex.db.tables as tables
 from pylons import config, request, response, session, tmpl_context as c, url
@@ -20,104 +20,6 @@ from spline.plugins.pokedex.db import pokedex_session
 
 log = logging.getLogger(__name__)
 
-class QueryTextField(fields.TextField):
-    """Represents a database object entered in a freeform text field.
-
-    Works similarly to QuerySelectField.  `query_factory` is still expected to
-    return a query, but it takes a single argument: the incoming form value.
-    `label_attr` is used to set the rendered field's value.
-    """
-    def __init__(self, label, query_factory, label_attr, *args, **kwargs):
-        super(fields.TextField, self).__init__(label, *args, **kwargs)
-        self.query_factory = query_factory
-        self.label_attr = label_attr
-
-    def process_formdata(self, valuelist):
-        """Processes and loads the form value."""
-        # Default of None
-        if not valuelist or valuelist[0] == '':
-            self.data = None
-            return
-
-        try:
-            row = self.query_factory(valuelist[0]).one()
-        except NoResultFound:
-            raise ValidationError("No such {0}".format(self.label.text.lower()))
-
-        if row:
-            self.data = row
-            return
-
-    def _value(self):
-        """Converts Python value back to a form value."""
-        if self.data is None:
-            return u''
-        else:
-            return getattr(self.data, self.label_attr)
-
-# XXX clean this up a bit and propose it for inclusion?
-class DuplicateField(fields.Field):
-    """Wraps a field that must be rendered several times.  Similar to
-    FieldList, except the fields are identical -- names are unchanged."""
-    widget = widgets.ListWidget()
-
-    def __init__(self, field, count=1, default=[], **kwargs):
-        # XXX uhhh no.
-        label = field.args[0]
-
-        super(DuplicateField, self).__init__(label, default=default, **kwargs)
-
-        self.inner_field = field
-        self.count = count
-        self._prefix = kwargs.get('_prefix', '')
-
-    def process(self, formdata, data=None):
-        # XXX handle data somehow?  it's a default I guess?
-
-        # Grab data from the incoming form
-        if self.name in formdata:
-            valuelist = formdata.getlist(self.name)
-        else:
-            valuelist = []
-
-        # Create the subfields
-        self.subfields = []
-        self.data = []
-
-        for i in range(self.count):
-            subfield = self.inner_field.bind(form=None, name=self.short_name, prefix=self._prefix, id="{0}-{1}".format(self.id, i))
-
-            if i < len(valuelist):
-                subfield.process_formdata([ valuelist[i] ])
-            else:
-                # nb: do NOT let subfield read the formdata.  subfields want to
-                # see only their own values, and formdata contains values for
-                # everyone
-                subfield.process({})
-
-            if subfield.data != subfield._default:
-                self.data.append(subfield.data)
-
-            self.subfields.append(subfield)
-
-    def validate(self, form, extra_validators=[]):
-        self.errors = []
-        success = True
-        for subfield in self.subfields:
-            if not subfield.validate(form):
-                success = False
-                self.errors.append(subfield.errors)
-        return success
-
-    def __iter__(self):
-        return iter(self.subfields)
-
-    def __len__(self):
-        return len(self.subfields)
-
-    def __getitem__(self, index):
-        return self.subfields[index]
-
 class PokemonSearchForm(Form):
     # Defaults are set to match what the client will actually send if the field
     # is left blank
@@ -130,6 +32,7 @@ class PokemonSearchForm(Form):
             lambda value: pokedex_session.query(tables.Ability)
                 .filter( func.lower(tables.Ability.name) == value.lower() ),
         label_attr='name',
+        allow_blank=True,
     )
 
     # Type
@@ -179,14 +82,15 @@ class PokemonSearchForm(Form):
         choices=[ ('any', 'any of'), ('all', 'all of') ],
         default='all',
     )
-    egg_group = DuplicateField(
+    egg_group = fields.DuplicateField(
         QuerySelectField(
             'Egg group',
             query_factory=lambda: pokedex_session.query(tables.EggGroup),
             label_attr='name',
             allow_blank=True,
         ),
-        count=2,
+        min_entries=2,
+        max_entries=2,
     )
 
     # Evolution
