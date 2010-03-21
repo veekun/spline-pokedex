@@ -1,15 +1,8 @@
 <%inherit file="/base.mako"/>
-<%namespace name="lib" file="/pokedex/lib.mako"/>
+<%namespace name="lib" file="/lib.mako"/>
+<%namespace name="dexlib" file="/pokedex/lib.mako"/>
 
 <%def name="title()">Pokémon Search</%def>
-
-<%def name="field(name)">
-    <dt>${c.form[name].label() | n}</dt>
-    <dd>${c.form[name]() | n}</dd>
-    % for error in c.form[name].errors:
-    <dd class="error">${error}</dd>
-    % endfor
-</%def>
 
 
 ${h.form(url.current(), method='GET')}
@@ -17,10 +10,10 @@ ${h.form(url.current(), method='GET')}
 
 <h2>Essentials and flavor</h2>
 <dl class="standard-form">
-    ${field('name')}
-    ${field('ability')}
-    ${field('color')}
-    ${field('habitat')}
+    ${lib.field('name')}
+    ${lib.field('ability')}
+    ${lib.field('color')}
+    ${lib.field('habitat')}
     <dt>${c.form.gender_rate.label() | n}</dt>
     <dd>${c.form.gender_rate_operator() | n} ${c.form.gender_rate() | n}</dd>
     <dt>${c.form.egg_group.label() | n}</dt>
@@ -55,17 +48,17 @@ ${h.form(url.current(), method='GET')}
 <div class="dex-column-container">
 <div class="dex-column">
     <dl class="standard-form">
-        ${field('evolution_stage')}
+        ${lib.field('evolution_stage')}
     </dl>
 </div>
 <div class="dex-column">
     <dl class="standard-form">
-        ${field('evolution_position')}
+        ${lib.field('evolution_position')}
     </dl>
 </div>
 <div class="dex-column">
     <dl class="standard-form">
-        ${field('evolution_special')}
+        ${lib.field('evolution_special')}
     </dl>
 </div>
 </div>
@@ -84,13 +77,13 @@ ${h.end_form()}
 
 ## Generic Pokémon table, for now.  Cooler stuff later
 <table class="dex-pokemon-moves striped-rows">
-${lib.pokemon_table_columns()}
+${dexlib.pokemon_table_columns()}
 <tr class="header-row">
-    ${lib.pokemon_table_header()}
+    ${dexlib.pokemon_table_header()}
 </tr>
 % for result in c.results:
 <tr>
-    ${lib.pokemon_table_row(result)}
+    ${dexlib.pokemon_table_row(result)}
 </tr>
 % endfor
 </table>
