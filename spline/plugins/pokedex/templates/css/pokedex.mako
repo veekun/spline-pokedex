@@ -153,6 +153,13 @@ table.dex-pokemon-moves tr:nth-child(2n+1) td.js-sorted-by { background: #f6f4ea
 table.dex-pokemon-moves tr:nth-child(2n) td.better-move-reason { background: #afcfaf; }
 table.dex-pokemon-moves tr:nth-child(2n+1) td.better-move-reason { background: #c0d8c0; }
 
+table.dex-capture-rates td { vertical-align: middle; }
+table.dex-capture-rates th.item { text-align: left; }
+table.dex-capture-rates td.chance { text-align: right; }
+table.dex-capture-rates td.condition { font-size: 0.8em; font-style: italic; }
+table.dex-capture-rates td.expected-attempts { text-align: right; }
+table.dex-capture-rates tr.inactive td { color: #909090; }
+
 .dex-pokemon-flavor-generation { position: absolute; line-height: 1.5; }
 dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation { padding-top: 1.5em; }
 dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation + dl.dex-pokemon-flavor-text { padding-top: 1.5em; }

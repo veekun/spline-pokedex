@@ -13,6 +13,7 @@ import pokedex.db.tables as tables
 import pokedex.lookup
 import spline.plugins.pokedex.controllers.pokedex
 import spline.plugins.pokedex.controllers.pokedex_search
+import spline.plugins.pokedex.controllers.pokedex_tools
 from spline.plugins.pokedex import helpers as pokedex_helpers
 from spline.plugins.pokedex.db import get_by_name, pokedex_session
 import spline.lib.helpers as h
@@ -35,6 +36,8 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/dex/pokemon/{name}/flavor', controller='dex', action='pokemon_flavor')
     map.connect('/dex/pokemon/{name}/locations', controller='dex', action='pokemon_locations')
     map.connect('/dex/types/{name}', controller='dex', action='types')
+
+    map.connect('/dex/tools/capture', controller='dex_tools', action='capture_rate')
 
 def get_role(table):
     """Need a separate function here to avoid problems with generating closures
@@ -92,6 +95,7 @@ class PokedexPlugin(PluginBase):
         return {
             'dex': controllers.pokedex.PokedexController,
             'dex_search': controllers.pokedex_search.PokedexSearchController,
+            'dex_tools': controllers.pokedex_tools.PokedexToolsController,
         }
 
     def template_dirs(self):
@@ -116,6 +120,7 @@ class PokedexPlugin(PluginBase):
         return [
             PluginLink(u'Pokédex', url('/dex'), children=[
                 PluginLink(u'Pokémon search', url(controller='dex_search', action='pokemon_search')),
+                PluginLink(u'Pokéball performance', url(controller='dex_tools', action='capture_rate')),
             ]),
         ]
 
