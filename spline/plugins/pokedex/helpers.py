@@ -160,9 +160,14 @@ def type_link(type):
 
 def item_link(item):
     """Returns a link to the requested item."""
-    filename = filename_from_name(item.name)
+    if isinstance(item, basestring):
+        item_name = item
+    else:
+        item_name = item.name
+
+    filename = filename_from_name(item_name)
     return pokedex_img("items/%s.png" % filename,
-                       alt=item.name, title=item.name) + item.name
+                       alt=item_name, title=item_name) + item_name
 
 
 # Type efficacy, from percents to Unicode fractions
