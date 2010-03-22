@@ -127,7 +127,7 @@ def expected_attempts_oh_no(partitions):
 CaptureChance = namedtuple('CaptureChance', ['condition', 'is_active', 'chances'])
 
 
-class PokedexToolsController(BaseController):
+class PokedexGadgetsController(BaseController):
 
     def capture_rate(self):
         """Find a page in the Pokédex given a name.
@@ -364,4 +364,4 @@ class PokedexToolsController(BaseController):
         else:
             c.results = None
 
-        return render('/pokedex/tools/capture_rate.mako')
+        return render('/pokedex/gadgets/capture_rate.mako')
