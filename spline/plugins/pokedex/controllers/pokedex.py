@@ -354,9 +354,9 @@ class PokedexController(BaseController):
             elif isinstance(row, Move):
                 image = u"chrome/types/{0}.png".format(row.type.name)
             elif isinstance(row, Type):
-                path = u"chrome/types/{0}.png".format(row.name)
+                image = u"chrome/types/{0}.png".format(row.name)
             elif isinstance(row, Item):
-                path = u"items/{0}.png".format(
+                image = u"items/{0}.png".format(
                     pokedex_helpers.filename_from_name(row.name))
 
             if image:
