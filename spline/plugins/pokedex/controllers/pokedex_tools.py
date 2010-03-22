@@ -1,6 +1,7 @@
 # encoding: utf8
 from __future__ import absolute_import, division
 
+from collections import namedtuple
 import logging
 
 from wtforms import Form, ValidationError, fields, validators
@@ -28,6 +29,7 @@ from spline.plugins.pokedex.db import pokedex_session
 log = logging.getLogger(__name__)
 
 
+### Capture rate ("Pokéball performance") stuff
 class CaptureRateForm(Form):
     pokemon = QueryTextField(u'Wild Pokémon',
         query_factory=lambda value: db.pokemon_query(value),
@@ -60,12 +62,12 @@ class CaptureRateForm(Form):
         ],
         default='land',
     )
-    opposite_gender = fields.BooleanField(u'Opposite genders')
-    caught_before = fields.BooleanField(u'Have caught before')
-    is_dark = fields.BooleanField(u'Nighttime')
+    opposite_gender = fields.BooleanField(u'Wild and your Pokémon are opposite genders')
+    caught_before = fields.BooleanField(u'Wild Pokémon is in your Pokédex')
+    is_dark = fields.BooleanField(u'Nighttime or walking in a cave')
 
     # ...
-    is_pokemon_master = fields.BooleanField(u'Held Up+B')
+    is_pokemon_master = fields.BooleanField(u'Holding Up+B')
 
 
 def expected_attempts(catch_chance):
@@ -80,7 +82,7 @@ def expected_attempts_oh_no(partitions):
 
     Now there are a few finite partitions at the beginning.  `partitions` looks
     like:
-    
+
         [
             (catch_chance, number_of_turns),
             (catch_chance, number_of_turns),
@@ -117,10 +119,12 @@ def expected_attempts_oh_no(partitions):
 
     # The rest of infinity is covered by the usual expected-value formula with
     # the final catch chance, but factoring in the probability that the Pokémon
-    # is still uncaught
-    expected_attempts += p_got_here * 1 / catch_chance
+    # is still uncaught, and that we're starting our count late
+    expected_attempts += p_got_here * (1 / catch_chance + turn - 1)
 
     return expected_attempts
+
+CaptureChance = namedtuple('CaptureChance', ['condition', 'is_active', 'chances'])
 
 
 class PokedexToolsController(BaseController):
@@ -176,7 +180,7 @@ class PokedexToolsController(BaseController):
             # - chances: an iterable of chances as returned from capture_chance
 
             # This is a teeny shortcut.
-            only = lambda _: [( '', True, _ )]
+            only = lambda _: [CaptureChance( '', True, _ )]
 
             # Gen I
             c.results[u'Poké Ball']   = only(capture_chance(1))
@@ -191,7 +195,7 @@ class PokedexToolsController(BaseController):
                 # -1 because equality counts as bucket zero
                 relative_level = (c.form.your_level.data - 1) \
                                // c.form.level.data
-            
+
             # Heavy Ball partitions by 100kg / 200kg / 300kg.  Weights are
             # stored as...  hectograms.  So.
             weight_class = int((c.pokemon.weight - 1) / 1000)
@@ -207,62 +211,63 @@ class PokedexToolsController(BaseController):
             )
 
             c.results[u'Level Ball']  = [
-                (u'Your level <= target level',
+                CaptureChance(u'Your level ≤ target level',
                     relative_level == 0,
                     capture_chance(1)),
-                (u'Target level < your level <= 2 * target level',
+                CaptureChance(u'Target level < your level ≤ 2 * target level',
                     relative_level == 1,
                     capture_chance(2)),
-                (u'2 * target level < your level <= 4 * target level',
+                CaptureChance(u'2 * target level < your level ≤ 4 * target level',
                     relative_level in (2, 3),
                     capture_chance(4)),
-                (u'4 * target level < your level',
+                CaptureChance(u'4 * target level < your level',
                     relative_level >= 4,
                     capture_chance(8)),
             ]
             c.results[u'Lure Ball']   = [
-                (u'Hooked on a rod',
+                CaptureChance(u'Hooked on a rod',
                     c.form.terrain.data == 'fishing',
                     capture_chance(3)),
-                (u'Otherwise',
+                CaptureChance(u'Otherwise',
                     c.form.terrain.data != 'fishing',
                     capture_chance(1)),
             ]
             c.results[u'Moon Ball']   = [
-                (u'Target evolves with a Moon Stone',
+                CaptureChance(u'Target evolves with a Moon Stone',
                     is_moony,
                     capture_chance(4)),
-                (u'Otherwise',
+                CaptureChance(u'Otherwise',
                     not is_moony,
                     capture_chance(1)),
             ]
+            c.results[u'Friend Ball'] = only(capture_chance(1))
             c.results[u'Love Ball']   = [
-                (u'Target is opposite gender of your Pokémon',
+                CaptureChance(u'Target is opposite gender of your Pokémon',
                     c.form.opposite_gender.data,
                     capture_chance(8)),
-                (u'Otherwise',
+                CaptureChance(u'Otherwise',
                     not c.form.opposite_gender.data,
                     capture_chance(1)),
             ]
             c.results[u'Heavy Ball']   = [
-                (u'Target weight <= 100 kg',
+                CaptureChance(u'Target weight ≤ 100 kg',
                     weight_class == 0,
                     capture_chance(1, heavy_modifier=-30)),
-                (u'100 < target weight <= 200 kg',
+                CaptureChance(u'100 < target weight ≤ 200 kg',
                     weight_class == 1,
                     capture_chance(1, heavy_modifier=0)),
-                (u'200 < target weight <= 300 kg',
+                CaptureChance(u'200 < target weight ≤ 300 kg',
                     weight_class == 2,
                     capture_chance(1, heavy_modifier=20)),
-                (u'300 < target weight',
+                CaptureChance(u'300 < target weight',
                     weight_class >= 3,
                     capture_chance(1, heavy_modifier=30)),
             ]
             c.results[u'Fast Ball']   = [
-                (u'Target can run from wild battles',
+                CaptureChance(u'Target can run from wild battles',
                     is_skittish,
                     capture_chance(4)),
-                (u'Otherwise',
+                CaptureChance(u'Otherwise',
                     not is_skittish,
                     capture_chance(1)),
             ]
@@ -274,51 +279,51 @@ class PokedexToolsController(BaseController):
 
             c.results[u'Premier Ball'] = only(capture_chance(1))
             c.results[u'Repeat Ball'] = [
-                (u'Target is already in Pokédex',
+                CaptureChance(u'Target is already in Pokédex',
                     c.form.caught_before.data,
                     capture_chance(3)),
-                (u'Otherwise',
+                CaptureChance(u'Otherwise',
                     not c.form.caught_before.data,
                     capture_chance(1)),
             ]
             c.results[u'Timer Ball']  = [
-                (u'Turns passed <= 10',
+                CaptureChance(u'Turns passed ≤ 10',
                     True,
                     capture_chance(1)),
-                (u'10 < turns passed <= 20',
+                CaptureChance(u'10 < turns passed ≤ 20',
                     True,
                     capture_chance(2)),
-                (u'20 < turns passed <= 30',
+                CaptureChance(u'20 < turns passed ≤ 30',
                     True,
                     capture_chance(3)),
-                (u'30 < turns passed',
+                CaptureChance(u'30 < turns passed',
                     True,
                     capture_chance(4)),
             ]
             c.results[u'Nest Ball']   = [
-                (u'Target level <= 19',
+                CaptureChance(u'Target level ≤ 19',
                     c.form.level.data <= 19,
                     capture_chance(3)),
-                (u'20 <= target level <= 29',
+                CaptureChance(u'20 ≤ target level ≤ 29',
                     (20 <= c.form.level.data and c.form.level.data <= 29),
                     capture_chance(2)),
-                (u'30 <= target level',
+                CaptureChance(u'30 ≤ target level',
                     30 <= c.form.level.data,
                     capture_chance(1)),
             ]
             c.results[u'Net Ball']   = [
-                (u'Target is Water or Bug',
+                CaptureChance(u'Target is Water or Bug',
                     is_nettable,
                     capture_chance(3)),
-                (u'Otherwise',
+                CaptureChance(u'Otherwise',
                     not is_nettable,
                     capture_chance(1)),
             ]
             c.results[u'Dive Ball']   = [
-                (u'Currently fishing or surfing',
+                CaptureChance(u'Currently fishing or surfing',
                     c.form.terrain.data in ('fishing', 'surfing'),
                     capture_chance(3.5)),
-                (u'Otherwise',
+                CaptureChance(u'Otherwise',
                     c.form.terrain.data == 'land',
                     capture_chance(1)),
             ]
@@ -327,24 +332,24 @@ class PokedexToolsController(BaseController):
             # Gen IV
             c.results[u'Heal Ball']    = only(capture_chance(1))
             c.results[u'Quick Ball']  = [
-                (u'Turns passed <= 5',
+                CaptureChance(u'Turns passed ≤ 5',
                     True,
                     capture_chance(4)),
-                (u'5 < turns passed <= 10',
+                CaptureChance(u'5 < turns passed ≤ 10',
                     True,
                     capture_chance(3)),
-                (u'10 < turns passed <= 15',
+                CaptureChance(u'10 < turns passed ≤ 15',
                     True,
                     capture_chance(2)),
-                (u'15 < turns passed',
+                CaptureChance(u'15 < turns passed',
                     True,
                     capture_chance(1)),
             ]
             c.results[u'Dusk Ball']    = [
-                (u'During the night',
+                CaptureChance(u'During the night and while walking in caves',
                     c.form.is_dark.data,
                     capture_chance(4)),
-                (u'Otherwise',
+                CaptureChance(u'Otherwise',
                     not c.form.is_dark.data,
                     capture_chance(1)),
             ]

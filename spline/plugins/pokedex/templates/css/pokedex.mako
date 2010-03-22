@@ -157,8 +157,17 @@ table.dex-capture-rates td { vertical-align: middle; }
 table.dex-capture-rates th.item { text-align: left; }
 table.dex-capture-rates td.chance { text-align: right; }
 table.dex-capture-rates td.condition { font-size: 0.8em; font-style: italic; }
-table.dex-capture-rates td.expected-attempts { text-align: right; }
+table.dex-capture-rates td.expected-attempts { text-align: right; padding-right: 1em /* title is wide; offset a bit */; }
 table.dex-capture-rates tr.inactive td { color: #909090; }
+div.dex-capture-rate-graph { display: inline-block; position: relative; width: 10em; height: 1.3em; background: #79cc66; }
+div.dex-capture-rate-graph-bar { float: left; height: 100%; }
+p.dex-capture-rate-legend span { padding: 0.25em; }
+.wobble0 { background: #cc6666; }
+.wobble1 { background: #d88c8c; }
+.wobble2 { background: #e5b2b2; }
+.wobble3 { background: #f2d9d9; }
+.wobble4 { background: #79cc66; }
+table.dex-capture-rates tr.inactive div.dex-capture-rate-graph { opacity: 0.25; }
 
 .dex-pokemon-flavor-generation { position: absolute; line-height: 1.5; }
 dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation { padding-top: 1.5em; }
