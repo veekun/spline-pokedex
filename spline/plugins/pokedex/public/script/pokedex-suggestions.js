@@ -131,7 +131,7 @@ var pokedex_suggestions = {
         pokedex_suggestions.$lookup_element = $lookup;
 
         // If a letter was pressed it should be handled normally
-        if (e.keyCode == KeyEvent.DOM_VK_SPACE || e.keyCode >= KeyEvent.DOM_VK_0)
+        if (e.keyCode == 32 || e.keyCode >= 48)  // printable
             return;
 
         var $suggest_box = $('#dex-suggestions');
@@ -146,20 +146,17 @@ var pokedex_suggestions = {
 
 
         // Number of lines to scroll in the case of up/down/pgup/pgdn
-        var lines = (e.keyCode == KeyEvent.DOM_VK_PAGE_DOWN ||
-                     e.keyCode == KeyEvent.DOM_VK_PAGE_UP)
+        var lines = (e.keyCode == 33 || e.keyCode == 34)  // pgup; pgdn
                   ? pokedex_suggestions.page_height
                   : 1;
 
         // Handle keypress
-        if (e.keyCode == KeyEvent.DOM_VK_ESCAPE) {
+        if (e.keyCode == 27) {  // esc
             pokedex_suggestions.hide();
         }
         // These four cases are used for moving the selection highlight up
         // and down the fake listbox
-        else if (e.keyCode == KeyEvent.DOM_VK_UP
-              || e.keyCode == KeyEvent.DOM_VK_PAGE_UP)
-        {
+        else if (e.keyCode == 33 || e.keyCode == 38) {  // pgup; up
             // If the suggestion list isn't visible, show it
             if ($suggest_box.css('visibility') == "hidden") {
                 $suggest_box.css('visibility', 'visible');
@@ -190,9 +187,7 @@ var pokedex_suggestions = {
                 e.preventDefault();
             }
         }
-        else if (e.keyCode == KeyEvent.DOM_VK_DOWN
-              || e.keyCode == KeyEvent.DOM_VK_PAGE_DOWN)
-        {
+        else if (e.keyCode == 34 || e.keyCode == 40) {  // pdgn; down
             // If the suggestion list isn't visible, show it
             if ($suggest_box.css('visibility') == "hidden") {
                 $suggest_box.css('visibility', 'visible');
@@ -224,7 +219,7 @@ var pokedex_suggestions = {
             }
         }
         // Select the highlighted entry if there be one, otherwise submit
-        else if (e.keyCode == KeyEvent.DOM_VK_ENTER) {  // enter
+        else if (e.keyCode == 13 || e.keyCode == 14) {  // return; enter
             // If the suggestion list isn't visible, do nothing special
             if ($suggest_box.css('visibility') == "hidden"
                 || ! $selected.length)
