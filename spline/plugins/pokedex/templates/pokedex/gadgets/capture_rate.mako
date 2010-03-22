@@ -10,7 +10,7 @@
 
 ${h.form(url.current(), method='GET')}
 <dl class="standard-form">
-    ${lib.field('pokemon', class_='js-dex-suggest')}
+    ${lib.field('pokemon')}
     ${lib.field('level', size=3)}
     ${lib.field('current_hp', size=3)}
     ${lib.field('status_ailment')}

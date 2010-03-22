@@ -25,16 +25,14 @@ from spline.lib import helpers as h
 
 from spline.plugins.pokedex import db, helpers as pokedex_helpers
 from spline.plugins.pokedex.db import pokedex_session
+from spline.plugins.pokedex.forms import PokedexLookupField
 
 log = logging.getLogger(__name__)
 
 
 ### Capture rate ("Pokéball performance") stuff
 class CaptureRateForm(Form):
-    pokemon = QueryTextField(u'Wild Pokémon',
-        query_factory=lambda value: db.pokemon_query(value),
-        label_attr='full_name',
-    )
+    pokemon = PokedexLookupField(u'Wild Pokémon', valid_type='pokemon')
     level = fields.IntegerField(u'Its level', [validators.NumberRange(min=1, max=100)])
     current_hp = fields.IntegerField(u'% HP left', [validators.NumberRange(min=1, max=100)])
     status_ailment = fields.SelectField('Status ailment',
