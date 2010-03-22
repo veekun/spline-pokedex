@@ -227,14 +227,27 @@ var pokedex_suggestions = {
                 return;
             }
 
-            // otherwise, copy selection to target box...
-            $lookup.val( $selected.text() );
+            // Otherwise, populate target lookup box...
+            $lookup.val(
+                pokedex_suggestions.get_lookup_input($selected)
+            );
 
             // ...and kill submit
             e.preventDefault();
 
             pokedex_suggestions.hide();
         }
+    },
+
+    // User clicked on one of the suggestions.  Works just like pressing Enter
+    'click_suggestion': function(e) {
+        var $target = $(e.target);
+        var $selected = $target.closest('li');
+
+        pokedex_suggestions.$lookup_element.val(
+            pokedex_suggestions.get_lookup_input($selected)
+        );
+        pokedex_suggestions.hide();
     },
 
     'scroll_into_view': function($el) {
@@ -276,12 +289,18 @@ var pokedex_suggestions = {
     'hide': function() {
         $('#dex-suggestions').css('visibility', 'hidden');
     },
+
+    // Returns appropriate input for the lookup box, given a suggestion <li>
+    'get_lookup_input': function($suggestion) {
+        return $suggestion.text();
+    },
 };
 
 // Set up dex suggestion engine
 $(document).ready(function() {
     var $suggest_box = $('<ul id="dex-suggestions"></ul>');
     $suggest_box.css('visibility', 'hidden');
+    $suggest_box.click(pokedex_suggestions.click_suggestion);
     $('body').append($suggest_box);
 
     // Attach events to all lookup boxes

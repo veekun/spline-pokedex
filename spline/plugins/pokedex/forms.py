@@ -19,7 +19,8 @@ class PokedexLookupField(fields.TextField):
 
     def __call__(self, *args, **kwargs):
         """Adds the appropriate classes to make lookup suggestions work."""
-        extra_class = 'js-dex-suggest'
+        extra_class = "js-dex-suggest js-dex-suggest-{0}" \
+                      .format(self.valid_type)
 
         if 'class_' in kwargs:
             kwargs['class_'] += ' ' + extra_class
