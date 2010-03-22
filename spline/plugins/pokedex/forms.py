@@ -3,8 +3,7 @@
 
 from wtforms import ValidationError, fields
 
-import pokedex.lookup
-from spline.plugins.pokedex.db import pokedex_session
+from spline.plugins.pokedex.db import pokedex_lookup
 
 class PokedexLookupField(fields.TextField):
     u"""Provides a lookup box for naming something in the Pokédex."""
@@ -34,10 +33,9 @@ class PokedexLookupField(fields.TextField):
         if valuelist:
             self._original_value = valuelist[0]
 
-            results = pokedex.lookup.lookup(
+            results = pokedex_lookup.lookup(
                 valuelist[0],
                 valid_types=[self.valid_type],
-                session=pokedex_session,
             )
 
             if not results:

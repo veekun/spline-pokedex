@@ -19,6 +19,7 @@ from spline.plugins.pokedex.db import get_by_name, pokedex_session
 import spline.lib.helpers as h
 from spline.lib.plugin import PluginBase, PluginLink, Priority
 
+
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
     map.connect('/dex/media/*path', controller='dex', action='media')
@@ -62,10 +63,6 @@ def get_role(table):
 
 def after_setup_hook(*args, **kwargs):
     """Hook to do some housekeeping after the app starts."""
-    config['spline.pokedex.index'] = pokedex.lookup.open_index(
-        session=pokedex_session,
-    )
-
     ### reST text roles
 
     for table in (tables.Ability, tables.Item, tables.Move, tables.Pokemon,

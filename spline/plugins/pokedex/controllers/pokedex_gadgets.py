@@ -10,7 +10,6 @@ from wtforms.ext.sqlalchemy.fields import QueryTextField
 import pokedex.db
 import pokedex.db.tables as tables
 import pokedex.formulae
-import pokedex.lookup
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
 from sqlalchemy import and_, or_, not_

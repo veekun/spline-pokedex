@@ -9,7 +9,6 @@ import mimetypes
 import pokedex.db
 import pokedex.db.tables as tables
 from pokedex.db.tables import Ability, EggGroup, Generation, Item, Language, Machine, Move, MoveFlagType, Pokemon, PokemonEggGroup, PokemonFormSprite, PokemonMove, PokemonStat, Type, VersionGroup, PokemonType
-import pokedex.lookup
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
@@ -25,7 +24,7 @@ from spline.lib.base import BaseController, render
 from spline.lib import helpers as h
 
 from spline.plugins.pokedex import db, helpers as pokedex_helpers
-from spline.plugins.pokedex.db import pokedex_session
+from spline.plugins.pokedex.db import pokedex_lookup, pokedex_session
 
 log = logging.getLogger(__name__)
 
@@ -275,11 +274,7 @@ class PokedexController(BaseController):
 
 
         ### Regular lookup
-        results = pokedex.lookup.lookup(
-            name,
-            session=pokedex_session,
-            indices=config['spline.pokedex.index'],
-        )
+        results = pokedex_lookup.lookup(name)
 
         if len(results) == 0:
             # Nothing found
@@ -340,10 +335,7 @@ class PokedexController(BaseController):
         if not prefix:
             return []
 
-        suggestions = pokedex.lookup.prefix_lookup(
-            prefix,
-            session=pokedex_session,
-        )
+        suggestions = pokedex_lookup.prefix_lookup(prefix)
 
         names = []     # actual terms that will appear in the list
         metadata = []  # parallel array of metadata my suggest widget uses

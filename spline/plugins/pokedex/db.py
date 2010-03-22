@@ -2,6 +2,8 @@
 """Small wrapper for access to the pokedex library's database."""
 from __future__ import absolute_import
 
+import os.path
+
 import pokedex.db
 from pokedex.db import tables
 import pylons
@@ -9,11 +11,23 @@ from sqlalchemy.sql import func
 
 from spline.lib.base import SQLATimerProxy
 
+
+# XXX should these really do all this connecting on import??
 # DB session for everyone to use.
 # This uses the same timer proxy as the main engine, so Pokédex queries are
 # counted towards the db time in the footer
-pokedex_session = pokedex.db.connect(pylons.config['pokedex_db_url'],
-                                     engine_args={'proxy': SQLATimerProxy()})
+pokedex_session = pokedex.db.connect(
+    pylons.config['pokedex_db_url'],
+    engine_args={'proxy': SQLATimerProxy()},
+)
+
+# Lookup object
+pokedex_lookup = pokedex.lookup.PokedexLookup(
+    # Keep our own whoosh index in the /data dir
+    directory=os.path.join(pylons.config['pylons.cache_dir'],
+                          'pokedex-index'),
+    session=pokedex_session,
+)
 
 # Quick access to a few database objects
 def get_by_name_query(table, name):
