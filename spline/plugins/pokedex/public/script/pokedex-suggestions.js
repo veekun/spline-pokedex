@@ -4,6 +4,7 @@ var pokedex_suggestions = {
     '$lookup_element':  null,  // where the dropdown box is right now
     'request':          null,  // ajax request, for canceling
     'page_height':      8,     // number of elements pgup/pgdn should scroll
+    'initialized':      false, // has initialize run?
 
     // Use a wrapper to set a small delay on the ajax request; otherwise we'll
     // ping the server after every keypress, even if the user wasn't finished
@@ -16,7 +17,8 @@ var pokedex_suggestions = {
 
         // The actual handler will also clear this timeout
         pokedex_suggestions.timeout = window.setTimeout(
-            pokedex_suggestions.change, 100, e
+            function() { pokedex_suggestions.change(e) },
+            250
         );
     },
 
@@ -25,9 +27,6 @@ var pokedex_suggestions = {
     'change': function(e) {
         // Clear double-request timeout
         pokedex_suggestions.timeout = null;
-
-        // Tab and enter aren't very useful
-        if (e.keyCode == 9 || e.keyCode == 13) return;
 
         var $suggest_box = $('#dex-suggestions');
         var el = e.target;
@@ -59,13 +58,17 @@ var pokedex_suggestions = {
         else if (pokedex_suggestions.$lookup_element.is(".js-dex-suggest-move"))
             url += ";type=move";
 
+        // Might be embedded from elsewhere...
+        if (window.__veekun_url_prefix)
+            url = window.__veekun_url_prefix + url;
+
         // Perform request, saving the request object in case we need to cancel
         // it later
         pokedex_suggestions.request = $.ajax({
             type: "GET",
             url: url,
-            dataType: "json",
-            error: function() {
+            dataType: "jsonp",
+            error: function(foo, bar, quux) {
                 pokedex_suggestions.request = null;
             },
             success: function(res) {
@@ -282,7 +285,7 @@ var pokedex_suggestions = {
         $suggest_box.css({
             'top':  (position.top + $lookup.outerHeight()) + 'px',
             'left':  position.left + 'px',
-            'width': $lookup.outerWidth() + 'px',
+            'width': $lookup.outerWidth() + 'px'
         });
     },
 
@@ -294,22 +297,30 @@ var pokedex_suggestions = {
     'get_lookup_input': function($suggestion) {
         return $suggestion.text();
     },
+
+    // Set up the whole suggestion engine
+    'initialize': function() {
+        var $suggest_box = $('<ul id="dex-suggestions"></ul>');
+        $suggest_box.css('visibility', 'hidden');
+        $suggest_box.click(pokedex_suggestions.click_suggestion);
+        $('body').append($suggest_box);
+
+        // Attach events to all lookup boxes
+        $(".js-dex-suggest")
+            .attr("autocomplete", "off")
+            .keyup(pokedex_suggestions.change_wrapper)
+            .keydown(pokedex_suggestions.keydown)
+            .blur(function(){ window.setTimeout(pokedex_suggestions.hide, 100) });
+
+        $(document).resize(pokedex_suggestions.move_results);
+        pokedex_suggestions.move_results();
+
+        pokedex_suggestions.initialized = true;
+    },
+
+
+    "IE is retarded and doesn't support trailing commas in lists": null
 };
 
-// Set up dex suggestion engine
-$(document).ready(function() {
-    var $suggest_box = $('<ul id="dex-suggestions"></ul>');
-    $suggest_box.css('visibility', 'hidden');
-    $suggest_box.click(pokedex_suggestions.click_suggestion);
-    $('body').append($suggest_box);
 
-    // Attach events to all lookup boxes
-    $(".js-dex-suggest")
-        .attr("autocomplete", "off")
-        .keyup(pokedex_suggestions.change_wrapper)
-        .keydown(pokedex_suggestions.keydown)
-        .blur(function(){ window.setTimeout(pokedex_suggestions.hide, 100) });
-
-    $(document).resize(pokedex_suggestions.move_results);
-    pokedex_suggestions.move_results();
-});
+$(pokedex_suggestions.initialize);
