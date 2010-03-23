@@ -3,6 +3,7 @@ from __future__ import absolute_import, division
 
 from collections import defaultdict, namedtuple
 import colorsys
+import json
 import logging
 import mimetypes
 
@@ -12,7 +13,6 @@ from pokedex.db.tables import Ability, EggGroup, Generation, Item, Language, Mac
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
-from pylons.decorators import jsonify
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join
 from sqlalchemy.orm.exc import NoResultFound
@@ -325,7 +325,6 @@ class PokedexController(BaseController):
         return render('/pokedex/cheat_unlocked.mako')
 
 
-    @jsonify
     def suggest(self):
         """Returns a JSON array of Pokédex lookup suggestions, compatible with
         the OpenSearch spec.
@@ -361,25 +360,45 @@ class PokedexController(BaseController):
 
             if image:
                 meta['image'] = url(controller='dex', action='media',
-                                    path=image)
+                                    path=image,
+                                    qualified=True)
 
             # Give a country icon so JavaScript doesn't have to hardcore Spline
             # paths.  Don't *think* we need to give the long language name...
             meta['language'] = suggestion.iso3166
             meta['language_icon'] = h.static_uri(
                 'spline',
-                'flags/{0}.png'.format(suggestion.iso3166)
+                'flags/{0}.png'.format(suggestion.iso3166),
+                qualified=True
             )
 
             metadata.append(meta)
 
-        return [
+        data = [
             prefix,
             names,
             None,       # descriptions
             None,       # query URLs
             metadata,   # my metadata; outside the spec's range
         ]
+
+        ### Format as JSON.  Also sets the content-type and supports JSONP --
+        ### if there's a 'callback' param, the return value will be wrapped
+        ### appropriately.
+        json_data = json.dumps(data)
+
+        if 'callback' in request.params:
+            # Pad and change the content-type to match a script tag
+            json_data = "{callback}({json})".format(
+                callback=request.params['callback'],
+                json=json_data,
+            )
+            response.headers['Content-Type'] = 'text/javascript; charset=UTF-8'
+        else:
+            # Just set content type
+            response.headers['Content-Type'] = 'application/json; charset=UTF-8'
+
+        return json_data
 
 
     def _prev_next_pokemon(self, pokemon):
