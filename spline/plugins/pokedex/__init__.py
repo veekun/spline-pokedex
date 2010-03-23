@@ -124,4 +124,5 @@ class PokedexPlugin(PluginBase):
     def widgets(self):
         return [
             ('page_header', Priority.NORMAL, 'widgets/pokedex_lookup.mako'),
+            ('head_tag',    Priority.NORMAL, 'widgets/pokedex_suggestion_css.mako'),
         ]
