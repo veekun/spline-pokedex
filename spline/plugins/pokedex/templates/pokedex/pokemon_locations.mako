@@ -11,6 +11,21 @@ ${lib.pokemon_page_header()}
 <h1>${region.name}</h1>
 
 <table class="dex-encounters striped-rows">
+    ## Spit out <col> tags.  Zip cleverness lets us compare the current version
+    ## to the one before it
+    <col class="dex-col-name">
+    % for version, prior_version in zip( \
+        c.region_versions[region], \
+        [None] + c.region_versions[region] \
+    ):
+    % if not prior_version or prior_version.version_group.generation \
+                                 != version.version_group.generation:
+    <col class="dex-col-encounter-version dex-col-first-version">
+    % else:
+    <col class="dex-col-encounter-version">
+    % endif
+    % endfor
+
     ## Draw a divider to separate terrain, in id order.  Why not?
     ## Include the versions header, too.
     % for terrain, area_version_condition_encounters \
