@@ -57,41 +57,43 @@ ${h.h1('Essentials')}
 <div class="dex-column-container">
 <div class="dex-column">
     <h2>Pokédex Numbers</h2>
-<%
-    dex_numbers = {} # dex => [number, generation]; generation is None if no generation is to be shown
-    to_show = ('National', 'Kanto', 'New', 'Hoenn', 'Sinnoh', 'Johto') # 'New' is GSC Johto dex
-
-    for number in c.pokemon.normal_form.dex_numbers:
-        dex_name = number.pokedex.name
-        if dex_name in to_show:
-            if number.pokedex.id == 6 and 'Sinnoh' in dex_numbers.keys():
-                # Prefer D/P Sinnoh dex over Platinum: Pt won't usurp an existing D/P entry, but a D/P entry will clobber Pt.
-                continue
-
-            generations = [group.generation.id for group in number.pokedex.version_groups]
-            if generations:
-                shown_generation = min(generations)
-            else:
-                shown_generation = None
-
-            dex_numbers[dex_name] = [number.pokedex_number, shown_generation]
-
-            if number.pokedex.id == 6: # Platinum Sinnoh dex
-                # We want the Platinum version icon to stay a literal, or else we end up with "&lt;img ...", so we can't put it in the format string.
-                dex_numbers[dex_name][0] = '{0} '.format(dex_numbers[dex_name][0]) + h.pokedex.version_icons(u'Platinum')
-%>
     <dl>
         <dt>Introduced in</dt>
-        <dd>${h.pokedex.generation_icon(c.pokemon.generation)}</dd>
-        % for dex_name in sorted(dex_numbers.keys(), key=to_show.index):
-        % if dex_name == 'New':
-        <dt>Johto ${h.pokedex.generation_icon(2)}</dt>
-        % elif dex_numbers[dex_name][1]:
-        <dt>${dex_name} ${h.pokedex.generation_icon(dex_numbers[dex_name][1])}</dt>
+        <dd>${h.pokedex.generation_icon(c.pokemon.generation)}</dd>\
+
+<%
+        to_skip = ("Internal ID")
+        show_pt_dex = True
+%>\
+        ## Sort by first appearance, then second, ....  Probably not the cleanest way to acheive this.
+        % for number in sorted(c.pokemon.normal_form.dex_numbers, key=lambda _: sorted(group.id for group in _.pokedex.version_groups)):
+        % if number.pokedex.name not in to_skip:
+<%
+        if number.pokedex.id == 5: # D/P Sinnoh dex
+            show_pt_dex = False
+        elif number.pokedex.id == 6 and not show_pt_dex: # Pt Sinnoh dex
+            continue
+
+        generations = [group.generation.id for group in number.pokedex.version_groups]
+        if generations:
+            shown_generation = min(generations)
+        else:
+            shown_generation = None
+%>\
+
+        % if shown_generation:
+        <dt>${number.pokedex.name} ${h.pokedex.generation_icon(shown_generation)}</dt>
         % else:
-        <dt>${dex_name}</dt>
+        <dt>${number.pokedex.name}</dt>
+        % endif\
+
+        % if number.pokedex.id == 6: # Platinum Sinnoh dex
+        <dd>${number.pokedex_number} ${h.pokedex.version_icons(u'Platinum')}</dd>
+        % else:
+        <dd>${number.pokedex_number}</dd>
+        % endif\
+
         % endif
-        <dd>${dex_numbers[dex_name][0]}</dd>
         % endfor
     </dl>
 
