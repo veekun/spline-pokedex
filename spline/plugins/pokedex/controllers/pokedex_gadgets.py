@@ -144,6 +144,11 @@ class PokedexGadgetsController(BaseController):
             c.pokemon = c.form.pokemon.data
             level = c.form.level.data
 
+            # Overrule a 'yes' for opposite genders if this Pokémon has no
+            # gender
+            if c.pokemon.gender_rate == -1:
+                c.form.opposite_gender.data = False
+
             # It's wild, so EVs are all zero.  IVs could be anything, so
             # cheerfully assume the midpoint, 16.  This is all super
             # approximate, anyway
