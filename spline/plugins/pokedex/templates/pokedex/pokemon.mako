@@ -173,34 +173,40 @@ ${h.h1('Essentials')}
         <dd>${c.pokemon.evolution_chain.growth_rate.name}</dd>
         <dt>Wild held items</dt>
         <dd>
-            % for generation, version_dict in sorted(c.held_items.items(), key=lambda x: x[0].id):
-            <h3>${h.pokedex.generation_icon(generation)}</h3><table><tbody>
-            ## "x and y" returns x if x is false; x might be None here and we'd
-            ## rather not try to get None.id
+            <table class="compact stretch striped-row-groups">
+            % for generation, version_dict in sorted(c.held_items.items(), \
+                                                     key=lambda (k, v): k.id):
+            <tbody>
             % for versions, item_records in sorted(version_dict.items(), \
-                                                  key=lambda (k,v): k and k[0].id):
-                % if not len(item_records):
-                <tr>
-                % if versions:
-                <td>${h.pokedex.version_icons(*versions)}</td>
-                % endif
-                <td>None</td>
-                </tr>
-                % endif
-                % for item, rarity in item_records:
-                <tr>
-                % if versions:
-                <td>${h.pokedex.version_icons(*versions)}</td>
-                % endif
-                <td>
-                    <span class="dex-pokemon-item-rarity">${rarity}%</span>
-                    ${h.pokedex.item_link(item)}
+                                                  key=lambda (k, v): k[0].id):
+            <tr>
+              % for i in range(len(item_records) or 1):
+                % if i == 0:
+                <td rowspan="${len(item_records) or 1}">
+                    % if len(version_dict) == 1:
+                    ${h.pokedex.generation_icon(generation)}
+                    % else:
+                    ${h.pokedex.version_icons(*versions)}
+                    % endif
                 </td>
-                </tr>
-                % endfor
+                % else:
+                <td></td>
+                % endif
+
+                ## Print the item and rarity.  Might be nothing
+                % if i < len(item_records):
+                <td>${item_records[i][1]}%</td>
+                <td>${h.pokedex.item_link(item_records[i][0])}</td>
+                % else:
+                <td></td>
+                <td>nothing</td>
+                % endif
+              % endfor
+            </tr>
             % endfor
-            </tbody></table>
+            </tbody>
             % endfor
+            </table>
         </dd>
     </dl>
 </div>

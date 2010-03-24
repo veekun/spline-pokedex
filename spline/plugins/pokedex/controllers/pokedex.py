@@ -527,51 +527,39 @@ class PokedexController(BaseController):
         # In the case of all versions within a generation being merged, the
         # key is None instead of a tuple of version objects.
         c.held_items = {}
+
+        # First group by the things we care about
+        # n.b.: the keys are tuples of versions, not versions!
+        version_held_items = {}
+        # Preload with a list of versions so we know which ones are empty
         generations = pokedex_session.query(tables.Generation) \
             .options( eagerload('versions') ) \
-            .filter(tables.Generation.id >= 3) \
-            .filter(tables.Generation.id >= c.pokemon.generation.id) \
-            .all()
-        version_held_items = {}  # version => [ (item, rarity), ... ]
-
+            .filter(tables.Generation.id >= 3)
         for generation in generations:
+            version_held_items[generation] = {}
             for version in generation.versions:
-                version_held_items[version] = []
+                version_held_items[generation][version,] = []
 
         for pokemon_item in c.pokemon.items:
-            version_held_items[pokemon_item.version] \
-                              .append((pokemon_item.item, pokemon_item.rarity))
+            generation = pokemon_item.version.generation
 
-        for generation in generations:
-            # Figure out if we can merge some of the versions for this gen,
-            # i.e., if any lists of (item, rarity) tuples are identical to any
-            # others.
-            version_lists = [[version] for version in generation.versions]
+            version_held_items[generation][pokemon_item.version,] \
+                .append((pokemon_item.item, pokemon_item.rarity))
 
-            i = 0
-            while i < len(version_lists) - 1: # could be shrinking
-               j = i + 1
-               while j < len(version_lists):
-                   if version_held_items[version_lists[i][0]] == \
-                      version_held_items[version_lists[j][0]]:
-                       version_lists[i] += version_lists[j]
-                       del version_lists[j]
-                   else:
-                       # We only need to go on if we didn't just delete the
-                       # one we were looking at.
-                       j += 1
-               i += 1
+        # Then group these into the form above
+        for generation, gen_held_items in version_held_items.items():
+            # gen_held_items: { (versions...): [(item, rarity)...] }
+            # Group by item, rarity, sorted by version...
+            inverted_held_items = defaultdict(tuple)
+            for version_tuple, item_rarity_list in \
+                sorted(gen_held_items.items(), key=lambda (k, v): k[0].id):
 
-            # Copy item lists to the final dictionary.  If all versions have
-            # been merged, stick any version's list under the key None;
-            # otherwise, pick any version from each set of versions and stick
-            # its list under a tuple of all those versions.
-            if len(version_lists) == 1:
-                c.held_items[generation] = { None: version_held_items.get(version_lists[0][0]) }
-            else:
-                c.held_items[generation] = {}
-                for versions in version_lists:
-                    c.held_items[generation][tuple(versions)] = version_held_items[versions[0]]
+                inverted_held_items[tuple(item_rarity_list)] += version_tuple
+
+            # Then flip back to versions as keys
+            c.held_items[generation] = {}
+            for item_rarity_tuple, version_tuple in inverted_held_items.items():
+                c.held_items[generation][version_tuple] = item_rarity_tuple
 
         ### Evolution
         # Format is a matrix as follows:
