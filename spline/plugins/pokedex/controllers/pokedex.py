@@ -343,13 +343,17 @@ class PokedexController(BaseController):
             names.append(suggestion.name)
             meta = dict(
                 type=row.__singlename__,
+                indexed_name=suggestion.indexed_name,
             )
 
             # Get an accompanying image.  Moves get their type; abilities get
             # nothing; everything else gets the obvious corresponding icon
             image = None
             if isinstance(row, Pokemon):
-                image = u"icons/{0}.png".format(row.id)
+                if row.forme_name:
+                    image = u"icons/{0}-{1}.png".format(row.national_id, row.forme_name)
+                else:
+                    image = u"icons/{0}.png".format(row.national_id)
             elif isinstance(row, Move):
                 image = u"chrome/types/{0}.png".format(row.type.name)
             elif isinstance(row, Type):
@@ -380,6 +384,7 @@ class PokedexController(BaseController):
             None,       # descriptions
             None,       # query URLs
             metadata,   # my metadata; outside the spec's range
+            pokedex_lookup.normalize_name(prefix)  # the key we actually looked for
         ]
 
         ### Format as JSON.  Also sets the content-type and supports JSONP --

@@ -81,6 +81,7 @@ var pokedex_suggestions = {
 
                 var len = input.length;
                 var suggestions = res[1];
+                var normalized_input = res[5];
                 for (var i in suggestions) {
                     var suggestion = suggestions[i];
                     var metadata = res[4][i];
@@ -88,11 +89,17 @@ var pokedex_suggestions = {
                     var $suggestion_el = $('<li></li>');
                     $suggestion_el.addClass('dex-suggestion-' + metadata.type);
 
-                    var $typed_part = $('<span class="typed"></span>')
-                    $typed_part.text(suggestion.substr(0, len));
+                    // Wrap whatever the user typed in bold/underlines
+                    var typed_index = metadata.indexed_name.toLowerCase()
+                                              .indexOf(normalized_input.toLowerCase());
+                    if (typed_index != -1) {
+                        var $typed_part = $('<span class="typed"></span>')
+                        $typed_part.text(suggestion.substr(typed_index, len));
 
-                    $suggestion_el.text(suggestion.substr(len));
-                    $suggestion_el.prepend($typed_part);
+                        $suggestion_el.text(suggestion.substr(0, typed_index));
+                        $suggestion_el.append($typed_part);
+                        $suggestion_el.append(suggestion.substr(typed_index + len));
+                    }
 
                     if (metadata.image) {
                         $suggestion_el.css('background-image', "url(" + metadata.image + ")");
