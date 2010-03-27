@@ -100,24 +100,24 @@ def expected_attempts_oh_no(partitions):
     # partitions are exhausted
     for catch_chance, number_of_turns in partitions:
         if number_of_turns is None:
-            # Almost done!
+            # The rest of infinity is covered by the usual expected-value formula with
+            # the final catch chance, but factoring in the probability that the Pokémon
+            # is still uncaught, and that turns have already passed
+            expected_attempts += p_got_here * (1 / catch_chance + turn)
+
+            # Done!
             break
 
         for _ in range(number_of_turns):
-            # Add the chance that we'll catch it this turn.  That's the chance that
-            # we made it to this turn, times the chance that we'll actually catch
-            # it, times the number of turns this attempt has taken
+            # Add the contribution of possibly catching it this turn.  That's
+            # the chance that we'll catch it this turn, times the turn number
+            # -- times the chance that we made it this long without catching
             turn += 1
             expected_attempts += p_got_here * catch_chance * turn
 
             # Probability that we get to the next turn is decreased by the
             # probability that we didn't catch it this turn
             p_got_here *= 1 - catch_chance
-
-    # The rest of infinity is covered by the usual expected-value formula with
-    # the final catch chance, but factoring in the probability that the Pokémon
-    # is still uncaught, and that we're starting our count late
-    expected_attempts += p_got_here * (1 / catch_chance + turn - 1)
 
     return expected_attempts
 
