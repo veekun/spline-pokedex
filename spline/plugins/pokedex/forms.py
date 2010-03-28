@@ -33,6 +33,9 @@ class PokedexLookupField(fields.TextField):
         if valuelist:
             self._original_value = valuelist[0]
 
+            if not valuelist[0]:
+                raise ValidationError('Gotta pick something')
+
             results = pokedex_lookup.lookup(
                 valuelist[0],
                 valid_types=[self.valid_type],
