@@ -153,3 +153,53 @@
 % endfor
 <td>${sum((pokemon_stat.base_stat for pokemon_stat in pokemon.stats))}</td>
 </%def>
+
+
+<%def name="move_table_columns()">
+<col class="dex-col-name">
+<col class="dex-col-type">
+<col class="dex-col-type">
+<col class="dex-col-stat">
+<col class="dex-col-stat">
+<col class="dex-col-stat">
+<col class="dex-col-stat">
+<col class="dex-col-effect">
+</%def>
+
+<%def name="move_table_header(gen_instead_of_type=False)">
+<th>Move</th>
+% if gen_instead_of_type:
+<th>Gen</th>
+% else:
+<th>Type</th>
+% endif
+<th>Class</th>
+<th>PP</th>
+<th>Power</th>
+<th>Acc</th>
+<th>Pri</th>
+<th>Effect</th>
+</%def>
+
+<%def name="move_table_row(move, gen_instead_of_type=False)">
+<td><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></td>
+% if gen_instead_of_type:
+## Done on type pages; we already know the type, so show the generation instead
+<td class="type">${h.pokedex.generation_icon(move.generation)}</td>
+% else:
+<td class="type">${h.pokedex.type_link(move.type)}</td>
+% endif
+<td class="class">${h.pokedex.damage_class_icon(move.damage_class)}</td>
+<td>${move.pp}</td>
+<td>${move.power}</td>
+<td>${move.accuracy}%</td>
+## Priority is colored red for slow and green for fast
+% if move.priority == 0:
+<td></td>
+% elif move.priority > 0:
+<td class="dex-priority-fast">${move.priority}</td>
+% else:
+<td class="dex-priority-slow">${move.priority}</td>
+% endif
+<td class="effect">${h.literal(move.short_effect.as_html)}</td>
+</%def>

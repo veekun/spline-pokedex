@@ -1,5 +1,5 @@
 <%inherit file="/base.mako"/>
-<%namespace name="lib" file="lib.mako"/>
+<%namespace name="dexlib" file="lib.mako"/>
 <%from pokedex.db import rst%>
 
 <%def name="title()">${c.type.name.title()} – Type #${c.type.id}</%def>
@@ -63,16 +63,16 @@ purely ???-type before hatching, and are displayed as such in the Generation III
 )).as_html)}
 % else:
 <table class="dex-pokemon-moves striped-rows">
-    ${lib.pokemon_table_columns()}
+    ${dexlib.pokemon_table_columns()}
     <thead>
         <tr class="header-row">
-            ${lib.pokemon_table_header()}
+            ${dexlib.pokemon_table_header()}
         </tr>
     </thead>
     <tbody>
         % for pokemon in c.pokemon:
         <tr>
-            ${lib.pokemon_table_row(pokemon)}
+            ${dexlib.pokemon_table_row(pokemon)}
         </tr>
         % endfor
     </tbody>
@@ -81,36 +81,16 @@ purely ???-type before hatching, and are displayed as such in the Generation III
 
 ${h.h1('Moves')}
 <table class="dex-pokemon-moves striped-rows">
+    ${dexlib.move_table_columns()}
     <thead>
         <tr class="header-row">
-            <th>Move</th>
-            <th>Gen</th>
-            <th>Class</th>
-            <th>PP</th>
-            <th>Power</th>
-            <th>Acc</th>
-            <th>Pri</th>
-            <th>Effect</th>
+            ${dexlib.move_table_header(gen_instead_of_type=True)}
         </tr>
     </thead>
     <tbody>
         % for move in c.moves:
         <tr>
-            <td><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></td>
-            <td>${h.pokedex.generation_icon(move.generation)}</td>
-            <td>${h.pokedex.damage_class_icon(move.damage_class)}</td>
-            <td>${move.pp}</td>
-            <td>${move.power}</td>
-            <td>${move.accuracy}%</td>
-            ## Priority is colored red for slow and green for fast
-            % if move.priority == 0:
-            <td></td>
-            % elif move.priority > 0:
-            <td class="dex-priority-fast">${move.priority}</td>
-            % else:
-            <td class="dex-priority-slow">${move.priority}</td>
-            % endif
-            <td class="effect">${h.literal(move.short_effect.as_html)}</td>
+            ${dexlib.move_table_row(move, gen_instead_of_type=True)}
         </tr>
         % endfor
     </tbody>

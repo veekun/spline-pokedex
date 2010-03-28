@@ -495,6 +495,7 @@ ${h.h1('Moves')}
 <col class="dex-col-version">
 % endif
 % endfor
+${dexlib.move_table_columns()}
 ## HEADERS
 % for method, method_list in c.moves:
 <%
@@ -504,56 +505,25 @@ ${h.h1('Moves')}
     % for column in c.move_columns:
     ${dexlib.pokemon_move_table_column_header(column)}
     % endfor
-    <th>Move</th>
-    <th>Type</th>
-    <th>Class</th>
-    <th>PP</th>
-    <th>Power</th>
-    <th>Acc</th>
-    <th>Pri</th>
-    <th>Effect</th>
+    ${dexlib.move_table_header()}
 </tr>
 <tr class="subheader-row">
     <th colspan="${len(c.move_columns) + 8}"><a href="#${method_id}" class="subtle"><strong>${method.name}</strong></a>: ${method.description}</th>
 </tr>
 ## DATA
 % for move, version_group_data in method_list:
-% if move.type in c.pokemon.types:
-<tr class="better-move">
-% else:
-<tr>
-% endif
+<tr class="\
+    % if move.type in c.pokemon.types:
+    better-move-type\
+    % endif
+    % if move.damage_class.name == c.better_damage_class:
+    better-move-stat\
+    % endif
+">
     % for column in c.move_columns:
     ${dexlib.pokemon_move_table_method_cell(column, method, version_group_data)}
     % endfor
-
-    <td><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></td>
-    % if move.type in c.pokemon.types:
-    <td class="better-move-reason">
-    % else:
-    <td>
-    % endif
-        ${h.pokedex.type_link(move.type)}
-    </td>
-    % if move.damage_class.name == c.better_damage_class:
-    <td class="better-move-reason">
-    % else:
-    <td>
-    % endif
-        ${h.pokedex.damage_class_icon(move.damage_class)}
-    </td>
-    <td>${move.pp}</td>
-    <td>${move.power}</td>
-    <td>${move.accuracy}%</td>
-    ## Priority is colored red for slow and green for fast
-    % if move.priority == 0:
-    <td></td>
-    % elif move.priority > 0:
-    <td class="dex-priority-fast">${move.priority}</td>
-    % else:
-    <td class="dex-priority-slow">${move.priority}</td>
-    % endif
-    <td class="effect">${h.literal(move.short_effect.as_html)}</td>
+    ${dexlib.move_table_row(move)}
 </tr>
 % endfor
 % endfor

@@ -23,11 +23,13 @@ ul.inline-menu > li:last-child:after { content: none; }
 #dex-header + h1 { margin-top: 0.25em; }
 
 /* Table columns */
+col.dex-col-name        { width: 10em; }
 col.dex-col-stat        { width: 3em; }
 col.dex-col-stat-name   { width: 10em; }
 col.dex-col-stat-bar    { width: auto; }
 col.dex-col-stat-pctile { width: 5em; }
 col.dex-col-stat-result { width: 5em; }
+col.dex-col-type        { width: 3em; }
 col.dex-col-version     { width: 3.5em; }  /* two versions (32px < 33px == 3em) plus 0.17em padding < 3.5em */
 col.dex-col-encounter-name { width: 10em; }
 col.dex-col-encounter-version { width: 12em; }
