@@ -159,8 +159,10 @@ table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls td.js-not-a-button:hove
 table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls td.js-sorted-by { background: #f0efe6; }
 table.dex-pokemon-moves tr:nth-child(2n) td.js-sorted-by { background: #f0efe6; }
 table.dex-pokemon-moves tr:nth-child(2n+1) td.js-sorted-by { background: #f6f4ea; }
-table.dex-pokemon-moves tr:nth-child(2n) td.better-move-reason { background: #afcfaf; }
-table.dex-pokemon-moves tr:nth-child(2n+1) td.better-move-reason { background: #c0d8c0; }
+table.dex-pokemon-moves tr.better-move-type:nth-child(2n) td.type,
+table.dex-pokemon-moves tr.better-move-stat:nth-child(2n) td.class { background: #afcfaf; }
+table.dex-pokemon-moves tr.better-move-type:nth-child(2n+1) td.type,
+table.dex-pokemon-moves tr.better-move-stat:nth-child(2n+1) td.class { background: #c0d8c0; }
 
 table.dex-capture-rates td { vertical-align: middle; }
 table.dex-capture-rates th.item { text-align: left; }
