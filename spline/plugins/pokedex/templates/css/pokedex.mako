@@ -153,9 +153,9 @@ table.dex-pokemon-moves td.egg-group { font-size: 0.75em; }
 table.dex-pokemon-moves td.stat { text-align: right; }
 /* javascript filtering/sorting */
 table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls .js-label { font-size: 0.67em; }
-table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls:hover { background: transparent; outline: none; }
-table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls td:hover { cursor: pointer; outline: 1px solid #bfd3f1; outline-offset: -1px; background: #e6eefa; }
-table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls td.js-not-a-button:hover { cursor: default; outline: none; background: transparent; }
+table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls:hover { background: transparent; }
+table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls td:hover { cursor: pointer; background: #e6eefa; }
+table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls td.js-not-a-button:hover { cursor: default; background: transparent; }
 table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls td.js-sorted-by { background: #f0efe6; }
 table.dex-pokemon-moves tr:nth-child(2n) td.js-sorted-by { background: #f0efe6; }
 table.dex-pokemon-moves tr:nth-child(2n+1) td.js-sorted-by { background: #f6f4ea; }
