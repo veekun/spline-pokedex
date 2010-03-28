@@ -71,6 +71,13 @@ col.dex-col-last-version  { border-right: 1px solid #b4c7e6; }
 .dex-size .dex-size-trainer .dex-size-value { right: 0.25em; }
 .dex-size .dex-size-pokemon .dex-size-value { left: 0.25em; }
 
+/* HP bar */
+.dex-hp-bar { display: inline-block; height: 3px; width: 48px; margin: 0.25em; padding: 6px 2px 7px 16px /* 4px of extra vertical padding for click space */; vertical-align: middle; background: url(${h.static_uri('pokedex', 'images/hp-bar.png')}) center left no-repeat; }
+.dex-hp-bar .dex-hp-bar-bar { width: 100%; height: 100%; }
+.dex-hp-bar .dex-hp-bar-bar.green  { background-color: #18c31f; }
+.dex-hp-bar .dex-hp-bar-bar.yellow { background-color: #d7ac00; }
+.dex-hp-bar .dex-hp-bar-bar.red    { background-color: #be2821; }
+
 /*** Individual pages ***/
 .dex-page-portrait { float: left; width: 15em; min-height: 10em; padding-bottom: 1em; text-align: center; }
 .dex-page-portrait p { margin: 0.25em 0; line-height: 1; }

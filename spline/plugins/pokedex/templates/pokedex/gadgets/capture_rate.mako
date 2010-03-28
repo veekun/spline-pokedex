@@ -11,8 +11,7 @@
 ${h.form(url.current(), method='GET')}
 <dl class="standard-form">
     ${lib.field('pokemon')}
-    ${lib.field('level', size=3)}
-    ${lib.field('current_hp', size=3)}
+    ${lib.field('current_hp', size=3, class_='js-dex-dynamic-hp-bar')}
     ${lib.field('status_ailment')}
 </dl>
 
@@ -23,6 +22,7 @@ ${h.form(url.current(), method='GET')}
     <dd>${c.form[name]() | n} ${c.form[name].label() | n}</dd>
 </%def>
 <dl class="standard-form">
+    ${lib.field('level', size=3)}
     ${lib.field('your_level', size=3)}
     ${lib.field('terrain')}
     ${long_checkbox_field('opposite_gender')}
@@ -47,14 +47,19 @@ ${h.end_form()}
     % endif
 
     % if c.form.is_pokemon_master.data:
-    ## Tee hee.
+    ## None of this math means anything; it's just meant to be both
+    ## deterministic and ridiculous
     <td class="chance">
         <div class="dex-capture-rate-graph"></div>
     </td>
     <td class="chance">
-        ${ "{0:.1f}%".format(chances[0] * 100 + 100) }
+        ${ "{0:.1f}%".format(chances[0] * 133 + 133) }
     </td>
-    % else:
+    <td class="expected-attempts">
+        ${ "{0:.1f}".format(-1 / (chances[0] * 1.33)) }
+    </td>
+
+    % else:  ## up+b
     <td class="chance">
         <div class="dex-capture-rate-graph"
              title="Capture: ${ "{0:.1f}%".format(chances[0] * 100) }">
@@ -73,7 +78,6 @@ ${h.end_form()}
         ## And finally actually print the chance to capture
         ${ "{0:.1f}%".format(chances[0] * 100) }
     </td>
-    % endif
 
     % if ball in (u'Timer Ball', u'Quick Ball'):
     ## These are handled super-specially!  Showing expected attempts when it
@@ -99,6 +103,8 @@ ${h.end_form()}
     % endif
     </td>
 
+    % endif  ## up+b
+
     <td class="condition">
         % if condition and len(c.results[ball]) > 1:
         ${condition}
@@ -118,6 +124,10 @@ ${h.end_form()}
 </p>
 
 <p>Disclaimer: This is all approximate!  The game might still hate you more than these numbers indicate.</p>
+
+% if c.form.is_pokemon_master.data:
+<p>And no, Up+B doesn't actually do anything.</p>
+% endif
 
 <p class="dex-capture-rate-legend">
     Legend: Ball wobbles

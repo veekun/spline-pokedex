@@ -32,8 +32,8 @@ log = logging.getLogger(__name__)
 ### Capture rate ("Pokéball performance") stuff
 class CaptureRateForm(Form):
     pokemon = PokedexLookupField(u'Wild Pokémon', valid_type='pokemon')
-    level = fields.IntegerField(u'Its level', [validators.NumberRange(min=1, max=100)])
-    current_hp = fields.IntegerField(u'% HP left', [validators.NumberRange(min=1, max=100)])
+    current_hp = fields.IntegerField(u'% HP left', [validators.NumberRange(min=1, max=100)],
+                                     default=100)
     status_ailment = fields.SelectField('Status ailment',
         choices=[
             ('', u'—'),
@@ -47,10 +47,18 @@ class CaptureRateForm(Form):
     )
 
     ### Extras
+    level = fields.IntegerField(u'Wild Pokémon\'s level', [
+        validators.Optional(),
+        validators.NumberRange(min=1, max=100),
+    ],
+        default=u'',
+    )
     your_level = fields.IntegerField(u'Your Pokémon\'s level', [
         validators.Optional(),
         validators.NumberRange(min=1, max=100),
-    ])
+    ],
+        default=u'',
+    )
     terrain = fields.SelectField(u'Terrain',
         choices=[
             ('land',    u'On land'),
@@ -132,6 +140,7 @@ class PokedexGadgetsController(BaseController):
         Also performs fuzzy search.
         """
 
+        c.javascripts.append(('pokedex', 'pokedex-gadgets'))
         c.form = CaptureRateForm(request.params)
 
         valid_form = False
@@ -149,12 +158,7 @@ class PokedexGadgetsController(BaseController):
             if c.pokemon.gender_rate == -1:
                 c.form.opposite_gender.data = False
 
-            # It's wild, so EVs are all zero.  IVs could be anything, so
-            # cheerfully assume the midpoint, 16.  This is all super
-            # approximate, anyway
-            base_hp = [_ for _ in c.pokemon.stats if _.stat.name == 'HP'][0].base_stat  # XXX what.
-            approx_max_hp = pokedex.formulae.calculated_hp(base_hp=base_hp, level=level, iv=16, effort=0)
-            approx_hp = int(approx_max_hp * c.form.current_hp.data / 100)
+            percent_hp = c.form.current_hp.data / 100
 
             status_bonus = 1
             if c.form.status_ailment.data in ('PAR', 'BRN', 'PSN'):
@@ -165,10 +169,11 @@ class PokedexGadgetsController(BaseController):
             # Little wrapper around capture_chance...
             def capture_chance(ball_bonus, heavy_modifier=0):
                 return pokedex.formulae.capture_chance(
-                    current_hp=approx_hp, max_hp=approx_max_hp,
+                    percent_hp=percent_hp,
                     capture_rate=c.pokemon.capture_rate,
                     heavy_modifier=heavy_modifier,
-                    ball_bonus=ball_bonus, status_bonus=status_bonus,
+                    ball_bonus=ball_bonus,
+                    status_bonus=status_bonus,
                 )
 
             ### Do some math!
