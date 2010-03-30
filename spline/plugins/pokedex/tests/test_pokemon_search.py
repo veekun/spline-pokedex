@@ -486,7 +486,7 @@ class TestPokemonSearchController(TestController):
         )
         self.check_search(
             dict(id=u'133-135'),
-            [ u'Eevee', u'Flareon', u'Jolteon' ],
+            [ u'Eevee', u'Vaporeon', u'Jolteon' ],
             'range: n-m',
             exact=True,
         )

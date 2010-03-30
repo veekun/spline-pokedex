@@ -29,10 +29,76 @@ def in_pokedex_label(pokedex):
         name=pokedex.name,
     )
 
+class RangeQueryEvaluator(object):
+    """Turns a list of values and (min, max) tuples into a query filter
+    statement.
+    """
+    def __init__(self, partitions):
+        self.partitions = partitions
+
+    def __call__(self, column):
+        clauses = []
+        for thing in self.partitions:
+            if isinstance(thing, tuple):
+                a, b = thing
+                if a is None:
+                    # -b
+                    clauses.append(column <= b)
+                elif b is None:
+                    # a+
+                    clauses.append(column >= a)
+                else:
+                    # a-b
+                    clauses.append(column.between(a, b))
+            else:
+                # a
+                clauses.append(column == thing)
+
+        return or_(*clauses)
+
+class RangeTextField(fields.TextField):
+    """Parses a string of the form 'a, b, c-e'."""
+    def process_formdata(self, valuelist):
+        if not valuelist:
+            self._original_data = u''
+            return
+
+        partitions = []
+
+        sentence = valuelist[0].strip()
+        for phrase in re.split(r'\s*,\s*', sentence):
+            endpoints = re.split(ur'\s*(?:-|–|[.][.]|[+])\s*', phrase, 1)
+
+            if len(endpoints) == 1:
+                # Not a range; just a single item
+                partitions.append(float(endpoints[0]))
+            else:
+                # a-b
+                if not endpoints[0]:
+                    endpoints[0] = None
+                else:
+                    endpoints[0] = float(endpoints[0])
+
+                if not endpoints[1]:
+                    endpoints[1] = None
+                else:
+                    endpoints[1] = float(endpoints[1])
+
+                partitions.append(tuple(endpoints))
+
+        self.data = RangeQueryEvaluator(partitions)
+
+    def _value(self):
+        # XXX Improve me
+        return self._original_data
+
+
 class PokemonSearchForm(Form):
     # Defaults are set to match what the client will actually send if the field
     # is left blank
     shorten = fields.HiddenField(default=u'')
+
+    id = RangeTextField('National ID')
 
     # Core stuff
     name = fields.TextField('Name', default=u'')
@@ -203,6 +269,19 @@ class PokedexSearchController(BaseController):
         ### Do the searching!
         me = tables.Pokemon
         query = pokedex_session.query(me)
+
+        # ID
+        if c.form.id.data:
+            # Have to handle forms and not-forms differently
+            query = query.filter(
+                or_(
+                    and_(
+                        c.form.id.data(me.id),
+                        me.forme_base_pokemon_id == None,
+                    ),
+                    c.form.id.data(me.forme_base_pokemon_id),
+                )
+            )
 
         # Name
         if c.form.name.data:
@@ -425,7 +504,7 @@ class PokedexSearchController(BaseController):
 
             if u'only' in c.form.evolution_position.data:
                 # No parent; children
-                clauses.append( 
+                clauses.append(
                     and_(
                         parent_pokemon.id == None,
                         child_subquery.c.child_count == None,
