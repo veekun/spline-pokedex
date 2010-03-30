@@ -18,6 +18,7 @@ from spline.lib.base import BaseController, render
 
 from spline.plugins.pokedex import helpers as pokedex_helpers
 from spline.plugins.pokedex.db import pokedex_session
+from spline.plugins.pokedex.forms import RangeTextField
 
 log = logging.getLogger(__name__)
 
@@ -28,70 +29,6 @@ def in_pokedex_label(pokedex):
         gen_icon=pokedex_helpers.generation_icon(pokedex.region.generation),
         name=pokedex.name,
     )
-
-class RangeQueryEvaluator(object):
-    """Turns a list of values and (min, max) tuples into a query filter
-    statement.
-    """
-    def __init__(self, partitions):
-        self.partitions = partitions
-
-    def __call__(self, column):
-        clauses = []
-        for thing in self.partitions:
-            if isinstance(thing, tuple):
-                a, b = thing
-                if a is None:
-                    # -b
-                    clauses.append(column <= b)
-                elif b is None:
-                    # a+
-                    clauses.append(column >= a)
-                else:
-                    # a-b
-                    clauses.append(column.between(a, b))
-            else:
-                # a
-                clauses.append(column == thing)
-
-        return or_(*clauses)
-
-class RangeTextField(fields.TextField):
-    """Parses a string of the form 'a, b, c-e'."""
-    def process_formdata(self, valuelist):
-        if not valuelist:
-            self._original_data = u''
-            return
-
-        partitions = []
-
-        sentence = valuelist[0].strip()
-        for phrase in re.split(r'\s*,\s*', sentence):
-            endpoints = re.split(ur'\s*(?:-|–|[.][.]|[+])\s*', phrase, 1)
-
-            if len(endpoints) == 1:
-                # Not a range; just a single item
-                partitions.append(float(endpoints[0]))
-            else:
-                # a-b
-                if not endpoints[0]:
-                    endpoints[0] = None
-                else:
-                    endpoints[0] = float(endpoints[0])
-
-                if not endpoints[1]:
-                    endpoints[1] = None
-                else:
-                    endpoints[1] = float(endpoints[1])
-
-                partitions.append(tuple(endpoints))
-
-        self.data = RangeQueryEvaluator(partitions)
-
-    def _value(self):
-        # XXX Improve me
-        return self._original_data
-
 
 class PokemonSearchForm(Form):
     # Defaults are set to match what the client will actually send if the field
@@ -209,6 +146,10 @@ class PokemonSearchForm(Form):
         allow_blank=True,
     )
 
+    # Numbers
+    # Effort and stats are pulled from the database, so those fields are added
+    # dynamically
+
     # Flavor
     color = QuerySelectField('Color',
         query_factory=lambda: pokedex_session.query(tables.PokemonColor),
@@ -245,7 +186,26 @@ class PokemonSearchForm(Form):
 class PokedexSearchController(BaseController):
 
     def pokemon_search(self):
-        c.form = PokemonSearchForm(request.params)
+        class F(PokemonSearchForm):
+            pass
+
+        # Add stat-based fields
+        c.stat_fields = []
+        for stat in pokedex_session.query(tables.Stat) \
+                                   .order_by(tables.Stat.id):
+            field_name = stat.name.lower().replace(u' ', u'_')
+
+            stat_field = RangeTextField(stat.name)
+            effort_field = RangeTextField(stat.name)
+
+            c.stat_fields.append((stat.id, field_name))
+
+            setattr(F, 'stat_' + field_name, stat_field)
+            setattr(F, 'effort_' + field_name, effort_field)
+
+        ### Parse form, etc etc
+        c.form = F(request.params)
+
         validates = c.form.validate()
         cleansed_data = c.form.cleanse_data(request.params)
 
@@ -563,6 +523,22 @@ class PokedexSearchController(BaseController):
                 pokedex_subquery,
                 me.id == pokedex_subquery.c.pokemon_id,
             ))
+
+        # Numbers
+        for stat_id, field_name in c.stat_fields:
+            stat_field = c.form['stat_' + field_name]
+            effort_field = c.form['effort_' + field_name]
+
+            if stat_field.data or effort_field.data:
+                stat_alias = aliased(tables.PokemonStat)
+                query = query.join(stat_alias)
+                query = query.filter(stat_alias.stat_id == stat_id)
+
+                if stat_field.data:
+                    query = query.filter(stat_field.data(stat_alias.base_stat))
+
+                if effort_field.data:
+                    query = query.filter(effort_field.data(stat_alias.effort))
 
         # Color
         if c.form.color.data:

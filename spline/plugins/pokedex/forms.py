@@ -1,6 +1,9 @@
 # encoding: utf8
 """Useful form fields of my own devising."""
 
+import re
+
+from sqlalchemy.sql import and_, or_
 from wtforms import ValidationError, fields
 
 from spline.plugins.pokedex.db import pokedex_lookup
@@ -58,3 +61,81 @@ class PokedexLookupField(fields.TextField):
             return self.data.full_name
         else:
             return self.data.name
+
+
+class RangeQueryEvaluator(object):
+    """Turns a list of values and (min, max) tuples into a query filter
+    statement.
+    """
+    def __init__(self, partitions):
+        self.partitions = partitions
+
+    def __call__(self, column):
+        clauses = []
+        for thing in self.partitions:
+            if isinstance(thing, tuple):
+                a, b = thing
+                if a is None:
+                    # -b
+                    clauses.append(column <= b)
+                elif b is None:
+                    # a+
+                    clauses.append(column >= a)
+                else:
+                    # a-b
+                    clauses.append(column.between(a, b))
+            else:
+                # a
+                clauses.append(column == thing)
+
+        return or_(*clauses)
+
+class RangeTextField(fields.TextField):
+    """Parses a string of the form 'a, b, c-e'."""
+    def __init__(self, label=u'', validators=[], **kwargs):
+        super(fields.TextField, self).__init__(label, validators, **kwargs)
+        self._original_data = u''
+
+    def __call__(self, *args, **kwargs):
+        """Size ought to be a bit smaller."""
+        if 'size' not in kwargs:
+            kwargs['size'] = u'6'
+
+        return super(fields.TextField, self).__call__(*args, **kwargs)
+
+    def _make_float(self, n):
+        try:
+            if n == u'':
+                return None
+            else:
+                return float(n)
+        except ValueError:
+            raise ValidationError('Invalid range')
+
+    def process_formdata(self, valuelist):
+        if not valuelist or not valuelist[0]:
+            self._original_data = u''
+            return
+
+        self._original_data = valuelist[0]
+        partitions = []
+
+        sentence = valuelist[0].strip()
+        for phrase in re.split(r'\s*,\s*', sentence):
+            endpoints = re.split(ur'\s*(?:-|–|[.][.]|[+])\s*', phrase, 1)
+
+            if len(endpoints) == 1:
+                # Not a range; just a single item
+                partitions.append(self._make_float(endpoints[0]))
+            else:
+                # a-b
+                endpoints[0] = self._make_float(endpoints[0])
+                endpoints[1] = self._make_float(endpoints[1])
+
+                partitions.append(tuple(endpoints))
+
+        self.data = RangeQueryEvaluator(partitions)
+
+    def _value(self):
+        # XXX Improve me
+        return self._original_data

@@ -79,6 +79,27 @@ ${h.form(url.current(), method='GET')}
 </div>
 </div>
 
+<h2>Numbers</h2>
+<p>Understands ranges in the form <code>-3, 5, 9, 12-16, 20+</code>.</p>
+<div class="dex-column-container">
+<div class="dex-column">
+    <h3>Base stats</h3>
+    <dl class="standard-form">
+        % for stat_id, field_name in c.stat_fields:
+        ${lib.field('stat_' + field_name)}
+        % endfor
+    </dl>
+</div>
+<div class="dex-column">
+    <h3>Effort</h3>
+    <dl class="standard-form">
+        % for stat_id, field_name in c.stat_fields:
+        ${lib.field('effort_' + field_name)}
+        % endfor
+    </dl>
+</div>
+</div>
+
 <p>
     ## Always shorten when the form is submitted!
     ${c.form.shorten(value=1) | n}
