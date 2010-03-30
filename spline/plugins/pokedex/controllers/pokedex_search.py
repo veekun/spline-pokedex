@@ -16,9 +16,18 @@ from sqlalchemy.sql import func, and_, not_, or_
 
 from spline.lib.base import BaseController, render
 
+from spline.plugins.pokedex import helpers as pokedex_helpers
 from spline.plugins.pokedex.db import pokedex_session
 
 log = logging.getLogger(__name__)
+
+def in_pokedex_label(pokedex):
+    """[ IV ] Sinnoh"""
+
+    return """{gen_icon} {name}""".format(
+        gen_icon=pokedex_helpers.generation_icon(pokedex.region.generation),
+        name=pokedex.name,
+    )
 
 class PokemonSearchForm(Form):
     # Defaults are set to match what the client will actually send if the field
@@ -31,7 +40,7 @@ class PokemonSearchForm(Form):
         query_factory=
             lambda value: pokedex_session.query(tables.Ability)
                 .filter( func.lower(tables.Ability.name) == value.lower() ),
-        label_attr='name',
+        get_label=lambda _: _.name,
         allow_blank=True,
     )
 
@@ -47,7 +56,7 @@ class PokemonSearchForm(Form):
     type = QueryCheckboxMultipleSelectField(
         'Type',
         query_factory=lambda: pokedex_session.query(tables.Type),
-        label_attr='name',
+        get_label=lambda _: _.name,
         get_pk=lambda table: table.name,
         allow_blank=True,
     )
@@ -86,7 +95,7 @@ class PokemonSearchForm(Form):
         QuerySelectField(
             'Egg group',
             query_factory=lambda: pokedex_session.query(tables.EggGroup),
-            label_attr='name',
+            get_label=lambda _: _.name,
             allow_blank=True,
         ),
         min_entries=2,
@@ -117,16 +126,33 @@ class PokemonSearchForm(Form):
         ],
     )
 
+    # Generation
+    introduced_in = QueryCheckboxMultipleSelectField(
+        'Introduced in',
+        query_factory=lambda: pokedex_session.query(tables.Generation),
+        get_label=lambda _: pokedex_helpers.generation_icon(_),
+        get_pk=lambda table: table.id,
+        allow_blank=True,
+    )
+    in_pokedex = QueryCheckboxMultipleSelectField(
+        u'In regional Pokédex',
+        query_factory=lambda: pokedex_session.query(tables.Pokedex) \
+                                  .join(tables.Generation),
+        get_label=in_pokedex_label,
+        get_pk=lambda table: table.id,
+        allow_blank=True,
+    )
+
     # Flavor
     color = QuerySelectField('Color',
         query_factory=lambda: pokedex_session.query(tables.PokemonColor),
-        label_attr='name',
+        get_label=lambda _: _.name,
         allow_blank=True,
         get_pk=lambda table: table.name,
     )
     habitat = QuerySelectField('Habitat',
         query_factory=lambda: pokedex_session.query(tables.PokemonHabitat),
-        label_attr='name',
+        get_label=lambda _: _.name,
         allow_blank=True,
         get_pk=lambda table: table.name,
     )
@@ -434,6 +460,30 @@ class PokedexSearchController(BaseController):
                 clauses.append( sibling_subquery.c.sibling_count > 1 )
 
             query = query.filter(or_(*clauses))
+
+        # Generation
+        if c.form.introduced_in.data:
+            query = query.filter(
+                me.generation_id.in_(_.id for _ in c.form.introduced_in.data)
+            )
+
+        if c.form.in_pokedex.data:
+            # Need a subquery that finds all the Pokémon in all the selected
+            # Pokédexes
+            pokedex_numbers = aliased(tables.PokemonDexNumber)
+            pokedex_subquery = pokedex_session.query(
+                pokedex_numbers.pokemon_id,
+            ) \
+                .filter(pokedex_numbers.pokedex_id.in_(
+                    _.id for _ in c.form.in_pokedex.data
+                )) \
+                .group_by(pokedex_numbers.pokemon_id) \
+                .subquery()
+
+            query = query.join((
+                pokedex_subquery,
+                me.id == pokedex_subquery.c.pokemon_id,
+            ))
 
         # Color
         if c.form.color.data:

@@ -7,6 +7,8 @@
 
 ${h.form(url.current(), method='GET')}
 <h1>Pokémon Search</h1>
+<p>Unless otherwise specified: matching Pokémon must match ALL of the criteria, but can match ANY selections within a group (e.g., evolution stage).</p>
+<p>Anything left blank is ignored entirely.</p>
 
 <h2>Essentials and flavor</h2>
 <dl class="standard-form">
@@ -59,6 +61,20 @@ ${h.form(url.current(), method='GET')}
 <div class="dex-column">
     <dl class="standard-form">
         ${lib.field('evolution_special')}
+    </dl>
+</div>
+</div>
+
+<h2>Generation</h2>
+<div class="dex-column-container">
+<div class="dex-column">
+    <dl class="standard-form">
+        ${lib.field('introduced_in')}
+    </dl>
+</div>
+<div class="dex-column-2x">
+    <dl class="standard-form">
+        ${lib.field('in_pokedex')}
     </dl>
 </div>
 </div>

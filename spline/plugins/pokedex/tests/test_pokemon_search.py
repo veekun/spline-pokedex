@@ -310,19 +310,19 @@ class TestPokemonSearchController(TestController):
     def test_generation(self):
         """Checks searching by generation introduced."""
         self.check_search(
-            dict(generation=u'1'),
+            dict(introduced_in=u'1'),
             [ u'Eevee', u'Pikachu', u'Shellder' ],
             'introduced in Kanto',
         )
         self.check_search(
-            dict(generation=u'5'),
+            dict(introduced_in=u'4'),
             [ u'Lucario', u'Munchlax', u'Roserade' ],
             'introduced in Sinnoh',
         )
 
         # and several at once for good measure
         self.check_search(
-            dict(generation=[u'1', u'4']),
+            dict(introduced_in=[u'1', u'4']),
             [ u'Eevee', u'Pikachu', u'Shellder', u'Lucario', u'Munchlax', u'Roserade' ],
             'introduced in Kanto or Sinnoh',
         )
@@ -330,8 +330,23 @@ class TestPokemonSearchController(TestController):
 
     def test_pokedex(self):
         u"""Checks searching by Pokédex."""
-        # TODO: zhorken is rewriting this atm
-        pass
+        self.check_search(
+            dict(in_pokedex=u'4'),
+            [ u'Sandshrew', u'Crobat', u'Lombre' ],
+            u'in Hoenn Pokedex',
+        )
+        self.check_search(
+            dict(in_pokedex=u'6'),
+            [ u'Eevee', u'Staraptor', (u'Giratina', u'altered') ],
+            u'in Sinnoh Pokedex',
+        )
+
+        # and several at once for good measure
+        self.check_search(
+            dict(in_pokedex=[u'7', u'4']),
+            [ u'Eevee', u'Espeon', u'Celebi', u'Silcoon', u'Nuzleaf', u'Aron' ],
+            u'in Johto or Hoenn Pokedex',
+        )
 
 
     def test_type(self):
