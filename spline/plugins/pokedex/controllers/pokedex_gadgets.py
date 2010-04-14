@@ -198,7 +198,7 @@ class PokedexGadgetsController(BaseController):
 
             # Gen II
             relative_level = None
-            if c.form.your_level.data:
+            if c.form.level.data and c.form.your_level.data:
                 # -1 because equality counts as bucket zero
                 relative_level = (c.form.your_level.data - 1) \
                                // c.form.level.data
