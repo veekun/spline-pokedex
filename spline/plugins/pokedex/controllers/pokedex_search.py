@@ -250,16 +250,16 @@ class PokedexSearchController(BaseController):
             def ilike(column, string):
                 # If there are no wildcards, assume it's a partial match
                 if '*' not in string and '?' not in string:
-                    string = "*{0}*".format(string)
+                    string = u"*{0}*".format(string)
 
                 # LIKE wildcards should be escaped: % -> ^%, _ -> ^_, ^ -> ^^
                 # Our wildcards should be changed: * -> %, ? -> _
                 # And all at once.
                 translations = {
-                    '%': '^%',      '_': '^_',      '^': '^^',
-                    '*': '%',       '?': '_',
+                    '%': u'^%',     '_': u'^_',     '^': u'^^',
+                    '*': u'%',      '?': u'_',
                 }
-                string = re.sub(r'([%_*?^])',
+                string = re.sub(ur'([%_*?^])',
                                 lambda match: translations[match.group(0)],
                                 string)
 
