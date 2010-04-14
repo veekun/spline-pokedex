@@ -267,7 +267,7 @@ class PokedexSearchController(BaseController):
 
             if ' ' in name:
                 # Hmm.  If there's a space, it might be a form name
-                form_name, name_sans_form = name.split(' ', 2)
+                form_name, name_sans_form = name.split(' ', 1)
                 query = query.filter(
                     or_(
                         # Either it was a form name...
