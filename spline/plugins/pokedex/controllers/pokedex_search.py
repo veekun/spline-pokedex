@@ -3,6 +3,7 @@ from __future__ import absolute_import, division
 
 import logging
 import re
+from string import Template
 
 from wtforms import Form, ValidationError, fields, widgets
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QueryTextField, QueryCheckboxMultipleSelectField
@@ -15,12 +16,29 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func, and_, not_, or_
 
 from spline.lib.base import BaseController, render
+from spline.lib import helpers as h
 
 from spline.plugins.pokedex import helpers as pokedex_helpers
 from spline.plugins.pokedex.db import pokedex_session
 from spline.plugins.pokedex.forms import RangeTextField
 
 log = logging.getLogger(__name__)
+
+# XXX probably needs to live elsewhere
+default_pokemon_table_columns = [
+    'name',
+    'type',
+    'ability',
+    'gender',
+    'egg_group',
+    'stat_hp',
+    'stat_attack',
+    'stat_defense',
+    'stat_special_attack',
+    'stat_special_defense',
+    'stat_speed',
+    'stat_total',
+]
 
 def in_pokedex_label(pokedex):
     """[ IV ] Sinnoh"""
@@ -165,22 +183,82 @@ class PokemonSearchForm(Form):
     )
 
 
+    # Order and display
+    # XXX mention fallback sort?  have a sort2?
+    sort = fields.SelectField('Sort by',
+        choices=[
+            ('name', 'Name'),
+            ('id', 'National dex number'),
+        ],
+        default='name',
+    )
+    display = fields.SelectField('Display',
+        choices=[
+            ('standard-table', 'Standard table'),
+            ('smart-table', 'Smart table'),
+            ('custom-table', 'Custom table'),
+            ('simple-list', 'Simple list'),
+            ('custom-list', 'Custom list'),
+            ('icons', 'Icons'),
+            ('sprites', 'Sprites'),
+        ],
+        default='smart-table',
+    )
 
-    def cleanse_data(self, data):
-        """Returns a copy of the given form data, with any default values
-        removed.
+    columns = fields.CheckboxMultiSelectField(
+        'Custom table columns',
+        choices=[
+            ('id', 'National ID'),
+            ('name', 'Name'),
+            ('type', 'Types'),
+            ('ability', 'Abilities'),
+            ('gender', 'Gender rate'),
+            ('egg_group', 'Egg groups'),
+            ('stat_hp', 'HP'),
+            ('stat_attack', 'Attack'),
+            ('stat_defense', 'Defense'),
+            ('stat_special_attack', 'Special Attack'),
+            ('stat_special_defense', 'Special Defense'),
+            ('stat_speed', 'Speed'),
+            ('stat_total', 'Stat total'),
+            ('effort', 'Effort given'),
+        ],
+        default=default_pokemon_table_columns,
+    )
+    format = fields.TextField('Custom list format', default=u'$icon $name')
+
+
+
+    def __init__(self, formdata=None, *args, **kwargs):
+        """Saves a copy of the passed form data, with default values removed,
+        in the `formdata` property.
         """
-        # Making a copy and deleting items, rather than adding new items to a
-        # new dictionary, allows data to not actually be a dictionary.  This is
-        # important given that it probably isn't; getlist() is called on it by
-        # wtforms code, and most frameworks have some multidict thing going on
-        # XXX it would be nice if this didn't include duplicate field defaults
-        newdata = data.copy()
-        for name, field in self._fields.iteritems():
-            if field.data == field._default and name in newdata:
-                del newdata[name]
 
-        return newdata
+        super(PokemonSearchForm, self).__init__(formdata, *args, **kwargs)
+
+        # Need to make a copy and delete items, rather than creating a new
+        # dict, because formdata is some variant of a multi-dict
+        if formdata:
+            self.cleansed_data = formdata.copy()
+            for name, field in self._fields.iteritems():
+                if field.data == field._default and name in self.cleansed_data:
+                    del self.cleansed_data[name]
+        else:
+            self.cleansed_data = {}
+
+    @property
+    def was_submitted(self):
+        """Returns true if the form was submitted with any meaningful data;
+        false otherwise.
+        """
+        extra_cleansed_data = self.cleansed_data.copy()
+        # Ignore display-only fields
+        extra_cleansed_data.pop('display', None)
+        extra_cleansed_data.pop('sort', None)
+        extra_cleansed_data.pop('columns', None)
+        extra_cleansed_data.pop('format', None)
+
+        return bool(extra_cleansed_data)
 
 
 class PokedexSearchController(BaseController):
@@ -189,7 +267,7 @@ class PokedexSearchController(BaseController):
         class F(PokemonSearchForm):
             pass
 
-        # Add stat-based fields
+        # Add stat-based fields dynamically
         c.stat_fields = []
         for stat in pokedex_session.query(tables.Stat) \
                                    .order_by(tables.Stat.id):
@@ -203,28 +281,25 @@ class PokedexSearchController(BaseController):
             setattr(F, 'stat_' + field_name, stat_field)
             setattr(F, 'effort_' + field_name, effort_field)
 
+
         ### Parse form, etc etc
         c.form = F(request.params)
 
         validates = c.form.validate()
-        cleansed_data = c.form.cleanse_data(request.params)
+        cleansed_data = c.form.cleansed_data
 
         # If this is the first time the form was submitted, redirect to a URL
-        # with only non-default values
-        if validates and cleansed_data and cleansed_data.get('shorten', None):
+        # with only non-default values.  Do this BEFORE the error check, so bad
+        # URLs are still shortened
+        if validates and c.form.was_submitted and cleansed_data.get('shorten', None):
             del cleansed_data['shorten']
             redirect_to(url.current(**cleansed_data.mixed()))
 
-        if not validates or not cleansed_data:
+        if not validates or not c.form.was_submitted:
             # Either blank, or errortastic.  Skip the logic and just send the
             # form back
-            c.search_performed = False
-
             return render('/pokedex/search/pokemon.mako')
 
-
-        # Let the template know we're actually doing something
-        c.search_performed = True
 
         ### Do the searching!
         me = tables.Pokemon
@@ -547,6 +622,70 @@ class PokedexSearchController(BaseController):
         # Habitat
         if c.form.habitat.data:
             query = query.filter( me.habitat_id == c.form.habitat.data.id )
+
+
+        ### Display and sorting
+        # Eagerloading is in here, too, since it depends heavily on how the
+        # results are actually shown
+        c.display_mode = c.form.display.data
+        c.display_columns = []
+
+        if c.display_mode == 'standard-table':
+            # Just do a "custom" table with a manual set of columns that happen
+            # to be the standard columns...
+            c.display_mode = 'custom-table'
+            c.display_columns = default_pokemon_table_columns
+
+        elif c.display_mode == 'smart-table':
+            # Based on the standard table, but a little more clever.  For
+            # example: searching by moves will show how the move is learned by
+            # each resulting Pokémon.
+            # TODO actually do that.
+            c.display_mode = 'custom-table'
+            c.display_columns = default_pokemon_table_columns
+
+        elif c.display_mode == 'custom-table':
+            # User can pick whatever columns, in any order.  Woo!
+            c.display_columns = c.form.columns.data
+            if not c.display_columns:
+                # Hmm.  Show name, at least.
+                c.display_columns = ['name']
+
+        elif c.display_mode == 'simple-list':
+            # This is a custom list with a fixed format string
+            c.display_mode = 'custom-list'
+            c.display_template = Template(u'$icon $name')
+
+        elif c.display_mode == 'custom-list':
+            # Use whatever they asked for; it'll get pumped through
+            # safe_substitute anyway.  This uses apply_pokemon_template from
+            # the pokedex helpers
+            c.display_template = Template(
+                h.escape(c.form.format.data)
+            )
+
+        else:
+            # icons and sprites don't need any special behavior
+            pass
+
+        # "Name" is the field that actually links to the page.  If it's
+        # missing, add a little link column
+        if c.display_mode == 'custom-table' and 'name' not in c.display_columns:
+            c.display_columns.append('link')
+
+        # nb: the below sort ascending for words (a->z) and descending for
+        # numbers (9->1), because that's how it should be, okay
+        # Default fallback sort is by name, then by id (in case of form)
+        sort_clauses = [ me.name.asc(), me.id.asc() ]
+        if c.form.sort.data == 'name':
+            # Name is fallback, so don't do anything
+            pass
+        elif c.form.sort.data == 'id':
+            sort_clauses.insert(0,
+                func.coalesce(me.base_forme_pokemon_id, me.id)
+            )
+
+        query = query.order_by(*sort_clauses)
 
 
         ### Run the query!

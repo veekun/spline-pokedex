@@ -24,11 +24,13 @@ ul.inline-menu > li:last-child:after { content: none; }
 
 /* Table columns */
 col.dex-col-name        { width: 10em; }
+col.dex-col-link        { width: 16px; }
 col.dex-col-stat        { width: 3em; }
 col.dex-col-stat-name   { width: 10em; }
 col.dex-col-stat-bar    { width: auto; }
 col.dex-col-stat-pctile { width: 5em; }
 col.dex-col-stat-result { width: 5em; }
+col.dex-col-effort      { width: 8em; }
 col.dex-col-type        { width: 3em; }
 col.dex-col-version     { width: 3.5em; }  /* two versions (32px < 33px == 3em) plus 0.17em padding < 3.5em */
 col.dex-col-encounter-name { width: 10em; }
@@ -151,6 +153,7 @@ table.dex-pokemon-moves td.type2 { text-align: left; }
 table.dex-pokemon-moves td.ability { font-size: 0.75em; }
 table.dex-pokemon-moves td.egg-group { font-size: 0.75em; }
 table.dex-pokemon-moves td.stat { text-align: right; }
+table.dex-pokemon-moves td.effort { font-size: 0.75em; text-align: left; }
 /* javascript filtering/sorting */
 table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls .js-label { font-size: 0.67em; }
 table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls:hover { background: transparent; }

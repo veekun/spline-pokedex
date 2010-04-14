@@ -115,12 +115,12 @@
 <th>Ability</th>
 <th>Gender</th>
 <th>Egg Group</th>
-<th>HP</th>
-<th>Atk</th>
-<th>Def</th>
-<th>SpA</th>
-<th>SpD</th>
-<th>Spd</th>
+<th><abbr title="Hit Points">HP</abbr></th>
+<th><abbr title="Attack">Atk</abbr></th>
+<th><abbr title="Defense">Def</abbr></th>
+<th><abbr title="Special Attack">SpA</abbr></th>
+<th><abbr title="Special Defense">SpD</abbr></th>
+<th><abbr title="Speed">Spd</abbr></th>
 <th>Total</th>
 </%def>
 

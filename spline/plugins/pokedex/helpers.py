@@ -55,7 +55,7 @@ def version_icons(*versions):
     return version_icons
 
 
-def pokemon_sprite(pokemon, prefix='platinum', **attr):
+def pokemon_sprite(pokemon, prefix='heartgold-soulsilver', **attr):
     """Returns an <img> tag for a Pokémon sprite."""
 
     # Kinda gross, but it's entirely valid to pass None as a form
@@ -225,3 +225,21 @@ def scale_sizes(size_dict, dimensions=1):
     for k, v in size_dict.items():
         scaled_sizes[k] = math.pow(v / max_size, 1.0 / dimensions)
     return scaled_sizes
+
+
+def apply_pokemon_template(template, pokemon):
+    u"""`template` should be a string.Template object.
+
+    Uses safe_substitute to inject some fields from the Pokémon into the
+    template.
+
+    This cheerfully returns a literal, so be sure to escape the original format
+    string BEFORE passing it to Template!
+    """
+
+    d = dict(
+        icon=pokemon_sprite(pokemon, prefix=u'icons'),
+        id=pokemon.national_id,
+        name=pokemon.full_name,
+    )
+    return h.literal(template.safe_substitute(d))
