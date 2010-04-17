@@ -682,7 +682,7 @@ class PokedexSearchController(BaseController):
             pass
         elif c.form.sort.data == 'id':
             sort_clauses.insert(0,
-                func.coalesce(me.base_forme_pokemon_id, me.id)
+                func.coalesce(me.forme_base_pokemon_id, me.id)
             )
 
         query = query.order_by(*sort_clauses)
