@@ -257,6 +257,8 @@ class PokemonSearchForm(Form):
         extra_cleansed_data.pop('sort', None)
         extra_cleansed_data.pop('columns', None)
         extra_cleansed_data.pop('format', None)
+        # 'shorten' isn't really a field
+        extra_cleansed_data.pop('shorten', None)
 
         return bool(extra_cleansed_data)
 
