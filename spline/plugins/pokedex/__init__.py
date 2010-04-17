@@ -15,6 +15,7 @@ import spline.plugins.pokedex.controllers.pokedex
 import spline.plugins.pokedex.controllers.pokedex_search
 import spline.plugins.pokedex.controllers.pokedex_gadgets
 import spline.plugins.pokedex.controllers.fake_gts
+import spline.plugins.pokedex.model
 from spline.plugins.pokedex import helpers as pokedex_helpers
 from spline.plugins.pokedex.db import get_by_name, pokedex_session
 import spline.lib.helpers as h
@@ -102,6 +103,9 @@ class PokedexPlugin(PluginBase):
 
             'fake_gts': controllers.fake_gts.FakeGTSController,
         }
+
+    def model(self):
+        return [spline.plugins.pokedex.model.FakeGTSBeta]
 
     def template_dirs(self):
         return [

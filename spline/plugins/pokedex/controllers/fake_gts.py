@@ -1,14 +1,18 @@
 # encoding: utf8
 from __future__ import absolute_import, division
 
+from base64 import urlsafe_b64decode
 from collections import namedtuple
+from itertools import izip
 import logging
 from random import sample
 from string import uppercase, lowercase, digits
+import struct
 
 import pokedex.db
 import pokedex.db.tables as tables
 import pokedex.formulae
+from pokedex.savefile import PokemonSave
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
 from sqlalchemy import and_, or_, not_
@@ -23,8 +27,56 @@ from spline.lib import helpers as h
 
 from spline.plugins.pokedex import db, helpers as pokedex_helpers
 from spline.plugins.pokedex.db import pokedex_session
+from spline.plugins.pokedex.model import FakeGTSBeta
 
 log = logging.getLogger(__name__)
+
+
+### Utility functions
+
+def gts_prng(seed):
+    """Implements the GTS's linear congruential generator.
+
+    I love typing that out.  It makes me sounds so smart.
+
+    Yields magical numbers."""
+    # 0xabcd => 0xabcdabcd
+    seed = seed | (seed << 16)
+    while True:
+        seed = (seed * 0x45 + 0x1111) & 0x7fffffff  # signed dword!
+        yield (seed >> 16) & 0xff
+
+def stream_decipher(data, keystream):
+    """Reverses a stream cipher, given iterable data and keystream.
+
+    Yields decrypted bytes.
+    """
+    for c, key in izip(data, keystream):
+        new_c = (ord(c) ^ key) & 0xff
+        yield chr(new_c)
+
+
+def decrypt_data(data):
+    """Takes a binary blob uploaded from a game and returns the original binary
+    blob.  Depending on your perspective, the returned value may be more
+    intelligible.
+    """
+    # GTS encryption is a simple stream cipher.
+    # The first four bytes of the data are a header containing an obfuscated
+    # key; the rest is the message
+    obf_key_blob, message = data[0:4], data[4:]
+    obf_key, = struct.unpack('>I', obf_key_blob)
+    key = obf_key ^ 0x4a3b2c1d
+
+    # Data is XORed with the output of an LCG, like everything else in Pokémon
+    return ''.join( stream_decipher(message, gts_prng(key)) )
+
+
+### Controller!
+
+def dbg(*args):
+    #print ' '.join(args)
+    pass
 
 class FakeGTSController(BaseController):
 
@@ -38,22 +90,30 @@ class FakeGTSController(BaseController):
         2. Easier to dump stuff if desired.
         """
 
-        print request
+        dbg(request)
 
         # Always return binary!
         response.headers['Content-type'] = 'application/octet-stream'
 
         if 'hash' in request.params:
-            # Okay, already done the response.  Dispatch!
+            # Okay, already done the response.  Decrypt, then dispatch!
+            if request.params['data']:
+                # Note: base64 doesn't like unicode.  Go figure.  It's binary
+                # junk, anyway.
+                encrypted_data = urlsafe_b64decode(str(request.params['data']))
+                data = decrypt_data(encrypted_data)
+                data = data[4:]  # data always starts with pid; we don't care
+            else:
+                data = ''
+
             method = 'page_' + page
-            try:
-                res = getattr(self, method)(request.params['pid'],
-                                             request.params['data'])
-                print "RESPONDING WITH ", type(res), len(res), repr(res)
-                return res
-            except AttributeError:
-                # Page doesn't exist...  yet?
+            if not hasattr(self, method):
+                dbg("NOT YET IMPLEMENTED?")
                 abort(404)
+
+            res = getattr(self, method)(request.params['pid'], data)
+            dbg("RESPONDING WITH ", type(res), len(res), repr(res))
+            return res
 
         # No hash.  Need to issue a challenge.  It's random, so whatever
         return ''.join(sample( uppercase + lowercase + digits, 32 ))
@@ -92,8 +152,16 @@ class FakeGTSController(BaseController):
         ol' Pokémon blob.
         """
 
-        # This is just some Combee I got off the internets for now
-        return '\xfc\x1bH\x86\x00\x00)\x98\xccFi\xa1=\xe7\xa6\xca\x1d\x0fR\xa5\xdcB\xe0l/\x04\xd9\x12\xf8\xc7\x95?|\xd4\xd4~C\xab\xa6B\xae\x90\xa8H\x05;\xba[#\xc0\xfc\xf3\xd5\tzsI\xdaB3\x94\xd8\x8a\xe4a\xd8\xbb\x02\xf4\xce\x98\xc32\xba\xe7I\x0e\xb9Av\xbf!\xb7\x00\xbc\xb7kR-\xe5\xd2W\xcb\xac\xb8)B\xdf-\x9e\xec\xee\xd8\xfd+G\x0b0\xb2\xe9w~\x1bfZ\xd4\x1c\xd4\xf5\x95\xa4N\xda\xb4c\xb4\xb4l\xbeCEE\x0e\x1d\xee\xde#\xc6_\x0b\r\xe2Z\xd2\xd5\xc2\x0f\xc1|\x0f\x05t\x96\x1f\x8b\x99\xb86\x06w\r?\x17\xd1\xb6\x82\\\xb4\x9fI\xa0\xec\xa9\xee\xe6c\x8b\xbb\xdb\xb5:\xfa\xed\x12\xe2\xfbk\xa6\xad\xa8R%\xe8P\xb9\x87U?\xf7D\x9f\xc5\xf7JIw]c\x9d\xd4a]W\x16\x8e1&\xec\xc6\xfc9#=2v\x1fFP\x06)*\xca]\x99]I\x9f\x01\x01\x0b\x01\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x002\x01S\x01W\x01L\x01M\x01\xff\xff\x00\x00\x00\x00\xa2i\x00\x00\x00\x00\x00\x00'
+        # Check for an existing Pokémon
+        stored_pokemon = meta.Session.query(model.FakeGTSBeta).get(pid)
+        if stored_pokemon:
+            # We've got one!  Cool, send it back.  The game will ask us to
+            # delete it after receiving successfully
+            pokemon_save = PokemonSave(stored_pokemon.pokemon_blob)
+            return pokemon_save.as_encrypted
+        else:
+            # Nothing
+            return '\x05\x00'
 
     def page_delete(self, pid, data):
         u"""delete.asp
@@ -104,5 +172,41 @@ class FakeGTSController(BaseController):
         Returns 0x0001.
         """
 
+        meta.Session.query(model.FakeGTSBeta).filter_by(pid=pid).delete()
+        meta.Session.commit()
+
         return '\x01\x00'
 
+    def page_post(self, pid, data):
+        u"""post.asp
+
+        Deposits a Pokémon in the GTS.  Returns 0x0001 on success, or 0x000c if
+        the deposit is rejected.
+        """
+
+        try:
+            # The uploaded Pokémon is encrypted, which is not very useful
+            pokemon_save = PokemonSave(data, encrypted=True)
+
+            # Create a record...
+            stored_pokemon = model.FakeGTSBeta(
+                pid=pid,
+                pokemon_blob=pokemon_save.as_struct,
+            )
+            meta.Session.add(stored_pokemon)
+            meta.Session.commit()
+            return '\x01\x00'
+        except:
+            # If that failed (presumably due to unique key collision), we're
+            # already storing something.  Reject!
+            return '\x0c\x00'
+
+    def page_post_finish(self, pid, data):
+        u"""post_finish.asp
+
+        Surely this does something, but for the life of me I can't figure out
+        what.
+
+        Returns 0x0001.
+        """
+        return '\x01\x00'
