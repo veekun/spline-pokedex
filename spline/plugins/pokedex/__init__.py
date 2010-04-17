@@ -14,6 +14,7 @@ import pokedex.lookup
 import spline.plugins.pokedex.controllers.pokedex
 import spline.plugins.pokedex.controllers.pokedex_search
 import spline.plugins.pokedex.controllers.pokedex_gadgets
+import spline.plugins.pokedex.controllers.fake_gts
 from spline.plugins.pokedex import helpers as pokedex_helpers
 from spline.plugins.pokedex.db import get_by_name, pokedex_session
 import spline.lib.helpers as h
@@ -39,6 +40,11 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/dex/types/{name}', controller='dex', action='types')
 
     map.connect('/dex/gadgets/pokeballs', controller='dex_gadgets', action='capture_rate')
+
+    # Fake GTS.  Awesome.
+    map.connect('/pokemondpds/worldexchange/{page}.asp', controller='fake_gts', action='dispatch')
+    map.connect('/pokemondpds/common/{page}.asp', controller='fake_gts', action='dispatch')
+
 
 def get_role(table):
     """Need a separate function here to avoid problems with generating closures
@@ -93,6 +99,8 @@ class PokedexPlugin(PluginBase):
             'dex': controllers.pokedex.PokedexController,
             'dex_search': controllers.pokedex_search.PokedexSearchController,
             'dex_gadgets': controllers.pokedex_gadgets.PokedexGadgetsController,
+
+            'fake_gts': controllers.fake_gts.FakeGTSController,
         }
 
     def template_dirs(self):

@@ -394,7 +394,12 @@ ${h.h1('Flavor')}
         <dt>Species</dt>
         <dd>${c.pokemon.species}</dd>
         <dt>Color</dt>
-        <dd>${c.pokemon.color}</dd>
+        <dd>
+            ${c.pokemon.color}
+            <a href="${url(controller='dex_search', action='pokemon_search', color=c.pokemon.color)}">
+                <img src="${h.static_uri('spline', 'icons/magnifier.png')}" alt="Search: " title="Search">
+            </a>
+        </dd>
         <dt>Cry</dt>
         <dd>${h.HTML.a('download mp3', href=url(controller='dex', action='media', path='cries/%d.mp3' % c.pokemon.national_id))}</dd>
         % if c.pokemon.generation.id <= 3:
