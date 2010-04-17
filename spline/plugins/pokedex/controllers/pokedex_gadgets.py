@@ -67,7 +67,7 @@ class CaptureRateForm(Form):
         ],
         default='land',
     )
-    opposite_gender = fields.BooleanField(u'Wild and your Pokémon are opposite genders')
+    twitterpating = fields.BooleanField(u'Wild and your Pokémon are opposite genders AND the same species')
     caught_before = fields.BooleanField(u'Wild Pokémon is in your Pokédex')
     is_dark = fields.BooleanField(u'Nighttime or walking in a cave')
 
@@ -156,24 +156,24 @@ class PokedexGadgetsController(BaseController):
             # Overrule a 'yes' for opposite genders if this Pokémon has no
             # gender
             if c.pokemon.gender_rate == -1:
-                c.form.opposite_gender.data = False
+                c.form.twitterpating.data = False
 
             percent_hp = c.form.current_hp.data / 100
 
-            status_bonus = 1
+            status_bonus = 10
             if c.form.status_ailment.data in ('PAR', 'BRN', 'PSN'):
-                status_bonus = 1.5
+                status_bonus = 15
             elif c.form.status_ailment.data in ('SLP', 'FRZ'):
-                status_bonus = 2
+                status_bonus = 20
 
             # Little wrapper around capture_chance...
-            def capture_chance(ball_bonus, heavy_modifier=0):
+            def capture_chance(ball_bonus=10, **kwargs):
                 return pokedex.formulae.capture_chance(
                     percent_hp=percent_hp,
                     capture_rate=c.pokemon.capture_rate,
-                    heavy_modifier=heavy_modifier,
-                    ball_bonus=ball_bonus,
                     status_bonus=status_bonus,
+                    ball_bonus=ball_bonus,
+                    **kwargs
                 )
 
             ### Do some math!
@@ -189,182 +189,179 @@ class PokedexGadgetsController(BaseController):
             # This is a teeny shortcut.
             only = lambda _: [CaptureChance( '', True, _ )]
 
+            normal_chance = capture_chance()
+
             # Gen I
-            c.results[u'Poké Ball']   = only(capture_chance(1))
-            c.results[u'Great Ball']  = only(capture_chance(1.5))
-            c.results[u'Ultra Ball']  = only(capture_chance(2))
+            c.results[u'Poké Ball']   = only(normal_chance)
+            c.results[u'Great Ball']  = only(capture_chance(15))
+            c.results[u'Ultra Ball']  = only(capture_chance(20))
             c.results[u'Master Ball'] = only((1.0, 0, 0, 0, 0))
-            c.results[u'Safari Ball'] = only(capture_chance(1.5))
+            c.results[u'Safari Ball'] = only(capture_chance(15))
 
             # Gen II
+            # NOTE: All the Gen II balls, as of HG/SS, modify CAPTURE RATE and
+            # leave the ball bonus alone.
             relative_level = None
             if c.form.level.data and c.form.your_level.data:
                 # -1 because equality counts as bucket zero
                 relative_level = (c.form.your_level.data - 1) \
                                // c.form.level.data
 
-            # Heavy Ball partitions by 100kg / 200kg / 300kg.  Weights are
-            # stored as...  hectograms.  So.
-            weight_class = int((c.pokemon.weight - 1) / 1000)
+            # Heavy Ball partitions by 102.4 kg.  Weights are stored as...
+            # hectograms.  So.
+            weight_class = int((c.pokemon.weight - 1) / 1024)
 
             # Ugh.
-            is_moony = c.pokemon.name in (u'Nidoran♀', u'Nidoran♂',
-                                        u'Clefairy', u'Jigglypuff', u'Skitty')
-
-            is_skittish = c.pokemon.name in (
-                u'Abra', u'Dragonair', u'Dratini', u'Eevee', u'Entei',
-                u'Grimer', u'Latias', u'Latios', u'Magnemite', u'Mr. Mime',
-                u'Porygon', u'Quagsire', u'Raikou', u'Suicune', u'Tangela',
+            is_moony = c.pokemon.name in (
+                u'Nidoran♀', u'Nidorina', u'Nidoqueen',
+                u'Nidoran♂', u'Nidorino', u'Nidoking',
+                u'Clefairy', u'Clefable', u'Jigglypuff', u'Wigglytuff',
+                u'Skitty', u'Delcatty',
             )
+
+            is_skittish = c.pokemon.stat('Speed').base_stat >= 100
 
             c.results[u'Level Ball']  = [
                 CaptureChance(u'Your level ≤ target level',
                     relative_level == 0,
-                    capture_chance(1)),
+                    normal_chance),
                 CaptureChance(u'Target level < your level ≤ 2 * target level',
                     relative_level == 1,
-                    capture_chance(2)),
+                    capture_chance(capture_bonus=20)),
                 CaptureChance(u'2 * target level < your level ≤ 4 * target level',
                     relative_level in (2, 3),
-                    capture_chance(4)),
+                    capture_chance(capture_bonus=40)),
                 CaptureChance(u'4 * target level < your level',
                     relative_level >= 4,
-                    capture_chance(8)),
+                    capture_chance(capture_bonus=80)),
             ]
             c.results[u'Lure Ball']   = [
                 CaptureChance(u'Hooked on a rod',
                     c.form.terrain.data == 'fishing',
-                    capture_chance(3)),
+                    capture_chance(capture_bonus=30)),
                 CaptureChance(u'Otherwise',
                     c.form.terrain.data != 'fishing',
-                    capture_chance(1)),
+                    normal_chance),
             ]
             c.results[u'Moon Ball']   = [
                 CaptureChance(u'Target evolves with a Moon Stone',
                     is_moony,
-                    capture_chance(4)),
+                    capture_chance(capture_bonus=40)),
                 CaptureChance(u'Otherwise',
                     not is_moony,
-                    capture_chance(1)),
+                    normal_chance),
             ]
-            c.results[u'Friend Ball'] = only(capture_chance(1))
+            c.results[u'Friend Ball'] = only(normal_chance)
             c.results[u'Love Ball']   = [
-                CaptureChance(u'Target is opposite gender of your Pokémon',
-                    c.form.opposite_gender.data,
-                    capture_chance(8)),
+                CaptureChance(u'Target is opposite gender of your Pokémon and the same species',
+                    c.form.twitterpating.data,
+                    capture_chance(capture_bonus=80)),
                 CaptureChance(u'Otherwise',
-                    not c.form.opposite_gender.data,
-                    capture_chance(1)),
+                    not c.form.twitterpating.data,
+                    normal_chance),
             ]
             c.results[u'Heavy Ball']   = [
-                CaptureChance(u'Target weight ≤ 100 kg',
+                CaptureChance(u'Target weight ≤ 102.4 kg',
                     weight_class == 0,
-                    capture_chance(1, heavy_modifier=-30)),
-                CaptureChance(u'100 < target weight ≤ 200 kg',
+                    capture_chance(capture_modifier=-20)),
+                CaptureChance(u'102.4 kg < target weight ≤ 204.8 kg',
                     weight_class == 1,
-                    capture_chance(1, heavy_modifier=0)),
-                CaptureChance(u'200 < target weight ≤ 300 kg',
+                    capture_chance(capture_modifier=-20)),  # sic; game bug
+                CaptureChance(u'204.8 kg < target weight ≤ 307.2 kg',
                     weight_class == 2,
-                    capture_chance(1, heavy_modifier=20)),
-                CaptureChance(u'300 < target weight',
-                    weight_class >= 3,
-                    capture_chance(1, heavy_modifier=30)),
+                    capture_chance(capture_modifier=20)),
+                CaptureChance(u'307.2 kg < target weight ≤ 409.6 kg',
+                    weight_class == 3,
+                    capture_chance(capture_modifier=30)),
+                CaptureChance(u'409.6 kg < target weight',
+                    weight_class >= 4,
+                    capture_chance(capture_modifier=40)),
             ]
             c.results[u'Fast Ball']   = [
-                CaptureChance(u'Target can run from wild battles',
+                CaptureChance(u'Target has base Speed of 100 or more',
                     is_skittish,
-                    capture_chance(4)),
+                    capture_chance(capture_bonus=40)),
                 CaptureChance(u'Otherwise',
                     not is_skittish,
-                    capture_chance(1)),
+                    normal_chance),
             ]
-            c.results[u'Sport Ball']  = only(capture_chance(1.5))
+            c.results[u'Sport Ball']  = only(capture_chance(15))
 
             # Gen III
             is_nettable = any(_.name in ('bug', 'water')
                               for _ in c.pokemon.types)
 
-            c.results[u'Premier Ball'] = only(capture_chance(1))
+            c.results[u'Premier Ball'] = only(normal_chance)
             c.results[u'Repeat Ball'] = [
                 CaptureChance(u'Target is already in Pokédex',
                     c.form.caught_before.data,
-                    capture_chance(3)),
+                    capture_chance(30)),
                 CaptureChance(u'Otherwise',
                     not c.form.caught_before.data,
-                    capture_chance(1)),
+                    normal_chance),
             ]
+            # Timer and Nest Balls use a gradient instead of partitions!  Keep
+            # the same desc but just inject the right bonus if there's enough
+            # to get the bonus correct.  Otherwise, assume the best case
             c.results[u'Timer Ball']  = [
-                CaptureChance(u'Turns passed ≤ 10',
+                CaptureChance(u'Better in later turns, caps at turn 30',
                     True,
-                    capture_chance(1)),
-                CaptureChance(u'10 < turns passed ≤ 20',
-                    True,
-                    capture_chance(2)),
-                CaptureChance(u'20 < turns passed ≤ 30',
-                    True,
-                    capture_chance(3)),
-                CaptureChance(u'30 < turns passed',
-                    True,
-                    capture_chance(4)),
+                    capture_chance(40)),
             ]
-            c.results[u'Nest Ball']   = [
-                CaptureChance(u'Target level ≤ 19',
-                    c.form.level.data <= 19,
-                    capture_chance(3)),
-                CaptureChance(u'20 ≤ target level ≤ 29',
-                    (20 <= c.form.level.data and c.form.level.data <= 29),
-                    capture_chance(2)),
-                CaptureChance(u'30 ≤ target level',
-                    30 <= c.form.level.data,
-                    capture_chance(1)),
-            ]
+            if c.form.level.data:
+                c.results[u'Nest Ball']   = [
+                    CaptureChance(u'Better against lower-level targets, worst at level 30+',
+                        True,
+                        capture_chance(max(10, 40 - c.form.level.data)))
+                ]
+            else:
+                c.results[u'Nest Ball']   = [
+                    CaptureChance(u'Better against lower-level targets, worst at level 30+',
+                        False,
+                        capture_chance(40)),
+                ]
             c.results[u'Net Ball']   = [
                 CaptureChance(u'Target is Water or Bug',
                     is_nettable,
-                    capture_chance(3)),
+                    capture_chance(30)),
                 CaptureChance(u'Otherwise',
                     not is_nettable,
-                    capture_chance(1)),
+                    normal_chance),
             ]
             c.results[u'Dive Ball']   = [
                 CaptureChance(u'Currently fishing or surfing',
                     c.form.terrain.data in ('fishing', 'surfing'),
-                    capture_chance(3.5)),
+                    capture_chance(35)),
                 CaptureChance(u'Otherwise',
                     c.form.terrain.data == 'land',
-                    capture_chance(1)),
+                    normal_chance),
             ]
-            c.results[u'Luxury Ball']  = only(capture_chance(1))
+            c.results[u'Luxury Ball']  = only(normal_chance)
 
             # Gen IV
-            c.results[u'Heal Ball']    = only(capture_chance(1))
+            c.results[u'Heal Ball']    = only(normal_chance)
             c.results[u'Quick Ball']  = [
-                CaptureChance(u'Turns passed ≤ 5',
+                CaptureChance(u'First turn',
                     True,
-                    capture_chance(4)),
-                CaptureChance(u'5 < turns passed ≤ 10',
+                    capture_chance(40)),
+                CaptureChance(u'Otherwise',
                     True,
-                    capture_chance(3)),
-                CaptureChance(u'10 < turns passed ≤ 15',
-                    True,
-                    capture_chance(2)),
-                CaptureChance(u'15 < turns passed',
-                    True,
-                    capture_chance(1)),
+                    normal_chance),
             ]
             c.results[u'Dusk Ball']    = [
                 CaptureChance(u'During the night and while walking in caves',
                     c.form.is_dark.data,
-                    capture_chance(4)),
+                    capture_chance(35)),
                 CaptureChance(u'Otherwise',
                     not c.form.is_dark.data,
-                    capture_chance(1)),
+                    normal_chance),
             ]
-            c.results[u'Cherish Ball'] = only(capture_chance(1))
-            c.results[u'Park Ball']    = only(capture_chance(255))
+            c.results[u'Cherish Ball'] = only(normal_chance)
+            c.results[u'Park Ball']    = only(capture_chance(2550))
 
 
             # Template needs to know how to find expected number of attempts
+            c.capture_chance = capture_chance
             c.expected_attempts = expected_attempts
             c.expected_attempts_oh_no = expected_attempts_oh_no
 

@@ -25,7 +25,7 @@ ${h.form(url.current(), method='GET')}
     ${lib.field('level', size=3)}
     ${lib.field('your_level', size=3)}
     ${lib.field('terrain')}
-    ${long_checkbox_field('opposite_gender')}
+    ${long_checkbox_field('twitterpating')}
     ${long_checkbox_field('caught_before')}
     ${long_checkbox_field('is_dark')}
 
@@ -85,15 +85,19 @@ ${h.end_form()}
     % if i == 0:
     <td class="expected-attempts" rowspan="${len(c.results[ball])}">
         <%
-            # Three identical partitions, plus one very long one.
-            # This is all pretty gross; sorry.
-            partition_size = 10 if ball == u'Timer Ball' else 5
-            partitions = [
-                (c.results[ball][_].chances[0], partition_size)
-                for _ in range(3)
-            ] + [
-                (c.results[ball][3].chances[0], None),
-            ]
+            if ball == u'Timer Ball':
+                # Gradient, from 1 through 30 turns.  Ick.
+                partitions = [
+                    (c.capture_chance(n + 10)[0], 1) for n in range(1, 30)
+                ] + [
+                    (c.capture_chance(40)[0], None)
+                ]
+            else:
+                # Quick Ball!  Great on turn 1; crap otherwise.
+                partitions = [
+                    (c.capture_chance(40)[0], 1),
+                    (c.capture_chance(10)[0], None),
+                ]
         %>
         ${"{0:.1f}".format( c.expected_attempts_oh_no(partitions) )}
         % endif
@@ -106,7 +110,7 @@ ${h.end_form()}
     % endif  ## up+b
 
     <td class="condition">
-        % if condition and len(c.results[ball]) > 1:
+        % if condition:
         ${condition}
         % endif
     </td>
