@@ -14,6 +14,7 @@ from pylons.controllers.util import abort, redirect_to
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func, and_, not_, or_
+from sqlalchemy.sql.operators import asc_op
 
 from spline.lib.base import BaseController, render
 from spline.lib import helpers as h
@@ -204,6 +205,8 @@ class PokemonSearchForm(Form):
         ],
         default='name',
     )
+    sort_backwards = fields.BooleanField('Sort backwards')
+
     display = fields.SelectField('Display',
         choices=[
             ('standard-table', 'Standard table'),
@@ -725,7 +728,10 @@ class PokedexSearchController(BaseController):
             # followed by Ivysaur and Venusaur dimmed.
             # XXX doing this for lists would be nice, too, but would sort of
             # break copy/paste, which is what lists are designed for
-            # XXX now that I think about it, they have * anyway.  whoops.
+
+            # DO NOT allow sorting backwards!  It breaks the template's
+            # indenting magic.  XXX fix me!
+            c.form.sort_backwards.data = False
 
             if c.display_mode in ('custom-table',):
                 # Grab the results first
@@ -817,6 +823,15 @@ class PokedexSearchController(BaseController):
 
             query, stat_alias = join_to_stat(stat_name)
             sort_clauses.insert(0, stat_alias.base_stat.desc())
+
+        # Reverse sort
+        if c.form.sort_backwards.data:
+            for i, clause in enumerate(sort_clauses):
+                # This is some semi-black SQLA magic...
+                if clause.modifier == asc_op:
+                    sort_clauses[i] = clause.element.desc()
+                else:
+                    sort_clauses[i] = clause.element.asc()
 
         query = query.order_by(*sort_clauses)
 

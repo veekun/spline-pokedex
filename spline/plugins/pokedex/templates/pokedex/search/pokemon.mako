@@ -214,6 +214,7 @@ ${h.form(url.current(), method='GET')}
     <dl class="standard-form">
         ${lib.field('display')}
         ${lib.field('sort')}
+        ${lib.field('sort_backwards')}
     </dl>
 </div>
 <div class="dex-column-2x">
