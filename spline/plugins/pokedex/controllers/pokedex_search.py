@@ -733,31 +733,47 @@ class PokedexSearchController(BaseController):
             # indenting magic.  XXX fix me!
             c.form.sort_backwards.data = False
 
-            if c.display_mode in ('custom-table',):
-                # Grab the results first
-                pokemon_ids = {}
-                evolution_chain_ids = set()
-                for id, chain_id in query.values(me.id, me.evolution_chain_id):
-                    evolution_chain_ids.add(chain_id)
-                    pokemon_ids[id] = None
+            # Grab the results first; needed for sorting even if the query is
+            # otherwise left alone, boo
+            pokemon_ids = {}
+            evolution_chain_ids = set()
+            for id, chain_id in query.values(me.id, me.evolution_chain_id):
+                evolution_chain_ids.add(chain_id)
+                pokemon_ids[id] = None
 
-                # Rebuild the query
+            # Rebuild the query
+            if c.display_mode in ('custom-table',):
                 query = pokedex_session.query(me).filter(
                     me.evolution_chain_id.in_( list(evolution_chain_ids) )
                 )
+            else:
+                query = pokedex_session.query(me) \
+                    .filter(me.id.in_(pokemon_ids.keys()))
 
-                # Let the template know which Pokémon are actually in the
-                # original result set
-                c.original_results = pokemon_ids
+            # Let the template know which Pokémon are actually in the original
+            # result set
+            c.original_results = pokemon_ids
 
-            # Actually sort it by family whether or not the query was
-            # rewritten.
-            # Evolution chain ids are explicitly set to be in order, so
-            # ordering by them is safe.  Within a chain, sort in evolution
-            # order -- in practice, putting babies first and then sorting by id
-            # always works
+            # Pokémon should be sorted by the id number of the first form of
+            # their chain to actually appear in the results.  This is wonky,
+            # but makes sure that fake results don't affect sorting
+            chain_sorting_alias = aliased(tables.Pokemon)
+            chain_sorting_subquery = pokedex_session.query(
+                    chain_sorting_alias.evolution_chain_id,
+                    func.min(chain_sorting_alias.id).label('chain_position')
+                ) \
+                .filter(chain_sorting_alias.id.in_(pokemon_ids)) \
+                .group_by(chain_sorting_alias.evolution_chain_id) \
+                .subquery()
+
+            query = query.join((
+                chain_sorting_subquery,
+                chain_sorting_subquery.c.evolution_chain_id
+                    == me.evolution_chain_id
+            ))
+
             sort_clauses = [
-                    me.evolution_chain_id.asc(),
+                    chain_sorting_subquery.c.chain_position,
                     me.is_baby.desc(),
                     me.id.asc(),
                 ] + sort_clauses
