@@ -145,15 +145,24 @@ table.dex-pokemon-moves td { padding: 0.33em; vertical-align: middle; text-align
 table.dex-pokemon-moves th { padding: 0.33em 0.17em; text-align: center; }
 table.dex-pokemon-moves tr.subheader-row th { padding: 0.17em 0.33em; text-align: left; }
 table.dex-pokemon-moves td.egg { padding: 0 /* egg sprite consumes a lot of space, so let it extend into padding */; }
+table.dex-pokemon-moves td.icon { padding: 0 /* icons consume a lot of space, so let em extend into padding */; }
+table.dex-pokemon-moves td.name { white-space: nowrap; }
 table.dex-pokemon-moves td.effect { font-size: 0.8em; text-align: left; }
 table.dex-pokemon-moves td.effect p { margin: 0; }
 table.dex-pokemon-moves td.tutored { white-space: nowrap; }
 table.dex-pokemon-moves .no-tutor { visibility: hidden; }
 table.dex-pokemon-moves td.type2 { text-align: left; }
-table.dex-pokemon-moves td.ability { font-size: 0.75em; }
-table.dex-pokemon-moves td.egg-group { font-size: 0.75em; }
+table.dex-pokemon-moves td.ability { font-size: 0.75em; padding: 0.25em; }
+table.dex-pokemon-moves td.egg-group { font-size: 0.75em; padding: 0.25em; }
 table.dex-pokemon-moves td.stat { text-align: right; }
-table.dex-pokemon-moves td.effort { font-size: 0.75em; text-align: left; }
+table.dex-pokemon-moves td.effort { font-size: 0.75em; padding: 0.25em; text-align: left; }
+/* "sorting" pokemon search results by evolution chain */
+table.dex-pokemon-moves tr.fake-result td { opacity: 0.25; }
+table.dex-pokemon-moves tr.chain-divider { border-top: 2px solid #b4c7e6; }
+table.dex-pokemon-moves tr.evolution-depth-0 td.name { text-align: left; }
+table.dex-pokemon-moves tr.evolution-depth-1 td.name { padding-left: 1em; text-align: left; }
+table.dex-pokemon-moves tr.evolution-depth-2 td.name { padding-left: 2em; text-align: left; }
+table.dex-pokemon-moves tr.evolution-depth-3 td.name { padding-left: 3em; text-align: left; }
 /* javascript filtering/sorting */
 table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls .js-label { font-size: 0.67em; }
 table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls:hover { background: transparent; }

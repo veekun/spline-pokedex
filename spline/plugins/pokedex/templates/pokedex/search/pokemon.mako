@@ -26,12 +26,59 @@ ${getattr(self, 'col_' + column)()}
     ${getattr(self, 'th_' + column)()}
     % endfor
 </tr>
+
+<%
+    evolution_chain_stack = []
+    last_evolution_chain_id = None
+%>\
 % for result in c.results:
-<tr>
-    % for column in c.display_columns:
-    ${getattr(self, 'td_' + column)(result)}
-    % endfor
-</tr>
+    <%
+        tr_classes = []
+        if c.original_results is not None:
+            # Evolution chain sorting.
+            # Need to make the indenting right, and take care of fake results
+
+            # Indenting is kept right by keeping a running list of this
+            # Pokémon's ancestry.  Luckily, except for babies, National Dex
+            # order is always post-order
+            if last_evolution_chain_id == result.evolution_chain_id:
+                # Still in the same family.  Look for this Pokémon's immediate
+                # parent somewhere in the stack, in case this is a sibling.
+                # Yes, this will die if the parent hasn't been seen
+                while evolution_chain_stack[-1] != \
+                    result.evolution_parent_pokemon_id:
+
+                    evolution_chain_stack.pop()
+
+            else:
+                # New family; reset everything and show a divider
+                if result.is_baby:
+                    evolution_chain_stack = []
+                else:
+                    # Stub out a baby
+                    evolution_chain_stack = [None]
+
+                if last_evolution_chain_id is not None:
+                    tr_classes.append(u'chain-divider')
+                last_evolution_chain_id = result.evolution_chain_id
+
+            # nb: babies are depth zero
+            tr_classes.append(
+                u"evolution-depth-{0}".format(len(evolution_chain_stack))
+            )
+
+            if result.id not in c.original_results:
+                # Fake!
+                tr_classes.append(u'fake-result')
+
+            evolution_chain_stack.append(result.id)
+    %>\
+
+    <tr class="${u' '.join(tr_classes)}">
+        % for column in c.display_columns:
+        ${getattr(self, 'td_' + column)(result)}
+        % endfor
+    </tr>
 % endfor
 </table>
 
@@ -198,9 +245,13 @@ ${h.end_form()}
 <%def name="th_id()"><th>Num</th></%def>
 <%def name="td_id(pokemon)"><td>${pokemon.national_id}</td></%def>
 
+<%def name="col_icon()"><col class="dex-col-icon"></%def>
+<%def name="th_icon()"><th></th></%def>
+<%def name="td_icon(pokemon)"><td class="icon">${h.pokedex.pokemon_sprite(pokemon, prefix='icons')}</td></%def>
+
 <%def name="col_name()"><col class="dex-col-name"></%def>
 <%def name="th_name()"><th>Name</th></%def>
-<%def name="td_name(pokemon)"><td>${h.pokedex.pokemon_link(pokemon, pokemon.full_name)}</td></%def>
+<%def name="td_name(pokemon)"><td class="name">${h.pokedex.pokemon_link(pokemon, pokemon.full_name)}</td></%def>
 
 <%def name="col_type()"><col class="dex-col-type2"></%def>
 <%def name="th_type()"><th>Type</th></%def>

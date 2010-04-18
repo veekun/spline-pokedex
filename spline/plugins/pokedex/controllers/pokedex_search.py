@@ -26,6 +26,7 @@ log = logging.getLogger(__name__)
 
 # XXX probably needs to live elsewhere
 default_pokemon_table_columns = [
+    'icon',
     'name',
     'type',
     'ability',
@@ -187,8 +188,19 @@ class PokemonSearchForm(Form):
     # XXX mention fallback sort?  have a sort2?
     sort = fields.SelectField('Sort by',
         choices=[
-            ('name', 'Name'),
             ('id', 'National dex number'),
+            ('evolution-chain', 'Evolution family'),
+            ('name', 'Name'),
+            ('type', 'Type'),
+            ('height', 'Height'),
+            ('weight', 'Weight'),
+            ('stat-hp', 'HP'),
+            ('stat-attack', 'Attack'),
+            ('stat-defense', 'Defense'),
+            ('stat-special-attack', 'Special Attack'),
+            ('stat-special-defense', 'Special Defense'),
+            ('stat-speed', 'Speed'),
+            ('stat-total', 'Stat total'),
         ],
         default='name',
     )
@@ -209,6 +221,7 @@ class PokemonSearchForm(Form):
         'Custom table columns',
         choices=[
             ('id', 'National ID'),
+            ('icon', 'Icon'),
             ('name', 'Name'),
             ('type', 'Types'),
             ('ability', 'Abilities'),
@@ -306,6 +319,28 @@ class PokedexSearchController(BaseController):
         ### Do the searching!
         me = tables.Pokemon
         query = pokedex_session.query(me)
+
+        # Sorting and filtering by stat both need to join to the stat table for
+        # the specific stat in question.  Keep track of these joins to avoid
+        # doing them multiple times
+        stat_aliases = {}
+        def join_to_stat(stat):
+            # stat can be an id, object, or name
+            if isinstance(stat, basestring):
+                stat = pokedex_session.query(tables.Stat).filter_by(name=stat) \
+                                      .one()
+            elif isinstance(stat, int):
+                stat = pokedex_session.query(tables.Stat).get(stat)
+
+            if stat not in stat_aliases:
+                stat_alias = aliased(tables.PokemonStat)
+                new_query = query.join(stat_alias)
+                new_query = new_query.filter(stat_alias.stat_id == stat.id)
+                stat_aliases[stat] = stat_alias
+            else:
+                new_query = query
+
+            return new_query, stat_aliases[stat]
 
         # ID
         if c.form.id.data:
@@ -462,9 +497,9 @@ class PokedexSearchController(BaseController):
         if c.form.evolution_position.data or c.form.evolution_special.data:
             child_pokemon = aliased(tables.Pokemon)
             child_subquery = pokedex_session.query(
-                child_pokemon.evolution_parent_pokemon_id.label('parent_id'),
-                func.count('*').label('child_count'),
-            ) \
+                    child_pokemon.evolution_parent_pokemon_id.label('parent_id'),
+                    func.count('*').label('child_count'),
+                ) \
                 .group_by(child_pokemon.evolution_parent_pokemon_id) \
                 .subquery()
 
@@ -607,9 +642,7 @@ class PokedexSearchController(BaseController):
             effort_field = c.form['effort_' + field_name]
 
             if stat_field.data or effort_field.data:
-                stat_alias = aliased(tables.PokemonStat)
-                query = query.join(stat_alias)
-                query = query.filter(stat_alias.stat_id == stat_id)
+                query, stat_alias = join_to_stat(stat_id)
 
                 if stat_field.data:
                     query = query.filter(stat_field.data(stat_alias.base_stat))
@@ -626,11 +659,10 @@ class PokedexSearchController(BaseController):
             query = query.filter( me.habitat_id == c.form.habitat.data.id )
 
 
-        ### Display and sorting
-        # Eagerloading is in here, too, since it depends heavily on how the
-        # results are actually shown
+        ### Display
         c.display_mode = c.form.display.data
         c.display_columns = []
+        c.original_results = None  # evolution chain thing
 
         if c.display_mode == 'standard-table':
             # Just do a "custom" table with a manual set of columns that happen
@@ -675,19 +707,121 @@ class PokedexSearchController(BaseController):
         if c.display_mode == 'custom-table' and 'name' not in c.display_columns:
             c.display_columns.append('link')
 
+        ### Sorting
         # nb: the below sort ascending for words (a->z) and descending for
         # numbers (9->1), because that's how it should be, okay
         # Default fallback sort is by name, then by id (in case of form)
         sort_clauses = [ me.name.asc(), me.id.asc() ]
-        if c.form.sort.data == 'name':
-            # Name is fallback, so don't do anything
-            pass
-        elif c.form.sort.data == 'id':
+        if c.form.sort.data == 'id':
             sort_clauses.insert(0,
-                func.coalesce(me.forme_base_pokemon_id, me.id)
+                func.coalesce(me.forme_base_pokemon_id, me.id).asc()
             )
 
+        elif c.form.sort.data == 'evolution-chain':
+            # This one is very special!  It affects sorting, but if the display
+            # is a table, sorting by chain will also show other Pokémon from
+            # each family, even if they don't match the search criteria.
+            # E.g., a search that produces Bulbasaur will display Bulbasaur,
+            # followed by Ivysaur and Venusaur dimmed.
+            # XXX doing this for lists would be nice, too, but would sort of
+            # break copy/paste, which is what lists are designed for
+            # XXX now that I think about it, they have * anyway.  whoops.
+
+            if c.display_mode in ('custom-table',):
+                # Grab the results first
+                pokemon_ids = {}
+                evolution_chain_ids = set()
+                for id, chain_id in query.values(me.id, me.evolution_chain_id):
+                    evolution_chain_ids.add(chain_id)
+                    pokemon_ids[id] = None
+
+                # Rebuild the query
+                query = pokedex_session.query(me).filter(
+                    me.evolution_chain_id.in_( list(evolution_chain_ids) )
+                )
+
+                # Let the template know which Pokémon are actually in the
+                # original result set
+                c.original_results = pokemon_ids
+
+            # Actually sort it by family whether or not the query was
+            # rewritten.
+            # Evolution chain ids are explicitly set to be in order, so
+            # ordering by them is safe.  Within a chain, sort in evolution
+            # order -- in practice, putting babies first and then sorting by id
+            # always works
+            sort_clauses = [
+                    me.evolution_chain_id.asc(),
+                    me.is_baby.desc(),
+                    me.id.asc(),
+                ] + sort_clauses
+
+        elif c.form.sort.data == 'name':
+            # Name is fallback, so don't do anything
+            pass
+
+        elif c.form.sort.data == 'type':
+            # Sort by type1, then type2.  Unfortunately, need to left-join
+            # independently for each type to make this work right
+            type_sort_clauses = []
+            for type_slot in [1, 2]:
+                pokemon_type_alias = aliased(tables.PokemonType)
+                type_alias = aliased(tables.Type)
+
+                query = query \
+                    .outerjoin((pokemon_type_alias,
+                        and_(pokemon_type_alias.pokemon_id == me.id,
+                             pokemon_type_alias.slot == type_slot))) \
+                    .outerjoin((type_alias,
+                        pokemon_type_alias.type_id == type_alias.id))
+
+                # Single-type should come first; i.e., sorting by type2 asc
+                # means NULL should come first.  This isn't the default in
+                # postgres (and elsewhere?), so do it explicitly
+                if type_slot == 2:
+                    # Booleans sort by false, true -- so this should be desc to
+                    # put NULL first
+                    type_sort_clauses.append((type_alias.id == None).desc())
+
+                type_sort_clauses.append(type_alias.name.asc())
+
+            sort_clauses = type_sort_clauses + sort_clauses
+
+        elif c.form.sort.data == 'height':
+            sort_clauses.insert(0, me.height.desc())
+
+        elif c.form.sort.data == 'weight':
+            sort_clauses.insert(0, me.weight.desc())
+
+        elif c.form.sort.data == 'stat-total':
+            # Create a subquery that sums all base stats
+            stat_total = aliased(tables.PokemonStat)
+            stat_total_subquery = pokedex_session.query(
+                    stat_total.pokemon_id,
+                    func.sum(stat_total.base_stat).label('stat_total'),
+                ) \
+                .group_by(stat_total.pokemon_id) \
+                .subquery()
+
+            query = query.outerjoin((
+                stat_total_subquery,
+                me.id == stat_total_subquery.c.pokemon_id
+            ))
+
+            sort_clauses.insert(0, stat_total_subquery.c.stat_total.desc())
+
+        elif c.form.sort.data[0:5] == 'stat-':
+            # Gross!  stat_special_attack => Special Attack
+            stat_name = c.form.sort.data[5:]
+            stat_name = stat_name.replace('-', ' ').title()
+
+            query, stat_alias = join_to_stat(stat_name)
+            sort_clauses.insert(0, stat_alias.base_stat.desc())
+
         query = query.order_by(*sort_clauses)
+
+        ### Eagerloading
+        # TODO!
 
 
         ### Run the query!
