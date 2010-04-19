@@ -466,6 +466,8 @@ class TestPokemonSearchController(TestController):
         - n–m
         - n+ or +m
         - n- or -m  (negative numbers are impossible)
+        - n~m or n±m
+        - n~ or ~m
 
         In the case of size, there's extra parsing to do for units; however,
         that won't conflict with any of the above rules.
@@ -517,6 +519,25 @@ class TestPokemonSearchController(TestController):
             exact=True,
         )
 
+        self.check_search(
+            dict(id=u'5~1'),
+            [ u'Charmander', u'Charmeleon', u'Charizard' ],
+            'range: n~m',
+            exact=True,
+        )
+        self.check_search(
+            dict(id=u'133~'),
+            [ u'Eevee' ],
+            'range: n~ (same as just n)',
+            exact=True,
+        )
+        self.check_search(
+            dict(id=u'~9'),
+            [ u'Wartortle', u'Blastoise', u'Caterpie' ],
+            'range: ~m',
+            exact=True,
+        )
+
     def test_stats(self):
         """Check that searching by stats works correctly."""
         self.check_search(
@@ -543,7 +564,7 @@ class TestPokemonSearchController(TestController):
 
     def test_size(self):
         """Check that searching by size works correctly."""
-        # XXX what should a size with no units do?  default american units?
+        # XXX what should a size with no units do?  default american units?  just fail?
         self.check_search(
             dict(height=u'0m-8in'),
             [ u'Natu' ],

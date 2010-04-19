@@ -91,9 +91,18 @@ class RangeQueryEvaluator(object):
         return or_(*clauses)
 
 class RangeTextField(fields.TextField):
-    """Parses a string of the form 'a, b, c-e'."""
-    def __init__(self, label=u'', validators=[], **kwargs):
+    """Parses a string of the form 'a, b, c-e'.
+
+    `inflator` converts each chunk (a, b, c, and e) to a number.  If it dies,
+    the range is taken to be invalid.
+    """
+    def __init__(self, label=u'', validators=[], inflator=None, **kwargs):
         super(fields.TextField, self).__init__(label, validators, **kwargs)
+
+        if not inflator:
+            raise ValueError('RangeTextField requires an inflator')
+
+        self.inflator = inflator
         self._original_data = u''
 
     def __call__(self, *args, **kwargs):
@@ -103,14 +112,14 @@ class RangeTextField(fields.TextField):
 
         return super(fields.TextField, self).__call__(*args, **kwargs)
 
-    def _make_float(self, n):
+    def _make_number(self, n):
+        if n == u'':
+            return None
+
         try:
-            if n == u'':
-                return None
-            else:
-                return float(n)
-        except ValueError:
-            raise ValidationError('Invalid range')
+            return self.inflator(n)
+        except:
+            raise ValidationError("Don't know what '{0}' is".format(n))
 
     def process_formdata(self, valuelist):
         if not valuelist or not valuelist[0]:
@@ -122,17 +131,59 @@ class RangeTextField(fields.TextField):
 
         sentence = valuelist[0].strip()
         for phrase in re.split(r'\s*,\s*', sentence):
-            endpoints = re.split(ur'\s*(?:-|–|[.][.]|[+])\s*', phrase, 1)
+            # Allowed separators: - – .. + ~ ±
+            endpoints = re.split(ur'([.]{2}|[-–+~±])', phrase, 1)
+
+            if len(endpoints) > 3:
+                # Can't handle this yet.  TODO: try it each way
+                raise ValidationError('Invalid range')
 
             if len(endpoints) == 1:
-                # Not a range; just a single item
-                partitions.append(self._make_float(endpoints[0]))
-            else:
-                # a-b
-                endpoints[0] = self._make_float(endpoints[0])
-                endpoints[1] = self._make_float(endpoints[1])
+                # Not a range; just a single item.  Use the same logic as below
+                # so the error fudging still works
+                endpoints = [ endpoints[0], '-', endpoints[0] ]
 
-                partitions.append(tuple(endpoints))
+            # The split captured, so endpoints is [a, '-', b]
+            delimiter = endpoints.pop(1)
+
+            # Note; either of these can be None
+            a = self._make_number(endpoints[0])
+            b = self._make_number(endpoints[1])
+
+            if a is None and b is None:
+                raise ValidationError("'{0}' is not a valid range".format(delimiter))
+
+            error = 0
+            if isinstance(a, float) or isinstance(b, float):
+                # Allow +/- 0.5.  All the numbers in the db are integers,
+                # and unit conversions can introduce rounding error
+                error = 0.5
+
+            if delimiter in ('~', u'±'):
+                # 10~3 means 7-13.
+                # It's possible for a or b to be None here
+                if a is None:
+                    # If a is None ("~b"), take that to mean "about b", and
+                    # auto-approximate.  Half the square root seems reasonable;
+                    # ~100 becomes 95-105, and ~50 becomes 46-54.
+                    a = b
+                    b = a ** 0.5 / 2
+                elif b is None:
+                    # If b is None ("a~"), just make b zero.
+                    b = 0.0
+
+                partitions.append((a - b - error, a + b + error))
+
+            else:
+                # Force them to be in the right order
+                if a is not None and b is not None:
+                    a, b = sorted((a, b))
+
+                if a is not None:
+                    a -= error
+                if b is not None:
+                    b += error
+                partitions.append((a, b))
 
         self.data = RangeQueryEvaluator(partitions)
 

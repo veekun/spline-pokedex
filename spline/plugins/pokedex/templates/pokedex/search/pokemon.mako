@@ -188,7 +188,9 @@ ${h.form(url.current(), method='GET')}
 </div>
 
 <h2>Numbers</h2>
-<p>Understands ranges in the form <code>-3, 5, 9, 12-16, 20+</code>.</p>
+<p>Understands single numbers (<code>50</code>), ranges (<code>17-29</code>), at-least (<code>100+</code>), at-most (<code>-100</code>, the same as <code>0-100</code>), approximations (<code>120~10</code>, the same as <code>110-130</code>), and any combination of those (<code>20, 50-60, 90~5</code>).</p>
+<p>Height and weight work the same way, but expect units.  Anything is acceptable.</p>
+
 <div class="dex-column-container">
 <div class="dex-column">
     <h3>Base stats</h3>
@@ -204,6 +206,13 @@ ${h.form(url.current(), method='GET')}
         % for stat_id, field_name in c.stat_fields:
         ${lib.field('effort_' + field_name)}
         % endfor
+    </dl>
+</div>
+<div class="dex-column">
+    <h3>Size</h3>
+    <dl class="standard-form">
+        ${lib.field('height')}
+        ${lib.field('weight')}
     </dl>
 </div>
 </div>
@@ -327,6 +336,22 @@ ${pokemon_stat.effort} ${pokemon_stat.stat.name}<br>
 % endfor
 </td>\
 </%def>
+
+<%def name="col_height()"><col class="dex-col-height"></%def>
+<%def name="th_height()"><th>Height</th></%def>
+<%def name="td_height(pokemon)"><td class="stat">${h.pokedex.format_height_imperial(pokemon.height)}</td></%def>
+
+<%def name="col_weight()"><col class="dex-col-weight"></%def>
+<%def name="th_weight()"><th>Weight</th></%def>
+<%def name="td_weight(pokemon)"><td class="stat">${h.pokedex.format_weight_imperial(pokemon.weight)}</td></%def>
+
+<%def name="col_height_metric()"><col class="dex-col-height"></%def>
+<%def name="th_height_metric()"><th>Height</th></%def>
+<%def name="td_height_metric(pokemon)"><td class="stat">${h.pokedex.format_height_metric(pokemon.height)}</td></%def>
+
+<%def name="col_weight_metric()"><col class="dex-col-weight"></%def>
+<%def name="th_weight_metric()"><th>Weight</th></%def>
+<%def name="td_weight_metric(pokemon)"><td class="stat">${h.pokedex.format_weight_metric(pokemon.weight)}</td></%def>
 
 <%def name="col_link()"><col class="dex-col-link"></%def>
 <%def name="th_link()"><th></th></%def>

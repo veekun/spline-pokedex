@@ -255,6 +255,7 @@ var weight_abbrs = {
 // Returns a single number, in whatever units the `units` hash scales to.
 // TODO accept pokemon names
 // TODO return the "primary" unit (whatever that means) and show pokemon size in it
+// TODO just offload this to the server  :|
 function parse_size(size, units, abbrs) {
     // Strip whitespace
     size = size.replace(/[\s,]/g, '');

@@ -22,6 +22,7 @@ from spline.lib import helpers as h
 from spline.plugins.pokedex import helpers as pokedex_helpers
 from spline.plugins.pokedex.db import pokedex_session
 from spline.plugins.pokedex.forms import RangeTextField
+from spline.plugins.pokedex.magnitude import parse_size
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +56,7 @@ class PokemonSearchForm(Form):
     # is left blank
     shorten = fields.HiddenField(default=u'')
 
-    id = RangeTextField('National ID')
+    id = RangeTextField('National ID', inflator=int)
 
     # Core stuff
     name = fields.TextField('Name', default=u'')
@@ -169,6 +170,8 @@ class PokemonSearchForm(Form):
     # Numbers
     # Effort and stats are pulled from the database, so those fields are added
     # dynamically
+    height = RangeTextField('Height', inflator=lambda _: parse_size(_, 'height'))
+    weight = RangeTextField('Weight', inflator=lambda _: parse_size(_, 'weight'))
 
     # Flavor
     color = QuerySelectField('Color',
@@ -227,6 +230,10 @@ class PokemonSearchForm(Form):
             ('icon', 'Icon'),
             ('name', 'Name'),
             ('type', 'Types'),
+            ('height', 'Height'),
+            ('height_metric', 'Height (in metric)'),
+            ('weight', 'Weight'),
+            ('weight_metric', 'Weight (in metric)'),
             ('ability', 'Abilities'),
             ('gender', 'Gender rate'),
             ('egg_group', 'Egg groups'),
@@ -291,8 +298,8 @@ class PokedexSearchController(BaseController):
                                    .order_by(tables.Stat.id):
             field_name = stat.name.lower().replace(u' ', u'_')
 
-            stat_field = RangeTextField(stat.name)
-            effort_field = RangeTextField(stat.name)
+            stat_field = RangeTextField(stat.name, inflator=int)
+            effort_field = RangeTextField(stat.name, inflator=int)
 
             c.stat_fields.append((stat.id, field_name))
 
@@ -652,6 +659,12 @@ class PokedexSearchController(BaseController):
 
                 if effort_field.data:
                     query = query.filter(effort_field.data(stat_alias.effort))
+
+        if c.form.height.data:
+            query = query.filter(c.form.height.data(me.height))
+
+        if c.form.weight.data:
+            query = query.filter(c.form.weight.data(me.weight))
 
         # Color
         if c.form.color.data:
