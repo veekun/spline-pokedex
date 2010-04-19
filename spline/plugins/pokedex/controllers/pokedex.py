@@ -334,9 +334,14 @@ class PokedexController(BaseController):
 
         prefix = request.params.get('prefix', None)
         if not prefix:
-            return []
+            return '[]'
 
-        suggestions = pokedex_lookup.prefix_lookup(prefix)
+        valid_types = request.params.getall('type')
+
+        suggestions = pokedex_lookup.prefix_lookup(
+            prefix,
+            valid_types=valid_types,
+        )
 
         names = []     # actual terms that will appear in the list
         metadata = []  # parallel array of metadata my suggest widget uses
@@ -380,13 +385,17 @@ class PokedexController(BaseController):
 
             metadata.append(meta)
 
+        normalized_name = pokedex_lookup.normalize_name(prefix)
+        if ':' in normalized_name:
+            _, normalized_name = normalized_name.split(':', 1)
+
         data = [
             prefix,
             names,
             None,       # descriptions
             None,       # query URLs
             metadata,   # my metadata; outside the spec's range
-            pokedex_lookup.normalize_name(prefix)  # the key we actually looked for
+            normalized_name,  # the key we actually looked for
         ]
 
         ### Format as JSON.  Also sets the content-type and supports JSONP --

@@ -226,7 +226,7 @@ ${h.form(url.current(), method='GET')}
     <ul>
         % for field in c.form.move:
         <li>
-            ${field() | n}
+            ${field(class_='js-dex-suggest js-dex-suggest-move') | n}
             % for error in field.errors:
             <p class="error">${error}</p>
             % endfor

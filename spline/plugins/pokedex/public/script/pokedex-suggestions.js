@@ -79,9 +79,9 @@ var pokedex_suggestions = {
                 $suggest_box.children().remove();
                 $suggest_box.scrollTop(0);
 
-                var len = input.length;
                 var suggestions = res[1];
                 var normalized_input = res[5];
+                var len = normalized_input.length;
                 for (var i in suggestions) {
                     var suggestion = suggestions[i];
                     var metadata = res[4][i];
@@ -231,9 +231,9 @@ var pokedex_suggestions = {
             }
 
             // Otherwise, populate target lookup box...
-            $lookup.val(
-                pokedex_suggestions.get_lookup_input($selected)
-            );
+            var new_input = pokedex_suggestions.get_lookup_input($selected);
+            $lookup.val(new_input);
+            pokedex_suggestions.previous_input = new_input;  // prevent ajaxing again
 
             // ...and kill submit
             e.preventDefault();
