@@ -417,6 +417,9 @@ class PokedexController(BaseController):
             (c.pokemon.national_id - 1 + 1) % max_id + 1)
         return prev_pokemon, next_pokemon
 
+    def pokemon_list(self):
+        return render('/pokedex/pokemon_list.mako')
+
     def pokemon(self, name=None):
         form = request.params.get('form', None)
         try:
