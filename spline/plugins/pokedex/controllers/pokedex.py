@@ -1284,6 +1284,13 @@ class PokedexController(BaseController):
         return
 
 
+    def types_list(self):
+        c.types = pokedex_session.query(tables.Type) \
+            .order_by(tables.Type.name) \
+            .options(eagerload('damage_efficacies')) \
+            .all()
+        return render('/pokedex/type_list.mako')
+
     def types(self, name):
         try:
             c.type = db.get_by_name(Type, name)

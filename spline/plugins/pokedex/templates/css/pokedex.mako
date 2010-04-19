@@ -46,19 +46,19 @@ col.dex-col-last-version  { border-right: 1px solid #b4c7e6; }
 .dex-column-2x:first-child { margin-left: 0; }
 
 /* Type damage */
-.dex-damage-taken-0   { font-weight: bold; color: #44c; }
-.dex-damage-taken-25  { font-weight: bold; color: #4cc; }
-.dex-damage-taken-50  { font-weight: bold; color: #4c4; }
+.dex-damage-taken-0   { font-weight: bold; color: #66c; }
+.dex-damage-taken-25  { font-weight: bold; color: #6cc; }
+.dex-damage-taken-50  { font-weight: bold; color: #6c6; }
 .dex-damage-taken-100 { font-weight: bold; color: #999; }
-.dex-damage-taken-200 { font-weight: bold; color: #c44; }
-.dex-damage-taken-400 { font-weight: bold; color: #c4c; }
+.dex-damage-taken-200 { font-weight: bold; color: #c66; }
+.dex-damage-taken-400 { font-weight: bold; color: #c6c; }
 
-.dex-damage-dealt-0   { font-weight: bold; color: #44c; }
-.dex-damage-dealt-25  { font-weight: bold; color: #c4c; }
-.dex-damage-dealt-50  { font-weight: bold; color: #c44; }
+.dex-damage-dealt-0   { font-weight: bold; color: #66c; }
+.dex-damage-dealt-25  { font-weight: bold; color: #c6c; }
+.dex-damage-dealt-50  { font-weight: bold; color: #c66; }
 .dex-damage-dealt-100 { font-weight: bold; color: #999; }
-.dex-damage-dealt-200 { font-weight: bold; color: #4c4; }
-.dex-damage-dealt-400 { font-weight: bold; color: #4cc; }
+.dex-damage-dealt-200 { font-weight: bold; color: #6c6; }
+.dex-damage-dealt-400 { font-weight: bold; color: #6cc; }
 
 /* Size comparison */
 .dex-size { height: 120px; padding-bottom: 2.5em /* for -value */; overflow: hidden /* new float context */}
@@ -191,6 +191,9 @@ p.dex-capture-rate-legend span { padding: 0.25em; }
 .wobble3 { background: #f2d9d9; }
 .wobble4 { background: #79cc66; }
 table.dex-capture-rates tr.inactive div.dex-capture-rate-graph { opacity: 0.25; }
+
+table.dex-type-chart td { text-align: center; }
+table.dex-type-chart td.dex-damage-dealt-100 { color: #e0e0e0; }
 
 .dex-pokemon-flavor-generation { position: absolute; line-height: 1.5; }
 dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation { padding-top: 1.5em; }
