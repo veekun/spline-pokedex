@@ -185,11 +185,13 @@ class PokedexController(BaseController):
 
     # Used by lookup disambig pages
     table_labels = {
-        Ability: 'ability',
-        Item: 'item',
-        Move: 'move',
-        Pokemon: 'Pokémon',
-        Type: 'type',
+        tables.Ability: 'ability',
+        tables.Item: 'item',
+        tables.Location: 'location',
+        tables.Move: 'move',
+        tables.Nature: 'nature',
+        tables.Pokemon: 'Pokémon',
+        tables.Type: 'type',
     }
 
     # Dict of terrain name => icon path
