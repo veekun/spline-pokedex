@@ -404,7 +404,7 @@ class TestPokemonSearchController(TestController):
         # Try searching for identical moves -- that is, moves with the same
         # effect id.
         self.check_search(
-            dict(move=u'Thief', move_fuzz=u'same_effect'),
+            dict(move=u'Thief', move_fuzz=u'same-effect'),
             [
                 # These can learn Thief
                 u'Abra', u'Bidoof', u'Ekans', u'Meowth', u'Pidgey',
@@ -416,14 +416,15 @@ class TestPokemonSearchController(TestController):
 
         # Restrict by version
         self.check_search(
-            dict(move=u'Roar of Time', move_version=u'1'),
+            dict(move=u'Roar of Time', move_version_group=[u'1', u'2']),
             [],
             'gen 4 moves aren\'t learned in gen 1',
             exact=True,
         )
         self.check_search(
             dict(move=u'SolarBeam',
-                 move_version=[u'diamond', u'platinum', u'heart_gold'],
+                 move_method=u'level-up',
+                 move_version_group=[u'8', u'9', u'10'],
                  name=u'Bulbasaur'),
             [],
             'Bulbasaur lost SolarBeam in gen 4',
@@ -439,7 +440,7 @@ class TestPokemonSearchController(TestController):
         )
         self.check_search(
             dict(move=u'Volt Tackle',
-                 move_method=[u'level', u'tutor', u'machine', u'egg']),
+                 move_method=[u'level-up', u'tutor', u'machine', u'egg']),
             [],
             '...but not by normal means',
             exact=True,
@@ -449,7 +450,7 @@ class TestPokemonSearchController(TestController):
         self.check_search(
             dict(move=u'Frenzy Plant',
                  move_method=u'tutor',
-                 move_version=u'fire_red'),
+                 move_version_group=[u'7']),
             [ u'Venusaur' ],
             'only Venusaur gets elemental beam in FR',
             exact=True,

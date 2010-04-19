@@ -167,6 +167,45 @@ class PokemonSearchForm(Form):
         allow_blank=True,
     )
 
+    # Moves
+    move = fields.DuplicateField(
+        QueryTextField(
+            u'',
+            query_factory=
+                lambda value: pokedex_session.query(tables.Move)
+                    .filter( func.lower(tables.Move.name) == value.lower() ),
+            get_label=lambda _: _.name,
+            allow_blank=True,
+        ),
+        min_entries=4,
+        max_entries=4,
+    )
+    # XXX tests claim this will also do "similar moves", but I don't know what
+    # that means.  same categories..?
+    move_fuzz = fields.SelectField('Accept',
+        choices=[
+            (u'exact-move', 'Only these moves'),
+            (u'same-effect', 'Any moves with the same effect'),
+        ],
+        default=u'exact-move',
+    )
+    move_method = QueryCheckboxMultipleSelectField(
+        'Learned by',
+        query_factory=lambda: pokedex_session.query(tables.PokemonMoveMethod)
+            # XXX move methods need to identify themselves as "common"
+            .filter(tables.PokemonMoveMethod.id <= 4),
+        get_label=lambda row: row.name,
+        get_pk=lambda table: table.name.lower().replace(' ', '-'),
+        allow_blank=True,
+    )
+    move_version_group = QueryCheckboxMultipleSelectField(
+        'Versions',
+        query_factory=lambda: pokedex_session.query(tables.VersionGroup),
+        get_label=lambda row: pokedex_helpers.version_icons(*row.versions),
+        get_pk=lambda table: table.id,
+        allow_blank=True,
+    )
+
     # Numbers
     # Effort and stats are pulled from the database, so those fields are added
     # dynamically
@@ -223,7 +262,7 @@ class PokemonSearchForm(Form):
         default='smart-table',
     )
 
-    columns = fields.CheckboxMultiSelectField(
+    column = fields.CheckboxMultiSelectField(
         'Custom table columns',
         choices=[
             ('id', 'National ID'),
@@ -278,7 +317,7 @@ class PokemonSearchForm(Form):
         # Ignore display-only fields
         extra_cleansed_data.pop('display', None)
         extra_cleansed_data.pop('sort', None)
-        extra_cleansed_data.pop('columns', None)
+        extra_cleansed_data.pop('column', None)
         extra_cleansed_data.pop('format', None)
         # 'shorten' isn't really a field
         extra_cleansed_data.pop('shorten', None)
@@ -312,6 +351,7 @@ class PokedexSearchController(BaseController):
 
         validates = c.form.validate()
         cleansed_data = c.form.cleansed_data
+        c.form_valid = validates and c.form.was_submitted
 
         # If this is the first time the form was submitted, redirect to a URL
         # with only non-default values.  Do this BEFORE the error check, so bad
@@ -320,7 +360,7 @@ class PokedexSearchController(BaseController):
             del cleansed_data['shorten']
             redirect_to(url.current(**cleansed_data.mixed()))
 
-        if not validates or not c.form.was_submitted:
+        if not c.form_valid:
             # Either blank, or errortastic.  Skip the logic and just send the
             # form back
             return render('/pokedex/search/pokemon.mako')
@@ -646,6 +686,46 @@ class PokedexSearchController(BaseController):
                 me.id == pokedex_subquery.c.pokemon_id,
             ))
 
+        # Moves
+        if c.form.move.data:
+            # To avoid stupid group-by-having-count tricks, each move needs to
+            # join to a separate subquery of Pokémon that learn the given move
+            # under the given conditions.
+            move_version_groups = [_.id for _ in c.form.move_version_group.data]
+            move_methods = [_.id for _ in c.form.move_method.data]
+
+            for move in c.form.move.data:
+                # Apply fuzzing
+                if c.form.move_fuzz.data == 'same-effect':
+                    move_effect_query = pokedex_session.query(tables.Move) \
+                        .filter_by(effect_id=move.effect_id)
+                    move_ids = [id for (id,) in
+                        move_effect_query.values(tables.Move.id)]
+                else:
+                    move_ids = [move.id]
+
+                move_alias = aliased(tables.PokemonMove)
+                move_subquery = pokedex_session.query(move_alias.pokemon_id) \
+                    .filter(move_alias.move_id.in_(move_ids))
+
+                if move_methods:
+                    move_subquery = move_subquery.filter(
+                        move_alias.pokemon_move_method_id.in_(move_methods))
+                if move_version_groups:
+                    move_subquery = move_subquery.filter(
+                        move_alias.version_group_id.in_(move_version_groups))
+
+                move_subquery = move_subquery.subquery()  # ok, dumb, but...
+
+                query = query.join((
+                    move_subquery,
+                    move_subquery.c.pokemon_id == me.id
+                ))
+
+                # The INNER JOIN does the filtering automatically, so nothing
+                # else to do
+
+
         # Numbers
         for stat_id, field_name in c.stat_fields:
             stat_field = c.form['stat_' + field_name]
@@ -696,7 +776,7 @@ class PokedexSearchController(BaseController):
 
         elif c.display_mode == 'custom-table':
             # User can pick whatever columns, in any order.  Woo!
-            c.display_columns = c.form.columns.data
+            c.display_columns = c.form.column.data
             if not c.display_columns:
                 # Hmm.  Show name, at least.
                 c.display_columns = ['name']

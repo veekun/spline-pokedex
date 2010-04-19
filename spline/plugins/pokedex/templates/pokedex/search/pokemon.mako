@@ -9,7 +9,7 @@
 ## XXX: errors
 ## XXX: no results
 
-% if c.form.was_submitted:
+% if c.form_valid:
 <h1>Results</h1>
 <p><a href="${url.current()}">Clear form</a></p>
 
@@ -188,8 +188,8 @@ ${h.form(url.current(), method='GET')}
 </div>
 
 <h2>Numbers</h2>
-<p>Understands single numbers (<code>50</code>), ranges (<code>17-29</code>), at-least (<code>100+</code>), at-most (<code>-100</code>, the same as <code>0-100</code>), approximations (<code>120~10</code>, the same as <code>110-130</code>), and any combination of those (<code>20, 50-60, 90~5</code>).</p>
-<p>Height and weight work the same way, but expect units.  Anything is acceptable.</p>
+<p>Understands single numbers (<code>50</code>); ranges (<code>17-29</code>); at-least (<code>100+</code>); at-most (<code>-100</code> = <code>0-100</code>); approximations (<code>120~10</code> = <code>110-130</code>); and any combination of those (<code>20, 50-60, 90~5</code>).</p>
+<p>Height and weight work the same way, but require units.  Anything is acceptable.</p>
 
 <div class="dex-column-container">
 <div class="dex-column">
@@ -217,6 +217,33 @@ ${h.form(url.current(), method='GET')}
 </div>
 </div>
 
+<h2>Moves</h2>
+<div class="dex-column-container">
+<div class="dex-column">
+    <h3>Moves</h3>
+    <p>Look for: ${lib.bare_field('move_fuzz')}</p>
+    ## Render move fields manually; don't want the labels
+    <ul>
+        % for field in c.form.move:
+        <li>
+            ${field() | n}
+            % for error in field.errors:
+            <p class="error">${error}</p>
+            % endfor
+        </li>
+        % endfor
+    </ul>
+</div>
+<div class="dex-column">
+    <h3>Learned by</h3>
+    ${lib.bare_field('move_method')}
+</div>
+<div class="dex-column">
+    <h3>Version</h3>
+    ${lib.bare_field('move_version_group')}
+</div>
+</div>
+
 <h2>Display and sorting</h2>
 <div class="dex-column-container">
 <div class="dex-column">
@@ -228,7 +255,7 @@ ${h.form(url.current(), method='GET')}
 </div>
 <div class="dex-column-2x">
     <dl class="standard-form">
-        ${lib.field('columns')}
+        ${lib.field('column')}
     </dl>
 </div>
 <div class="dex-column-2x">
