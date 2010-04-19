@@ -149,8 +149,8 @@ ${h.literal(c.move.effect.as_html)}
 </dl>
 <h2>Categories</h2>
 <ul>
-    % for category in c.move.move_effect.categories:
-    <li>${category.name}</li>
+    % for category_map in c.move.move_effect.category_map:
+    <li>${category_map.category.name} at ${'user' if category_map.affects_user else 'target'}</li>
     % endfor
 </ul>
 
