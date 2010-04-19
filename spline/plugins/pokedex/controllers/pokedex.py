@@ -1432,3 +1432,11 @@ class PokedexController(BaseController):
                 c.group_versions[area][0:0] = version_group.versions
 
         return render('/pokedex/location.mako')
+
+
+    def natures(self, name):
+        try:
+            c.nature = db.get_by_name(tables.Nature, name)
+        except NoResultFound:
+            return self._not_found()
+        return render('/pokedex/nature.mako')
