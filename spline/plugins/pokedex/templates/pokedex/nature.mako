@@ -22,4 +22,3 @@ ${h.h1('Essentials')}
     </dl>
     % endif
 </div>
-

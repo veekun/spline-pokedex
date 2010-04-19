@@ -1436,6 +1436,11 @@ class PokedexController(BaseController):
         return render('/pokedex/location.mako')
 
 
+    def natures_list(self):
+        c.natures = pokedex_session.query(tables.Nature) \
+            .order_by(tables.Nature.name)
+        return render('/pokedex/nature_list.mako')
+
     def natures(self, name):
         try:
             c.nature = db.get_by_name(tables.Nature, name)

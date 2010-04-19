@@ -41,6 +41,7 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/dex/pokemon/{name}/locations', controller='dex', action='pokemon_locations')
     map.connect('/dex/types/{name}', controller='dex', action='types')
 
+    map.connect('/dex/natures', controller='dex', action='natures_list')
     map.connect('/dex/pokemon', controller='dex', action='pokemon_list')
 
     map.connect('/dex/gadgets/pokeballs', controller='dex_gadgets', action='capture_rate')
