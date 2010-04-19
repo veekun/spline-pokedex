@@ -134,6 +134,8 @@ class PokedexPlugin(PluginBase):
         return [
             PluginLink(u'Pokédex', url('/dex'), children=[
                 PluginLink(u'Pokémon', url(controller='dex', action='pokemon_list')),
+                PluginLink(u'Types', url(controller='dex', action='types_list')),
+                PluginLink(u'Natures', url(controller='dex', action='natures_list')),
                 PluginLink(u'Pokémon search', url(controller='dex_search', action='pokemon_search')),
                 PluginLink(u'Pokéball performance', url(controller='dex_gadgets', action='capture_rate')),
             ]),
