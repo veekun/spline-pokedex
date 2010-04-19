@@ -111,9 +111,6 @@ var pokedex_suggestions = {
                                              + ' alt="[' + metadata.language + ']"> ');
                     }
 
-                    // Events
-                    $suggestion_el.click(pokedex_suggestions.update_lookup);
-
                     $suggest_box.append($suggestion_el);
                 }
 
@@ -127,10 +124,6 @@ var pokedex_suggestions = {
                 pokedex_suggestions.move_results();
             }
         });
-    },
-
-    'update_lookup': function(e) {
-        pokedex_suggestions.$lookup_element.val( $(e.target).text() );
     },
 
     // Handle keypresses in a suggest box.  Used to detect navigation keys and
@@ -309,7 +302,7 @@ var pokedex_suggestions = {
     'initialize': function() {
         var $suggest_box = $('<ul id="dex-suggestions"></ul>');
         $suggest_box.css('visibility', 'hidden');
-        $suggest_box.click(pokedex_suggestions.click_suggestion);
+        $suggest_box.mousedown(pokedex_suggestions.click_suggestion);
         $('body').append($suggest_box);
 
         // Attach events to all lookup boxes
@@ -317,7 +310,7 @@ var pokedex_suggestions = {
             .attr("autocomplete", "off")
             .keyup(pokedex_suggestions.change_wrapper)
             .keydown(pokedex_suggestions.keydown)
-            .blur(function(){ window.setTimeout(pokedex_suggestions.hide, 100) });
+            .blur(function(){ window.setTimeout(pokedex_suggestions.hide, 10) });
 
         $(document).resize(pokedex_suggestions.move_results);
         pokedex_suggestions.move_results();
