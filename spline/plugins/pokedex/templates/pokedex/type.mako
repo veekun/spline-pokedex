@@ -53,7 +53,7 @@ ${h.h1('Essentials')}
 ${h.h1(u'Pokémon', id='pokemon')}
 % if c.type.name == '???':
 ${h.literal(rst.RstString(u"""In Generation IV, pure :type:`flying`-types become ???-type during :move:`Roost`. This can be
-accomplished with :move:`Conversion`, :move:`Conversion2`, or the ability :ability:`Color Change`. A Pokémon can legitimately have
+accomplished with :move:`Conversion`, :move:`Conversion 2`, or the ability :ability:`Color Change`. A Pokémon can legitimately have
 both Roost and one of these only through the use of :move:`Mimic`, :move:`Sketch`, :move:`Role Play`, or :move:`Skill Swap`.  (No
 Pokémon that has :ability:`Trace` or :ability:`Multitype` learns Roost, and Multitype cannot be copied.)
 
