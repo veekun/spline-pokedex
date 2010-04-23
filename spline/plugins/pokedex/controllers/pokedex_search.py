@@ -11,7 +11,7 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField, QueryTextField, Quer
 import pokedex.db.tables as tables
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, eagerload, eagerload_all
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func, and_, not_, or_
 from sqlalchemy.sql.operators import asc_op
@@ -161,7 +161,8 @@ class PokemonSearchForm(Form):
     in_pokedex = QueryCheckboxMultipleSelectField(
         u'In regional Pokédex',
         query_factory=lambda: pokedex_session.query(tables.Pokedex) \
-                                  .join(tables.Generation),
+                                  .join(tables.Generation) \
+                                  .options(eagerload_all('region.generation')),
         get_label=in_pokedex_label,
         get_pk=lambda table: table.id,
         allow_blank=True,
@@ -200,7 +201,8 @@ class PokemonSearchForm(Form):
     )
     move_version_group = QueryCheckboxMultipleSelectField(
         'Versions',
-        query_factory=lambda: pokedex_session.query(tables.VersionGroup),
+        query_factory=lambda: pokedex_session.query(tables.VersionGroup) \
+                                             .options(eagerload('versions')),
         get_label=lambda row: pokedex_helpers.version_icons(*row.versions),
         get_pk=lambda table: table.id,
         allow_blank=True,
@@ -944,11 +946,46 @@ class PokedexSearchController(BaseController):
 
         query = query.order_by(*sort_clauses)
 
-        ### Eagerloading
-        # TODO!
-
 
         ### Run the query!
         c.results = query.all()
 
+
+        ### Eagerloading
+        # SQLAlchemy is guaranteed to only have one copy of a particular object
+        # around at a time.  So if I run queries with the same results several
+        # times, but eagerload something different each time, I'll only have
+        # one set of obects with all of the eagerloads present on each.
+        # For simplicity, and because all of the conditional eagerloads are
+        # has-manies, this code abuses the above property to eagerload
+        # everything after-the-fact, based on which table columns are visible.
+        # TODO doesn't apply so much to lists at the moment...
+        if c.results and c.display_mode == 'custom-table':
+            eagerloads = []
+
+            if 'type' in c.display_columns:
+                eagerloads.append('types')
+
+            if 'ability' in c.display_columns:
+                eagerloads.append('abilities')
+
+            if 'egg_group' in c.display_columns:
+                eagerloads.append('egg_groups')
+
+            if any(column[0:5] == 'stat_' for column in c.display_columns) \
+                or 'effort' in c.display_columns:
+
+                eagerloads.append('stats.stat')
+
+
+            ids = [_.id for _ in c.results]
+            for relation in eagerloads:
+                # Run the query again, selecting only by id this time, but
+                # eagerloading some relation
+                pokedex_session.query(tables.Pokemon) \
+                    .filter(tables.Pokemon.id.in_(ids)) \
+                    .options(eagerload_all(relation)) \
+                    .all()
+
+        ### Done.
         return render('/pokedex/search/pokemon.mako')
