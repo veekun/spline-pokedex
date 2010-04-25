@@ -930,7 +930,10 @@ class PokedexSearchController(BaseController):
         elif c.form.sort.data[0:5] == 'stat-':
             # Gross!  stat_special_attack => Special Attack
             stat_name = c.form.sort.data[5:]
-            stat_name = stat_name.replace('-', ' ').title()
+            if stat_name == 'hp':
+                stat_name = 'HP'
+            else:
+                stat_name = stat_name.replace('-', ' ').title()
 
             query, stat_alias = join_to_stat(stat_name)
             sort_clauses.insert(0, stat_alias.base_stat.desc())
