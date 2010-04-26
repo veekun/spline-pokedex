@@ -23,7 +23,9 @@ ${h.h1('Essentials')}
     % if c.pokemon.forme_name:
     <p id="dex-pokemon-forme">${c.pokemon.forme_name.capitalize()} Forme</p>
     % endif
-    ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver', id="dex-pokemon-portrait-sprite")}
+    <div id="dex-pokemon-portrait-sprite">
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver')}
+    </div>
     <p id="dex-page-types">
         % for type in c.pokemon.types:
         ${h.pokedex.type_link(type)}

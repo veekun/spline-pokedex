@@ -166,8 +166,11 @@ def item_link(item):
         item_name = item.name
 
     filename = filename_from_name(item_name)
-    return pokedex_img("items/%s.png" % filename,
-                       alt=item_name, title=item_name) + item_name
+    return h.HTML.a(
+        pokedex_img("items/%s.png" % filename,
+                   alt=item_name, title=item_name) + item_name,
+        href=url(controller='dex', action='items', name=item_name.lower()),
+    )
 
 
 # Type efficacy, from percents to Unicode fractions

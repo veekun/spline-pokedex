@@ -1339,6 +1339,64 @@ class PokedexController(BaseController):
             c.item = db.get_by_name(Item, name)
         except NoResultFound:
             return self._not_found()
+
+        # Pokémon that can hold this item are per version; break this up into a
+        # two-dimensional structure of pokemon => version => rarity
+        c.holding_pokemon = defaultdict(lambda: defaultdict(int))
+        held_generations = set()
+        for pokemon_item in c.item.pokemon:
+            c.holding_pokemon[pokemon_item.pokemon][pokemon_item.version] = pokemon_item.rarity
+            held_generations.add(pokemon_item.version.generation)
+
+        # Craft a list of versions the item appears in at all
+        held_generations = list(held_generations)
+        held_generations.sort(key=lambda _: _.id)
+        c.held_version_columns = []
+        c.held_version_last_columns = []
+        for generation in held_generations:
+            # Oh boy!  More version collapsing logic!
+            # Try to make this as simple as possible: have a running list of
+            # versions in some column, then switch to a new column when any
+            # rarity changes
+            current_column = []
+            current_group_is_whole = True
+            last_version = None
+            for version in generation.versions:
+                # If the any of the rarities changed, OR the version group
+                # changed AND the previous group was broken up, this version
+                # needs to begin a new column
+                if last_version and (
+                        (last_version.version_group != version.version_group
+                            and not current_group_is_whole) or
+                        any(
+                            rarities[last_version] != rarities[version]
+                            for rarities in c.holding_pokemon.values()
+                        )
+                    ):
+
+                    c.held_version_columns.append(current_column)
+                    current_column = []
+
+                    # If this broke a group up, remember it
+                    if last_version.version_group == version.version_group:
+                        current_group_is_whole = False
+
+                if last_version and \
+                    last_version.version_group != version.version_group:
+                    # If this is a new group, then the "current" group has yet
+                    # to be split up
+                    current_group_is_whole = True
+
+                current_column.append(version)
+                last_version = version
+
+            # Add whatever's left at the end
+            if current_column:
+                c.held_version_columns.append(current_column)
+
+            # Track which column indexes are the last of a generation
+            c.held_version_last_columns.append(len(c.held_version_columns) - 1)
+
         return render('/pokedex/item.mako')
 
 

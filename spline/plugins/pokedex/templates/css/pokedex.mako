@@ -23,6 +23,7 @@ ul.inline-menu > li:last-child:after { content: none; }
 #dex-header + h1 { margin-top: 0.25em; }
 
 /* Table columns */
+col.dex-col-icon        { width: 32px; }
 col.dex-col-name        { width: 10em; }
 col.dex-col-link        { width: 16px; }
 col.dex-col-stat        { width: 3em; }
@@ -88,7 +89,7 @@ col.dex-col-last-version  { border-right: 1px solid #b4c7e6; }
 .dex-page-beside-portrait:after { display: block; clear: both; content: ""; }
 p#dex-page-name { font-size: 2em; margin: 0.12em 0; }
 #dex-pokemon-forme { font-size: 1.25em; font-weight: bold; }
-#dex-pokemon-portrait-sprite { margin: 0.33em; padding: 7px; background: url(/dex/media/chrome/sprite-frame.png) center center no-repeat; }
+#dex-pokemon-portrait-sprite { height: 80px; width: 80px; margin: 0.33em auto; padding: 7px; line-height: 80px; vertical-align: middle; text-align: center; background: url(/dex/media/chrome/sprite-frame.png) center center no-repeat; }
 
 ul.dex-page-damage { overflow: hidden /* new float context */; margin-bottom: 2em; }
 ul.dex-page-damage li { display: inline-block; text-align: center; padding: 0.125em; }
