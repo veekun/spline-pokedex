@@ -6,7 +6,7 @@ import re
 from string import Template
 
 from wtforms import Form, ValidationError, fields, widgets
-from wtforms.ext.sqlalchemy.fields import QuerySelectField, QueryTextField, QueryCheckboxMultipleSelectField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 import pokedex.db.tables as tables
 from pylons import config, request, response, session, tmpl_context as c, url
@@ -16,8 +16,9 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func, and_, not_, or_
 from sqlalchemy.sql.operators import asc_op
 
-from spline.lib.base import BaseController, render
 from spline.lib import helpers as h
+from spline.lib.base import BaseController, render
+from spline.lib.forms import DuplicateField, MultiCheckboxField, QueryCheckboxSelectMultipleField, QueryTextField
 
 from spline.plugins.pokedex import helpers as pokedex_helpers
 from spline.plugins.pokedex.db import pokedex_session
@@ -77,7 +78,7 @@ class PokemonSearchForm(Form):
         ],
         default=u'any',
     )
-    type = QueryCheckboxMultipleSelectField(
+    type = QueryCheckboxSelectMultipleField(
         'Type',
         query_factory=lambda: pokedex_session.query(tables.Type),
         get_label=lambda _: _.name,
@@ -115,7 +116,7 @@ class PokemonSearchForm(Form):
         choices=[ ('any', 'any of'), ('all', 'all of') ],
         default='all',
     )
-    egg_group = fields.DuplicateField(
+    egg_group = DuplicateField(
         QuerySelectField(
             'Egg group',
             query_factory=lambda: pokedex_session.query(tables.EggGroup),
@@ -127,7 +128,7 @@ class PokemonSearchForm(Form):
     )
 
     # Evolution
-    evolution_stage = fields.CheckboxMultiSelectField('Stage',
+    evolution_stage = MultiCheckboxField('Stage',
         choices=[
             (u'baby',   u'baby'),
             (u'basic',  u'basic'),
@@ -135,7 +136,7 @@ class PokemonSearchForm(Form):
             (u'stage2', u'stage 2'),
         ],
     )
-    evolution_position = fields.CheckboxMultiSelectField('Position',
+    evolution_position = MultiCheckboxField('Position',
         choices=[
             (u'first',  u'First evolution'),
             (u'middle', u'Middle evolution'),
@@ -143,7 +144,7 @@ class PokemonSearchForm(Form):
             (u'only',   u'Only evolution'),
         ],
     )
-    evolution_special = fields.CheckboxMultiSelectField('Special',
+    evolution_special = MultiCheckboxField('Special',
         choices=[
             (u'branching', u'Branching evolution (e.g., Tyrogue)'),
             (u'branched',  u'Branched evolution (e.g., Shedinja)'),
@@ -151,14 +152,14 @@ class PokemonSearchForm(Form):
     )
 
     # Generation
-    introduced_in = QueryCheckboxMultipleSelectField(
+    introduced_in = QueryCheckboxSelectMultipleField(
         'Introduced in',
         query_factory=lambda: pokedex_session.query(tables.Generation),
         get_label=lambda _: pokedex_helpers.generation_icon(_),
         get_pk=lambda table: table.id,
         allow_blank=True,
     )
-    in_pokedex = QueryCheckboxMultipleSelectField(
+    in_pokedex = QueryCheckboxSelectMultipleField(
         u'In regional Pokédex',
         query_factory=lambda: pokedex_session.query(tables.Pokedex) \
                                   .join(tables.Generation) \
@@ -169,7 +170,7 @@ class PokemonSearchForm(Form):
     )
 
     # Moves
-    move = fields.DuplicateField(
+    move = DuplicateField(
         QueryTextField(
             u'',
             query_factory=
@@ -190,7 +191,7 @@ class PokemonSearchForm(Form):
         ],
         default=u'exact-move',
     )
-    move_method = QueryCheckboxMultipleSelectField(
+    move_method = QueryCheckboxSelectMultipleField(
         'Learned by',
         query_factory=lambda: pokedex_session.query(tables.PokemonMoveMethod)
             # XXX move methods need to identify themselves as "common"
@@ -199,7 +200,7 @@ class PokemonSearchForm(Form):
         get_pk=lambda table: table.name.lower().replace(' ', '-'),
         allow_blank=True,
     )
-    move_version_group = QueryCheckboxMultipleSelectField(
+    move_version_group = QueryCheckboxSelectMultipleField(
         'Versions',
         query_factory=lambda: pokedex_session.query(tables.VersionGroup) \
                                              .options(eagerload('versions')),
@@ -264,7 +265,7 @@ class PokemonSearchForm(Form):
         default='smart-table',
     )
 
-    column = fields.CheckboxMultiSelectField(
+    column = MultiCheckboxField(
         'Custom table columns',
         choices=[
             ('id', 'National ID'),
@@ -305,7 +306,7 @@ class PokemonSearchForm(Form):
         if formdata:
             self.cleansed_data = formdata.copy()
             for name, field in self._fields.iteritems():
-                if field.data == field._default and name in self.cleansed_data:
+                if field.data == field.default and name in self.cleansed_data:
                     del self.cleansed_data[name]
         else:
             self.cleansed_data = {}

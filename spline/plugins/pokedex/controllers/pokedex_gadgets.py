@@ -4,8 +4,8 @@ from __future__ import absolute_import, division
 from collections import namedtuple
 import logging
 
-from wtforms import Form, ValidationError, fields, validators
-from wtforms.ext.sqlalchemy.fields import QueryTextField
+import wtforms.validators
+from wtforms import Form, ValidationError, fields
 
 import pokedex.db
 import pokedex.db.tables as tables
@@ -19,8 +19,9 @@ from sqlalchemy.sql import func
 
 from spline import model
 from spline.model import meta
-from spline.lib.base import BaseController, render
 from spline.lib import helpers as h
+from spline.lib.base import BaseController, render
+from spline.lib.forms import QueryTextField
 
 from spline.plugins.pokedex import db, helpers as pokedex_helpers
 from spline.plugins.pokedex.db import pokedex_session
@@ -30,9 +31,29 @@ log = logging.getLogger(__name__)
 
 
 ### Capture rate ("Pokéball performance") stuff
+class OptionalLevelField(fields.IntegerField):
+    """IntegerField subclass that requires either a number from 1 to 100, or
+    nothing.
+
+    Also overrides the usual IntegerField logic to default to an empty field.
+    Defaulting to 0 means the field can't be submitted from scratch.
+    """
+    def __init__(self, label=u'', validators=[], **kwargs):
+        validators.extend([
+            wtforms.validators.NumberRange(min=1, max=100),
+            wtforms.validators.Optional(),
+        ])
+        super(OptionalLevelField, self).__init__(label, validators, **kwargs)
+
+    def _value(self):
+        if self.raw_data:
+            return self.raw_data[0]
+        else:
+            return unicode(self.data or u'')
+
 class CaptureRateForm(Form):
     pokemon = PokedexLookupField(u'Wild Pokémon', valid_type='pokemon')
-    current_hp = fields.IntegerField(u'% HP left', [validators.NumberRange(min=1, max=100)],
+    current_hp = fields.IntegerField(u'% HP left', [wtforms.validators.NumberRange(min=1, max=100)],
                                      default=100)
     status_ailment = fields.SelectField('Status ailment',
         choices=[
@@ -47,18 +68,8 @@ class CaptureRateForm(Form):
     )
 
     ### Extras
-    level = fields.IntegerField(u'Wild Pokémon\'s level', [
-        validators.Optional(),
-        validators.NumberRange(min=1, max=100),
-    ],
-        default=u'',
-    )
-    your_level = fields.IntegerField(u'Your Pokémon\'s level', [
-        validators.Optional(),
-        validators.NumberRange(min=1, max=100),
-    ],
-        default=u'',
-    )
+    level = OptionalLevelField(u'Wild Pokémon\'s level', default=u'')
+    your_level = OptionalLevelField(u'Your Pokémon\'s level', default=u'')
     terrain = fields.SelectField(u'Terrain',
         choices=[
             ('land',    u'On land'),
