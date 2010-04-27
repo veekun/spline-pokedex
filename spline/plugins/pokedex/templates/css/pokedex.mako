@@ -193,6 +193,10 @@ p.dex-capture-rate-legend span { padding: 0.25em; }
 .wobble4 { background: #79cc66; }
 table.dex-capture-rates tr.inactive div.dex-capture-rate-graph { opacity: 0.25; }
 
+ul#dex-item-pockets { text-align: center; }
+ul#dex-item-pockets li { display: inline-block; }
+ul#dex-item-pockets li img { padding: 4px; }
+
 table.dex-type-chart td { text-align: center; }
 table.dex-type-chart td.dex-damage-dealt-100 { color: #e0e0e0; }
 

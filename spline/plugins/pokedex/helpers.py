@@ -160,16 +160,14 @@ def type_link(type):
 
 def item_link(item):
     """Returns a link to the requested item."""
-    if isinstance(item, basestring):
-        item_name = item
-    else:
-        item_name = item.name
+    item_name = item.name
 
     filename = filename_from_name(item_name)
     return h.HTML.a(
         pokedex_img("items/%s.png" % filename,
                    alt=item_name, title=item_name) + item_name,
-        href=url(controller='dex', action='items', name=item_name.lower()),
+        href=url(controller='dex', action='items',
+                 pocket=item.pocket.identifier, name=item_name.lower()),
     )
 
 

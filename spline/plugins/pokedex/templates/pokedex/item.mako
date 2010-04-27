@@ -1,7 +1,7 @@
 <%inherit file="/base.mako"/>
 <%namespace name="dexlib" file="lib.mako"/>
 
-<%def name="title()">${c.item.name}</%def>
+<%def name="title()">${c.item.name} - Items (${c.item.pocket.name})</%def>
 
 <h1>Essentials</h1>
 
@@ -15,10 +15,13 @@
             sprite_path = 'items'
     %>\
     <div id="dex-pokemon-portrait-sprite">
-        ${h.pokedex.pokedex_img("{0}/{1}.png".format(sprite_path, h.pokedex.filename_from_name(c.item.name)))}
+        ${h.pokedex.pokedex_img(u"{0}/{1}.png".format(sprite_path, h.pokedex.filename_from_name(c.item.name)))}
     </div>
     <p id="dex-page-types">
-        ${c.item.category.pocket.name} pocket
+        <a href="${url(controller='dex', action='item_pockets', pocket=c.item.pocket.identifier)}">
+            ${h.pokedex.pokedex_img(u"chrome/bag/{0}.png".format(c.item.pocket.identifier))}
+            ${c.item.pocket.name}
+        </a> pocket
     </p>
 </div>
 
@@ -72,9 +75,10 @@
         <dd>
             ${c.item.berry.growth_time} hours per stage<br>
             ${c.item.berry.growth_time * 4} hours total<br>
-            ${h.pokedex.item_link('Growth Mulch')}:
+            <%! from spline.plugins.pokedex.db import get_by_name %>
+            ${h.pokedex.item_link(c.growth_mulch)}:
                 ${c.item.berry.growth_time * 3 / 4}/${c.item.berry.growth_time * 3} hours<br>
-            ${h.pokedex.item_link('Damp Mulch')}:
+            ${h.pokedex.item_link(c.damp_mulch)}:
                 ${c.item.berry.growth_time * 5 / 4}/${c.item.berry.growth_time * 5} hours
         </dd>
         <dt>Soil drying rate</dt>

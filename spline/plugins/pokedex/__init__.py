@@ -32,7 +32,8 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/dex/pokemon/search', controller='dex_search', action='pokemon_search')
 
     map.connect('/dex/abilities/{name}', controller='dex', action='abilities')
-    map.connect('/dex/items/{name}', controller='dex', action='items')
+    map.connect('/dex/items/{pocket}', controller='dex', action='item_pockets')
+    map.connect('/dex/items/{pocket}/{name}', controller='dex', action='items')
     map.connect('/dex/locations/{name}', controller='dex', action='locations')
     map.connect('/dex/moves/{name}', controller='dex', action='moves')
     map.connect('/dex/natures/{name}', controller='dex', action='natures')
@@ -41,6 +42,7 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/dex/pokemon/{name}/locations', controller='dex', action='pokemon_locations')
     map.connect('/dex/types/{name}', controller='dex', action='types')
 
+    map.connect('/dex/items', controller='dex', action='items_list')
     map.connect('/dex/natures', controller='dex', action='natures_list')
     map.connect('/dex/pokemon', controller='dex', action='pokemon_list')
     map.connect('/dex/types', controller='dex', action='types_list')

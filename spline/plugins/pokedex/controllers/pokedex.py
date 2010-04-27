@@ -1334,11 +1334,44 @@ class PokedexController(BaseController):
         return render('/pokedex/ability.mako')
 
 
-    def items(self, name):
+    def items_list(self):
+        c.item_pockets = pokedex_session.query(tables.ItemPocket) \
+            .order_by(tables.ItemPocket.id.asc())
+
+        return render('/pokedex/item_list.mako')
+
+    def item_pockets(self, pocket):
+        try:
+            c.item_pocket = pokedex_session.query(tables.ItemPocket) \
+                .filter(tables.ItemPocket.identifier == pocket) \
+                .one()
+        except NoResultFound:
+            # It's possible this is an old item URL; redirect if so
+            try:
+                item = db.get_by_name(tables.Item, pocket)
+                return redirect_to(controller='dex', action='items',
+                                   pocket=item.pocket.identifier, name=pocket)
+            except NoResultFound:
+                return self._not_found()
+
+        # OK, got a valid pocket
+
+        c.item_pockets = pokedex_session.query(tables.ItemPocket) \
+            .order_by(tables.ItemPocket.id.asc())
+
+        return render('/pokedex/item_pockets.mako')
+
+    def items(self, pocket, name):
         try:
             c.item = db.get_by_name(Item, name)
         except NoResultFound:
             return self._not_found()
+
+        # These are used for their item linkage
+        c.growth_mulch = pokedex_session.query(tables.Item) \
+            .filter_by(name=u'Growth Mulch').one()
+        c.damp_mulch = pokedex_session.query(tables.Item) \
+            .filter_by(name=u'Damp Mulch').one()
 
         # Pokémon that can hold this item are per version; break this up into a
         # two-dimensional structure of pokemon => version => rarity
