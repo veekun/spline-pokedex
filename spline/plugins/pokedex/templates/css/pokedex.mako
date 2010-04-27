@@ -200,6 +200,9 @@ ul#dex-item-pockets li img { padding: 4px; }
 table.dex-type-chart td { text-align: center; }
 table.dex-type-chart td.dex-damage-dealt-100 { color: #e0e0e0; }
 
+table.dex-nature-list td { padding: 0.33em 1em 0.33em 0.75em; }
+table.dex-nature-list td.flavor { text-align: right; }
+
 .dex-pokemon-flavor-generation { position: absolute; line-height: 1.5; }
 dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation { padding-top: 1.5em; }
 dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation + dl.dex-pokemon-flavor-text { padding-top: 1.5em; }
