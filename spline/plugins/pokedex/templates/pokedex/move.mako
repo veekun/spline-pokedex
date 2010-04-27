@@ -163,7 +163,7 @@ ${h.h1('Contests')}
     % if c.move.contest_effect:
     <dl>
         <dt>Type</dt>
-        <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type, alt=c.move.contest_type, title=c.move.contest_type)}</dd>
+        <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type.name, alt=c.move.contest_type.name, title=c.move.contest_type.name)}</dd>
         <dt>Appeal</dt>
         <dd title="${c.move.contest_effect.appeal}">${u'♡' * c.move.contest_effect.appeal}</dd>
         <dt>Jam</dt>
@@ -206,7 +206,7 @@ ${h.h1('Contests')}
     % if c.move.super_contest_effect:
     <dl>
         <dt>Type</dt>
-        <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type, alt=c.move.contest_type, title=c.move.contest_type)}</dd>
+        <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type.name, alt=c.move.contest_type.name, title=c.move.contest_type.name)}</dd>
         <dt>Appeal</dt>
         <dd title="${c.move.super_contest_effect.appeal}">${u'♡' * c.move.super_contest_effect.appeal}</dd>
         <dt>Flavor text</dt>
