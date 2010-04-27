@@ -9,9 +9,34 @@ import math
 import re
 
 from pylons import url
+
+import pokedex.db.tables as tables
 import pokedex.formulae as formulae
 from pokedex.roomaji import romanize
+
 import spline.lib.helpers as h
+
+
+def make_thingy_url(thingy):
+    u"""Given a thingy (Pokémon, move, type, whatever), returns a URL to it.
+    """
+    # Using the table name as an action directly looks kinda gross, but I can't
+    # think of anywhere I've ever broken this convention, and making a
+    # dictionary to get data I already have is just silly
+    args = {}
+
+    # Pokémon with forms need the form attached to the URL
+    if getattr(thingy, 'forme_base_pokemon_id', None):
+        args['form'] = thingy.forme_name
+
+    # Items are split up by pocket
+    if isinstance(thingy, tables.Item):
+        args['pocket'] = thingy.pocket.identifier
+
+    return url(controller='dex',
+               action=thingy.__tablename__,
+               name=thingy.name.lower(),
+               **args)
 
 def filename_from_name(name):
     """Shorten the name of a whatever to something suitable as a filename.

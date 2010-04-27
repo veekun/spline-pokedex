@@ -63,7 +63,7 @@ ${h.h1('Essentials')}
             % endif
         </dd>
         <dt>PP</dt>
-        <dd>${c.move.pp}, up to ${c.move.pp * 8/5} with <a href="${url(controller='dex', action='items', name='pp up')}">PP Up</a></dd>
+        <dd>${c.move.pp}, up to ${c.move.pp * 8/5} with ${h.pokedex.item_link(c.pp_up)}</dd>
         <dt>Target</dt>
         <dd><abbr title="${c.move.target.description}">${c.move.target.name}</abbr></dd>
         <dt>Effect chance</dt>

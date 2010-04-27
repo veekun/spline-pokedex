@@ -16,7 +16,7 @@
 %>\
 <li>
     The ${c.table_labels[object.__class__]}
-    <a href="${url(controller='dex', action=object.__tablename__, name=object.name.lower())}">
+    <a href="${h.pokedex.make_thingy_url(object)}">
     % if object.__tablename__ == 'pokemon':
     ${h.pokedex.pokemon_sprite(object, prefix='icons')}
     % elif object.__tablename__ == 'items':

@@ -293,16 +293,8 @@ class PokedexController(BaseController):
                         u"""This is the only close match.""".format(name),
                         icon='spell-check-error')
 
-            # Using the table name as an action directly looks kinda gross, but
-            # I can't think of anywhere I've ever broken this convention, and
-            # making a dictionary to get data I already have is just silly
-            form = {}
-            if getattr(results[0].object, 'forme_base_pokemon_id', None):
-                form['form'] = results[0].object.forme_name
-            redirect_to(controller='dex',
-                        action=results[0].object.__tablename__,
-                        name=results[0].object.name.lower(),
-                        **form)
+            return redirect_to(
+                pokedex_helpers.make_thingy_url(results[0].object))
 
         else:
             # Multiple matches.  Could be exact (e.g., Metronome) or a fuzzy
@@ -1165,6 +1157,10 @@ class PokedexController(BaseController):
         )
 
     def _do_moves(self, name):
+        # Used for item linkage
+        c.pp_up = pokedex_session.query(tables.Item) \
+            .filter_by(name=u'PP Up').one()
+
         ### Type efficacy
         c.type_efficacies = {}
         for type_efficacy in c.move.type.damage_efficacies:
