@@ -1549,4 +1549,106 @@ class PokedexController(BaseController):
             c.nature = db.get_by_name(tables.Nature, name)
         except NoResultFound:
             return self._not_found()
+
+        # Find related natures.
+        # Other neutral natures if this one is neutral; otherwise, the inverse
+        # of this one
+        if c.nature.increased_stat == c.nature.decreased_stat:
+            c.neutral_natures = pokedex_session.query(tables.Nature) \
+                .filter(tables.Nature.increased_stat_id
+                     == tables.Nature.decreased_stat_id) \
+                .filter(tables.Nature.id != c.nature.id) \
+                .order_by(tables.Nature.name)
+        else:
+            c.inverse_nature = pokedex_session.query(tables.Nature) \
+                .filter_by(
+                    increased_stat_id=c.nature.decreased_stat_id,
+                    decreased_stat_id=c.nature.increased_stat_id,
+                ) \
+                .one()
+
+        # Find appropriate example Pokémon.
+        # Arbitrarily decided that these are Pokémon for which:
+        # - their best and worst stats are at least 10 apart
+        # - their best stat is improved by this nature
+        # - their worst stat is hindered by this nature
+        # Of course, if this is a neutral nature, then find only Pokémon for
+        # which the best and worst stats are close together.
+        # The useful thing here is that this cannot be done in the Pokémon
+        # search, as it requires comparing a Pokémon's stats to themselves.
+        # Also, HP doesn't count.  Durp.
+        hp = pokedex_session.query(tables.Stat).filter_by(name=u'HP').one()
+        if c.nature.increased_stat == c.nature.decreased_stat:
+            # Neutral.  Boring!
+            # Create a subquery of neutral-ish Pokémon
+            stat_subquery = pokedex_session.query(
+                    tables.PokemonStat.pokemon_id
+                ) \
+                .filter(tables.PokemonStat.stat_id != hp.id) \
+                .group_by(tables.PokemonStat.pokemon_id) \
+                .having(
+                    func.max(tables.PokemonStat.base_stat)
+                    - func.min(tables.PokemonStat.base_stat)
+                    <= 10
+                ) \
+                .subquery()
+
+            c.pokemon = pokedex_session.query(tables.Pokemon) \
+                .join((stat_subquery,
+                    stat_subquery.c.pokemon_id == tables.Pokemon.id))
+
+        else:
+            # More interesting.
+            # Create the subquery again, but..  the other way around.
+            grouped_stats = aliased(tables.PokemonStat)
+            stat_range_subquery = pokedex_session.query(
+                    grouped_stats.pokemon_id,
+                    func.max(grouped_stats.base_stat).label('max_stat'),
+                    func.min(grouped_stats.base_stat).label('min_stat'),
+                ) \
+                .filter(grouped_stats.stat_id != hp.id) \
+                .group_by(grouped_stats.pokemon_id) \
+                .having(
+                    func.max(grouped_stats.base_stat)
+                    - func.min(grouped_stats.base_stat)
+                    > 10
+                ) \
+                .subquery()
+
+            # Also need to join twice more to PokemonStat to figure out WHICH
+            # of those stats is the max or min.  So, yes, joining to the same
+            # table three times and two deep.  One to make sure the Pokémon has
+            # the right lowest stat; one to make sure it has the right highest
+            # stat.
+            # Note that I really want to do: range --> min; --> max
+            # But SQLAlchemy won't let me start from a subquery like that, so
+            # instead I do min --> range --> max.  :(  Whatever.
+            min_stats = aliased(tables.PokemonStat)
+            max_stats = aliased(tables.PokemonStat)
+            minmax_stat_subquery = pokedex_session.query(
+                    min_stats
+                ) \
+                .join((stat_range_subquery, and_(
+                        min_stats.base_stat == stat_range_subquery.c.min_stat,
+                        min_stats.pokemon_id == stat_range_subquery.c.pokemon_id,
+                    )
+                )) \
+                .join((max_stats, and_(
+                        max_stats.base_stat == stat_range_subquery.c.max_stat,
+                        max_stats.pokemon_id == stat_range_subquery.c.pokemon_id,
+                    )
+                )) \
+                .filter(min_stats.stat_id == c.nature.decreased_stat_id) \
+                .filter(max_stats.stat_id == c.nature.increased_stat_id) \
+                .subquery()
+
+            # Finally, just join that mess to pokemon; INNER-ness will do all
+            # the filtering
+            c.pokemon = pokedex_session.query(tables.Pokemon) \
+                .join((minmax_stat_subquery,
+                    minmax_stat_subquery.c.pokemon_id == tables.Pokemon.id))
+
+        # Order by id as per usual
+        c.pokemon = c.pokemon.order_by(tables.Pokemon.id.asc())
+
         return render('/pokedex/nature.mako')

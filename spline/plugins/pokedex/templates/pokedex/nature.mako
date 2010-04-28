@@ -1,4 +1,5 @@
 <%inherit file="/base.mako"/>
+<%namespace name="dexlib" file="lib.mako"/>
 <%namespace name="lib" file="/lib.mako"/>
 
 <%def name="title()">${c.nature.name} - Nature</%def>
@@ -7,6 +8,19 @@ ${h.h1('Essentials')}
 
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.nature.name}</p>
+
+    % if c.nature.increased_stat == c.nature.decreased_stat:
+    <p>
+        Same as:
+        <ul>
+            % for nature in c.neutral_natures:
+            <li><a href="${url(controller='dex', action='natures', name=nature.name.lower())}">${nature.name}</a></li>
+            % endfor
+        </ul>
+    </p>
+    % else:
+    <p>Inverse of <a href="${url(controller='dex', action='natures', name=c.inverse_nature.name.lower())}">${c.inverse_nature.name}</a></p>
+    % endif
 </div>
 
 <div class="dex-page-beside-portrait">
@@ -61,3 +75,28 @@ ${h.h1('Essentials')}
     </ul>
 </div>
 </div>
+
+
+<h1>Pokémon</h1>
+% if c.nature.increased_stat == c.nature.decreased_stat:
+<p>These Pokémon are selected automatically, based on having roughly equal stats.  Don't take this as carefully-constructed tournament advice.</p>
+% else:
+<p>These Pokémon are selected automatically, based on having high ${c.nature.increased_stat.name} and low ${c.nature.decreased_stat.name}.  Don't take this as carefully-constructed tournament advice.</p>
+% endif
+
+<table class="dex-pokemon-moves striped-rows">
+## Columns
+${dexlib.pokemon_table_columns()}
+
+## Headers
+<tr class="header-row">
+    ${dexlib.pokemon_table_header()}
+</tr>
+
+## Rows
+% for pokemon in c.pokemon:
+<tr>
+    ${dexlib.pokemon_table_row(pokemon)}
+</tr>
+% endfor
+</table>
