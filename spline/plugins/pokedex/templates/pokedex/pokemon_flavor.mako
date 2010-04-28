@@ -1,5 +1,6 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="lib.mako"/>
+<%! import re %>\
 
 <%def name="title()">\
 % if c.pokemon.name == 'Unown' and c.form:
@@ -23,6 +24,11 @@ ${h.h1(u'Pokédex Description', id='pokedex')}
         class_ = ' class="dex-obdurate"'
 %>\
     % for versions, flavor_text in version_texts:
+<%
+    flavor_text = re.sub(u'(\S)-[\n\f]+', u'\g<1>-', flavor_text) # ' -\n' should just become ' - ', hence '(\S)'
+    flavor_text = re.sub(u'\u00ad[\n\f]+', u'\u00ad', flavor_text) # shy hyphen
+    flavor_text = re.sub(u'[\n\f]', u' ', flavor_text)
+%>
     <dt>${h.pokedex.version_icons(*versions)}</dt>
     <dd${h.literal(class_)}>${flavor_text}</dd>
     % endfor
