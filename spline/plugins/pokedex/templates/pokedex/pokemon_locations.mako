@@ -8,7 +8,7 @@ ${lib.pokemon_page_header()}
 ## Sort regions by the generation that introduced them
 % for region, terrain_area_version_condition_encounters \
    in sorted( c.grouped_encounters.items(), key=lambda (k, v): k.generation.id):
-<h1>${region.name}</h1>
+${h.h1(region.name)}
 
 <table class="dex-encounters striped-rows">
     ## Spit out <col> tags.  Zip cleverness lets us compare the current version

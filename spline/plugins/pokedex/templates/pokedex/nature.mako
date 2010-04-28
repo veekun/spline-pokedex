@@ -45,7 +45,7 @@ ${h.h1('Essentials')}
 </div>
 
 
-<h1>Less essentials</h1>
+${h.h1('Not-so-essentials')}
 <div class="dex-column-container">
 <div class="dex-column">
     <h2>Battle Style Preferences</h2>
@@ -77,7 +77,7 @@ ${h.h1('Essentials')}
 </div>
 
 
-<h1>Pokémon</h1>
+${h.h1(u'Pokémon')}
 % if c.nature.increased_stat == c.nature.decreased_stat:
 <p>These Pokémon are selected automatically, based on having roughly equal stats.  Don't take this as carefully-constructed tournament advice.</p>
 % else:

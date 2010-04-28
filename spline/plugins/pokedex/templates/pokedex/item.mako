@@ -3,7 +3,7 @@
 
 <%def name="title()">${c.item.name} - Items (${c.item.pocket.name})</%def>
 
-<h1>Essentials</h1>
+${h.h1('Essentials')}
 
 ## Portrait block
 <div class="dex-page-portrait">
@@ -39,7 +39,7 @@
 </div>
 
 
-<h1>Effect</h1>
+${h.h1('Effect')}
 <p>${c.item.effect}</p>
 
 % if c.item.fling_effect or c.item.berry:
@@ -64,7 +64,7 @@
 
 
 % if c.item.berry:
-<h1>Berry tag</h1>
+${h.h1('Berry tag')}
 <div class="dex-column-container">
 <div class="dex-column">
     <h2>Growth</h2>
@@ -116,7 +116,7 @@
 
 
 % if c.holding_pokemon:
-<h1>Held by wild Pokémon</h1>
+${h.h1(u'Held by wild Pokémon')}
 <table class="dex-pokemon-moves striped-rows">
 ## Columns
 % for i, column in enumerate(c.held_version_columns):
