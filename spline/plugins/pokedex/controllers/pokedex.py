@@ -932,7 +932,7 @@ class PokedexController(BaseController):
 
     def pokemon_flavor(self, name=None):
         try:
-            c.pokemon = db.pokemon(name)
+            c.pokemon = db.pokemon_query(name).one()
         except NoResultFound:
             return self._not_found()
 

@@ -6,7 +6,7 @@
 % if c.pokemon.name == 'Unown' and c.form:
 Unown ${c.form.capitalize()} \
 % else:
-${c.pokemon.full_name} \
+${c.form.title() if c.form else u''} ${c.pokemon.name} \
 % endif
 – Pokémon #${c.pokemon.national_id} – Flavor\
 </%def>
