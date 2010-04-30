@@ -53,10 +53,16 @@ var pokedex_suggestions = {
         // Construct request URL
         var url = "/dex/suggest?prefix=" + encodeURIComponent(input);
         var type;
-        if (pokedex_suggestions.$lookup_element.is(".js-dex-suggest-pokemon"))
-            url += ";type=pokemon";
-        else if (pokedex_suggestions.$lookup_element.is(".js-dex-suggest-move"))
-            url += ";type=move";
+
+        // Figure out and add type prefixes
+        var classes = pokedex_suggestions.$lookup_element.attr('class')
+            .split(' ');
+        $.each(classes, function(index, value) {
+            var matches = value.match(/^js-dex-suggest-(\w+)$/);
+            if (matches) {
+                url += ";type=" + matches[1];
+            }
+        });
 
         // Might be embedded from elsewhere...
         if (window.__veekun_url_prefix)

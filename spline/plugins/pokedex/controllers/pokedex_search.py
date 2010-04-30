@@ -22,7 +22,7 @@ from spline.lib.forms import DuplicateField, MultiCheckboxField, QueryCheckboxSe
 
 from spline.plugins.pokedex import helpers as pokedex_helpers
 from spline.plugins.pokedex.db import pokedex_session
-from spline.plugins.pokedex.forms import RangeTextField
+from spline.plugins.pokedex.forms import PokedexLookupField, RangeTextField
 from spline.plugins.pokedex.magnitude import parse_size
 
 log = logging.getLogger(__name__)
@@ -61,13 +61,7 @@ class PokemonSearchForm(Form):
 
     # Core stuff
     name = fields.TextField('Name', default=u'')
-    ability = QueryTextField('Ability',
-        query_factory=
-            lambda value: pokedex_session.query(tables.Ability)
-                .filter( func.lower(tables.Ability.name) == value.lower() ),
-        get_label=lambda _: _.name,
-        allow_blank=True,
-    )
+    ability = PokedexLookupField('Ability', valid_type='ability', allow_blank=True)
 
     # Type
     type_operator = fields.SelectField(

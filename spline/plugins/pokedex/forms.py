@@ -12,12 +12,13 @@ class PokedexLookupField(fields.TextField):
     u"""Provides a lookup box for naming something in the Pokédex."""
 
     def __init__(self, label=u'', validators=[],
-                 valid_type='pokemon', **kwargs):
+                 valid_type='pokemon', allow_blank=False, **kwargs):
         """`valid_type` is the type prefix to pass to lookup."""
         super(fields.TextField, self).__init__(label, validators, **kwargs)
 
-        self._original_value = u''
+        self.raw_data = None
         self.valid_type = valid_type
+        self.allow_blank = allow_blank
 
     def __call__(self, *args, **kwargs):
         """Adds the appropriate classes to make lookup suggestions work."""
@@ -34,10 +35,14 @@ class PokedexLookupField(fields.TextField):
     def process_formdata(self, valuelist):
         """Load the value from the incoming form."""
         if valuelist:
-            self._original_value = valuelist[0]
+            self.raw_data = valuelist
 
             if not valuelist[0]:
-                raise ValidationError('Gotta pick something')
+                if self.allow_blank:
+                    self.data = None
+                    return
+                else:
+                    raise ValidationError('Gotta pick something')
 
             results = pokedex_lookup.lookup(
                 valuelist[0],
@@ -55,7 +60,7 @@ class PokedexLookupField(fields.TextField):
     def _value(self):
         """Converts Python value back to a form value."""
         if self.data is None:
-            return self._original_value
+            return self.raw_data[0] if self.raw_data else u''
         elif self.valid_type == 'pokemon':
             # Pokémon need form names
             return self.data.full_name
