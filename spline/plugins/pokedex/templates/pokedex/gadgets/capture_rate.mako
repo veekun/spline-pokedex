@@ -42,7 +42,7 @@ ${h.end_form()}
 <tr class="${'inactive' if not is_active else ''}">
     % if i == 0:
     <th class="item" rowspan="${len(c.results[ball])}">
-        ${h.pokedex.item_link(ball)}
+        ${h.pokedex.item_link(c.pokeballs[ball])}
     </th>
     % endif
 

@@ -376,6 +376,14 @@ class PokedexGadgetsController(BaseController):
             c.expected_attempts = expected_attempts
             c.expected_attempts_oh_no = expected_attempts_oh_no
 
+            # Template also needs real item objects to create links
+            pokeball_query = pokedex_session.query(tables.Item) \
+                .join(tables.ItemCategory, tables.ItemPocket) \
+                .filter(tables.ItemPocket.identifier == 'pokeballs')
+            c.pokeballs = dict(
+                (item.name, item) for item in pokeball_query
+            )
+
         else:
             c.results = None
 
