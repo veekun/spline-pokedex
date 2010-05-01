@@ -60,8 +60,7 @@ def get_role(table):
         try:
             # Find the object and get a link to it
             obj = get_by_name(table, text)
-            options['refuri'] = url(controller='dex', action=table_name,
-                                    name=obj.name.lower())
+            options['refuri'] = pokedex_helpers.make_thingy_url(obj)
             node = nodes.reference(rawtext, obj.name, **options)
         except NoResultFound:
             # Invalid name.  Just ignore the tag I guess
