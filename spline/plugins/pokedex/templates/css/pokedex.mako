@@ -218,6 +218,11 @@ th { vertical-align: middle; }
 /* Move effects, etc */
 .dex-effect a { font-weight: normal; }
 
+/* Pokémon search */
+/* XXXXXXXXXXXXXX GROSS */
+#shape option { min-height: 24px; padding-left: 28px; background: none left center no-repeat; vertical-align: middle; }
+#shape option[value='quadruped'] { background-image: url(/dex/media/chrome/shapes/8.png); }
+
 
 /* Static page stuff */
 #big-pokedex-lookup { font-size: 2em; text-align: center; }

@@ -44,6 +44,25 @@ default_pokemon_table_columns = [
     'stat_total',
 ]
 
+def ilike(column, string):
+    # If there are no wildcards, assume it's a partial match
+    if '*' not in string and '?' not in string:
+        string = u"*{0}*".format(string)
+
+    # LIKE wildcards should be escaped: % -> ^%, _ -> ^_, ^ -> ^^
+    # Our wildcards should be changed: * -> %, ? -> _
+    # And all at once.
+    translations = {
+        '%': u'^%',     '_': u'^_',     '^': u'^^',
+        '*': u'%',      '?': u'_',
+    }
+    string = re.sub(ur'([%_*?^])',
+                    lambda match: translations[match.group(0)],
+                    string)
+
+    return func.lower(column).like(string, escape='^')
+
+
 def in_pokedex_label(pokedex):
     """[ IV ] Sinnoh"""
 
@@ -62,6 +81,13 @@ class PokemonSearchForm(Form):
     # Core stuff
     name = fields.TextField('Name', default=u'')
     ability = PokedexLookupField('Ability', valid_type='ability', allow_blank=True)
+    held_item = PokedexLookupField('Held item', valid_type='item', allow_blank=True)
+    growth_rate = QuerySelectField('Growth rate',
+        query_factory=lambda: pokedex_session.query(tables.GrowthRate),
+        get_label=lambda _: _.name,
+        get_pk=lambda _: _.name,
+        allow_blank=True,
+    )
 
     # Type
     type_operator = fields.SelectField(
@@ -206,10 +232,16 @@ class PokemonSearchForm(Form):
     # Numbers
     # Effort and stats are pulled from the database, so those fields are added
     # dynamically
+    steps_to_hatch = RangeTextField('Steps to hatch', inflator=int)
+    base_experience = RangeTextField('Base EXP', inflator=int)
+    capture_rate = RangeTextField('Capture rate', inflator=int)
+    base_happiness = RangeTextField('Base happiness', inflator=int)
+
     height = RangeTextField('Height', inflator=lambda _: parse_size(_, 'height'))
     weight = RangeTextField('Weight', inflator=lambda _: parse_size(_, 'weight'))
 
     # Flavor
+    species = fields.TextField('Species', default=u'')
     color = QuerySelectField('Color',
         query_factory=lambda: pokedex_session.query(tables.PokemonColor),
         get_label=lambda _: _.name,
@@ -221,6 +253,13 @@ class PokemonSearchForm(Form):
         get_label=lambda _: _.name,
         allow_blank=True,
         get_pk=lambda table: table.name,
+    )
+    shape = QuerySelectField('Shape',
+        query_factory=lambda: pokedex_session.query(tables.PokemonShape)
+            .order_by(tables.PokemonShape.awesome_name),
+        get_label=lambda _: _.awesome_name,
+        get_pk=lambda _: _.name.lower(),
+        allow_blank=True,
     )
 
 
@@ -406,24 +445,6 @@ class PokedexSearchController(BaseController):
         if c.form.name.data:
             name = c.form.name.data.strip().lower()
 
-            def ilike(column, string):
-                # If there are no wildcards, assume it's a partial match
-                if '*' not in string and '?' not in string:
-                    string = u"*{0}*".format(string)
-
-                # LIKE wildcards should be escaped: % -> ^%, _ -> ^_, ^ -> ^^
-                # Our wildcards should be changed: * -> %, ? -> _
-                # And all at once.
-                translations = {
-                    '%': u'^%',     '_': u'^_',     '^': u'^^',
-                    '*': u'%',      '?': u'_',
-                }
-                string = re.sub(ur'([%_*?^])',
-                                lambda match: translations[match.group(0)],
-                                string)
-
-                return func.lower(column).like(string, escape='^')
-
             if ' ' in name:
                 # Hmm.  If there's a space, it might be a form name
                 form_name, name_sans_form = name.split(' ', 1)
@@ -448,6 +469,22 @@ class PokedexSearchController(BaseController):
                                     tables.Ability.id == c.form.ability.data.id
                                   )
                                 )
+
+        # Held item
+        if c.form.held_item.data:
+            item_subquery = pokedex_session.query(
+                    tables.PokemonItem.pokemon_id
+                ) \
+                .filter_by(item_id=c.form.held_item.data.id) \
+                .subquery()
+
+            query = query.join((item_subquery,
+                me.id == item_subquery.c.pokemon_id))
+
+        # Growth rate
+        if c.form.growth_rate.data:
+            query = query.join(tables.EvolutionChain) \
+                .filter(tables.EvolutionChain.growth_rate == c.form.growth_rate.data)
 
         # Type
         if c.form.type.data:
@@ -737,11 +774,29 @@ class PokedexSearchController(BaseController):
                 if effort_field.data:
                     query = query.filter(effort_field.data(stat_alias.effort))
 
+        if c.form.steps_to_hatch.data:
+            query = query.join(tables.EvolutionChain) \
+                .filter(c.form.steps_to_hatch.data(
+                    tables.EvolutionChain.steps_to_hatch))
+
+        if c.form.base_experience.data:
+            query = query.filter(c.form.base_experience.data(me.base_experience))
+
+        if c.form.capture_rate.data:
+            query = query.filter(c.form.capture_rate.data(me.capture_rate))
+
+        if c.form.base_happiness.data:
+            query = query.filter(c.form.base_happiness.data(me.base_happiness))
+
         if c.form.height.data:
             query = query.filter(c.form.height.data(me.height))
 
         if c.form.weight.data:
             query = query.filter(c.form.weight.data(me.weight))
+
+        # Species string
+        if c.form.species.data:
+            query = query.filter(ilike(me.species, c.form.species.data))
 
         # Color
         if c.form.color.data:
@@ -750,6 +805,10 @@ class PokedexSearchController(BaseController):
         # Habitat
         if c.form.habitat.data:
             query = query.filter( me.habitat_id == c.form.habitat.data.id )
+
+        # Shape
+        if c.form.shape.data:
+            query = query.filter( me.pokemon_shape_id == c.form.shape.data.id )
 
 
         ### Display

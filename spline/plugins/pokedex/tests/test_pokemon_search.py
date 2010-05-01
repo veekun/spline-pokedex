@@ -116,16 +116,6 @@ class TestPokemonSearchController(TestController):
         )
 
 
-    def test_color(self):
-        """Checks searching by color."""
-        self.check_search(
-            dict(color=u'brown'),
-            [ u'Cubone', u'Eevee', u'Feebas', u'Pidgey', u'Spinda', u'Zigzagoon' ],
-                # etc.
-            'color',
-        )
-
-
     def test_ability(self):
         """Checks searching by ability."""
         self.check_search(
@@ -136,6 +126,46 @@ class TestPokemonSearchController(TestController):
         )
 
 
+    def test_held_item(self):
+        """Check that searching by held item works correctly."""
+        self.check_search(
+            dict(held_item=u'magmarizer'),
+            [ u'Magby', u'Magmar', u'Magmortar' ],
+            'simple held-item search',
+            exact=True,
+        )
+
+
+    def test_growth_rate(self):
+        """Check that searching by growth rate works correctly."""
+        self.check_search(
+            dict(growth_rate=u'medium slow'),
+            # All the starters are like this
+            [ u'Bulbasaur', u'Charmander', u'Totodile', u'Piplup' ],
+            'growth rate',
+        )
+
+
+    def test_species(self):
+        """Checks searching by species flavor."""
+        self.check_search(
+            dict(species=u'evolutio'),
+            [ u'Eevee' ],
+            'species',
+            exact=True,
+        )
+
+
+    def test_color(self):
+        """Checks searching by color."""
+        self.check_search(
+            dict(color=u'brown'),
+            [ u'Cubone', u'Eevee', u'Feebas', u'Pidgey', u'Spinda', u'Zigzagoon' ],
+                # etc.
+            'color',
+        )
+
+
     def test_habitat(self):
         """Checks searching by FR/LG habitat."""
         # I actually checked this by looking at the old search's results.  Hm.
@@ -143,6 +173,15 @@ class TestPokemonSearchController(TestController):
             dict(habitat=u'urban'),
             [ u'Abra', u'Eevee', u'Hitmonlee', u'Muk', u'Persian', u'Voltorb' ],
             'habitat',
+        )
+
+
+    def test_shape(self):
+        """Checks searching by flavor shape."""
+        self.check_search(
+            dict(shape=u'arms'),
+            [ u'Baltoy', u'Drifloon', u'Grimer', u'Haunter', u'Porygon-Z', u'Spoink' ],
+            'shape',
         )
 
 
@@ -569,6 +608,43 @@ class TestPokemonSearchController(TestController):
             exact=True,
         )
 
+    def test_steps_to_hatch(self):
+        """Checks searching by base experience."""
+        self.check_search(
+            dict(base_experience=u'255'),
+            [ u'Arceus', u'Blissey', u'Chansey', u'Happiny' ],
+            'base EXP',
+        )
+
+    def test_base_experience(self):
+        """Checks searching by base experience."""
+        self.check_search(
+            dict(base_experience=u'255'),
+            [ u'Arceus', u'Blissey', u'Chansey', u'Happiny' ],
+            'base EXP',
+        )
+
+    def test_capture_rate(self):
+        """Checks searching by capture rate."""
+        self.check_search(
+            dict(capture_rate=u'5'),
+            [ u'Groudon', u'Kyogre' ],
+            'capture rate',
+            exact=True,
+        )
+
+    def test_base_happiness(self):
+        """Checks searching by base happiness."""
+        self.check_search(
+            dict(base_happiness=u'140'),
+            [
+                u'Azelf', u'Blissey', u'Chansey', u'Clefable', u'Clefairy',
+                u'Cleffa', u'Happiny', u'Lopunny', u'Mesprit', u'Uxie',
+            ],
+            'base happiness',
+            exact=True,
+        )
+
     def test_size(self):
         """Check that searching by size works correctly."""
         # XXX what should a size with no units do?  default american units?  just fail?
@@ -588,13 +664,4 @@ class TestPokemonSearchController(TestController):
             dict(weight=u'14.3 lb'),
             [ u'Eevee' ],
             'converted units match',
-        )
-
-    def test_held_item(self):
-        """Check that searching by held item works correctly."""
-        self.check_search(
-            dict(held_item=u'magmarizer'),
-            [ u'Magby', u'Magmar', u'Magmortar' ],
-            'simple held-item search',
-            exact=True,
         )

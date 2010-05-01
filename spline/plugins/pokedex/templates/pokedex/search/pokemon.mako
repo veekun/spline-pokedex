@@ -118,22 +118,35 @@ ${h.form(url.current(), method='GET')}
 <p>Unless otherwise specified: matching Pokémon must match ALL of the criteria, but can match ANY selections within a group (e.g., evolution stage).</p>
 <p>Anything left blank is ignored entirely.</p>
 
-<h2>Essentials and flavor</h2>
-<dl class="standard-form">
-    ${lib.field('name')}
-    ${lib.field('ability')}
-    ${lib.field('color')}
-    ${lib.field('habitat')}
-    <dt>${c.form.gender_rate.label() | n}</dt>
-    <dd>${c.form.gender_rate_operator() | n} ${c.form.gender_rate() | n}</dd>
-    <dt>${c.form.egg_group.label() | n}</dt>
-    <dd>
-        ${c.form.egg_group_operator() | n}
-        % for widget in c.form.egg_group:
-        ${widget() | n}
-        % endfor
-    </dd>
-</dl>
+<div class="dex-column-container">
+<div class="dex-column-2x">
+    <h2>Essentials</h2>
+    <dl class="standard-form">
+        ${lib.field('name')}
+        ${lib.field('ability')}
+        ${lib.field('held_item')}
+        ${lib.field('growth_rate')}
+        <dt>${c.form.gender_rate.label() | n}</dt>
+        <dd>${c.form.gender_rate_operator() | n} ${c.form.gender_rate() | n}</dd>
+        <dt>${c.form.egg_group.label() | n}</dt>
+        <dd>
+            ${c.form.egg_group_operator() | n}
+            % for widget in c.form.egg_group:
+            ${widget() | n}
+            % endfor
+        </dd>
+    </dl>
+</div>
+<div class="dex-column">
+    <h2>Flavor</h2>
+    <dl class="standard-form">
+        ${lib.field('species')}
+        ${lib.field('color')}
+        ${lib.field('habitat')}
+        ${lib.field('shape')}
+    </dl>
+</div>
+</div>
 
 <h2>Type</h2>
 <p>Type must be ${c.form.type_operator() | n}.</p>
@@ -209,6 +222,13 @@ ${h.form(url.current(), method='GET')}
     </dl>
 </div>
 <div class="dex-column">
+    <h3>Breeding/Training</h3>
+    <dl class="standard-form">
+        ${lib.field('steps_to_hatch')}
+        ${lib.field('base_experience')}
+        ${lib.field('capture_rate')}
+        ${lib.field('base_happiness')}
+    </dl>
     <h3>Size</h3>
     <dl class="standard-form">
         ${lib.field('height')}
