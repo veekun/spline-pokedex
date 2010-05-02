@@ -9,7 +9,7 @@ ${h.h1('Essentials')}
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.item.name}</p>
     <%
-        if c.item.is_underground or c.item.berry:
+        if c.item.appears_underground or c.item.berry:
             sprite_path = 'items/big'
         else:
             sprite_path = 'items'
@@ -35,12 +35,20 @@ ${h.h1('Essentials')}
         Can't be bought or sold
         % endif
     </dd>
+    <dt>Flags</dt>
+    <dd>
+        <ul class="classic-list">
+            % for flag in c.item.flags:
+            <li>${flag.name}</li>
+            % endfor
+        </ul>
+    </dd>
 </dl>
 </div>
 
 
 ${h.h1('Effect')}
-<p>${c.item.effect}</p>
+<p>${c.item.effect.as_html | n}</p>
 
 % if c.item.fling_effect or c.item.berry:
 <h2>Special move effects</h2>
