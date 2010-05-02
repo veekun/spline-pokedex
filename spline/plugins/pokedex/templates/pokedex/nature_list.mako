@@ -5,6 +5,14 @@
 
 ${h.h1('Nature list')}
 
+<p>
+    % if c.sort_order == u'stat':
+    <a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/sort-alphabet.png')}"> Sort by name</a>
+    % else:
+    <a href="${url.current(sort=u'stat')}"><img src="${h.static_uri('spline', 'icons/sort-rating.png')}"> Sort by stat</a>
+    % endif
+</p>
+
 <table class="dex-nature-list striped-rows">
 ## eh
 <col>

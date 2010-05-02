@@ -1540,8 +1540,22 @@ class PokedexController(BaseController):
 
 
     def natures_list(self):
-        c.natures = pokedex_session.query(tables.Nature) \
-            .order_by(tables.Nature.name)
+        c.natures = pokedex_session.query(tables.Nature)
+
+        # Figure out sort order
+        c.sort_order = request.params.get('sort', None)
+        if c.sort_order == u'stat':
+            # Sort neutral natures first, sorted by name, then the others in
+            # stat order
+            c.natures = c.natures.order_by(
+                (tables.Nature.increased_stat_id
+                    == tables.Nature.decreased_stat_id).desc(),
+                tables.Nature.increased_stat_id.asc(),
+                tables.Nature.decreased_stat_id.asc(),
+            )
+        else:
+            c.natures = c.natures.order_by(tables.Nature.name.asc())
+
         return render('/pokedex/nature_list.mako')
 
     def natures(self, name):
