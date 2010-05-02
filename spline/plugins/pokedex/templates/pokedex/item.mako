@@ -58,8 +58,10 @@ ${h.h1('Effect')}
 
 <h2>Flavor text</h2>
 <dl>
-    <dt>${h.pokedex.generation_icon(4)}</dt>
-    <dd>${c.item.flavor_text}</dd>
+    % for item_flavor_text in c.item.flavor_text:
+    <dt>${h.pokedex.version_icons(*item_flavor_text.version_group.versions)}</dt>
+    <dd>${h.pokedex.render_flavor_text(item_flavor_text.flavor_text)}</dd>
+    % endfor
 </dl>
 
 

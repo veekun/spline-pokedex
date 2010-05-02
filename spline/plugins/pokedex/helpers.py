@@ -38,6 +38,30 @@ def make_thingy_url(thingy):
                name=thingy.name.lower(),
                **args)
 
+def render_flavor_text(flavor_text, literal=False):
+    """Makes flavor text suitable for HTML presentation.
+
+    If `literal` is false, collapses broken lines into single lines.
+
+    If `literal` is true, linebreaks are preserved exactly as they are in the
+    games.
+    """
+
+    # n.b.: \u00ad is soft hyphen
+
+    if literal:
+        html = flavor_text.replace('\f', '<br><br>') \
+                          .replace('\u00ad', '-') \
+                          .replace('\n', '<br>')
+
+    else:
+        html = flavor_text.replace('\f', '<br>') \
+                          .replace('\u00ad', '') \
+                          .replace(' \n', ' ') \
+                          .replace('\n', ' ')
+
+    return h.literal(html)
+
 def filename_from_name(name):
     """Shorten the name of a whatever to something suitable as a filename.
 
