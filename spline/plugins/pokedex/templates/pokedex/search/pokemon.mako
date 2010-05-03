@@ -218,7 +218,7 @@ ${h.form(url.current(), method='GET')}
 </div>
 
 <h2>Numbers</h2>
-<p>Understands single numbers (<code>50</code>); ranges (<code>17-29</code>); at-least (<code>100+</code>); at-most (<code>-100</code> = <code>0-100</code>); approximations (<code>120~10</code> = <code>110-130</code>); and any combination of those (<code>20, 50-60, 90~5</code>).</p>
+<p>Understands single numbers (<code>50</code>); ranges (<code>17-29</code>); at-least (<code>100+</code>); at-most (<code>&lt; 100</code>); approximations (<code>120~10</code> = <code>110-130</code>); and any combination of those (<code>20, 50-60, 90~5</code>).</p>
 <p>Height and weight work the same way, but require units.  Anything is acceptable.</p>
 
 <div class="dex-column-container">

@@ -137,7 +137,7 @@ class RangeTextField(fields.TextField):
         sentence = valuelist[0].strip()
         for phrase in re.split(r'\s*,\s*', sentence):
             # Allowed separators: - – .. + ~ ±
-            endpoints = re.split(ur'([.]{2}|[-–+~±])', phrase, 1)
+            endpoints = re.split(ur'([.]{2}|[-–+~±]|[<>]=?)', phrase, 1)
 
             if len(endpoints) > 3:
                 # Can't handle this yet.  TODO: try it each way
@@ -155,7 +155,10 @@ class RangeTextField(fields.TextField):
             a = self._make_number(endpoints[0])
             b = self._make_number(endpoints[1])
 
-            if a is None and b is None:
+            if (a is None and b is None) or \
+                (a is not None and delimiter in ('<', '<=', '>', '>=')):
+
+                # Either there are no numbers, or someone typed "1<4"
                 raise ValidationError("'{0}' is not a valid range".format(delimiter))
 
             error = 0
@@ -178,6 +181,18 @@ class RangeTextField(fields.TextField):
                     b = 0.0
 
                 partitions.append((a - b - error, a + b + error))
+
+            elif delimiter == '<':
+                partitions.append((None, b - 0.01))
+
+            elif delimiter == '<=':
+                partitions.append((None, b))
+
+            elif delimiter == '>':
+                partitions.append((b + 0.01, None))
+
+            elif delimiter == '>=':
+                partitions.append((b, None))
 
             else:
                 # Force them to be in the right order

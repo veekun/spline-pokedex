@@ -514,6 +514,7 @@ class TestPokemonSearchController(TestController):
         - n- or -m  (negative numbers are impossible)
         - n~m or n±m
         - n~ or ~m
+        - <n or >n
 
         In the case of size, there's extra parsing to do for units; however,
         that won't conflict with any of the above rules.
@@ -551,6 +552,12 @@ class TestPokemonSearchController(TestController):
             'range: n-',
             exact=True,
         )
+        self.check_search(
+            dict(id=u'>=492'),
+            [ (u'Shaymin', u'land'), (u'Shaymin', u'sky'), u'Arceus' ],
+            'range: >=n',
+            exact=True,
+        )
 
         self.check_search(
             dict(id=u'+3'),
@@ -562,6 +569,12 @@ class TestPokemonSearchController(TestController):
             dict(id=u'–3'),
             [ u'Bulbasaur', u'Ivysaur', u'Venusaur' ],
             'range: endash-m',
+            exact=True,
+        )
+        self.check_search(
+            dict(id=u'<4'),
+            [ u'Bulbasaur', u'Ivysaur', u'Venusaur' ],
+            'range: <m',
             exact=True,
         )
 
