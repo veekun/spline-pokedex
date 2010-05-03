@@ -256,8 +256,8 @@ class PokemonSearchForm(Form):
     )
     shape = QuerySelectField('Shape',
         query_factory=lambda: pokedex_session.query(tables.PokemonShape)
-            .order_by(tables.PokemonShape.awesome_name),
-        get_label=lambda _: _.awesome_name,
+            .order_by(tables.PokemonShape.name.asc()),
+        get_label=lambda _: _.name,
         get_pk=lambda _: _.name.lower(),
         allow_blank=True,
     )
@@ -334,31 +334,48 @@ class PokemonSearchForm(Form):
 
         super(PokemonSearchForm, self).__init__(formdata, *args, **kwargs)
 
+        # Two factoids we need to remember about this form: was it submitted at
+        # all, and is it valid?
+        self.is_valid = None
+        self.was_submitted = None
+        self.needs_shortening = bool(formdata.get('shorten', False))
+        self.cleansed_data = dict()
+
         # Need to make a copy and delete items, rather than creating a new
         # dict, because formdata is some variant of a multi-dict
-        if formdata:
+        if self.needs_shortening and formdata:
+            self.was_submitted = True
             self.cleansed_data = formdata.copy()
+            del self.cleansed_data['shorten']
+
             for name, field in self._fields.iteritems():
+                # Shorten: nuke anything that's a default
                 if field.data == field.default and name in self.cleansed_data:
                     del self.cleansed_data[name]
-        else:
-            self.cleansed_data = {}
 
-    @property
-    def was_submitted(self):
-        """Returns true if the form was submitted with any meaningful data;
-        false otherwise.
-        """
-        extra_cleansed_data = self.cleansed_data.copy()
-        # Ignore display-only fields
-        extra_cleansed_data.pop('display', None)
-        extra_cleansed_data.pop('sort', None)
-        extra_cleansed_data.pop('column', None)
-        extra_cleansed_data.pop('format', None)
-        # 'shorten' isn't really a field
-        extra_cleansed_data.pop('shorten', None)
+        elif not self.needs_shortening:
+            self.was_submitted = bool(formdata)
 
-        return bool(extra_cleansed_data)
+            # Unshortening.  Fields that are missing entirely from the form
+            # data need to be FILLED IN with their defaults.
+            # Note that this will cheerfully fill in a multi-select field where
+            # nothing was selected; it's assumed that a multi-select field with
+            # a default makes no sense with nothing selected
+            for name, field in self._fields.iteritems():
+                if field.default and name not in formdata:
+                    field.data = field.default
+
+    def validate(self):
+        # XXX this works around a wtforms bug; QueryMultiSelectField (or
+        # whatever it's called) lazily checks or errors when field.data is
+        # accessed, but that's not likely to happen before validating!  Ping
+        # all the field data
+        for name, field in self._fields.iteritems():
+            field.data
+
+        self.is_valid = super(PokemonSearchForm, self).validate()
+
+        return self.is_valid
 
 
 class PokedexSearchController(BaseController):
@@ -384,19 +401,19 @@ class PokedexSearchController(BaseController):
 
         ### Parse form, etc etc
         c.form = F(request.params)
+        c.form.validate()
 
-        validates = c.form.validate()
-        cleansed_data = c.form.cleansed_data
-        c.form_valid = validates and c.form.was_submitted
+        # Rendering needs to know which version groups go with which
+        # generations for the move-version-group list
+        c.generations = pokedex_session.query(tables.Generation) \
+            .order_by(tables.Generation.id.asc())
 
         # If this is the first time the form was submitted, redirect to a URL
-        # with only non-default values.  Do this BEFORE the error check, so bad
-        # URLs are still shortened
-        if validates and c.form.was_submitted and cleansed_data.get('shorten', None):
-            del cleansed_data['shorten']
-            redirect_to(url.current(**cleansed_data.mixed()))
+        # with only non-default values
+        if c.form.is_valid and c.form.was_submitted and c.form.needs_shortening:
+            redirect_to(url.current(**c.form.cleansed_data.mixed()))
 
-        if not c.form_valid:
+        if not c.form.was_submitted or not c.form.is_valid:
             # Either blank, or errortastic.  Skip the logic and just send the
             # form back
             return render('/pokedex/search/pokemon.mako')

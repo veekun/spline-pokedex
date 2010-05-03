@@ -219,9 +219,7 @@ th { vertical-align: middle; }
 .dex-effect a { font-weight: normal; }
 
 /* Pokémon search */
-/* XXXXXXXXXXXXXX GROSS */
-#shape option { min-height: 24px; padding-left: 28px; background: none left center no-repeat; vertical-align: middle; }
-#shape option[value='quadruped'] { background-image: url(/dex/media/chrome/shapes/8.png); }
+table#dex-pokemon-search-move-versions td { padding-right: 2em; }
 
 
 /* Static page stuff */

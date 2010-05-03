@@ -4,14 +4,30 @@
 
 <%def name="title()">Pokémon Search</%def>
 
-
 ### RESULTS ###
-## XXX: errors
-## XXX: no results
+## Four possibilities here: the form wasn't submitted, the form was submitted
+## but was bogus, the form was submitted and there are no results, or the form
+## was submitted and is good.
 
-% if c.form_valid:
+% if c.form.was_submitted:
 <h1>Results</h1>
-<p><a href="${url.current()}">Clear form</a></p>
+<p><a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/eraser.png')}" alt=""> Reset form</a></p>
+
+% if not c.form.is_valid:
+## Errors
+<p>It seems you entered something bogus for:</p>
+<ul class="classic-list">
+    % for field_name in c.form.errors.keys():
+    <li>${c.form[field_name].label.text}</li>
+    % endfor
+</ul>
+
+% elif c.form.is_valid and not c.results:
+## No results
+<p>Nothing found.</p>
+
+% elif c.form.is_valid:
+## Got something
 
 ## Display.  Could be one of several options...
 % if c.display_mode == 'custom-table':
@@ -109,6 +125,7 @@ ${getattr(self, 'col_' + column)()}
 % endif  ## display_mode
 
 % endif  ## search performed
+% endif  ## form submitted
 
 
 ### SEARCH FORM ###
@@ -260,7 +277,26 @@ ${h.form(url.current(), method='GET')}
 </div>
 <div class="dex-column">
     <h3>Version</h3>
-    ${lib.bare_field('move_version_group')}
+    ## Arrange versions by generation
+
+    <% version_group_controls = dict((control.data, control)
+        for control in c.form.move_version_group) %>\
+    <table id="dex-pokemon-search-move-versions">
+        % for generation in c.generations:
+        <tr>
+            % for version_group in generation.version_groups:
+            <td>
+                ${version_group_controls[ unicode(version_group.id) ]()}
+                ${version_group_controls[ unicode(version_group.id) ].label()}
+            </td>
+            % endfor
+        </tr>
+        % endfor
+    </table>
+
+    % for error in c.form.move_version_group.errors:
+    <p class="error">${error}</p>
+    % endfor
 </div>
 </div>
 
