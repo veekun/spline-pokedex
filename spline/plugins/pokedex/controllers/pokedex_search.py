@@ -84,8 +84,8 @@ class PokemonSearchForm(Form):
     held_item = PokedexLookupField('Held item', valid_type='item', allow_blank=True)
     growth_rate = QuerySelectField('Growth rate',
         query_factory=lambda: pokedex_session.query(tables.GrowthRate),
-        get_label=lambda _: _.name,
         get_pk=lambda _: _.name,
+        get_label=lambda _: """{0} ({1:n} EXP)""".format(_.name, _.max_experience),
         allow_blank=True,
     )
 
@@ -271,8 +271,17 @@ class PokemonSearchForm(Form):
             ('evolution-chain', 'Evolution family'),
             ('name', 'Name'),
             ('type', 'Type'),
+            ('steps-to-hatch', 'Steps to hatch'),
+            ('base-experience', 'Base EXP'),
+            ('capture-rate', 'Capture rate'),
+            ('base-happiness', 'Base happiness'),
             ('height', 'Height'),
             ('weight', 'Weight'),
+            ('gender', 'Gender rate'),
+            ('species', 'Species'),
+            ('color', 'Color'),
+            ('habitat', 'Habitat'),
+            ('shape', 'Shape'),
             ('stat-hp', 'HP'),
             ('stat-attack', 'Attack'),
             ('stat-defense', 'Defense'),
@@ -305,13 +314,24 @@ class PokemonSearchForm(Form):
             ('icon', 'Icon'),
             ('name', 'Name'),
             ('type', 'Types'),
+            ('growth_rate', 'EXP to level 100'),
+            ('ability', 'Abilities'),
+            ('gender', 'Gender rate'),
+            ('egg_group', 'Egg groups'),
+
             ('height', 'Height'),
             ('height_metric', 'Height (in metric)'),
             ('weight', 'Weight'),
             ('weight_metric', 'Weight (in metric)'),
-            ('ability', 'Abilities'),
-            ('gender', 'Gender rate'),
-            ('egg_group', 'Egg groups'),
+            ('species', 'Species'),
+            ('color', 'Color'),
+            ('habitat', 'Habitat'),
+            ('shape', 'Shape'),
+            ('steps_to_hatch', 'Steps to hatch'),
+            ('base_experience', 'Base EXP'),
+            ('capture_rate', 'Capture rate'),
+            ('base_happiness', 'Base happiness'),
+
             ('stat_hp', 'HP'),
             ('stat_attack', 'Attack'),
             ('stat_defense', 'Defense'),
@@ -445,6 +465,16 @@ class PokedexSearchController(BaseController):
 
             return new_query, stat_aliases[stat]
 
+        # Same applies to a couple other tables...
+        joins = []
+        def join_once(table):
+            if table in joins:
+                return query
+
+            new_query = query.join(table)
+            joins.append(table)
+            return new_query
+
         # ID
         if c.form.id.data:
             # Have to handle forms and not-forms differently
@@ -500,7 +530,7 @@ class PokedexSearchController(BaseController):
 
         # Growth rate
         if c.form.growth_rate.data:
-            query = query.join(tables.EvolutionChain) \
+            query = join_once(tables.EvolutionChain) \
                 .filter(tables.EvolutionChain.growth_rate == c.form.growth_rate.data)
 
         # Type
@@ -792,7 +822,7 @@ class PokedexSearchController(BaseController):
                     query = query.filter(effort_field.data(stat_alias.effort))
 
         if c.form.steps_to_hatch.data:
-            query = query.join(tables.EvolutionChain) \
+            query = join_once(tables.EvolutionChain) \
                 .filter(c.form.steps_to_hatch.data(
                     tables.EvolutionChain.steps_to_hatch))
 
@@ -981,6 +1011,33 @@ class PokedexSearchController(BaseController):
         elif c.form.sort.data == 'weight':
             sort_clauses.insert(0, me.weight.desc())
 
+        elif c.form.sort.data == 'gender':
+            sort_clauses.insert(0, me.gender_rate.asc())
+
+        elif c.form.sort.data == 'species':
+            sort_clauses.insert(0, me.species.asc())
+
+        elif c.form.sort.data == 'color':
+            query = join_once(tables.PokemonColor)
+            sort_clauses.insert(0, tables.PokemonColor.name.asc())
+
+        elif c.form.sort.data == 'habitat':
+            query = query.outerjoin(tables.PokemonHabitat)
+            sort_clauses.insert(0, tables.PokemonHabitat.name.asc())
+
+        elif c.form.sort.data == 'steps-to-hatch':
+            query = join_once(tables.EvolutionChain)
+            sort_clauses.insert(0, tables.EvolutionChain.steps_to_hatch.asc())
+
+        elif c.form.sort.data == 'base-experience':
+            sort_clauses.insert(0, me.base_experience.desc())
+
+        elif c.form.sort.data == 'capture-rate':
+            sort_clauses.insert(0, me.capture_rate.desc())
+
+        elif c.form.sort.data == 'base-happiness':
+            sort_clauses.insert(0, me.base_happiness.desc())
+
         elif c.form.sort.data == 'stat-total':
             # Create a subquery that sums all base stats
             stat_total = aliased(tables.PokemonStat)
@@ -1023,6 +1080,7 @@ class PokedexSearchController(BaseController):
 
         ### Run the query!
         c.results = query.all()
+        print query
 
 
         ### Eagerloading

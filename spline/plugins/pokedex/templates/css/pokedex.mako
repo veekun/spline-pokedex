@@ -26,6 +26,14 @@ ul.inline-menu > li:last-child:after { content: none; }
 col.dex-col-icon        { width: 32px; }
 col.dex-col-name        { width: 10em; }
 col.dex-col-link        { width: 16px; }
+col.dex-col-max-exp     { width: 7em; }
+col.dex-col-ability     { width: 7em; }
+col.dex-col-egg-group   { width: 7em; }
+col.dex-col-height      { width: 5em; }
+col.dex-col-weight      { width: 6em; }
+col.dex-col-species     { width: 8em; }
+col.dex-col-color       { width: 5em; }
+col.dex-col-habitat     { width: 9em; }
 col.dex-col-stat        { width: 3em; }
 col.dex-col-stat-name   { width: 10em; }
 col.dex-col-stat-bar    { width: auto; }
@@ -148,6 +156,7 @@ table.dex-pokemon-moves tr.subheader-row th { padding: 0.17em 0.33em; text-align
 table.dex-pokemon-moves td.egg { padding: 0 /* egg sprite consumes a lot of space, so let it extend into padding */; }
 table.dex-pokemon-moves td.icon { padding: 0 /* icons consume a lot of space, so let em extend into padding */; }
 table.dex-pokemon-moves td.name { white-space: nowrap; }
+table.dex-pokemon-moves td.max-exp { text-align: right; }
 table.dex-pokemon-moves td.effect { font-size: 0.8em; text-align: left; }
 table.dex-pokemon-moves td.effect p { margin: 0; }
 table.dex-pokemon-moves td.tutored { white-space: nowrap; }
@@ -156,6 +165,9 @@ table.dex-pokemon-moves td.type2 { text-align: left; }
 table.dex-pokemon-moves td.ability { font-size: 0.75em; padding: 0.25em; }
 table.dex-pokemon-moves td.egg-group { font-size: 0.75em; padding: 0.25em; }
 table.dex-pokemon-moves td.stat { text-align: right; }
+table.dex-pokemon-moves td.size { text-align: right; }
+table.dex-pokemon-moves td.color { }
+table.dex-pokemon-moves td.species { }
 table.dex-pokemon-moves td.effort { font-size: 0.75em; padding: 0.25em; text-align: left; }
 /* "sorting" pokemon search results by evolution chain */
 table.dex-pokemon-moves tr.fake-result td { opacity: 0.25; }

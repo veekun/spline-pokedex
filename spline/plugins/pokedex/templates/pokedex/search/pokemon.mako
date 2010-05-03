@@ -346,6 +346,10 @@ ${h.end_form()}
 <%def name="th_name()"><th>Name</th></%def>
 <%def name="td_name(pokemon)"><td class="name">${h.pokedex.pokemon_link(pokemon, pokemon.full_name)}</td></%def>
 
+<%def name="col_growth_rate()"><col class="dex-col-max-exp"></%def>
+<%def name="th_growth_rate()"><th>EXP to L100</th></%def>
+<%def name="td_growth_rate(pokemon)"><td class="max-exp">${pokemon.evolution_chain.growth_rate.max_experience}</td></%def>
+
 <%def name="col_type()"><col class="dex-col-type2"></%def>
 <%def name="th_type()"><th>Type</th></%def>
 <%def name="td_type(pokemon)">\
@@ -422,19 +426,57 @@ ${pokemon_stat.effort} ${pokemon_stat.stat.name}<br>
 
 <%def name="col_height()"><col class="dex-col-height"></%def>
 <%def name="th_height()"><th>Height</th></%def>
-<%def name="td_height(pokemon)"><td class="stat">${h.pokedex.format_height_imperial(pokemon.height)}</td></%def>
+<%def name="td_height(pokemon)"><td class="size">${h.pokedex.format_height_imperial(pokemon.height)}</td></%def>
 
 <%def name="col_weight()"><col class="dex-col-weight"></%def>
 <%def name="th_weight()"><th>Weight</th></%def>
-<%def name="td_weight(pokemon)"><td class="stat">${h.pokedex.format_weight_imperial(pokemon.weight)}</td></%def>
+<%def name="td_weight(pokemon)"><td class="size">${h.pokedex.format_weight_imperial(pokemon.weight)}</td></%def>
 
 <%def name="col_height_metric()"><col class="dex-col-height"></%def>
 <%def name="th_height_metric()"><th>Height</th></%def>
-<%def name="td_height_metric(pokemon)"><td class="stat">${h.pokedex.format_height_metric(pokemon.height)}</td></%def>
+<%def name="td_height_metric(pokemon)"><td class="size">${h.pokedex.format_height_metric(pokemon.height)}</td></%def>
 
 <%def name="col_weight_metric()"><col class="dex-col-weight"></%def>
 <%def name="th_weight_metric()"><th>Weight</th></%def>
-<%def name="td_weight_metric(pokemon)"><td class="stat">${h.pokedex.format_weight_metric(pokemon.weight)}</td></%def>
+<%def name="td_weight_metric(pokemon)"><td class="size">${h.pokedex.format_weight_metric(pokemon.weight)}</td></%def>
+
+<%def name="col_species()"><col class="dex-col-species"></%def>
+<%def name="th_species()"><th>Species</th></%def>
+<%def name="td_species(pokemon)"><td class="species">${pokemon.species}</td></%def>
+
+<%def name="col_color()"><col class="dex-col-color"></%def>
+<%def name="th_color()"><th>Color</th></%def>
+<%def name="td_color(pokemon)"><td class="color">${pokemon.color}</td></%def>
+
+<%def name="col_habitat()"><col class="dex-col-habitat"></%def>
+<%def name="th_habitat()"><th>Habitat</th></%def>
+<%def name="td_habitat(pokemon)"><td class="habitat">\
+% if pokemon.generation.id <= 3:
+${pokemon.habitat}\
+% else:
+—\
+% endif
+</td></%def>
+
+<%def name="col_shape()"><col class="dex-col-icon"></%def>
+<%def name="th_shape()"><th>Shape</th></%def>
+<%def name="td_shape(pokemon)"><td class="icon">${h.pokedex.pokedex_img('chrome/shapes/%d.png' % pokemon.shape.id, title=pokemon.shape.awesome_name, alt='')}</td></%def>
+
+<%def name="col_steps_to_hatch()"><col class="dex-col-stat"></%def>
+<%def name="th_steps_to_hatch()"><th>Steps</th></%def>
+<%def name="td_steps_to_hatch(pokemon)"><td class="stat">${pokemon.evolution_chain.steps_to_hatch}</td></%def>
+
+<%def name="col_base_experience()"><col class="dex-col-stat"></%def>
+<%def name="th_base_experience()"><th>EXP</th></%def>
+<%def name="td_base_experience(pokemon)"><td class="stat">${pokemon.base_experience}</td></%def>
+
+<%def name="col_capture_rate()"><col class="dex-col-stat"></%def>
+<%def name="th_capture_rate()"><th>Cap.</th></%def>
+<%def name="td_capture_rate(pokemon)"><td class="stat">${pokemon.capture_rate}</td></%def>
+
+<%def name="col_base_happiness()"><col class="dex-col-stat"></%def>
+<%def name="th_base_happiness()"><th>:)</th></%def>
+<%def name="td_base_happiness(pokemon)"><td class="stat">${pokemon.base_happiness}</td></%def>
 
 <%def name="col_link()"><col class="dex-col-link"></%def>
 <%def name="th_link()"><th></th></%def>
