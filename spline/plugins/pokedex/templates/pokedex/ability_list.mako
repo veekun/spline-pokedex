@@ -5,7 +5,6 @@
 ${h.h1('Ability list')}
 
 <table class="striped-rows dex-ability-list">
-## gross!  I'm just going with what the nature list does :|
 <col>
 <col>
 <col class="dex-col-first-version">

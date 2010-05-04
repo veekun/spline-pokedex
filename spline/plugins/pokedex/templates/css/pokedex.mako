@@ -214,12 +214,17 @@ table.dex-type-chart td.dex-damage-dealt-100 { color: #e0e0e0; }
 
 table.dex-nature-list td { padding: 0.33em 1em 0.33em 0.75em; }
 table.dex-nature-list td.flavor { text-align: right; }
+table.dex-ability-list td { padding: 0.33em 0.5em; }
+table.dex-ability-list p { margin: 0; padding: 0; }
 
 .dex-pokemon-flavor-generation { position: absolute; line-height: 1.5; }
 dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation { padding-top: 1.5em; }
 dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation + dl.dex-pokemon-flavor-text { padding-top: 1.5em; }
 dl.dex-pokemon-flavor-text dt { width: 7em /* enough for gen, two versions, and space */; }
 dl.dex-pokemon-flavor-text dd { padding-left: 7.5em; }
+
+dl.pokemon-abilities a { font-weight: normal; }
+dl.pokemon-abilities p { margin: 0; padding: 0; }
 
 th { vertical-align: middle; }
 .vertical-text { -moz-transform: rotate(-90deg); }
