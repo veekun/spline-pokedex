@@ -9,7 +9,7 @@ import mimetypes
 
 import pokedex.db
 import pokedex.db.tables as tables
-from pokedex.db.tables import Ability, EggGroup, Generation, Item, Language, Machine, Move, MoveFlagType, Pokemon, PokemonEggGroup, PokemonFormSprite, PokemonMove, PokemonStat, Type, VersionGroup, PokemonType
+from pokedex.db.tables import Ability, EggGroup, Generation, Item, Language, Machine, Move, MoveFlagType, Pokemon, PokemonEggGroup, PokemonFormSprite, PokemonMove, PokemonStat, Type, VersionGroup, PokemonType, PokemonAbility
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
@@ -1327,6 +1327,20 @@ class PokedexController(BaseController):
             c.ability = db.get_by_name(Ability, name)
         except NoResultFound:
             return self._not_found()
+
+        ### Prev/next for header
+        max_id = pokedex_session.query(Ability).count()
+        c.prev_ability = pokedex_session.query(Ability).get(
+            (c.ability.id - 1 - 1) % max_id + 1)
+        c.next_ability = pokedex_session.query(Ability).get(
+            (c.ability.id - 1 + 1) % max_id + 1)
+
+        c.pokemon = pokedex_session.query(Pokemon) \
+                                   .join(PokemonAbility) \
+                                   .filter(PokemonAbility.ability_id == c.ability.id)
+
+        c.pokemon = sorted(c.pokemon, key=lambda (pokemon): (pokemon.national_id, pokemon.forme_name))
+
         return render('/pokedex/ability.mako')
 
 

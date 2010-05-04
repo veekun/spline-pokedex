@@ -37,8 +37,8 @@ ${h.h1('Essentials')}
 <h2>Abilities</h2>
 <dl>
     % for ability in c.pokemon.abilities:
-    <dt>${ability.name}</dt>
-    <dd>${ability.effect}</dd>
+    <dt><a href="${url(controller='dex', action='abilities', name=ability.name.lower())}">${ability.name}</a></dt>
+    <dd>${h.literal(ability.short_effect.as_html)}</dd>
     % endfor
 </dl>
 
