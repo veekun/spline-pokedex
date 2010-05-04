@@ -45,6 +45,8 @@ default_pokemon_table_columns = [
 ]
 
 def ilike(column, string):
+    string = string.lower()
+
     # If there are no wildcards, assume it's a partial match
     if '*' not in string and '?' not in string:
         string = u"*{0}*".format(string)
@@ -84,7 +86,7 @@ class PokemonSearchForm(Form):
     held_item = PokedexLookupField('Held item', valid_type='item', allow_blank=True)
     growth_rate = QuerySelectField('Growth rate',
         query_factory=lambda: pokedex_session.query(tables.GrowthRate),
-        get_pk=lambda _: _.name,
+        get_pk=lambda _: _.max_experience,
         get_label=lambda _: """{0} ({1:n} EXP)""".format(_.name, _.max_experience),
         allow_blank=True,
     )

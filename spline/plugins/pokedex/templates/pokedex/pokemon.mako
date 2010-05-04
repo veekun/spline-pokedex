@@ -117,17 +117,36 @@ ${h.h1('Essentials')}
     <h2>Breeding</h2>
     <dl>
         <dt>Gender</dt>
-        <dd>${h.pokedex.pokedex_img('gender-rates/%d.png' % c.pokemon.gender_rate, alt='')} ${h.pokedex.gender_rate_label[c.pokemon.gender_rate]}</dd>
+        <dd>
+            ${h.pokedex.pokedex_img('gender-rates/%d.png' % c.pokemon.gender_rate, alt='')}
+            ${h.pokedex.gender_rate_label[c.pokemon.gender_rate]}
+            <a href="${url(controller='dex_search', action='pokemon_search', gender_rate=c.pokemon.gender_rate)}"
+                class="dex-subtle-search-link">
+                <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
+            </a>
+        </dd>
         <dt>Egg groups</dt>
         <dd>
-            <ul>
+            <ul class="inline-commas">
                 % for i, egg_group in enumerate(c.pokemon.egg_groups):
                 <li>${egg_group.name}</li>
                 % endfor
             </ul>
+            % if len(c.pokemon.egg_groups) > 1:
+            <a href="${url(controller='dex_search', action='pokemon_search', egg_group=[_.id for _ in c.pokemon.egg_groups])}"
+                class="dex-subtle-search-link">
+                <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="">
+            </a>
+            % endif
         </dd>
         <dt>Steps to hatch</dt>
-        <dd>${c.pokemon.evolution_chain.steps_to_hatch}</dd>
+        <dd>
+            ${c.pokemon.evolution_chain.steps_to_hatch}
+            <a href="${url(controller='dex_search', action='pokemon_search', steps_to_hatch=c.pokemon.evolution_chain.steps_to_hatch)}"
+                class="dex-subtle-search-link">
+                <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
+            </a>
+        </dd>
     </dl>
 
     <h2>Compatibility</h2>
@@ -154,7 +173,12 @@ ${h.h1('Essentials')}
     <dl>
         <dt>Base EXP</dt>
         <dd>
-            <span id="dex-pokemon-exp-base">${c.pokemon.base_experience}</span> <br/>
+            <span id="dex-pokemon-exp-base">${c.pokemon.base_experience}</span>
+            <a href="${url(controller='dex_search', action='pokemon_search', base_experience=c.pokemon.base_experience)}"
+                class="dex-subtle-search-link">
+                <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
+            </a>
+            <br/>
             <span id="dex-pokemon-exp">${h.pokedex.formulae.earned_exp(base_exp=c.pokemon.base_experience, level=100)}</span> EXP at level <input type="text" size="3" value="100" id="dex-pokemon-exp-level">
         </dd>
         <dt>Effort points</dt>
@@ -168,11 +192,29 @@ ${h.h1('Essentials')}
             </ul>
         </dd>
         <dt>Capture rate</dt>
-        <dd>${c.pokemon.capture_rate}</dd>
+        <dd>
+            ${c.pokemon.capture_rate}
+            <a href="${url(controller='dex_search', action='pokemon_search', capture_rate=c.pokemon.capture_rate)}"
+                class="dex-subtle-search-link">
+                <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
+            </a>
+        </dd>
         <dt>Base happiness</dt>
-        <dd>${c.pokemon.base_happiness}</dd>
+        <dd>
+            ${c.pokemon.base_happiness}
+            <a href="${url(controller='dex_search', action='pokemon_search', base_happiness=c.pokemon.base_happiness)}"
+                class="dex-subtle-search-link">
+                <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
+            </a>
+        </dd>
         <dt>Growth rate</dt>
-        <dd>${c.pokemon.evolution_chain.growth_rate.name}</dd>
+        <dd>
+            ${c.pokemon.evolution_chain.growth_rate.name}
+            <a href="${url(controller='dex_search', action='pokemon_search', growth_rate=c.pokemon.evolution_chain.growth_rate.max_experience)}"
+                class="dex-subtle-search-link">
+                <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
+            </a>
+        </dd>
         <dt>Wild held items</dt>
         <dd>
             <table class="compact stretch striped-row-groups">
@@ -394,19 +436,33 @@ ${h.h1('Flavor')}
     <h2>Miscellany</h2>
     <dl>
         <dt>Species</dt>
-        <dd>${c.pokemon.species}</dd>
+        <dd>
+            ${c.pokemon.species}
+            <a href="${url(controller='dex_search', action='pokemon_search', species=c.pokemon.species)}"
+                class="dex-subtle-search-link">
+                <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
+            </a>
+        </dd>
         <dt>Color</dt>
         <dd>
             ${c.pokemon.color}
-            <a href="${url(controller='dex_search', action='pokemon_search', color=c.pokemon.color)}">
-                <img src="${h.static_uri('spline', 'icons/magnifier.png')}" alt="Search: " title="Search">
+            <a href="${url(controller='dex_search', action='pokemon_search', color=c.pokemon.color)}"
+                class="dex-subtle-search-link">
+                <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
             </a>
         </dd>
         <dt>Cry</dt>
         <dd>${h.HTML.a('download mp3', href=url(controller='dex', action='media', path='cries/%d.mp3' % c.pokemon.national_id))}</dd>
         % if c.pokemon.generation.id <= 3:
         <dt>Habitat ${h.pokedex.generation_icon(3)}</dt>
-        <dd>${h.pokedex.pokedex_img('chrome/habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.habitat))} ${c.pokemon.habitat}</dd>
+        <dd>
+            ${h.pokedex.pokedex_img('chrome/habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.habitat))}
+            ${c.pokemon.habitat}
+            <a href="${url(controller='dex_search', action='pokemon_search', habitat=c.pokemon.habitat)}"
+                class="dex-subtle-search-link">
+                <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
+            </a>
+        </dd>
         % endif
         <dt>Pawprint</dt>
         <dd>${h.pokedex.pokemon_sprite(c.pokemon, prefix='pawprints', form=None)}</dd>
@@ -414,6 +470,10 @@ ${h.h1('Flavor')}
         <dd>
             ${h.pokedex.pokedex_img('chrome/shapes/%d.png' % c.pokemon.shape.id, alt='')}
             ${c.pokemon.shape.awesome_name}
+            <a href="${url(controller='dex_search', action='pokemon_search', shape=c.pokemon.shape.name.lower())}"
+                class="dex-subtle-search-link">
+                <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
+            </a>
         </dd>
     </dl>
 </div>

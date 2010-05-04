@@ -233,6 +233,10 @@ th { vertical-align: middle; }
 /* Pokémon search */
 table#dex-pokemon-search-move-versions td { padding-right: 2em; }
 
+/* Links to Pokémon search */
+dd .dex-subtle-search-link { visibility: hidden; }
+dd:hover .dex-subtle-search-link { visibility: visible; }
+
 
 /* Static page stuff */
 #big-pokedex-lookup { font-size: 2em; text-align: center; }
