@@ -1321,6 +1321,11 @@ class PokedexController(BaseController):
 
         return render('/pokedex/type.mako')
 
+    def abilities_list(sef):
+        c.abilities = pokedex_session.query(tables.Ability) \
+            .order_by(tables.Ability.id) \
+            .all()
+        return render('/pokedex/ability_list.mako')
 
     def abilities(self, name):
         try:

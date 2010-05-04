@@ -41,6 +41,7 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/dex/pokemon/{name}/locations', controller='dex', action='pokemon_locations')
     map.connect('/dex/types/{name}', controller='dex', action='types')
 
+    map.connect('/dex/abilities', controller='dex', action='abilities_list')
     map.connect('/dex/items', controller='dex', action='items_list')
     map.connect('/dex/natures', controller='dex', action='natures_list')
     map.connect('/dex/pokemon', controller='dex', action='pokemon_list')
@@ -125,6 +126,7 @@ class PokedexPlugin(PluginBase):
         return [
             PluginLink(u'Pokédex', url('/dex'), children=[
                 PluginLink(u'Pokémon', url(controller='dex', action='pokemon_list')),
+                PluginLink(u'Abilities', url(controller='dex', action='abilities_list')),
                 PluginLink(u'Types', url(controller='dex', action='types_list')),
                 PluginLink(u'Natures', url(controller='dex', action='natures_list')),
                 PluginLink(u'Pokémon search', url(controller='dex_search', action='pokemon_search')),
