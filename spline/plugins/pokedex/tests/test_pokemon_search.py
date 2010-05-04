@@ -1,6 +1,8 @@
 # encoding: utf8
 from spline.tests import *
 
+from spline.plugins.pokedex.controllers.pokedex_search import PokemonSearchForm
+
 class TestPokemonSearchController(TestController):
 
     def do_search(self, **criteria):
@@ -139,7 +141,7 @@ class TestPokemonSearchController(TestController):
     def test_growth_rate(self):
         """Check that searching by growth rate works correctly."""
         self.check_search(
-            dict(growth_rate=u'medium slow'),
+            dict(growth_rate=u'1059860'),
             # All the starters are like this
             [ u'Bulbasaur', u'Charmander', u'Totodile', u'Piplup' ],
             'growth rate',
@@ -677,4 +679,30 @@ class TestPokemonSearchController(TestController):
             dict(weight=u'14.3 lb'),
             [ u'Eevee' ],
             'converted units match',
+        )
+
+
+    def test_sort(self):
+        """Make sure all the sort methods actually work."""
+        sort_field = PokemonSearchForm.sort
+        for value, label in sort_field.kwargs['choices']:
+            response = self.do_search(id=u'1', sort=value)
+            self.assert_(
+                response.c.results,
+                """Sort by {0} doesn't crash""".format(value)
+            )
+
+    def test_display_custom_table(self):
+        """Try spitting out a custom table with every column, and make sure it
+        doesn't explode.
+        """
+
+        column_field = PokemonSearchForm.column
+        columns = [value for (value, label) in column_field.kwargs['choices']]
+
+        response = self.do_search(id=u'1', display='custom-table',
+                                           column=columns)
+        self.assert_(
+            response.c.results,
+            """Custom table columns don't crash""".format(value)
         )
