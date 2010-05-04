@@ -540,7 +540,7 @@ class PokedexController(BaseController):
         # Preload with a list of versions so we know which ones are empty
         generations = pokedex_session.query(tables.Generation) \
             .options( eagerload('versions') ) \
-            .filter(tables.Generation.id >= 3)
+            .filter(tables.Generation.id >= max(3, c.pokemon.generation.id))
         for generation in generations:
             version_held_items[generation] = {}
             for version in generation.versions:
