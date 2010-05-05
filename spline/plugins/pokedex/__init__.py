@@ -125,12 +125,18 @@ class PokedexPlugin(PluginBase):
     def links(self):
         return [
             PluginLink(u'Pokédex', url('/dex'), children=[
-                PluginLink(u'Pokémon', url(controller='dex', action='pokemon_list')),
-                PluginLink(u'Abilities', url(controller='dex', action='abilities_list')),
-                PluginLink(u'Types', url(controller='dex', action='types_list')),
-                PluginLink(u'Natures', url(controller='dex', action='natures_list')),
-                PluginLink(u'Pokémon search', url(controller='dex_search', action='pokemon_search')),
-                PluginLink(u'Pokéball performance', url(controller='dex_gadgets', action='capture_rate')),
+                PluginLink(u'Core pages', None, children=[
+                    PluginLink(u'Pokémon', url(controller='dex', action='pokemon_list'), children=[
+                        PluginLink(u'Awesome search', url(controller='dex_search', action='pokemon_search')),
+                    ]),
+                    PluginLink(u'Types', url(controller='dex', action='types_list')),
+                    PluginLink(u'Abilities', url(controller='dex', action='abilities_list')),
+                    PluginLink(u'Items', url(controller='dex', action='items_list')),
+                    PluginLink(u'Natures', url(controller='dex', action='natures_list')),
+                ]),
+                PluginLink(u'Gadgets', None, children=[
+                    PluginLink(u'Pokéball performance', url(controller='dex_gadgets', action='capture_rate')),
+                ]),
             ]),
         ]
 
