@@ -223,7 +223,6 @@ dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation + dl.dex-pokemon-fla
 dl.dex-pokemon-flavor-text dt { width: 7em /* enough for gen, two versions, and space */; }
 dl.dex-pokemon-flavor-text dd { padding-left: 7.5em; }
 
-dl.pokemon-abilities a { font-weight: normal; }
 dl.pokemon-abilities p { margin: 0; padding: 0; }
 
 th { vertical-align: middle; }
