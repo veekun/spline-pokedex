@@ -11,7 +11,7 @@
 
 % if c.form.was_submitted:
 <h1>Results</h1>
-<p><a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/eraser.png')}" alt=""> Reset form</a></p>
+<p><a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/eraser.png')}" alt=""> Start over</a></p>
 
 % if not c.form.is_valid:
 ## Errors
