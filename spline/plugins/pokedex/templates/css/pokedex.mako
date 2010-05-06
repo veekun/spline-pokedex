@@ -167,6 +167,13 @@ dl.pokemon-abilities p { margin: 0; padding: 0; }
 /* Pokémon page -- grid of compatible breeding partners */
 ul.dex-pokemon-compatibility { max-height: 136px /* four rows of icons plus borders */; overflow: auto; }
 
+/* Pokémon page -- wild held items */
+table.dex-pokemon-held-items { width: 100%; }
+table.dex-pokemon-held-items .versions { width: 48px /* three versions */; padding-right: 0.5em; }
+table.dex-pokemon-held-items .rarity { width: 4em; padding-right: 0.5em; text-align: right; }
+table.dex-pokemon-held-items tr.new-version { border-top: 1px dotted #c0c0c0; }
+table.dex-pokemon-held-items tbody tr:first-child.new-version { border-top: none; }
+
 /* Pokémon page -- evolution chain table */
 table.dex-evolution-chain { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0.5em; empty-cells: hide; }
 table.dex-evolution-chain td { padding: 0.5em; vertical-align: middle; border: 1px solid #d8d8d8; background: #f0f0f0; }

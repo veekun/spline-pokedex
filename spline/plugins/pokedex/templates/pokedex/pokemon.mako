@@ -215,44 +215,44 @@ ${h.h1('Essentials')}
                 <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
             </a>
         </dd>
-        <dt>Wild held items</dt>
-        <dd>
-            <table class="compact stretch striped-row-groups">
-            % for generation, version_dict in sorted(c.held_items.items(), \
-                                                     key=lambda (k, v): k.id):
-            <tbody>
-            % for versions, item_records in sorted(version_dict.items(), \
-                                                  key=lambda (k, v): k[0].id):
-            <tr>
-              % for i in range(len(item_records) or 1):
-                % if i == 0:
-                <td rowspan="${len(item_records) or 1}">
-                    % if len(version_dict) == 1:
-                    ${h.pokedex.generation_icon(generation)}
-                    % else:
-                    ${h.pokedex.version_icons(*versions)}
-                    % endif
-                </td>
-                % else:
-                <td></td>
-                % endif
-
-                ## Print the item and rarity.  Might be nothing
-                % if i < len(item_records):
-                <td>${item_records[i][1]}%</td>
-                <td>${h.pokedex.item_link(item_records[i][0])}</td>
-                % else:
-                <td></td>
-                <td>nothing</td>
-                % endif
-              % endfor
-            </tr>
-            % endfor
-            </tbody>
-            % endfor
-            </table>
-        </dd>
     </dl>
+
+    <h2>Wild held items</h2>
+    <table class="dex-pokemon-held-items striped-row-groups">
+    % for generation, version_dict in sorted(c.held_items.items(), \
+                                             key=lambda (k, v): k.id):
+    <tbody>
+    % for versions, item_records in sorted(version_dict.items(), \
+                                          key=lambda (k, v): k[0].id):
+    <tr class="new-version">
+      % for i in range(len(item_records) or 1):
+        % if i == 0:
+        <td class="versions" rowspan="${len(item_records) or 1}">
+            % if len(version_dict) == 1:
+            ${h.pokedex.generation_icon(generation)}
+            % else:
+            ${h.pokedex.version_icons(*versions)}
+            % endif
+        </td>
+        % else:
+    </tr>
+    <tr>
+        % endif
+
+        ## Print the item and rarity.  Might be nothing
+        % if i < len(item_records):
+        <td class="rarity">${item_records[i][1]}%</td>
+        <td class="item">${h.pokedex.item_link(item_records[i][0])}</td>
+        % else:
+        <td class="rarity"></td>
+        <td class="item">nothing</td>
+        % endif
+      % endfor
+    </tr>
+    % endfor
+    </tbody>
+    % endfor
+    </table>
 </div>
 </div>
 
