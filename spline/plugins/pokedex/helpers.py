@@ -79,7 +79,7 @@ def filename_from_name(name):
     name = unicode(name)
     name = name.lower()
     name = re.sub(u'[ _]+', u'-', name)
-    name = re.sub(u'[^-éa-z0-9]', u'', name)
+    name = re.sub(u'[\']', u'', name)
     return name
 
 def pokedex_img(src, **attr):
@@ -107,7 +107,7 @@ def version_icons(*versions):
             version = version.name
 
         version_filename = filename_from_name(version)
-        version_icons += pokedex_img('versions/%s.png' % version_filename,
+        version_icons += pokedex_img(u'versions/%s.png' % version_filename,
                                      alt=version)
 
     return version_icons

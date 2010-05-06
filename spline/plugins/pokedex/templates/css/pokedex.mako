@@ -142,7 +142,7 @@ ul.dex-type-list li img { display: block; margin-bottom: 0.25em; }
 
 /* Size comparison -- used by Pokémon and flavor */
 .dex-size { height: 120px; padding-bottom: 2.5em /* for -value */; overflow: hidden /* new float context */}
-.dex-size img { clip: 8px; position: absolute; bottom: 0; image-rendering: -moz-crisp-edges; }
+.dex-size img { clip: 8px; position: absolute; bottom: 0; image-rendering: -moz-crisp-edges; -ms-interpolation-mode: nearest-neighbor; }
 .dex-size input[type='text'] { text-align: right; }
 .dex-size .dex-size-trainer,
 .dex-size .dex-size-pokemon { display: block; position: relative; float: left; height: 100%; width: 50%; text-align: left; }
@@ -192,6 +192,10 @@ dl.dex-simple-encounters ul { display: inline; }
 dl.dex-simple-encounters ul li { display: inline; }
 dl.dex-simple-encounters ul li:after { content: '; '; }
 dl.dex-simple-encounters ul li:last-child:after { content: ''; }
+
+/* Pokémon flavor page -- RBY sprite needs doublesizin' */
+td.dex-pokemon-flavor-rby-back { vertical-align: middle; }
+.dex-pokemon-flavor-rby-back img { width: 64px; image-rendering: -moz-crisp-edges; -ms-interpolation-mode: nearest-neighbor; }
 
 /* Pokémon flavor page -- flavor text */
 .dex-pokemon-flavor-generation { position: absolute; line-height: 1.5; }
