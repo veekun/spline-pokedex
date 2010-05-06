@@ -14,23 +14,14 @@ ${c.form.title() if c.form else u''} ${c.pokemon.name} \
 ${lib.pokemon_page_header()}
 
 ${h.h1(u'Pokédex Description', id='pokedex')}
+<% obdurate = session.get('cheat_obdurate', False) %>\
 % for generation, version_texts in sorted(c.flavor_text.items(), \
                                           key=lambda (k, v): k.id):
 <div class="dex-pokemon-flavor-generation">${h.pokedex.generation_icon(generation)}</div>
 <dl class="dex-pokemon-flavor-text">
-<%
-    class_ = ''
-    if session.get('cheat_obdurate', False):
-        class_ = ' class="dex-obdurate"'
-%>\
     % for versions, flavor_text in version_texts:
-<%
-    flavor_text = re.sub(u'(\S)-[\n\f]+', u'\g<1>-', flavor_text) # ' -\n' should just become ' - ', hence '(\S)'
-    flavor_text = re.sub(u'\u00ad[\n\f]+', u'\u00ad', flavor_text) # shy hyphen
-    flavor_text = re.sub(u'[\n\f]', u' ', flavor_text)
-%>
     <dt>${h.pokedex.version_icons(*versions)}</dt>
-    <dd${h.literal(class_)}>${flavor_text}</dd>
+    <dd${' class="dex-obdurate"' if obdurate else '' | n}>${h.pokedex.render_flavor_text(flavor_text, literal=obdurate)}</dd>
     % endfor
 </dl>
 % endfor

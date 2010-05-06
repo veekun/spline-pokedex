@@ -50,15 +50,24 @@ def render_flavor_text(flavor_text, literal=False):
     # n.b.: \u00ad is soft hyphen
 
     if literal:
-        html = flavor_text.replace('\f', '<br><br>') \
-                          .replace('\u00ad', '-') \
-                          .replace('\n', '<br>')
+        # Page breaks become two linebreaks.
+        # Soft hyphens become real hyphens.
+        # Newlines become linebreaks.
+        html = flavor_text.replace('\f',        '<br><br>') \
+                          .replace('\u00ad',    '-') \
+                          .replace('\n',        '<br>')
 
     else:
-        html = flavor_text.replace('\f', '<br>') \
-                          .replace('\u00ad', '') \
-                          .replace(' \n', ' ') \
-                          .replace('\n', ' ')
+        # Page breaks are treated just like newlines.
+        # Soft hyphens vanish.
+        # Letter-hyphen-newline becomes letter-hyphen, to preserve real
+        # hyphenation.
+        # Any other newline becomes a space.
+        html = flavor_text.replace('\f',        '\n') \
+                          .replace('\u00ad',    '') \
+                          .replace(' -\n',      ' - ') \
+                          .replace('-\n',       '-') \
+                          .replace('\n',        ' ')
 
     return h.literal(html)
 

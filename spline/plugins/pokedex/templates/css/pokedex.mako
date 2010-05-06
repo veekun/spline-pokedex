@@ -288,5 +288,5 @@ table.dex-capture-rates tr.inactive div.dex-capture-rate-graph { opacity: 0.25; 
 #dex-cheat-list li { display: inline; padding: 0.5em 1em; }
 #dex-cheat-list li.this-cheat { font-weight: bold; }
 
-/* obdurate cheat code; make flavor text nowrap */
-.dex-obdurate-word { white-space: nowrap; }
+/* obdurate cheat code */
+dd.dex-obdurate { margin-bottom: 1em; }

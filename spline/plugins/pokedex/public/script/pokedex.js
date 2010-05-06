@@ -497,9 +497,13 @@ $(function() {
 
 // Easter egg: obdurate
 $(function() {
-    $('.dex-obdurate').each(function() {
-        var $this = $(this);
-        var text = $this.text();
+    // Run through text nodes individually, so <br>s are untouched.
+    // nb: 3 is Node.TEXT_NODE
+    $('.dex-obdurate')
+    .contents()
+    .filter(function() { return this.nodeType == 3 })
+    .each(function() {
+        var text = this.nodeValue;
 
         // Wrap words in these so the browser doesn't break in the middle of a
         // "word"
@@ -510,7 +514,7 @@ $(function() {
 
         for (var i = 0; i < text.length; i++) {
             var ch = text.substr(i, 1);
-            newtext.push('<img src="/dex/media/fonts/diamond-pearl-platinum/' + ch + '.png">');
+            newtext.push('<img src="/dex/media/fonts/diamond-pearl-platinum/' + encodeURIComponent(ch) + '.png">');
 
             if (ch == ' ') {
                 // Allow break on spaces
@@ -520,6 +524,6 @@ $(function() {
         }
 
         newtext.push(nobr_end);
-        $this.html(newtext.join(''));
+        $(this).replaceWith(newtext.join(''));
     });
 });
