@@ -45,7 +45,7 @@ col.dex-col-icon        { width: 32px; }
 col.dex-col-name        { width: 10em; }
 col.dex-col-link        { width: 16px; }
 col.dex-col-max-exp     { width: 7em; }
-col.dex-col-ability     { width: 7em; }
+col.dex-col-ability     { width: 8em; }
 col.dex-col-egg-group   { width: 7em; }
 col.dex-col-height      { width: 5em; }
 col.dex-col-weight      { width: 6em; }
@@ -80,7 +80,7 @@ table.dex-pokemon-moves td.effect p { margin: 0; }
 table.dex-pokemon-moves td.tutored { white-space: nowrap; }
 table.dex-pokemon-moves .no-tutor { visibility: hidden; }
 table.dex-pokemon-moves td.type2 { text-align: left; }
-table.dex-pokemon-moves td.ability { font-size: 0.75em; padding: 0.25em; }
+table.dex-pokemon-moves td.ability { font-size: 0.75em; padding: 0.25em; white-space: nowrap; }
 table.dex-pokemon-moves td.egg-group { font-size: 0.75em; padding: 0.25em; }
 table.dex-pokemon-moves td.stat { text-align: right; }
 table.dex-pokemon-moves td.size { text-align: right; }
