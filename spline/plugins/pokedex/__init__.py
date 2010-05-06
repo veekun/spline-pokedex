@@ -16,7 +16,7 @@ import spline.plugins.pokedex.controllers.pokedex_search
 import spline.plugins.pokedex.controllers.pokedex_gadgets
 import spline.plugins.pokedex.model
 from spline.plugins.pokedex import helpers as pokedex_helpers
-from spline.plugins.pokedex.db import get_by_name, pokedex_session
+from spline.plugins.pokedex.db import get_by_name_query, pokedex_session, pokemon_query
 import spline.lib.helpers as h
 from spline.lib.plugin import PluginBase, PluginLink, Priority
 
@@ -60,7 +60,10 @@ def get_role(table):
     def role(name, rawtext, text, lineno, inliner, options={}, content=[]):
         try:
             # Find the object and get a link to it
-            obj = get_by_name(table, text)
+            if name == 'pokemon':
+                obj = pokemon_query(text).one()
+            else:
+                obj = get_by_name_query(table, text).one()
             options['refuri'] = pokedex_helpers.make_thingy_url(obj)
             node = nodes.reference(rawtext, obj.name, **options)
         except NoResultFound:
