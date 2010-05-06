@@ -45,7 +45,7 @@ ${h.h1('Essentials')}
 <h2>Damage Taken</h2>
 ## Boo not using <dl>  :(  But I can't get them to align horizontally with CSS2
 ## if the icon and value have no common element..
-<ul class="dex-page-damage">
+<ul class="dex-type-list">
     ## always sort ??? last
     % for type, damage_factor in sorted(c.type_efficacies.items(), \
                                         key=lambda x: (x[0].id == 18, x[0].name)):

@@ -137,10 +137,9 @@ p#dex-page-name { font-size: 2em; margin: 0.12em 0; }
 #dex-pokemon-portrait-sprite { height: 80px; width: 80px; margin: 0.33em auto; padding: 7px; line-height: 80px; vertical-align: middle; text-align: center; background: url(/dex/media/chrome/sprite-frame.png) center center no-repeat; }
 
 /* List of types with damage (or whatever) below */
-/* XXX rename */
-ul.dex-page-damage { overflow: hidden /* new float context */; margin-bottom: 2em; }
-ul.dex-page-damage li { display: inline-block; text-align: center; padding: 0.125em; }
-ul.dex-page-damage li img { display: block; margin-bottom: 0.25em; }
+ul.dex-type-list { overflow: hidden /* new float context */; margin-bottom: 2em; }
+ul.dex-type-list li { display: inline-block; text-align: center; padding: 0.125em; }
+ul.dex-type-list li img { display: block; margin-bottom: 0.25em; }
 
 /* Size comparison -- used by Pokémon and flavor */
 .dex-size { height: 120px; padding-bottom: 2.5em /* for -value */; overflow: hidden /* new float context */}

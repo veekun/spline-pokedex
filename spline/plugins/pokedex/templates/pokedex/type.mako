@@ -31,7 +31,7 @@ ${h.h1('Essentials')}
 
 <div class="dex-page-beside-portrait">
     <h2>Damage Dealt</h2>
-    <ul class="dex-page-damage">
+    <ul class="dex-type-list">
         ## always sort ??? last
         % for type in sorted(c.type.damage_efficacies, key=lambda type: (type.target_type.id == 18, type.target_type.name)):
         <li class="dex-damage-dealt-${type.damage_factor}">
@@ -41,7 +41,7 @@ ${h.h1('Essentials')}
     </ul>
 
     <h2>Damage Taken</h2>
-    <ul class="dex-page-damage">
+    <ul class="dex-type-list">
         % for type in sorted(c.type.target_efficacies, key=lambda type: (type.damage_type.id == 18, type.damage_type.name)):
         <li class="dex-damage-taken-${type.damage_factor}">
              ${h.pokedex.type_link(type.damage_type)} ${h.pokedex.type_efficacy_label[type.damage_factor]}

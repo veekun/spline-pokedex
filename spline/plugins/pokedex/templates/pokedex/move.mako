@@ -34,7 +34,7 @@ ${h.h1('Essentials')}
     ${h.literal(c.move.short_effect.as_html)}
 
     <h2>Damage Dealt</h2>
-    <ul class="dex-page-damage">
+    <ul class="dex-type-list">
         ## always sort ??? last
         % for type, damage_factor in sorted(c.type_efficacies.items(), \
                                             key=lambda x: (x[0].id == 18, x[0].name)):

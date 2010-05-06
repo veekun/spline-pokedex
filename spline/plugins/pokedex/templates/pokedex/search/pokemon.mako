@@ -170,8 +170,7 @@ ${h.form(url.current(), method='GET')}
 % for error in c.form.type_operator.errors:
 <p class="error">${error}</p>
 % endfor
-## Umm.  This class is increasingly misnamed.
-<ul class="dex-page-damage">
+<ul class="dex-type-list">
     ## always sort ??? last
     % for a_field in sorted(c.form.type, key=lambda field: field.label.text):
     <li> <label>

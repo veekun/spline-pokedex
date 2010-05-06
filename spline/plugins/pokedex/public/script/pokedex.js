@@ -487,7 +487,7 @@ $(function() {
     // do 2x damage, etc., at a time.  Let's facilitate that: when a user
     // hovers over a type, fade out all the types that do NOT have the same
     // efficacy, leaving all those with the same efficacy most obvious
-    $('ul.dex-page-damage li').hover(function() {
+    $('ul.dex-type-list li').hover(function() {
         $(this).closest('ul').find('li:not(.' + this.className + ')').addClass('faded');
     }, function() {
         $(this).closest('ul').find('li').removeClass('faded');
