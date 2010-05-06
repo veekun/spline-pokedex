@@ -95,6 +95,7 @@
 
 
 <%def name="pokemon_table_columns()">
+<col class="dex-col-icon">
 <col class="dex-col-name">
 <col class="dex-col-type2">
 <col class="dex-col-ability">
@@ -110,6 +111,7 @@
 </%def>
 
 <%def name="pokemon_table_header()">
+<th></th>
 <th>Pokémon</th>
 <th>Type</th>
 <th>Ability</th>
@@ -125,6 +127,7 @@
 </%def>
 
 <%def name="pokemon_table_row(pokemon)">
+<td class="icon">${h.pokedex.pokemon_sprite(pokemon, prefix='icons')}</td>
 <td>${h.pokedex.pokemon_link(pokemon)}</td>
 <td class="type2">
     % for type in pokemon.types:
