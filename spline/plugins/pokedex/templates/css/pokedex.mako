@@ -65,8 +65,7 @@ col.dex-col-encounter-version { width: 12em; }
 col.dex-col-first-version { border-left:  1px solid #b4c7e6; }
 col.dex-col-last-version  { border-right: 1px solid #b4c7e6; }
 
-/* Pokémon/moves table; originally used for a Pokémon's moves, or a move's Pokémon */
-/* XXX change this to a general dex-table */
+/* Generic Pokémon and move lists; originally used for a Pokémon's moves, or a move's Pokémon */
 table.dex-pokemon-moves {;}
 table.dex-pokemon-pokemon-moves { width: 100%; }
 table.dex-pokemon-moves td { padding: 0.33em; vertical-align: middle; text-align: center; }
