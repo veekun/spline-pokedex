@@ -49,25 +49,30 @@ def render_flavor_text(flavor_text, literal=False):
 
     # n.b.: \u00ad is soft hyphen
 
+    # Somehow, the games occasionally have \n\f, which makes no sense at all
+    # and wouldn't render in-game anyway.  Fix this
+    flavor_text = flavor_text.replace('\n\f', '\f')
+
     if literal:
         # Page breaks become two linebreaks.
         # Soft hyphens become real hyphens.
         # Newlines become linebreaks.
-        html = flavor_text.replace('\f',        '<br><br>') \
-                          .replace('\u00ad',    '-') \
-                          .replace('\n',        '<br>')
+        html = flavor_text.replace(u'\f',       u'<br><br>') \
+                          .replace(u'\u00ad',   u'-') \
+                          .replace(u'\n',       u'<br>')
 
     else:
         # Page breaks are treated just like newlines.
-        # Soft hyphens vanish.
+        # Soft hyphens followed by newlines vanish.
         # Letter-hyphen-newline becomes letter-hyphen, to preserve real
         # hyphenation.
         # Any other newline becomes a space.
-        html = flavor_text.replace('\f',        '\n') \
-                          .replace('\u00ad',    '') \
-                          .replace(' -\n',      ' - ') \
-                          .replace('-\n',       '-') \
-                          .replace('\n',        ' ')
+        html = flavor_text.replace(u'\f',       u'\n') \
+                          .replace(u'\u00ad\n', u'') \
+                          .replace(u'\u00ad',   u'') \
+                          .replace(u' -\n',     u' - ') \
+                          .replace(u'-\n',      u'-') \
+                          .replace(u'\n',       u' ')
 
     return h.literal(html)
 
