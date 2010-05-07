@@ -706,3 +706,14 @@ class TestPokemonSearchController(TestController):
             response.c.results,
             """Custom table columns don't crash""".format(value)
         )
+
+
+    def test_crash_vague_join(self):
+        """Tests for a crash that occurred when searching by evolution position
+        and sorting by color, because the join to PokemonColor was vague.
+        """
+        self.check_search(
+            dict(evolution_stage=u'stage1', sort=u'color'),
+            [ u'Raichu' ],
+            u'joins to other tables still work when searching by evo',
+        )

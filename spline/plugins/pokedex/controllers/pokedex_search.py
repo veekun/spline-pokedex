@@ -469,12 +469,12 @@ class PokedexSearchController(BaseController):
 
         # Same applies to a couple other tables...
         joins = []
-        def join_once(table):
-            if table in joins:
+        def join_once(relation):
+            if relation in joins:
                 return query
 
-            new_query = query.join(table)
-            joins.append(table)
+            new_query = query.join(relation)
+            joins.append(relation)
             return new_query
 
         # ID
@@ -532,7 +532,7 @@ class PokedexSearchController(BaseController):
 
         # Growth rate
         if c.form.growth_rate.data:
-            query = join_once(tables.EvolutionChain) \
+            query = join_once(me.evolution_chain) \
                 .filter(tables.EvolutionChain.growth_rate == c.form.growth_rate.data)
 
         # Type
@@ -824,7 +824,7 @@ class PokedexSearchController(BaseController):
                     query = query.filter(effort_field.data(stat_alias.effort))
 
         if c.form.steps_to_hatch.data:
-            query = join_once(tables.EvolutionChain) \
+            query = join_once(me.evolution_chain) \
                 .filter(c.form.steps_to_hatch.data(
                     tables.EvolutionChain.steps_to_hatch))
 
@@ -1020,7 +1020,7 @@ class PokedexSearchController(BaseController):
             sort_clauses.insert(0, me.species.asc())
 
         elif c.form.sort.data == 'color':
-            query = join_once(tables.PokemonColor)
+            query = join_once(me.pokemon_color)
             sort_clauses.insert(0, tables.PokemonColor.name.asc())
 
         elif c.form.sort.data == 'habitat':
@@ -1028,7 +1028,7 @@ class PokedexSearchController(BaseController):
             sort_clauses.insert(0, tables.PokemonHabitat.name.asc())
 
         elif c.form.sort.data == 'steps-to-hatch':
-            query = join_once(tables.EvolutionChain)
+            query = join_once(me.evolution_chain)
             sort_clauses.insert(0, tables.EvolutionChain.steps_to_hatch.asc())
 
         elif c.form.sort.data == 'base-experience':
