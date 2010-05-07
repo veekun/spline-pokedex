@@ -1061,7 +1061,7 @@ class PokedexSearchController(BaseController):
             # Gross!  stat_special_attack => Special Attack
             stat_name = c.form.sort.data[5:]
             if stat_name == 'hp':
-                stat_name = 'HP'
+                stat_name = u'HP'
             else:
                 stat_name = stat_name.replace('-', ' ').title()
 
@@ -1082,7 +1082,6 @@ class PokedexSearchController(BaseController):
 
         ### Run the query!
         c.results = query.all()
-        print query
 
 
         ### Eagerloading
