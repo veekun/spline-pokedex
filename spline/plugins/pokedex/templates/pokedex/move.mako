@@ -266,7 +266,7 @@ ${dexlib.pokemon_table_columns()}
     ${dexlib.pokemon_table_header()}
 </tr>
 <tr class="subheader-row">
-    <th colspan="${len(c.pokemon_columns) + 12}"><a href="#${method_id}" class="subtle"><strong>${method.name}</a></strong>: ${method.description}</th>
+    <th colspan="${len(c.pokemon_columns) + 13}"><a href="#${method_id}" class="subtle"><strong>${method.name}</a></strong>: ${method.description}</th>
 </tr>
 ## DATA
 % for pokemon, version_group_data in method_list:
