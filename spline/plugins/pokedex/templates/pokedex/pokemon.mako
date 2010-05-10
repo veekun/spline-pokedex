@@ -64,18 +64,13 @@ ${h.h1('Essentials')}
         <dd>${h.pokedex.generation_icon(c.pokemon.generation)}</dd>\
 
 <%
-        to_skip = ("Internal ID")
+        to_skip = "Internal ID",
         show_pt_dex = True
 %>\
         ## Sort by first appearance, then second, ....  Probably not the cleanest way to acheive this.
         % for number in sorted(c.pokemon.normal_form.dex_numbers, key=lambda _: sorted(group.id for group in _.pokedex.version_groups)):
         % if number.pokedex.name not in to_skip:
 <%
-        if number.pokedex.id == 5: # D/P Sinnoh dex
-            show_pt_dex = False
-        elif number.pokedex.id == 6 and not show_pt_dex: # Pt Sinnoh dex
-            continue
-
         generations = [group.generation.id for group in number.pokedex.version_groups]
         if generations:
             shown_generation = min(generations)
@@ -83,17 +78,13 @@ ${h.h1('Essentials')}
             shown_generation = None
 %>\
 
-        % if shown_generation:
-        <dt>${number.pokedex.name} ${h.pokedex.generation_icon(shown_generation)}</dt>
-        % else:
         <dt>${number.pokedex.name}</dt>
-        % endif\
-
-        % if number.pokedex.id == 6: # Platinum Sinnoh dex
-        <dd>${number.pokedex_number} ${h.pokedex.version_icons(u'Platinum')}</dd>
-        % else:
-        <dd>${number.pokedex_number}</dd>
-        % endif\
+        <dd>
+            ${number.pokedex_number}
+            % if number.pokedex.version_groups:
+            ${h.pokedex.version_icons(*[v for vg in number.pokedex.version_groups for v in vg.versions])}
+            % endif
+        </dd>
 
         % endif
         % endfor
