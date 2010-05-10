@@ -376,7 +376,12 @@ class PokemonSearchForm(Form):
                     del self.cleansed_data[name]
 
         elif not self.needs_shortening:
-            self.was_submitted = bool(formdata)
+            # Only count the form as submitted if there are any actual
+            # searching fields
+            self.was_submitted = not all(
+                key in (u'sort', u'display', u'column', u'format')
+                for key in formdata.keys()
+            )
 
             # Unshortening.  Fields that are missing entirely from the form
             # data need to be FILLED IN with their defaults.
