@@ -98,13 +98,22 @@ ${getattr(self, 'col_' + column)()}
 % endfor
 </table>
 
-% elif c.display_mode == 'custom-list':
-## Plain list with a Template.
+% elif c.display_mode == 'custom-list-bullets':
+## Plain bulleted list with a Template.
 <ul class="classic-list">
     % for result in c.results:
     <li>${h.pokedex.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_template, result))}</li>
     % endfor
 </ul>
+
+% elif c.display_mode == 'custom-list':
+## Plain unbulleted list with a Template.  Less semantic HTML, but more
+## friendly to clipboards.
+<div class="dex-pokemon-search-list">
+% for result in c.results:
+${h.pokedex.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_template, result))}<br>
+% endfor
+</div>
 
 % elif c.display_mode == 'icons':
 ## Grid of icons
@@ -309,13 +318,37 @@ ${h.form(url.current(), method='GET')}
     </dl>
 </div>
 <div class="dex-column-2x">
-    <dl class="standard-form">
-        ${lib.field('column')}
-    </dl>
+    <h3>${c.form.column.label() | n}</h3>
+    ${lib.bare_field('column')}
 </div>
 <div class="dex-column-2x">
+    <h3>${c.form.format.label() | n}</h3>
+    ${lib.bare_field('format')}
+
+    <h3>Format</h3>
+    <p>e.g.: <code>* $id $name</code> becomes <code>&bull; 133 Eevee</code></p>
     <dl class="standard-form">
-        ${lib.field('format')}
+        <dt><code>*</code></dt>
+        <dd>&bull;</dd>
+
+        % for pattern in ( \
+            '$icon', '$id', '$name', '$gender', \
+            '$type', '$type1', '$type2', \
+            '$ability', '$ability1', '$ability2', \
+            '$egg_group', '$egg_group1', '$egg_group2', \
+            '$effort', '$stats', \
+            '$hp', '$attack', '$defense', \
+            '$special_attack', '$special_defense', '$speed', \
+            '$height', '$height_ft', '$height_m', \
+            '$weight', '$weight_lb', '$weight_kg', \
+            '$species', '$color', '$habitat', '$shape', \
+            '$steps_to_hatch', '$base_experience', '$capture_rate', '$base_happiness', \
+        ):
+        <%! from string import Template %>\
+        <% template = Template(pattern) %>\
+        <dt><code>${pattern}</code></dt>
+        <dd>${h.pokedex.apply_pokemon_template(template, c.eevee)}</dd>
+        % endfor
     </dl>
 </div>
 </div>

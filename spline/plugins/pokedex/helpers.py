@@ -305,5 +305,68 @@ def apply_pokemon_template(template, pokemon):
         icon=pokemon_sprite(pokemon, prefix=u'icons'),
         id=pokemon.national_id,
         name=pokemon.full_name,
+
+        height=format_height_imperial(pokemon.height),
+        height_ft=format_height_imperial(pokemon.height),
+        height_m=format_height_metric(pokemon.height),
+        weight=format_weight_imperial(pokemon.weight),
+        weight_lb=format_weight_imperial(pokemon.weight),
+        weight_kg=format_weight_metric(pokemon.weight),
+
+        gender=gender_rate_label[pokemon.gender_rate],
+        species=pokemon.species,
+        base_experience=pokemon.base_experience,
+        capture_rate=pokemon.capture_rate,
+        base_happiness=pokemon.base_happiness,
     )
+
+    # "Lazy" loading, to avoid hitting other tables if unnecessary.  This is
+    # very chumpy and doesn't distinguish between literal text and fields (e.g.
+    # '$type' vs 'type'), but that's very unlikely to happen, and it's not a
+    # big deal if it does
+    if 'type' in template.template:
+        types = pokemon.types
+        d['type'] = u'/'.join(_.name for _ in types)
+        d['type1'] = types[0].name
+        d['type2'] = types[1].name if len(types) > 1 else u''
+
+    if 'egg_group' in template.template:
+        egg_groups = pokemon.egg_groups
+        d['egg_group'] = u'/'.join(_.name for _ in egg_groups)
+        d['egg_group1'] = egg_groups[0].name
+        d['egg_group2'] = egg_groups[1].name if len(egg_groups) > 1 else u''
+
+    if 'ability' in template.template:
+        abilities = pokemon.abilities
+        d['ability'] = u'/'.join(_.name for _ in abilities)
+        d['ability1'] = abilities[0].name
+        d['ability2'] = abilities[1].name if len(abilities) > 1 else u''
+
+    if 'color' in template.template:
+        d['color'] = pokemon.color
+
+    if 'habitat' in template.template:
+        d['habitat'] = pokemon.habitat
+
+    if 'shape' in template.template:
+        d['shape'] = pokemon.shape.name
+
+    if 'steps_to_hatch' in template.template:
+        d['steps_to_hatch'] = pokemon.evolution_chain.steps_to_hatch
+
+    if 'stat' in template.template or \
+       'hp' in template.template or \
+       'attack' in template.template or \
+       'defense' in template.template or \
+       'speed' in template.template or \
+       'effort' in template.template:
+        d['effort'] = u', '.join("{0} {1}".format(_.effort, _.stat.name)
+                                 for _ in pokemon.stats if _.effort)
+
+        d['stats'] = u'/'.join(str(_.base_stat) for _ in pokemon.stats)
+
+        for pokemon_stat in pokemon.stats:
+            key = pokemon_stat.stat.name.lower().replace(' ', '_')
+            d[key] = pokemon_stat.base_stat
+
     return h.literal(template.safe_substitute(d))

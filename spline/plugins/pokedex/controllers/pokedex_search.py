@@ -430,6 +430,10 @@ class PokedexSearchController(BaseController):
         c.generations = pokedex_session.query(tables.Generation) \
             .order_by(tables.Generation.id.asc())
 
+        # Rendering also needs an example Pokémon, to make the custom list docs
+        # reliable
+        c.eevee = pokedex_session.query(tables.Pokemon).get(133)
+
         # If this is the first time the form was submitted, redirect to a URL
         # with only non-default values
         if c.form.is_valid and c.form.was_submitted and c.form.needs_shortening:
@@ -887,17 +891,24 @@ class PokedexSearchController(BaseController):
                 c.display_columns = ['name']
 
         elif c.display_mode == 'simple-list':
-            # This is a custom list with a fixed format string
-            c.display_mode = 'custom-list'
+            # This is a custom list with a fixed format string.
+            # Should look like: * [icon] Eevee
+            c.display_mode = 'custom-list-bullets'
             c.display_template = Template(u'$icon $name')
 
         elif c.display_mode == 'custom-list':
             # Use whatever they asked for; it'll get pumped through
             # safe_substitute anyway.  This uses apply_pokemon_template from
             # the pokedex helpers
-            c.display_template = Template(
-                h.escape(c.form.format.data)
-            )
+            list_format = c.form.format.data.strip()
+
+            # Asterisk at the beginning is secret code to make this a
+            # traditional list
+            if list_format[0] == u'*':
+                c.display_mode = 'custom-list-bullets'
+                list_format = list_format[1:]
+
+            c.display_template = Template( h.escape(list_format) )
 
         else:
             # icons and sprites don't need any special behavior
