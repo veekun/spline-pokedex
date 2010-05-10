@@ -461,12 +461,16 @@ class PokedexController(BaseController):
 
         # Let's cache this bitch
         return self.cache_content(
-            key=(name, form),
+            key=u';'.join( [name, form or u''] ),
             template='/pokedex/pokemon.mako',
             do_work=self._do_pokemon,
         )
 
-    def _do_pokemon(self, (name, form)):
+    def _do_pokemon(self, name_plus_form):
+        name, form = name_plus_form.split(u';')
+        if not form:
+            form = None
+
         ### Type efficacy
         c.type_efficacies = defaultdict(lambda: 100)
         for target_type in c.pokemon.types:
