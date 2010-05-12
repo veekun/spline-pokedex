@@ -34,12 +34,7 @@
     % if c.item_pocket.identifier == u'berries':
     <td>${item.berry.id}</td>
     % endif
-    <td>
-        <a href="${url(controller='dex', action='items', pocket=item.pocket.identifier, name=item.name.lower())}">
-            ${h.pokedex.pokedex_img(u"items/{0}.png".format(h.pokedex.filename_from_name(item.name)))}
-            ${item.name}
-        </a>
-    </td>
+    <td>${h.pokedex.item_link(item)}</td>
 </tr>
 % endfor
 % endfor

@@ -83,8 +83,20 @@ def filename_from_name(name):
     """
     name = unicode(name)
     name = name.lower()
+
+    # TMs and HMs share sprites
+    if re.match(u'^[th]m\d{2}$', name):
+        if name[0:2] == u'tm':
+            return u'tm-normal'
+        else:
+            return u'hm-normal'
+
+    # As do data cards
+    if re.match(u'^data card \d+$', name):
+        return u'data-card'
+
     name = re.sub(u'[ _]+', u'-', name)
-    name = re.sub(u'[\']', u'', name)
+    name = re.sub(u'[\'.]', u'', name)
     return name
 
 def pokedex_img(src, **attr):
@@ -223,12 +235,19 @@ def type_link(type):
 
 def item_link(item):
     """Returns a link to the requested item."""
+
     item_name = item.name
 
-    filename = filename_from_name(item_name)
+    machines = item.machines
+    if machines:
+        prefix = u'hm' if machines[-1].is_hm else u'tm'
+        filename = prefix + u'-' + machines[-1].move.type.name.lower()
+    else:
+        filename = filename_from_name(item_name)
+
     return h.HTML.a(
         pokedex_img("items/%s.png" % filename,
-                   alt=item_name, title=item_name) + item_name,
+                   alt=item_name, title=item_name) + ' ' + item_name,
         href=url(controller='dex', action='items',
                  pocket=item.pocket.identifier, name=item_name.lower()),
     )
