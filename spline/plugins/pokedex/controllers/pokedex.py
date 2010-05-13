@@ -954,8 +954,10 @@ class PokedexController(BaseController):
             # Normal Deoxys will always be /dex/pokemon/deoxys and vice versa
             c.form = c.pokemon.forme_name
 
-        elif not c.form \
-            and form_sprites and not any(_.name == '' for _ in form_sprites):
+        elif not c.form and \
+            form_sprites and \
+            not any(_.name == '' for _ in form_sprites) and \
+            c.pokemon.default_form_sprite.name:
             # If there are aesthetic forms, but not one without a name, and we
             # didn't GET a name, then redirect to the default.  In this case,
             # you can't see flavor for "just Unown"; there's no such thing.
