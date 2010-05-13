@@ -28,6 +28,8 @@ pokedex_lookup = pokedex.lookup.PokedexLookup(
                           'pokedex-index'),
     session=pokedex_session,
 )
+if not pokedex_lookup.index:
+    pokedex_lookup.rebuild_index()
 
 # Quick access to a few database objects
 def get_by_name_query(table, name):
