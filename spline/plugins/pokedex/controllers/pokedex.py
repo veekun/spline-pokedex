@@ -9,7 +9,6 @@ import mimetypes
 
 import pokedex.db
 import pokedex.db.tables as tables
-from pokedex.db.tables import Ability, EggGroup, Generation, Item, Language, Machine, Move, MoveFlagType, Pokemon, PokemonEggGroup, PokemonFormSprite, PokemonMove, PokemonStat, Type, VersionGroup, PokemonType, PokemonAbility
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
@@ -74,9 +73,9 @@ def _collapse_pokemon_move_columns(table, thing):
     # can put divider lines between gens.  Accumulate indices of these as we go
     move_divider_columns = []
     # Only even consider versions in which this item actually exists
-    q = pokedex_session.query(Generation) \
-                       .filter(Generation.id >= thing.generation_id) \
-                       .order_by(Generation.id.asc())
+    q = pokedex_session.query(tables.Generation) \
+                       .filter(tables.Generation.id >= thing.generation_id) \
+                       .order_by(tables.Generation.id.asc())
     for generation in q:
         last_vg = None
         for i, version_group in enumerate(generation.version_groups):
@@ -348,16 +347,16 @@ class PokedexController(BaseController):
             # Get an accompanying image.  Moves get their type; abilities get
             # nothing; everything else gets the obvious corresponding icon
             image = None
-            if isinstance(row, Pokemon):
+            if isinstance(row, tables.Pokemon):
                 if row.forme_name:
                     image = u"icons/{0}-{1}.png".format(row.national_id, row.forme_name)
                 else:
                     image = u"icons/{0}.png".format(row.national_id)
-            elif isinstance(row, Move):
+            elif isinstance(row, tables.Move):
                 image = u"chrome/types/{0}.png".format(row.type.name)
-            elif isinstance(row, Type):
+            elif isinstance(row, tables.Type):
                 image = u"chrome/types/{0}.png".format(row.name)
-            elif isinstance(row, Item):
+            elif isinstance(row, tables.Item):
                 image = u"items/{0}.png".format(
                     pokedex_helpers.filename_from_name(row.name))
 
@@ -411,12 +410,12 @@ class PokedexController(BaseController):
 
     def _prev_next_pokemon(self, pokemon):
         """Returns a 2-tuple of the previous and next Pokémon."""
-        max_id = pokedex_session.query(Pokemon) \
+        max_id = pokedex_session.query(tables.Pokemon) \
                                 .filter_by(forme_base_pokemon_id=None) \
                                 .count()
-        prev_pokemon = pokedex_session.query(Pokemon).get(
+        prev_pokemon = pokedex_session.query(tables.Pokemon).get(
             (c.pokemon.national_id - 1 - 1) % max_id + 1)
-        next_pokemon = pokedex_session.query(Pokemon).get(
+        next_pokemon = pokedex_session.query(tables.Pokemon).get(
             (c.pokemon.national_id - 1 + 1) % max_id + 1)
         return prev_pokemon, next_pokemon
 
@@ -496,20 +495,20 @@ class PokedexController(BaseController):
         # ASSUMPTION: Every family has the same breeding groups throughout.
         if c.pokemon.gender_rate == -1:
             # Genderless; Ditto only
-            ditto = pokedex_session.query(Pokemon).filter_by(name=u'Ditto') \
-                                   .one()
+            ditto = pokedex_session.query(tables.Pokemon) \
+                .filter_by(name=u'Ditto').one()
             c.compatible_families = [ditto]
         elif c.pokemon.egg_groups[0].id == 15:
             # No Eggs group
             pass
         else:
-            parent_a = aliased(Pokemon)
+            parent_a = aliased(tables.Pokemon)
             egg_group_ids = [_.id for _ in c.pokemon.egg_groups]
-            q = pokedex_session.query(Pokemon)
-            q = q.join(PokemonEggGroup) \
-                 .outerjoin((parent_a, Pokemon.evolution_parent)) \
-                 .filter(Pokemon.gender_rate != -1) \
-                 .filter(Pokemon.forme_base_pokemon_id == None) \
+            q = pokedex_session.query(tables.Pokemon)
+            q = q.join(tables.PokemonEggGroup) \
+                 .outerjoin((parent_a, tables.Pokemon.evolution_parent)) \
+                 .filter(tables.Pokemon.gender_rate != -1) \
+                 .filter(tables.Pokemon.forme_base_pokemon_id == None) \
                  .filter(
                     # This is a "base form" iff either:
                     or_(
@@ -523,8 +522,8 @@ class PokedexController(BaseController):
                              parent_a.evolution_parent_pokemon_id == None),
                     )
                  ) \
-                 .filter(PokemonEggGroup.egg_group_id.in_(egg_group_ids)) \
-                 .order_by(Pokemon.id)
+                 .filter(tables.PokemonEggGroup.egg_group_id.in_(egg_group_ids)) \
+                 .order_by(tables.Pokemon.id)
             c.compatible_families = q.all()
 
         ### Wild held items
@@ -581,7 +580,7 @@ class PokedexController(BaseController):
         # ]
         # That is, each row is a physical row in the resulting table, and each
         # contains four elements, one per row: Baby, Base, Stage 1, Stage 2.
-        # The Pokemon are actually dictionaries with 'pokemon' and 'span' keys,
+        # The Pokémon are actually dictionaries with 'pokemon' and 'span' keys,
         # where the span is used as the HTML cell's rowspan -- e.g., Eevee has a
         # total of seven descendents, so it would need to span 7 rows.
         c.evolution_table = []
@@ -600,7 +599,7 @@ class PokedexController(BaseController):
                     continue
 
                 children = []
-                # A Pokemon is a leaf if it has no evolutionary children, so...
+                # A Pokémon is a leaf if it has no evolutionary children, so...
                 for possible_child in family:
                     if possible_child in seen_nodes:
                         continue
@@ -670,7 +669,7 @@ class PokedexController(BaseController):
         c.stats = {}  # stat_name => { border, background, percentile }
                       #              (also 'value' for total)
         stat_total = 0
-        total_stat_rows = pokedex_session.query(PokemonStat) \
+        total_stat_rows = pokedex_session.query(tables.PokemonStat) \
                                          .filter_by(stat=c.pokemon.stats[0].stat) \
                                          .count()
         physical_attack = None
@@ -678,11 +677,11 @@ class PokedexController(BaseController):
         for pokemon_stat in c.pokemon.stats:
             stat_info = c.stats[pokemon_stat.stat.name] = {}
             stat_total += pokemon_stat.base_stat
-            q = pokedex_session.query(PokemonStat) \
+            q = pokedex_session.query(tables.PokemonStat) \
                                .filter_by(stat=pokemon_stat.stat)
-            less = q.filter(PokemonStat.base_stat < pokemon_stat.base_stat) \
+            less = q.filter(tables.PokemonStat.base_stat < pokemon_stat.base_stat) \
                     .count()
-            equal = q.filter(PokemonStat.base_stat == pokemon_stat.base_stat) \
+            equal = q.filter(tables.PokemonStat.base_stat == pokemon_stat.base_stat) \
                      .count()
             percentile = (less + equal * 0.5) / total_stat_rows
             stat_info['percentile'] = percentile
@@ -704,10 +703,11 @@ class PokedexController(BaseController):
 
         # Percentile for the total
         # Need to make a derived table that fakes pokemon_id, total_stats
-        stat_sum_tbl = pokedex_session.query(func.sum(PokemonStat.base_stat)
-                                                 .label('stat_total')) \
-                                      .group_by(PokemonStat.pokemon_id) \
-                                      .subquery()
+        stat_sum_tbl = pokedex_session.query(
+                func.sum(tables.PokemonStat.base_stat).label('stat_total')
+            ) \
+            .group_by(tables.PokemonStat.pokemon_id) \
+            .subquery()
 
         q = pokedex_session.query(stat_sum_tbl)
         less = q.filter(stat_sum_tbl.c.stat_total < stat_total).count()
@@ -721,7 +721,7 @@ class PokedexController(BaseController):
         }
 
         ### Sizing
-        # These are totally hardcoded average sizes in Pokemon units:
+        # These are totally hardcoded average sizes in Pokémon units:
         c.trainer_height = 17.8  # dm
         c.trainer_weight = 780   # hg
         heights = dict(pokemon=c.pokemon.height, trainer=c.trainer_height)
@@ -806,21 +806,21 @@ class PokedexController(BaseController):
         # order they go in the table.  This should keep it as compact as
         # possible.  Levels go in level order, and machines go in TM number
         # order
-        q = pokedex_session.query(PokemonMove) \
-                           .filter_by(pokemon_id=c.pokemon.id) \
-                           .outerjoin((Machine, PokemonMove.machine)) \
-                           .options(
-                                contains_eager(PokemonMove.machine),
-                                eagerload_all('move.damage_class'),
-                                eagerload_all('move.move_effect'),
-                                eagerload_all('move.type'),
-                                eagerload_all('version_group'),
-                            ) \
-                           .order_by(PokemonMove.level.asc(),
-                                     Machine.machine_number.asc(),
-                                     PokemonMove.order.asc(),
-                                     PokemonMove.version_group_id.asc()) \
-                           .all()
+        q = pokedex_session.query(tables.PokemonMove) \
+            .filter_by(pokemon_id=c.pokemon.id) \
+            .outerjoin((tables.Machine, tables.PokemonMove.machine)) \
+            .options(
+                 contains_eager(tables.PokemonMove.machine),
+                 eagerload_all('move.damage_class'),
+                 eagerload_all('move.move_effect'),
+                 eagerload_all('move.type'),
+                 eagerload_all('version_group'),
+             ) \
+            .order_by(tables.PokemonMove.level.asc(),
+                      tables.Machine.machine_number.asc(),
+                      tables.PokemonMove.order.asc(),
+                      tables.PokemonMove.version_group_id.asc()) \
+            .all()
         for pokemon_move in q:
             method_list = move_methods[pokemon_move.method]
             this_vg = pokemon_move.version_group
@@ -973,7 +973,7 @@ class PokedexController(BaseController):
         if c.form:
             try:
                 spr_form = pokedex_session \
-                    .query(PokemonFormSprite) \
+                    .query(tables.PokemonFormSprite) \
                     .filter_by(pokemon_id=c.pokemon.id, name=c.form) \
                     .one()
             except NoResultFound:
@@ -1136,7 +1136,7 @@ class PokedexController(BaseController):
 
     def moves(self, name):
         try:
-            c.move = db.get_by_name_query(Move, name) \
+            c.move = db.get_by_name_query(tables.Move, name) \
                 .options(
                     eagerload('damage_class'),
                     eagerload('type.damage_efficacies'),
@@ -1150,10 +1150,10 @@ class PokedexController(BaseController):
             return self._not_found()
 
         ### Prev/next for header
-        max_id = pokedex_session.query(Move).count()
-        c.prev_move = pokedex_session.query(Move).get(
+        max_id = pokedex_session.query(tables.Move).count()
+        c.prev_move = pokedex_session.query(tables.Move).get(
             (c.move.id - 1 - 1) % max_id + 1)
-        c.next_move = pokedex_session.query(Move).get(
+        c.next_move = pokedex_session.query(tables.Move).get(
             (c.move.id - 1 + 1) % max_id + 1)
 
         return self.cache_content(
@@ -1175,16 +1175,16 @@ class PokedexController(BaseController):
 
         ### Flags
         c.flags = []
-        move_flags = pokedex_session.query(MoveFlagType) \
-                                    .order_by(MoveFlagType.id.asc())
+        move_flags = pokedex_session.query(tables.MoveFlagType) \
+                                    .order_by(tables.MoveFlagType.id.asc())
         for flag in move_flags:
             has_flag = flag in c.move.flags
             c.flags.append((flag, has_flag))
 
         ### Machines
-        q = pokedex_session.query(Generation) \
-                           .filter(Generation.id >= c.move.generation.id) \
-                           .order_by(Generation.id.asc())
+        q = pokedex_session.query(tables.Generation) \
+                           .filter(tables.Generation.id >= c.move.generation.id) \
+                           .order_by(tables.Generation.id.asc())
         raw_machines = {}
         # raw_machines = { generation: { version_group: machine_number } }
         c.machines = {}
@@ -1227,7 +1227,7 @@ class PokedexController(BaseController):
         # that!  We have the same basic structure, a list of:
         #     ( method, [ (pokemon, { version_group => data, ... }), ... ] )
         pokemon_methods = defaultdict(list)
-        q = pokedex_session.query(PokemonMove) \
+        q = pokedex_session.query(tables.PokemonMove) \
             .options(
                 eagerload_all('version_group'),
                 eagerload_all('pokemon'),
@@ -1239,9 +1239,9 @@ class PokedexController(BaseController):
                 eagerload('pokemon.stats.stat'),
             ) \
             .filter_by(move=c.move) \
-            .order_by(PokemonMove.level.asc(),
-                      PokemonMove.order.asc(),
-                      PokemonMove.version_group_id.asc())
+            .order_by(tables.PokemonMove.level.asc(),
+                      tables.PokemonMove.order.asc(),
+                      tables.PokemonMove.version_group_id.asc())
         for pokemon_move in q:
             method_list = pokemon_methods[pokemon_move.method]
             this_vg = pokemon_move.version_group
@@ -1304,24 +1304,24 @@ class PokedexController(BaseController):
 
     def types(self, name):
         try:
-            c.type = db.get_by_name(Type, name)
+            c.type = db.get_by_name(tables.Type, name)
         except NoResultFound:
             return self._not_found()
 
         ### Prev/next for header
-        max_id = pokedex_session.query(Type).count()
-        c.prev_type = pokedex_session.query(Type).get(
+        max_id = pokedex_session.query(tables.Type).count()
+        c.prev_type = pokedex_session.query(tables.Type).get(
             (c.type.id - 1 - 1) % max_id + 1)
-        c.next_type = pokedex_session.query(Type).get(
+        c.next_type = pokedex_session.query(tables.Type).get(
             (c.type.id - 1 + 1) % max_id + 1)
 
-        c.moves = pokedex_session.query(Move) \
+        c.moves = pokedex_session.query(tables.Move) \
                                  .filter_by(type_id=c.type.id) \
-                                 .order_by(Move.name.asc())
+                                 .order_by(tables.Move.name.asc())
 
-        c.pokemon = pokedex_session.query(Pokemon) \
-                                   .join(PokemonType) \
-                                   .filter(PokemonType.type_id == c.type.id)
+        c.pokemon = pokedex_session.query(tables.Pokemon) \
+                                   .join(tables.PokemonType) \
+                                   .filter(tables.PokemonType.type_id == c.type.id)
 
         c.pokemon = sorted(c.pokemon, key=lambda (pokemon): (pokemon.national_id, pokemon.forme_name))
 
@@ -1335,20 +1335,20 @@ class PokedexController(BaseController):
 
     def abilities(self, name):
         try:
-            c.ability = db.get_by_name(Ability, name)
+            c.ability = db.get_by_name(tables.Ability, name)
         except NoResultFound:
             return self._not_found()
 
         ### Prev/next for header
-        max_id = pokedex_session.query(Ability).count()
-        c.prev_ability = pokedex_session.query(Ability).get(
+        max_id = pokedex_session.query(tables.Ability).count()
+        c.prev_ability = pokedex_session.query(tables.Ability).get(
             (c.ability.id - 1 - 1) % max_id + 1)
-        c.next_ability = pokedex_session.query(Ability).get(
+        c.next_ability = pokedex_session.query(tables.Ability).get(
             (c.ability.id - 1 + 1) % max_id + 1)
 
-        c.pokemon = pokedex_session.query(Pokemon) \
-                                   .join(PokemonAbility) \
-                                   .filter(PokemonAbility.ability_id == c.ability.id)
+        c.pokemon = pokedex_session.query(tables.Pokemon) \
+                                   .join(tables.PokemonAbility) \
+                                   .filter(tables.PokemonAbility.ability_id == c.ability.id)
 
         c.pokemon = sorted(c.pokemon, key=lambda (pokemon): (pokemon.national_id, pokemon.forme_name))
 
@@ -1384,7 +1384,7 @@ class PokedexController(BaseController):
 
     def items(self, pocket, name):
         try:
-            c.item = db.get_by_name(Item, name)
+            c.item = db.get_by_name(tables.Item, name)
         except NoResultFound:
             return self._not_found()
 
