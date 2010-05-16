@@ -11,12 +11,8 @@ from sqlalchemy.orm.exc import NoResultFound
 import pokedex.db
 import pokedex.db.tables as tables
 import pokedex.lookup
-import splinext.pokedex.controllers.pokedex
-import splinext.pokedex.controllers.pokedex_search
-import splinext.pokedex.controllers.pokedex_gadgets
 import splinext.pokedex.model
 from splinext.pokedex import helpers as pokedex_helpers
-from splinext.pokedex.db import get_by_name_query, pokedex_session, pokemon_query
 import spline.lib.helpers as h
 from spline.lib.plugin import PluginBase, PluginLink, Priority
 
@@ -58,6 +54,9 @@ def get_role(table):
     table_name = table.__tablename__
 
     def role(name, rawtext, text, lineno, inliner, options={}, content=[]):
+        # Import here so this module is safe to load
+        from splinext.pokedex.db import get_by_name_query, pokemon_query
+
         try:
             # Find the object and get a link to it
             if name == 'pokemon':
@@ -95,12 +94,18 @@ def before_controller_hook(*args, **kwargs):
 
 
 class PokedexPlugin(PluginBase):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """Stuff our helper module in the Pylons h object."""
+        super(PokedexPlugin, self).__init__(*args, **kwargs)
+
         # XXX should we really be doing this here?
         h.pokedex = pokedex_helpers
 
     def controllers(self):
+        import splinext.pokedex.controllers.pokedex
+        import splinext.pokedex.controllers.pokedex_search
+        import splinext.pokedex.controllers.pokedex_gadgets
+
         return {
             'dex': controllers.pokedex.PokedexController,
             'dex_search': controllers.pokedex_search.PokedexSearchController,

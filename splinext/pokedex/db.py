@@ -17,7 +17,7 @@ from spline.lib.base import SQLATimerProxy
 # This uses the same timer proxy as the main engine, so Pokédex queries are
 # counted towards the db time in the footer
 pokedex_session = pokedex.db.connect(
-    pylons.config['pokedex_db_url'],
+    pylons.config['spline-pokedex.database_url'],
     engine_args={'proxy': SQLATimerProxy()},
 )
 
