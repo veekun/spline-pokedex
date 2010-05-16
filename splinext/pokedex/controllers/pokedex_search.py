@@ -20,10 +20,10 @@ from spline.lib import helpers as h
 from spline.lib.base import BaseController, render
 from spline.lib.forms import DuplicateField, MultiCheckboxField, QueryCheckboxSelectMultipleField, QueryTextField
 
-from spline.plugins.pokedex import helpers as pokedex_helpers
-from spline.plugins.pokedex.db import pokedex_session
-from spline.plugins.pokedex.forms import PokedexLookupField, RangeTextField
-from spline.plugins.pokedex.magnitude import parse_size
+from splinext.pokedex import helpers as pokedex_helpers
+from splinext.pokedex.db import pokedex_session
+from splinext.pokedex.forms import PokedexLookupField, RangeTextField
+from splinext.pokedex.magnitude import parse_size
 
 log = logging.getLogger(__name__)
 

@@ -10,7 +10,7 @@ setup(
 
     zip_safe = False,
 
-    entry_points = {'spline.plugins': 'pokedex = spline.plugins.pokedex:PokedexPlugin'},
+    entry_points = {'spline.plugins': 'pokedex = splinext.pokedex:PokedexPlugin'},
 
-    namespace_packages = ['spline', 'spline.plugins'],
+    namespace_packages = ['splinext'],
 )

@@ -1,7 +1,7 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="/lib.mako"/>
 <%namespace name="dexlib" file="lib.mako"/>
-<%! from spline.plugins.pokedex import db %>\
+<%! from splinext.pokedex import db %>\
 <%! import re %>\
 
 <%def name="title()">\

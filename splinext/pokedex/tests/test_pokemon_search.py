@@ -1,7 +1,7 @@
 # encoding: utf8
 from spline.tests import *
 
-from spline.plugins.pokedex.controllers.pokedex_search import PokemonSearchForm
+from splinext.pokedex.controllers.pokedex_search import PokemonSearchForm
 
 class TestPokemonSearchController(TestController):
 

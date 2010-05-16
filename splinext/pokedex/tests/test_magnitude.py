@@ -3,7 +3,7 @@ from math import floor, log10
 
 from unittest import TestCase
 
-from spline.plugins.pokedex.magnitude import parse_size
+from splinext.pokedex.magnitude import parse_size
 
 class TestSizeParsing(TestCase):
     u"""Provides `assert_same` to the height and weight test classes.  Each

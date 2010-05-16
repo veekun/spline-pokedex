@@ -22,8 +22,8 @@ from spline.model import meta
 from spline.lib.base import BaseController, render
 from spline.lib import helpers as h
 
-from spline.plugins.pokedex import db, helpers as pokedex_helpers
-from spline.plugins.pokedex.db import pokedex_lookup, pokedex_session
+from splinext.pokedex import db, helpers as pokedex_helpers
+from splinext.pokedex.db import pokedex_lookup, pokedex_session
 
 log = logging.getLogger(__name__)
 

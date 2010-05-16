@@ -11,12 +11,12 @@ from sqlalchemy.orm.exc import NoResultFound
 import pokedex.db
 import pokedex.db.tables as tables
 import pokedex.lookup
-import spline.plugins.pokedex.controllers.pokedex
-import spline.plugins.pokedex.controllers.pokedex_search
-import spline.plugins.pokedex.controllers.pokedex_gadgets
-import spline.plugins.pokedex.model
-from spline.plugins.pokedex import helpers as pokedex_helpers
-from spline.plugins.pokedex.db import get_by_name_query, pokedex_session, pokemon_query
+import splinext.pokedex.controllers.pokedex
+import splinext.pokedex.controllers.pokedex_search
+import splinext.pokedex.controllers.pokedex_gadgets
+import splinext.pokedex.model
+from splinext.pokedex import helpers as pokedex_helpers
+from splinext.pokedex.db import get_by_name_query, pokedex_session, pokemon_query
 import spline.lib.helpers as h
 from spline.lib.plugin import PluginBase, PluginLink, Priority
 

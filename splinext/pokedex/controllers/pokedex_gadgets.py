@@ -23,9 +23,9 @@ from spline.lib import helpers as h
 from spline.lib.base import BaseController, render
 from spline.lib.forms import QueryTextField
 
-from spline.plugins.pokedex import db, helpers as pokedex_helpers
-from spline.plugins.pokedex.db import pokedex_session
-from spline.plugins.pokedex.forms import PokedexLookupField
+from splinext.pokedex import db, helpers as pokedex_helpers
+from splinext.pokedex.db import pokedex_session
+from splinext.pokedex.forms import PokedexLookupField
 
 log = logging.getLogger(__name__)
 

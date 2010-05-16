@@ -85,7 +85,7 @@ ${h.h1('Berry tag')}
         <dd>
             ${c.item.berry.growth_time} hours per stage<br>
             ${c.item.berry.growth_time * 4} hours total<br>
-            <%! from spline.plugins.pokedex.db import get_by_name %>
+            <%! from splinext.pokedex.db import get_by_name %>
             ${h.pokedex.item_link(c.growth_mulch)}:
                 ${c.item.berry.growth_time * 3 / 4}/${c.item.berry.growth_time * 3} hours<br>
             ${h.pokedex.item_link(c.damp_mulch)}:

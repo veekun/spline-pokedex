@@ -6,7 +6,7 @@ import re
 from sqlalchemy.sql import and_, or_
 from wtforms import ValidationError, fields
 
-from spline.plugins.pokedex.db import pokedex_lookup
+from splinext.pokedex.db import pokedex_lookup
 
 class PokedexLookupField(fields.TextField):
     u"""Provides a lookup box for naming something in the Pokédex."""

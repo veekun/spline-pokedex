@@ -5,7 +5,7 @@ trainer size comparison on Pokémon pages and the Pokémon search.
 
 import re
 
-from spline.plugins.pokedex import db
+from splinext.pokedex import db
 
 si_prefixes = {
     'yotta': 1e24,      'yocto': 1e-24,
