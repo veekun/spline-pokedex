@@ -3,7 +3,7 @@ setup(
     name = 'spline-gts',
     version = '0.1',
     packages = find_packages(),
-    
+
     install_requires = [
         'spline',
         'spline-users',
@@ -14,7 +14,7 @@ setup(
 
     zip_safe = False,
 
-    entry_points = {'spline.plugins': 'gts = spline.plugins.gts:GTSPlugin'},
+    entry_points = {'spline.plugins': 'gts = splinext.gts:GTSPlugin'},
 
-    namespace_packages = ['spline', 'spline.plugins'],
+    namespace_packages = ['splinext'],
 )

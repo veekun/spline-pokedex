@@ -25,7 +25,7 @@ from spline.model import meta
 from spline.lib.base import BaseController, render
 from spline.lib import helpers as h
 
-from spline.plugins.gts.model import GTSPokemon
+from splinext.gts.model import GTSPokemon
 
 log = logging.getLogger(__name__)
 

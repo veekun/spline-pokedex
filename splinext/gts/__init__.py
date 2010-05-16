@@ -7,8 +7,8 @@ from spline.lib.plugin import PluginBase, PluginLink, Priority
 import spline.model as model
 import spline.model.meta as meta
 
-import spline.plugins.gts.controllers.gts
-import spline.plugins.gts.model
+import splinext.gts.controllers.gts
+import splinext.gts.model
 
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
@@ -20,12 +20,12 @@ def add_routes_hook(map, *args, **kwargs):
 class GTSPlugin(PluginBase):
     def controllers(self):
         return dict(
-            gts = spline.plugins.gts.controllers.gts.GTSController,
+            gts = splinext.gts.controllers.gts.GTSController,
         )
 
     def model(self):
         return [
-            spline.plugins.gts.model.GTSPokemon,
+            splinext.gts.model.GTSPokemon,
         ]
 
     def template_dirs(self):
