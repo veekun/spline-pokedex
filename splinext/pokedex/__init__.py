@@ -112,17 +112,6 @@ class PokedexPlugin(PluginBase):
             'dex_gadgets': controllers.pokedex_gadgets.PokedexGadgetsController,
         }
 
-    def template_dirs(self):
-        return [
-            (resource_filename(__name__, 'templates'), Priority.NORMAL)
-        ]
-
-    def static_dir(self):
-        return resource_filename(__name__, 'public')
-
-    def content_dir(self):
-        return resource_filename(__name__, 'content')
-
     def hooks(self):
         return [
             ('routes_mapping',    Priority.NORMAL, add_routes_hook),
