@@ -20,12 +20,10 @@ from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, jo
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func
 
-from spline import model
 from spline.model import meta
 from spline.lib.base import BaseController, render
 from spline.lib import helpers as h
-
-from splinext.gts.model import GTSPokemon
+from splinext.gts import model as gts_model
 
 log = logging.getLogger(__name__)
 
@@ -153,7 +151,7 @@ class GTSController(BaseController):
         # Check for an existing Pokémon
         # TODO support multiple!
         try:
-            stored_pokemon = meta.Session.query(model.GTSPokemon) \
+            stored_pokemon = meta.Session.query(gts_model.GTSPokemon) \
                 .filter_by(pid=pid) \
                 .one()
             # We've got one!  Cool, send it back.  The game will ask us to
@@ -174,7 +172,7 @@ class GTSController(BaseController):
         Returns 0x0001.
         """
 
-        meta.Session.query(model.GTSPokemon).filter_by(pid=pid).delete()
+        meta.Session.query(gts_model.GTSPokemon).filter_by(pid=pid).delete()
         meta.Session.commit()
 
         return '\x01\x00'
@@ -191,7 +189,7 @@ class GTSController(BaseController):
             pokemon_save = PokemonSave(data, encrypted=True)
 
             # Create a record...
-            stored_pokemon = model.GTSPokemon(
+            stored_pokemon = gts_model.GTSPokemon(
                 pid=pid,
                 pokemon_blob=pokemon_save.as_struct,
             )
