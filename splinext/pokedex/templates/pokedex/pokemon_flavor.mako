@@ -48,33 +48,43 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 <table>
 <tr class="header-row">
     <th></th>
-    <td class="vertical-line" rowspan="3"></td>
-    <th>${h.pokedex.version_icons(u'赤い', u'緑')}</th>
-    <td class="vertical-line" rowspan="3"></td>
-    <th>${h.pokedex.version_icons(u'Red', u'Blue')}</th>
-    <td class="vertical-line" rowspan="3"></td>
-    <th>${h.pokedex.version_icons(u'Yellow')}</th>
-    <td class="vertical-line" rowspan="3"></td>
-    <th></th>
+    <td class="vertical-line" rowspan="4"></td>
+    <th colspan="2">${h.pokedex.version_icons(u'赤い', u'緑')}</th>
+    <td class="vertical-line" rowspan="4"></td>
+    <th colspan="2">${h.pokedex.version_icons(u'Red', u'Blue')}</th>
+    <td class="vertical-line" rowspan="4"></td>
+    <th colspan="2">${h.pokedex.version_icons(u'Yellow')}</th>
 </tr>
 <tr>
-    <th class="vertical-text" rowspan="2">Normal</th>
-    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-green', form=c.form)}</td>
-    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-blue', form=c.form)}</td>
-    <td>
-        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='yellow', form=c.form)}
-        <!-- ${h.pokedex.pokemon_sprite(c.pokemon, prefix='yellow/sgb', form=c.form)} -->
-    </td>
-
-    <td class="dex-pokemon-flavor-rby-back" rowspan="2">
-        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-blue/back', form=c.form)}
-    </td>
-</tr>
-<tr>
+    <th class="vertical-text">GB</th>
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-green/gray', form=c.form)}</td>
+    <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-green/back/gray', form=c.form)}</td>
+
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-blue/gray', form=c.form)}</td>
+    <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-blue/back/gray', form=c.form)}</td>
+
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='yellow/gray', form=c.form)}</td>
+    <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.pokemon, prefix='yellow/back/gray', form=c.form)}</td>
 </tr>
+<tr>
+    <th class="vertical-text">SGB</th>
+    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-green', form=c.form)}</td>
+    <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-green/back', form=c.form)}</td>
+
+    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-blue', form=c.form)}</td>
+    <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-blue/back', form=c.form)}</td>
+
+    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='yellow', form=c.form)}</td>
+    <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.pokemon, prefix='yellow/back', form=c.form)}</td>
+</tr>
+<tr>
+    <th class="vertical-text">GBC</th>
+    <td colspan="2"></td>
+
+    <td colspan="2"></td>
+
+    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='yellow/gbc', form=c.form)}</td>
+    <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.pokemon, prefix='yellow/back/gbc', form=c.form)}</td>
 </table>
 % endif
 
@@ -84,29 +94,39 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 <tr class="header-row">
     <th></th>
     <td class="vertical-line" rowspan="3"></td>
-    <th>${h.pokedex.version_icons(u'Gold')}</th>
+    <th colspan="2">${h.pokedex.version_icons(u'Gold')}</th>
     <td class="vertical-line" rowspan="3"></td>
-    <th>${h.pokedex.version_icons(u'Silver')}</th>
+    <th colspan="2">${h.pokedex.version_icons(u'Silver')}</th>
     <td class="vertical-line" rowspan="3"></td>
-    <th>${h.pokedex.version_icons(u'Crystal')}</th>
-    <td class="vertical-line" rowspan="3"></td>
-    <th></th>
+    <th colspan="2">${h.pokedex.version_icons(u'Crystal')}</th>
 </tr>
 <tr>
     <th class="vertical-text">Normal</th>
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='gold', form=c.form)}</td>
-    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='silver', form=c.form)}</td>
-    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='crystal', form=c.form)}</td>
-
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='gold/back', form=c.form)}</td>
+
+    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='silver', form=c.form)}</td>
+    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='silver/back', form=c.form)}</td>
+
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='crystal', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='crystal/animated', form=c.form)}
+    </td>
+    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='crystal/back', form=c.form)}</td>
 </tr>
 <tr>
     <th class="vertical-text">Shiny</th>
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='gold/shiny', form=c.form)}</td>
-    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='silver/shiny', form=c.form)}</td>
-    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='crystal/shiny', form=c.form)}</td>
-
     <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='gold/back/shiny', form=c.form)}</td>
+
+    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='silver/shiny', form=c.form)}</td>
+    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='silver/back/shiny', form=c.form)}</td>
+
+    <td>
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='crystal/shiny', form=c.form)}
+        ${h.pokedex.pokemon_sprite(c.pokemon, prefix='crystal/animated/shiny', form=c.form)}
+    </td>
+    <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='crystal/back/shiny', form=c.form)}</td>
 </tr>
 </table>
 % endif

@@ -136,7 +136,7 @@ def pokemon_sprite(pokemon, prefix='heartgold-soulsilver', **attr):
     # Kinda gross, but it's entirely valid to pass None as a form
     form = attr.pop('form', pokemon.forme_name)
 
-    if 'crystal' in prefix or 'animated' in prefix:
+    if 'animated' in prefix:
         ext = 'gif'
     else:
         ext = 'png'
