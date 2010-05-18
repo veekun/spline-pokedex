@@ -61,7 +61,7 @@ def _collapse_pokemon_move_columns(table, thing):
     Arguments are the table structure (defined in comments below) and the
     Pokémon or move in question.
 
-    Returns a 2-ruple consisting of:
+    Returns a 2-tuple consisting of:
     - a list of columns like `[ [ rb, y ], [ gs ], [ c ], ...]`
     - a list of indexes in the above list, corresponding to columns that are
       the last of their generation
