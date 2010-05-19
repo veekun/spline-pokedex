@@ -200,8 +200,11 @@ dl.dex-simple-encounters ul li { display: inline; }
 dl.dex-simple-encounters ul li:after { content: '; '; }
 dl.dex-simple-encounters ul li:last-child:after { content: ''; }
 
+/* Pokémon flavor page -- tables of sprites */
+table.dex-pokemon-flavor-sprites td { vertical-align: middle /* sprites aren't always the same height within a row */; }
+table.dex-pokemon-flavor-sprites td.dex-pokemon-flavor-no-sprite { text-align: center; }
+
 /* Pokémon flavor page -- RBY sprite needs doublesizin' */
-td.dex-pokemon-flavor-rby-back { vertical-align: middle; }
 .dex-pokemon-flavor-rby-back img { width: 64px; image-rendering: -moz-crisp-edges; -ms-interpolation-mode: nearest-neighbor; }
 
 /* Pokémon flavor page -- flavor text */
