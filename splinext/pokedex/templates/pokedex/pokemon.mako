@@ -541,46 +541,55 @@ ${h.h1('Locations')}
 </dl>
 
 ${h.h1('Moves')}
+<% columns = sum(c.move_columns, []) %>
 <table class="dex-pokemon-moves dex-pokemon-pokemon-moves striped-rows">
 ## COLUMNS
-% for i, column in enumerate(c.move_columns):
-% if i in c.move_divider_columns:
-<col class="dex-col-version dex-col-last-version">
-% else:
-<col class="dex-col-version">
-% endif
+% for column_group in c.move_columns:
+<colgroup class="dex-colgroup-versions">
+    % for column in column_group:
+    <col class="dex-col-version"> <!-- ${'/'.join(version.name for version in sum([group.versions for group in column], []))} -->
+    % endfor
+</colgroup>
 % endfor
-${dexlib.move_table_columns()}
-## HEADERS
+
+<colgroup>
+    ${dexlib.move_table_columns()}
+</colgroup>
+
 % for method, method_list in c.moves:
+## HEADERS
+<tbody>
 <%
     method_id = "moves:" + re.sub('\W+', '-', method.name.lower())
 %>\
-<tr class="header-row" id="${method_id}">
-    % for column in c.move_columns:
-    ${dexlib.pokemon_move_table_column_header(column)}
-    % endfor
-    ${dexlib.move_table_header()}
-</tr>
-<tr class="subheader-row">
-    <th colspan="${len(c.move_columns) + 8}"><a href="#${method_id}" class="subtle"><strong>${method.name}</strong></a>: ${method.description}</th>
-</tr>
+    <tr class="header-row" id="${method_id}">
+        % for column in columns:
+            ${dexlib.pokemon_move_table_column_header(column)}
+        % endfor
+        ${dexlib.move_table_header()}
+    </tr>
+    <tr class="subheader-row">
+        <th colspan="${len(columns) + 8}"><a href="#${method_id}" class="subtle"><strong>${method.name}</strong></a>: ${method.description}</th>
+    </tr>
+</tbody>
 ## DATA
-% for move, version_group_data in method_list:
-<tr class="\
-    % if move.type in c.pokemon.types:
-    better-move-type\
-    % endif
-    % if move.damage_class.name == c.better_damage_class:
-    better-move-stat\
-    % endif
-">
-    % for column in c.move_columns:
-    ${dexlib.pokemon_move_table_method_cell(column, method, version_group_data)}
+<tbody>
+    % for move, version_group_data in method_list:
+    <tr class="\
+        % if move.type in c.pokemon.types:
+        better-move-type\
+        % endif
+        % if move.damage_class.name == c.better_damage_class:
+        better-move-stat\
+        % endif
+    ">
+        % for column in columns:
+        ${dexlib.pokemon_move_table_method_cell(column, method, version_group_data)}
+        % endfor
+        ${dexlib.move_table_row(move)}
+    </tr>
     % endfor
-    ${dexlib.move_table_row(move)}
-</tr>
-% endfor
+</tbody>
 % endfor
 </table>
 

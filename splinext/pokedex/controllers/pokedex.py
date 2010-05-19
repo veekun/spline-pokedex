@@ -61,29 +61,25 @@ def _collapse_pokemon_move_columns(table, thing):
     Arguments are the table structure (defined in comments below) and the
     Pokémon or move in question.
 
-    Returns a 2-tuple consisting of:
-    - a list of columns like `[ [ rb, y ], [ gs ], [ c ], ...]`
-    - a list of indexes in the above list, corresponding to columns that are
-      the last of their generation
+    Returns a list of column groups, each represented by a list of its columns,
+    like `[ [ [gs, c] ], [ [rs, e], [fl] ], ... ]`
     """
 
-    # All we really need to know is what versions are ultimately collapsed into
-    # each column, so we need a list of lists of version groups:
+    # What we really need to know is what versions are ultimately collapsed
+    # into each column.  We also need to know how the columns are grouped into
+    # generations.  So we need a list of lists of lists of version groups:
     move_columns = []
-    # We also want to know what columns are the last for a generation, so we
-    # can put divider lines between gens.  Accumulate indices of these as we go
-    move_divider_columns = []
-    # Only even consider versions in which this item actually exists
+
+    # Only even consider versions in which this thing actually exists
     q = pokedex_session.query(tables.Generation) \
                        .filter(tables.Generation.id >= thing.generation_id) \
                        .order_by(tables.Generation.id.asc())
     for generation in q:
-        last_vg = None
+        move_columns.append( [] ) # a new column group for this generation
         for i, version_group in enumerate(generation.version_groups):
             if i == 0:
                 # Can't collapse these versions anywhere!  Create a new column
-                move_columns.append( [version_group] )
-                last_vg = version_group
+                move_columns[-1].append( [version_group] )
                 continue
 
             # Test to see if this version group column is identical to the one
@@ -99,7 +95,7 @@ def _collapse_pokemon_move_columns(table, thing):
 
                 for move, version_group_data in method_list:
                     if version_group_data.get(version_group, None) \
-                        != version_group_data.get(last_vg, None):
+                        != version_group_data.get(move_columns[-1][-1][-1], None): # yep
                         squashable = False
                         break
                 if not squashable:
@@ -108,17 +104,12 @@ def _collapse_pokemon_move_columns(table, thing):
 
             if squashable:
                 # Stick this version group in the previous column
-                move_columns[-1].append(version_group)
+                move_columns[-1][-1].append(version_group)
             else:
                 # Create a new column
-                move_columns.append( [version_group] )
+                move_columns[-1].append( [version_group] )
 
-            last_vg = version_group
-
-        # Remember the last column within the generation
-        move_divider_columns.append(len(move_columns) - 1)
-
-    return move_columns, move_divider_columns
+    return move_columns
 
 def _move_tutor_version_groups(table):
     """Tutored moves are never the same between version groups, so the column
@@ -921,7 +912,7 @@ class PokedexController(BaseController):
             method_list.sort(key=lambda (move, version_group_data): move.name)
 
         # Finally, collapse identical columns within the same generation
-        c.move_columns, c.move_divider_columns \
+        c.move_columns \
             = _collapse_pokemon_move_columns(table=c.moves, thing=c.pokemon)
 
         # Grab list of all the version groups with tutor moves
@@ -1263,7 +1254,7 @@ class PokedexController(BaseController):
             method_list.sort(key=lambda (pokemon, whatever): (pokemon.national_id, pokemon.forme_name))
 
         # Finally, collapse identical columns within the same generation
-        c.pokemon_columns, c.pokemon_divider_columns \
+        c.pokemon_columns \
             = _collapse_pokemon_move_columns(table=c.pokemon, thing=c.move)
 
         # Grab list of all the version groups with tutor moves

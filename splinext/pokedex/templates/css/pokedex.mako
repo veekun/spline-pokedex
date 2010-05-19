@@ -62,8 +62,8 @@ col.dex-col-type        { width: 3em; }
 col.dex-col-version     { width: 3.5em; }  /* two versions (32px < 33px == 3em) plus 0.17em padding < 3.5em */
 col.dex-col-encounter-name { width: 10em; }
 col.dex-col-encounter-version { width: 12em; }
-col.dex-col-first-version { border-left:  1px solid #b4c7e6; }
-col.dex-col-last-version  { border-right: 1px solid #b4c7e6; }
+/*col.dex-col-first-version { border-left:  1px solid #b4c7e6; }
+col.dex-col-last-version  { border-right: 1px solid #b4c7e6; }*/
 
 /* Generic Pokémon and move lists; originally used for a Pokémon's moves, or a move's Pokémon */
 table.dex-pokemon-moves {;}

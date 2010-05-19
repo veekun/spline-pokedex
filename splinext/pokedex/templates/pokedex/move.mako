@@ -240,34 +240,39 @@ ${h.h1('Contests')}
 </div>
 
 ${h.h1(u'Pokémon', id='pokemon')}
+<% columns = sum(c.pokemon_columns, []) %>
 <table class="dex-pokemon-moves striped-rows">
 ## COLUMNS
-% for i, column in enumerate(c.pokemon_columns):
-% if i in c.pokemon_divider_columns:
-<col class="dex-col-version dex-col-last-version">
-% else:
-<col class="dex-col-version">
-% endif
+% for column_group in c.pokemon_columns:
+<colgroup>
+    % for column in column_group:
+    <col class="dex-col-version">
+    % endfor
+</colgroup>
 % endfor
-${dexlib.pokemon_table_columns()}
+
+<colgroup>
+    ${dexlib.pokemon_table_columns()}
+</colgroup>
+
 ## HEADERS
 % for method, method_list in c.pokemon:
 <%
     method_id = "pokemon:" + re.sub("\W+", "-", method.name.lower())
 %>\
 <tr class="header-row" id="${method_id}">
-    % for column in c.pokemon_columns:
+    % for column in columns:
     ${dexlib.pokemon_move_table_column_header(column)}
     % endfor
     ${dexlib.pokemon_table_header()}
 </tr>
 <tr class="subheader-row">
-    <th colspan="${len(c.pokemon_columns) + 13}"><a href="#${method_id}" class="subtle"><strong>${method.name}</a></strong>: ${method.description}</th>
+    <th colspan="${len(columns) + 13}"><a href="#${method_id}" class="subtle"><strong>${method.name}</a></strong>: ${method.description}</th>
 </tr>
 ## DATA
 % for pokemon, version_group_data in method_list:
 <tr>
-    % for column in c.pokemon_columns:
+    % for column in columns:
     ${dexlib.pokemon_move_table_method_cell(column, method, version_group_data)}
     % endfor
     ${dexlib.pokemon_table_row(pokemon)}
