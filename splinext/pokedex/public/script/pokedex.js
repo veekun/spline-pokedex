@@ -49,20 +49,14 @@ pokedex.pokemon_moves = {
 
             // Remember the arrangement of version columns and separators
             // on page load
-            var column_classes = [];
-            var num_generations = 0;
-            var $version_columns = $this.find('col.dex-col-version');
-            $version_columns.each(function() {
-                column_classes.push(this.className);
-                if ($(this).hasClass('dex-col-last-version')) {
-                    num_generations++;
-                }
-            });
+            var $version_colgroups = $this.find('colgroup.dex-colgroup-versions');
+
             $this.data('pokemon_moves.first_generation',
-                       pokedex.generation_ct - num_generations + 1);
-            $this.data('pokemon_moves.column_classes', column_classes);
-            $this.data('pokemon_moves.version_column_count',
-                       $version_columns.length);
+                       pokedex.generation_ct - $version_colgroups.length + 1);
+            $this.data('pokemon_moves.version_colgroups',
+                       $version_colgroups);
+            $this.data('pokemon_moves.version_colgroup_count',
+                       $version_colgroups.length);
 
             // Remember the arrangement of rows, including header rows.  Using
             // references to the rows themselves will also let us delete them
@@ -74,54 +68,34 @@ pokedex.pokemon_moves = {
 
             var $controls = $('<tr class="js-dex-pokemon-moves-controls"></tr>');
 
-            // Create buttons for filtering by generation.
-            var vg_start = 0;
-            var vg_width = 0;
-            var num_generations = 0;
-            var $last_filter_control;
-            for (var i = 0; i < $version_columns.length; i++) {
-                vg_width++;
-                if (! $( $version_columns[i] )
-                      .hasClass('dex-col-last-version'))
-                {
-                    // Part of a generation set.  Don't do anything yet
-                    continue;
+            if (version_colgroups.length > 1) {
+                // Create buttons for filtering by generation.
+                var vg_start = 0;
+                var vg_width = 0;
+                var $last_filter_control;
+                for (var i = 0; i < $version_colgroups.length; i++) {
+                    vg_width = $version_colgroups[i].find('col').length
+
+                    var $control = $(
+                        '<td class="js-dex-pokemon-moves-filter-link" colspan="' + vg_width + '">'
+                        + '<img src="/static/spline/icons/table-select-column.png" alt="Filter" title="Filter">'
+                        + '<div class="js-label">Hide<br>others</div>'
+                        + '</td>'
+                    );
+
+                    $control.data(
+                        'pokemon_moves.column_endpoints', {
+                            'start': vg_start,
+                            'end':   vg_start + vg_width - 1
+                        }
+                    );
+                    $last_filter_control = $control;
+                    $control.click(pokedex.pokemon_moves.filter_columns);
+                    $controls.append($control);
+
+                    vg_start += vg_width;
+                    vg_width = 0;
                 }
-
-                // This is the last column of a generation, so we know how
-                // many columns the generation has for our single button's
-                // colspan
-                var $control = $(
-                    '<td class="js-dex-pokemon-moves-filter-link" colspan="' + vg_width + '">'
-                    + '<img src="/static/spline/icons/table-select-column.png" alt="Filter" title="Filter">'
-                    + '<div class="js-label">Hide<br>others</div>'
-                    + '</td>'
-                );
-
-                $control.data(
-                    'pokemon_moves.column_endpoints', {
-                        'start': vg_start,
-                        'end':   vg_start + vg_width - 1
-                    }
-                );
-                $last_filter_control = $control;
-                $control.click(pokedex.pokemon_moves.filter_columns);
-                $controls.append($control);
-
-                vg_start += vg_width;
-                vg_width = 0;
-                num_generations++;
-            }
-
-            // If there's only one generation, we don't need a button!  Blank
-            // the cell, remove the click action, and unstyle it
-            if (num_generations == 1) {
-                $last_filter_control.empty();
-                $last_filter_control.unbind('click');
-                $last_filter_control.removeClass('js-dex-pokemon-moves-filter-link');
-                $last_filter_control.addClass('js-not-a-button');
-
-                $last_filter_control = undefined;
             }
 
             // Create buttons for sorting by a column
@@ -187,10 +161,11 @@ pokedex.pokemon_moves = {
         var $controls = $table.find('tr.js-dex-pokemon-moves-controls');
 
         // Restore column definitions
-        $table.find('col.dex-col-version').remove();
-        var column_classes = $table.data('pokemon_moves.column_classes');
-        for (var col = column_classes.length; col >= 1; col--) {
-            $table.prepend('<col class="' + column_classes[col - 1] + '">');
+        $table.find('colgroup.dex-colgroup-versions').remove();
+        
+        var version_colgroups = $table.data('pokemon_moves.version_colgroups');
+        for (var colgroup = version_colgroups.length; colgroup >= 1; col--) {
+            $table.prepend(version_colgroups[colgroup - 1]);
         }
 
         // Unhide everything in the controls row
@@ -290,24 +265,24 @@ pokedex.pokemon_moves = {
         $this.find('td, th').css('display', null);
 
         // Get the indexes of the columns in the selected generation
-        var columns_hash = {};
+        var colgroups_hash = {};
         var start_end = $td.data('pokemon_moves.column_endpoints');
         for (var i = start_end.start; i <= start_end.end; i++) {
-            columns_hash[i + 1] = 1;
+            colgroups_hash[i + 1] = 1;
         }
 
-        // Write out only the <col> tags for the columns we're keeping
-        var column_classes = $this.data('pokemon_moves.column_classes');
+        // Write out only the <colgroup> tags for the colgroups we're keeping
+        var version_colgroups = $this.data('pokemon_moves.version_colgroups');
         var hidden_cell_css = [];
         var visible_cell_css = [];
-        $this.find('col.dex-col-version').remove();
-        for (var col = column_classes.length; col >= 1; col--) {
-            if (columns_hash[col]) {
-                $this.prepend('<col class="' + column_classes[col - 1] + '">');
-                visible_cell_css.push(':nth-child(' + col + ')')
+        $this.find('col.dex-colgroup-versions').remove();
+        for (var colgroup = version_colgroups.length; colgroup >= 1; colgroup--) {
+            if (colgroups_hash[colgroup]) {
+                $this.prepend(version_colgroups[colgrop - 1]);
+                visible_colgroup_css.push(':nth-child(' + colgroup + ')')
             }
             else {
-                hidden_cell_css.push(':nth-child(' + col + ')')
+                hidden_colgroup_css.push(':nth-child(' + colgroup + ')')
             }
         }
 
