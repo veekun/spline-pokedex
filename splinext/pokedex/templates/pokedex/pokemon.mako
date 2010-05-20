@@ -547,7 +547,7 @@ ${h.h1('Moves')}
 % for column_group in c.move_columns:
 <colgroup class="dex-colgroup-versions">
     % for column in column_group:
-    <col class="dex-col-version"> <!-- ${'/'.join(version.name for version in sum([group.versions for group in column], []))} -->
+    <col class="dex-col-version">
     % endfor
 </colgroup>
 % endfor

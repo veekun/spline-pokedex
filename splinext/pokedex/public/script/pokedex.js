@@ -50,13 +50,14 @@ pokedex.pokemon_moves = {
             // Remember the arrangement of version columns and separators
             // on page load
             var $version_colgroups = $this.find('colgroup.dex-colgroup-versions');
+            var version_column_count = $version_colgroups.find('col').length;
 
             $this.data('pokemon_moves.first_generation',
                        pokedex.generation_ct - $version_colgroups.length + 1);
             $this.data('pokemon_moves.version_colgroups',
                        $version_colgroups);
-            $this.data('pokemon_moves.version_colgroup_count',
-                       $version_colgroups.length);
+            $this.data('pokemon_moves.version_column_count',
+                       version_column_count);
 
             // Remember the arrangement of rows, including header rows.  Using
             // references to the rows themselves will also let us delete them
@@ -68,13 +69,13 @@ pokedex.pokemon_moves = {
 
             var $controls = $('<tr class="js-dex-pokemon-moves-controls"></tr>');
 
-            if (version_colgroups.length > 1) {
+            if ($version_colgroups.length > 1) {
                 // Create buttons for filtering by generation.
                 var vg_start = 0;
                 var vg_width = 0;
                 var $last_filter_control;
-                for (var i = 0; i < $version_colgroups.length; i++) {
-                    vg_width = $version_colgroups[i].find('col').length
+                $version_colgroups.each(function(i) {
+                    vg_width = $(this).find('col').length
 
                     var $control = $(
                         '<td class="js-dex-pokemon-moves-filter-link" colspan="' + vg_width + '">'
@@ -84,9 +85,10 @@ pokedex.pokemon_moves = {
                     );
 
                     $control.data(
-                        'pokemon_moves.column_endpoints', {
-                            'start': vg_start,
-                            'end':   vg_start + vg_width - 1
+                        'pokemon_moves.colgroup_info', {
+                            'start': vg_start + 1,
+                            'end':   vg_start + vg_width,
+                            'index': i + 1
                         }
                     );
                     $last_filter_control = $control;
@@ -95,7 +97,7 @@ pokedex.pokemon_moves = {
 
                     vg_start += vg_width;
                     vg_width = 0;
-                }
+                });
             }
 
             // Create buttons for sorting by a column
@@ -106,7 +108,7 @@ pokedex.pokemon_moves = {
                                    .eq(0)
                                    .find('td');
             var num_columns = $first_tds.length;
-            for (var i = $version_columns.length; i < num_columns; i++) {
+            for (var i = version_column_count; i < num_columns; i++) {
                 var is_numeric = false;
 
                 if (parseInt($first_data.eq(i).text()))
@@ -162,10 +164,10 @@ pokedex.pokemon_moves = {
 
         // Restore column definitions
         $table.find('colgroup.dex-colgroup-versions').remove();
-        
-        var version_colgroups = $table.data('pokemon_moves.version_colgroups');
-        for (var colgroup = version_colgroups.length; colgroup >= 1; col--) {
-            $table.prepend(version_colgroups[colgroup - 1]);
+
+        var $version_colgroups = $table.data('pokemon_moves.version_colgroups');
+        for (var colgroup = $version_colgroups.length; colgroup >= 1; colgroup--) {
+            $table.prepend($version_colgroups[colgroup - 1]);
         }
 
         // Unhide everything in the controls row
@@ -261,28 +263,26 @@ pokedex.pokemon_moves = {
         var $td = $(e.target).closest('td');
         var $tr = $(e.target).closest('tr');
         var $this = $tr.closest('table.dex-pokemon-moves');
+        //
         // First unhide everything
         $this.find('td, th').css('display', null);
 
-        // Get the indexes of the columns in the selected generation
-        var colgroups_hash = {};
-        var start_end = $td.data('pokemon_moves.column_endpoints');
-        for (var i = start_end.start; i <= start_end.end; i++) {
-            colgroups_hash[i + 1] = 1;
-        }
-
-        // Write out only the <colgroup> tags for the colgroups we're keeping
-        var version_colgroups = $this.data('pokemon_moves.version_colgroups');
+        // Write out only the <colgroup> tags that appear in this generation
+        var info = $td.data('pokemon_moves.colgroup_info');
+        var $version_colgroups = $this.data('pokemon_moves.version_colgroups');
+        var version_column_count = $this.data('pokemon_moves.version_column_count');
         var hidden_cell_css = [];
         var visible_cell_css = [];
-        $this.find('col.dex-colgroup-versions').remove();
-        for (var colgroup = version_colgroups.length; colgroup >= 1; colgroup--) {
-            if (colgroups_hash[colgroup]) {
-                $this.prepend(version_colgroups[colgrop - 1]);
-                visible_colgroup_css.push(':nth-child(' + colgroup + ')')
+        $this.find(
+            'colgroup.dex-colgroup-versions:not('
+                + ':nth-child(' + info.index + '))'
+        ).remove();
+        for (var col = version_column_count; col >= 1; col--) {
+            if (col >= info.start && col <= info.end) {
+                visible_cell_css.push(':nth-child(' + col + ')')
             }
             else {
-                hidden_colgroup_css.push(':nth-child(' + colgroup + ')')
+                hidden_cell_css.push(':nth-child(' + col + ')')
             }
         }
 
