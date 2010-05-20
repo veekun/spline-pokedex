@@ -77,20 +77,32 @@ def render_flavor_text(flavor_text, literal=False):
 
     return h.literal(html)
 
-def collapse_flavor_text(flavor_texts):
-    """Collapse a list of flavor text where adjacent text matches."""
-    return [list(group) for _, group
-            in groupby(flavor_texts, collapse_flavor_text_key)]
+def collapse(things, key=lambda _: _):
+    """Collapse a list of things where adjacent things match."""
+    return [list(group) for _, group in groupby(things, key)]
 
 def collapse_flavor_text_key(text):
     """Key for collapsing flavor text.  The generation and text have to be the
     same in order to collapse.
     """
-    if isinstance(text, (tables.AbilityFlavorText, tables.ItemFlavorText,
-                          tables.MoveFlavorText)):
-        return (text.version_group.generation, text.flavor_text)
-    elif isinstance(text, tables.PokemonFlavorText):
-        return (text.version.generation, text.flavor_text)
+    try:
+        generation = text.version_group.generation
+    except AttributeError:
+        generation = text.version.generation
+
+    # Ignore formatting differences
+    return generation, render_flavor_text(text.flavor_text)
+
+def collapse_literal_flavor_text_key(text):
+    """Another key for collapsing flavor text.  Same criteria, but considers
+    the literal text, including line wrapping, shy hyphens, etc.
+    """
+    try:
+        generation = text.version_group.generation
+    except AttributeError:
+        generation = text.version.generation
+
+    return generation, text.flavor_text
 
 def filename_from_name(name):
     """Shorten the name of a whatever to something suitable as a filename.

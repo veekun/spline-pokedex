@@ -994,8 +994,11 @@ class PokedexController(BaseController):
 
         ### Flavor text
         c.flavor_text = {}  # generation => grouped text objects
-        grouped_flavor_text = \
-            pokedex_helpers.collapse_flavor_text(c.pokemon.flavor_text)
+
+        grouped_flavor_text = pokedex_helpers.collapse(c.pokemon.flavor_text,
+                key=pokedex_helpers.collapse_literal_flavor_text_key
+                    if session.get('cheat_obdurate', False)
+                    else pokedex_helpers.collapse_flavor_text_key)
 
         for group in grouped_flavor_text:
             c.flavor_text.setdefault(group[0].version.generation.id, []) \
