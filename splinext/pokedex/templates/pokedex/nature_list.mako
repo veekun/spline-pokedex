@@ -14,43 +14,45 @@ ${h.h1('Nature list')}
 </p>
 
 <table class="dex-nature-list striped-rows">
-## eh
-<col>
-<col class="dex-col-first-version">
-<col>
-<col class="dex-col-first-version">
-<col>
-<tr class="header-row">
-    <th>Name</th>
-    <th>+10%</th>
-    <th>-10%</th>
-    <th>Likes flavor</th>
-    <th>Hates flavor</th>
-</tr>
+<colgroup span="1"></colgroup> <!-- name -->
+<colgroup span="2"></colgroup> <!-- stats -->
+<colgroup span="2"></colgroup> <!-- flavors -->
+<thead>
+    <tr class="header-row">
+        <th>Name</th>
+        <th>+10%</th>
+        <th>-10%</th>
+        <th>Likes flavor</th>
+        <th>Hates flavor</th>
+    </tr>
+</thead>
+<tbody>
 % for nature in c.natures:
-<tr>
-    <td><a href="${url(controller='dex', action='natures', name=nature.name.lower())}">${nature.name}</a></td>
-    % if nature.increased_stat == nature.decreased_stat:
-    <td>—</td>
-    <td>—</td>
-    % else:
-    <td>${nature.increased_stat.name}</td>
-    <td>${nature.decreased_stat.name}</td>
-    % endif
+    <tr>
+        <td><a href="${url(controller='dex', action='natures', name=nature.name.lower())}">${nature.name}</a></td>
 
-    % if nature.likes_flavor == nature.hates_flavor:
-    <td class="flavor">—</td>
-    <td class="flavor">—</td>
-    % else:
-    <td class="flavor">
-        ${nature.likes_flavor.flavor}:
-        ${h.pokedex.pokedex_img("chrome/contest/{0}.png".format(nature.likes_flavor.name), alt=nature.likes_flavor.name)}
-    </td>
-    <td class="flavor">
-        ${nature.hates_flavor.flavor}:
-        ${h.pokedex.pokedex_img("chrome/contest/{0}.png".format(nature.hates_flavor.name), alt=nature.hates_flavor.name)}
-    </td>
-    % endif
-</tr>
+        % if nature.increased_stat == nature.decreased_stat:
+        <td>—</td>
+        <td>—</td>
+        % else:
+        <td>${nature.increased_stat.name}</td>
+        <td>${nature.decreased_stat.name}</td>
+        % endif
+
+        % if nature.likes_flavor == nature.hates_flavor:
+        <td class="flavor">—</td>
+        <td class="flavor">—</td>
+        % else:
+        <td class="flavor">
+            ${nature.likes_flavor.flavor}:
+            ${h.pokedex.pokedex_img("chrome/contest/{0}.png".format(nature.likes_flavor.name), alt=nature.likes_flavor.name)}
+        </td>
+        <td class="flavor">
+            ${nature.hates_flavor.flavor}:
+            ${h.pokedex.pokedex_img("chrome/contest/{0}.png".format(nature.hates_flavor.name), alt=nature.hates_flavor.name)}
+        </td>
+        % endif
+    </tr>
 % endfor
+</tbody>
 </table>
