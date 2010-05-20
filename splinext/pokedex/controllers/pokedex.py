@@ -732,11 +732,6 @@ class PokedexController(BaseController):
         weights = dict(pokemon=c.pokemon.weight, trainer=c.trainer_weight)
         c.weights = pokedex_helpers.scale_sizes(weights, dimensions=2)
 
-        ### Flavor text
-        c.flavor_text = {}
-        for pokemon_flavor_text in c.pokemon.normal_form.flavor_text:
-            c.flavor_text[pokemon_flavor_text.version.name] = pokemon_flavor_text.flavor_text
-
         ### Encounters -- briefly
         # One row per version, then a list of places the Pokémon appears.
         # version => terrain => location_area => conditions => CombinedEncounters
@@ -998,31 +993,13 @@ class PokedexController(BaseController):
         c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
 
         ### Flavor text
-        c.flavor_text = {}  # generation => [ ( versions, text ) ]
-        db_flavor_text = c.pokemon.flavor_text
-        db_flavor_text.sort(key=lambda _: _.version_id)
+        c.flavor_text = {}  # generation => grouped text objects
+        grouped_flavor_text = \
+            pokedex_helpers.collapse_flavor_text(c.pokemon.flavor_text)
 
-        for flavor_text in db_flavor_text:
-            flavor_tuple = ([flavor_text.version], flavor_text.flavor_text)
-            gen_text = c.flavor_text.setdefault(flavor_text.version.generation,
-                                                [])
-
-            # Check for an existing tuple with the same text and a version from
-            # the same group; i.e., if we're doing Blue and the text matches
-            # Red's, stick them in the same tuple
-            found_existing = False
-            for versions, text in gen_text:
-                if versions[0].version_group_id == \
-                        flavor_text.version.version_group_id \
-                    and text == flavor_text.flavor_text:
-
-                    versions.append(flavor_text.version)
-                    found_existing = True
-                    break
-
-            if not found_existing:
-                # No matches; add a new row
-                gen_text.append(flavor_tuple)
+        for group in grouped_flavor_text:
+            c.flavor_text.setdefault(group[0].version.generation.id, []) \
+                         .append(group)
 
         return render('/pokedex/pokemon_flavor.mako')
 

@@ -399,14 +399,11 @@ ${h.h1('Flavor')}
 <div class="dex-column-2x">
     <h2>Flavor Text</h2>
     <dl class="dex-pokemon-flavor-text">
-<%
-        class_ = ''
-        if session.get('cheat_obdurate', False):
-            class_ = ' class="dex-obdurate"'
-%>\
-        % for version_name in u'Diamond', u'Pearl', u'Platinum', u'Heart Gold', u'Soul Silver':
-        <dt>${h.pokedex.version_icons(version_name)}</dt>
-        <dd${h.literal(class_)}>${c.flavor_text[version_name]}</dd>
+        <% obdurate = session.get('cheat_obdurate', False) %>
+        <% flavor_text = filter(lambda text: text.version.generation.id == 4, c.pokemon.normal_form.flavor_text) %>
+        % for flavor_text_group in h.pokedex.collapse_flavor_text(flavor_text):
+        <dt>${h.pokedex.version_icons(*(text.version for text in flavor_text_group))}</dt>
+        <dd${' class="dex-obdurate"' if obdurate else '' | n}>${h.pokedex.render_flavor_text(flavor_text_group[0].flavor_text, literal=obdurate)}</dd>
         % endfor
     </dl>
 </div>

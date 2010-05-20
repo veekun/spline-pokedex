@@ -33,14 +33,14 @@ ${h.h1('Effect')}
 </div>
 <h2>Flavor Text</h2>
 <dl class="dex-pokemon-flavor-text">
-    % for flavor_text in c.ability.flavor_text:
-<%
-    text = flavor_text.flavor_text
-    text = text.replace('-\n', '-')
-    text = text.replace('\n', ' ')
-%>
-    <dt>${h.pokedex.version_icons(*flavor_text.version_group.versions)}</dt>
-    <dd>${text}</dd>
+    % for flavor_text_group in h.pokedex.collapse_flavor_text(c.ability.flavor_text):
+    <% versions = sum((text.version_group.versions for text in flavor_text_group), []) %>
+    % if len(versions) == len(versions[0].generation.versions):
+    <dt>${h.pokedex.generation_icon(versions[0].generation)}</dt>
+    % else:
+    <dt>${h.pokedex.version_icons(*versions)}</dt>
+    % endif
+    <dd>${h.pokedex.render_flavor_text(flavor_text_group[0].flavor_text)}</dd>
     % endfor
 </dl>
 

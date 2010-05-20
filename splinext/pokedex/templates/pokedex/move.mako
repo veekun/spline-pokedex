@@ -142,9 +142,14 @@ ${h.literal(c.move.effect.as_html)}
 </div>
 <h2>Flavor Text</h2>
 <dl>
-    % for move_flavor_text in c.move.flavor_text:
-    <dt>${h.pokedex.version_icons(*move_flavor_text.version_group.versions)}</dt>
-    <dd>${h.pokedex.render_flavor_text(move_flavor_text.flavor_text)}</dd>
+    % for flavor_text_group in h.pokedex.collapse_flavor_text(c.move.flavor_text):
+    <% versions = sum((_.version_group.versions for _ in flavor_text_group), []) %>
+    % if len(versions) == len(versions[0].generation.versions):
+    <dt>${h.pokedex.generation_icon(versions[0].generation)}</dt>
+    % else:
+    <dt>${h.pokedex.version_icons(*versions)}</dt>
+    % endif
+    <dd>${h.pokedex.render_flavor_text(flavor_text_group[0].flavor_text)}</dd>
     % endfor
 </dl>
 <h2>Categories</h2>

@@ -15,15 +15,15 @@ ${lib.pokemon_page_header()}
 
 ${h.h1(u'Pokédex Description', id='pokedex')}
 <% obdurate = session.get('cheat_obdurate', False) %>\
-% for generation, version_texts in sorted(c.flavor_text.items(), \
-                                          key=lambda (k, v): k.id):
+% for generation in sorted(c.flavor_text):
 <div class="dex-pokemon-flavor-generation">${h.pokedex.generation_icon(generation)}</div>
 <dl class="dex-pokemon-flavor-text">
-    % for versions, flavor_text in version_texts:
-    <dt>${h.pokedex.version_icons(*versions)}</dt>
-    <dd${' class="dex-obdurate"' if obdurate else '' | n}>${h.pokedex.render_flavor_text(flavor_text, literal=obdurate)}</dd>
-    % endfor
+% for flavor_text_group in c.flavor_text[generation]:
+    <dt>${h.pokedex.version_icons(*(text.version for text in flavor_text_group))}</dt>
+    <dd${' class="dex-obdurate"' if obdurate else '' | n}>${h.pokedex.render_flavor_text(flavor_text_group[0].flavor_text, literal=obdurate)}</dd>
+% endfor
 </dl>
+
 % endfor
 
 

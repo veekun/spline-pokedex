@@ -7,6 +7,7 @@ from __future__ import absolute_import, division
 
 import math
 import re
+from itertools import groupby
 
 from pylons import url
 
@@ -75,6 +76,21 @@ def render_flavor_text(flavor_text, literal=False):
                           .replace(u'\n',       u' ')
 
     return h.literal(html)
+
+def collapse_flavor_text(flavor_texts):
+    """Collapse a list of flavor text where adjacent text matches."""
+    return [list(group) for _, group
+            in groupby(flavor_texts, collapse_flavor_text_key)]
+
+def collapse_flavor_text_key(text):
+    """Key for collapsing flavor text.  The generation and text have to be the
+    same in order to collapse.
+    """
+    if isinstance(text, (tables.AbilityFlavorText, tables.ItemFlavorText,
+                          tables.MoveFlavorText)):
+        return (text.version_group.generation, text.flavor_text)
+    elif isinstance(text, tables.PokemonFlavorText):
+        return (text.version.generation, text.flavor_text)
 
 def filename_from_name(name):
     """Shorten the name of a whatever to something suitable as a filename.
