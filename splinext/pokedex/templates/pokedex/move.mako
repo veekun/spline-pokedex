@@ -143,8 +143,8 @@ ${h.literal(c.move.effect.as_html)}
 <h2>Flavor Text</h2>
 <dl>
     % for move_flavor_text in c.move.flavor_text:
-    <dt>${h.pokedex.generation_icon(move_flavor_text.generation)}</dt>
-    <dd>${move_flavor_text.flavor_text}</dd>
+    <dt>${h.pokedex.version_icons(*move_flavor_text.version_group.versions)}</dt>
+    <dd>${h.pokedex.render_flavor_text(move_flavor_text.flavor_text)}</dd>
     % endfor
 </dl>
 <h2>Categories</h2>
