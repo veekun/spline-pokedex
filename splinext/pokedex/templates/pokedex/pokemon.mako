@@ -627,7 +627,7 @@ ${h.h1('External Links', id='links')}
 % endif
 <li><a href="http://www.legendarypokemon.net/pokedex/${lp_name}">Legendary Pokémon</a></li>
 <li><a href="http://www.psypokes.com/dex/psydex/${"%03d" % c.pokemon.national_id}">PsyPoke</a></li>
-<li><a href="http://www.serebii.net/pokedex-dp/${"%03d" % c.pokemon.national_id}.shtml">Serebii</a></li>
+<li><a href="http://www.serebii.net/pokedex-dp/${"%03d" % c.pokemon.national_id}.shtml">Serebii.net</a></li>
 <li><a href="http://www.smogon.com/dp/pokemon/${smogon_name}">Smogon</a></li>
 </ul>
 </%lib:cache_content>

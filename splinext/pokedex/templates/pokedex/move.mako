@@ -293,7 +293,7 @@ ${h.h1('External Links', id='links')}
 <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.move.name.replace(' ', '_')}_%28move%29">Bulbapedia</a></li>
 <li><a href="http://www.legendarypokemon.net/attacks/${c.move.name.replace(' ', '+')}/">Legendary Pok&eacute;mon</a></li>
 <li><a href="http://www.psypokes.com/dex/techdex/${"%03d" % c.move.id}">PsyPoke</a></li>
-<li><a href="http://www.serebii.net/attackdex-dp/${c.move.name.lower().replace(' ', '')}.shtml">Serebii</a></li>
+<li><a href="http://www.serebii.net/attackdex-dp/${c.move.name.lower().replace(' ', '')}.shtml">Serebii.net</a></li>
 <li><a href="http://www.smogon.com/dp/moves/${c.move.name.lower().replace(' ', '_')}">Smogon</a></li>
 </ul>
 </%lib:cache_content>
