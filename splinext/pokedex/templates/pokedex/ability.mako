@@ -60,3 +60,11 @@ ${h.h1(u'Pokémon', id='pokemon')}
         % endfor
     </tbody>
 </table>
+
+${h.h1('External Links', id='links')}
+<ul class="classic-list">
+    <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.ability.name.replace(' ', '_')}_%28ability%29">Bulbapedia</a></li>
+    <li><a href="http://legendarypokemon.net/dp/abilities#${c.ability.name.lower().replace(' ', '+')}">Legendary Pokémon</a></li>
+    <li><a href="http://serebii.net/abilitydex/${c.ability.name.lower().replace(' ', '')}.shtml">Serebii.net</a></li>
+    <li><a href="http://smogon.com/dp/abilities/${c.ability.name.lower().replace(' ', '_')}">Smogon</a></li>
+</ul>
