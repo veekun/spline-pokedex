@@ -4,7 +4,11 @@ setup(
     version = '0.1',
     packages = find_packages(),
 
-    install_requires = ['spline', 'pokedex'],
+    install_requires = [
+        'spline',
+        'pokedex',
+        'SQLAlchemy>=0.6',
+    ],
 
     include_package_data = True,
 
