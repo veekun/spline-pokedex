@@ -14,6 +14,7 @@ from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join
+from sqlalchemy.orm import subqueryload, subqueryload_all
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func
 
@@ -1019,6 +1020,12 @@ class PokedexController(BaseController):
         # Then by version -- table columns.
         # Finally, condition values associated with levels/rarity.
         q = pokedex_session.query(tables.Encounter) \
+            .options(
+                eagerload_all('condition_value_map.condition_value'),
+                eagerload_all('version'),
+                eagerload_all('slot.terrain'),
+                eagerload_all('location_area.location'),
+            )\
             .filter(tables.Encounter.pokemon == c.pokemon)
 
         # region => terrain => area => version => condition =>
@@ -1107,7 +1114,6 @@ class PokedexController(BaseController):
             c.move = db.get_by_name_query(tables.Move, name) \
                 .options(
                     eagerload('damage_class'),
-                    eagerload('type.damage_efficacies'),
                     eagerload('type.damage_efficacies.target_type'),
                     eagerload('move_effect'),
                     eagerload('contest_effect'),
@@ -1197,14 +1203,17 @@ class PokedexController(BaseController):
         pokemon_methods = defaultdict(list)
         q = pokedex_session.query(tables.PokemonMove) \
             .options(
-                eagerload_all('version_group'),
-                eagerload_all('pokemon'),
+                eagerload('method'),
+                eagerload('pokemon'),
+                eagerload('version_group'),
 
                 # Pokémon table trappings
-                eagerload_all('pokemon.abilities'),
-                eagerload_all('pokemon.egg_groups'),
-                eagerload_all('pokemon.types'),
-                eagerload('pokemon.stats.stat'),
+                eagerload('pokemon.form_group'),
+                subqueryload('pokemon.abilities'),
+                subqueryload('pokemon.egg_groups'),
+                subqueryload('pokemon.formes'),
+                subqueryload('pokemon.stats'),
+                subqueryload('pokemon.types'),
             ) \
             .filter_by(move=c.move) \
             .order_by(tables.PokemonMove.level.asc(),
@@ -1455,6 +1464,12 @@ class PokedexController(BaseController):
         # Then by version -- table columns.
         # Finally, condition values associated with levels/rarity.
         q = pokedex_session.query(tables.Encounter) \
+            .options(
+                eagerload_all('condition_value_map.condition_value'),
+                eagerload_all('slot.terrain'),
+                eagerload('pokemon'),
+                eagerload('version'),
+            ) \
             .filter(tables.Encounter.location_area_id.in_(_.id for _ in c.areas))
 
         # area => terrain => pokemon => version => condition =>
