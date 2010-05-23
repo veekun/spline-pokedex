@@ -206,3 +206,23 @@
 % endif
 <td class="effect">${h.literal(move.short_effect.as_html)}</td>
 </%def>
+
+<%def name="flavor_text_list(flavor_text, classes='')">
+<%
+obdurate = session.get('cheat_obdurate', False)
+collapse_key = h.pokedex.collapse_flavor_text_key(literal=obdurate)
+%>
+<dl class="dex-flavor-text${' ' if classes else ''}${classes}">
+% for generation, group in h.pokedex.group_by_generation(flavor_text):
+<dt class="dex-flavor-generation">${h.pokedex.generation_icon(generation)}</dt>
+<dd>
+  <dl>
+  % for versions, text in h.pokedex.collapse_versions(group, key=collapse_key):
+    <dt>${h.pokedex.version_icons(*versions)}</dt>
+    <dd><p${' class="dex-obdurate"' if obdurate else '' |n}>${text}</p></dd>
+  % endfor
+  </dl>
+</dd>
+% endfor
+</dl>
+</%def>

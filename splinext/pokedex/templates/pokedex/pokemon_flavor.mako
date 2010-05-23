@@ -14,18 +14,7 @@ ${c.form.title() if c.form else u''} ${c.pokemon.name} \
 ${lib.pokemon_page_header()}
 
 ${h.h1(u'Pokédex Description', id='pokedex')}
-<% obdurate = session.get('cheat_obdurate', False) %>\
-% for generation in sorted(c.flavor_text):
-<div class="dex-pokemon-flavor-generation">${h.pokedex.generation_icon(generation)}</div>
-<dl class="dex-pokemon-flavor-text">
-% for flavor_text_group in c.flavor_text[generation]:
-    <dt>${h.pokedex.version_icons(*(text.version for text in flavor_text_group))}</dt>
-    <dd${' class="dex-obdurate"' if obdurate else '' | n}>${h.pokedex.render_flavor_text(flavor_text_group[0].flavor_text, literal=obdurate)}</dd>
-% endfor
-</dl>
-
-% endfor
-
+${lib.flavor_text_list(c.pokemon.flavor_text, 'dex-pokemon-flavor-text')}
 
 ${h.h1('Main Game Portraits', id='main-sprites')}
 % if c.forms:

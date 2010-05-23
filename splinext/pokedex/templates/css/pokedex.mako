@@ -208,11 +208,12 @@ table.dex-pokemon-flavor-sprites td.dex-pokemon-flavor-no-sprite { text-align: c
 .dex-pokemon-flavor-rby-back img { width: 64px; image-rendering: -moz-crisp-edges; -ms-interpolation-mode: nearest-neighbor; }
 
 /* Pokémon flavor page -- flavor text */
-.dex-pokemon-flavor-generation { position: absolute; line-height: 1.5; }
-dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation { padding-top: 1.5em; }
-dl.dex-pokemon-flavor-text + .dex-pokemon-flavor-generation + dl.dex-pokemon-flavor-text { padding-top: 1.5em; }
-dl.dex-pokemon-flavor-text dt { width: 7em /* enough for gen, two versions, and space */; }
-dl.dex-pokemon-flavor-text dd { padding-left: 7.5em; }
+dl.dex-flavor-text dt { width: 96px /* enough for 5 versions and padding*/; }
+dl.dex-flavor-text dd { padding-left: 96px; margin-left: .5em; }
+dl.dex-flavor-text dt.dex-flavor-generation { width: auto; text-align: left; margin: 0;padding: 0; }
+dl.dex-flavor-text dt.dex-flavor-generation + dd { padding-left: 32px; }
+dl.dex-pokemon-flavor-text dt { width: 64px /* enough for 3 versions and padding */; }
+dl.dex-pokemon-flavor-text dd { padding-left: 64px; }
 
 /* Location page and Pokémon location page -- entire bigass table */
 table.dex-encounters td { padding-left: 0.5em; padding-right: 0.5em; vertical-align: top; }
@@ -303,4 +304,4 @@ table.dex-capture-rates tr.inactive div.dex-capture-rate-graph { opacity: 0.25; 
 #dex-cheat-list li.this-cheat { font-weight: bold; }
 
 /* obdurate cheat code */
-dd.dex-obdurate { margin-bottom: 1em; }
+p.dex-obdurate { margin: .5em 0 1.1em; line-height: 1.1; white-space: nowrap; font-size: 8px; }

@@ -65,13 +65,7 @@ ${h.h1('Effect')}
 % endif
 
 <h2>Flavor text</h2>
-<dl>
-    % for item_flavor_text in c.item.flavor_text:
-    <dt>${h.pokedex.version_icons(*item_flavor_text.version_group.versions)}</dt>
-    <dd>${h.pokedex.render_flavor_text(item_flavor_text.flavor_text)}</dd>
-    % endfor
-</dl>
-
+${dexlib.flavor_text_list(c.item.flavor_text)}
 
 % if c.item.berry:
 ${h.h1('Berry tag')}

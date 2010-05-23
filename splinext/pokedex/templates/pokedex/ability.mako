@@ -32,17 +32,7 @@ ${h.h1('Effect')}
     ${h.literal(c.ability.effect.as_html)}
 </div>
 <h2>Flavor Text</h2>
-<dl class="dex-pokemon-flavor-text">
-    % for flavor_text_group in h.pokedex.collapse(c.ability.flavor_text, key=h.pokedex.collapse_flavor_text_key):
-    <% versions = sum((text.version_group.versions for text in flavor_text_group), []) %>
-    % if len(versions) == len(versions[0].generation.versions):
-    <dt>${h.pokedex.generation_icon(versions[0].generation)}</dt>
-    % else:
-    <dt>${h.pokedex.version_icons(*versions)}</dt>
-    % endif
-    <dd>${h.pokedex.render_flavor_text(flavor_text_group[0].flavor_text)}</dd>
-    % endfor
-</dl>
+${dexlib.flavor_text_list(c.ability.flavor_text)}
 
 ${h.h1(u'Pokémon', id='pokemon')}
 <table class="dex-pokemon-moves striped-rows">

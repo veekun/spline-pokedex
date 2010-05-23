@@ -395,23 +395,15 @@ ${h.h1('Flavor')}
 <li> <img src="${h.static_uri('spline', 'icons/arrow-000-medium.png')}" alt="See also:"> <a href="${url.current(action='pokemon_flavor')}">All versions' flavor text and sprites</a> </li>
 </ul>
 
+## Only showing current generation's sprites and text
 <div class="dex-column-container">
 <div class="dex-column-2x">
     <h2>Flavor Text</h2>
-    <dl class="dex-pokemon-flavor-text">
-<%
-        obdurate = session.get('cheat_obdurate', False)
-        flavor_text = filter(lambda text: text.version.generation.id == 4, c.pokemon.normal_form.flavor_text)
-        key = h.pokedex.collapse_literal_flavor_text_key if obdurate else h.pokedex.collapse_flavor_text_key
-%>\
-        % for flavor_text_group in h.pokedex.collapse(flavor_text, key=key):
-        <dt>${h.pokedex.version_icons(*(text.version for text in flavor_text_group))}</dt>
-        <dd${' class="dex-obdurate"' if obdurate else '' | n}>${h.pokedex.render_flavor_text(flavor_text_group[0].flavor_text, literal=obdurate)}</dd>
-        % endfor
-    </dl>
+	<% flavor_text = filter(lambda text: text.version.generation.id == 4,
+	                        c.pokemon.normal_form.flavor_text) %>
+	${dexlib.flavor_text_list(flavor_text, 'dex-pokemon-flavor-text')}
 </div>
 <div class="dex-column">
-    ## Only showing current generation's sprites and text
     <h2>Sprites</h2>
     ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver')}
     ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/frame2')}

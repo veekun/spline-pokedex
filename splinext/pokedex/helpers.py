@@ -7,7 +7,8 @@ from __future__ import absolute_import, division
 
 import math
 import re
-from itertools import groupby
+from itertools import groupby, chain
+from operator import attrgetter
 
 from pylons import url
 
@@ -77,32 +78,55 @@ def render_flavor_text(flavor_text, literal=False):
 
     return h.literal(html)
 
-def collapse(things, key=lambda _: _):
-    """Collapse a list of things where adjacent things match."""
-    return [list(group) for _, group in groupby(things, key)]
-
-def collapse_flavor_text_key(text):
-    """Key for collapsing flavor text.  The generation and text have to be the
-    same in order to collapse.
+def collapse_flavor_text_key(literal=True):
+    """A wrapper around `render_flavor_text`. Returns a function to be used
+    as a key for `collapse_versions`, or any other function which takes a key.
     """
+    def key(text):
+        return render_flavor_text(text.flavor_text, literal=literal)
+    return key
+
+def group_by_generation(things):
+    """A wrapper around itertools.groupby which groups by generation."""
+    things = iter(things)
     try:
-        generation = text.version_group.generation
-    except AttributeError:
-        generation = text.version.generation
+        a_thing = things.next()
+    except StopIteration:
+        return ()
+    key = get_generation_key(a_thing)
+    return groupby(chain([a_thing], things), key)
 
-    # Ignore formatting differences
-    return generation, render_flavor_text(text.flavor_text)
+def get_generation_key(sample_object):
+    """Given an object, return a function which retrieves the generation.
 
-def collapse_literal_flavor_text_key(text):
-    """Another key for collapsing flavor text.  Same criteria, but considers
-    the literal text, including line wrapping, shy hyphens, etc.
+    Tries x.generation, x.version_group.generation, and x.version.generation.
     """
-    try:
-        generation = text.version_group.generation
-    except AttributeError:
-        generation = text.version.generation
+    if hasattr(sample_object, 'generation'):
+        return attrgetter('generation')
+    elif hasattr(sample_object, 'version_group'):
+        return (lambda x: x.version_group.generation)
+    elif hasattr(sample_object, 'version'):
+        return (lambda x: x.version.generation)
+    raise AttributeError
 
-    return generation, text.flavor_text
+def collapse_versions(things, key):
+    """Collapse adjacent equal objects and remember their versions.
+
+    Yields tuples of ([versions], key(x)). Uses itertools.groupby internally.
+    """
+    things = iter(things)
+    # let the StopIteration bubble up
+    a_thing = things.next()
+
+    if hasattr(a_thing, 'version'):
+        def get_versions(things):
+            return [x.version for x in things]
+    elif hasattr(a_thing, 'version_group'):
+        def get_versions(things):
+            return sum((x.version_group.versions for x in things), [])
+
+    for collapsed_key, group in groupby(chain([a_thing], things), key):
+        yield get_versions(group), collapsed_key
 
 def filename_from_name(name):
     """Shorten the name of a whatever to something suitable as a filename.
