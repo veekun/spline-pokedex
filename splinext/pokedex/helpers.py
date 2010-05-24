@@ -7,7 +7,7 @@ from __future__ import absolute_import, division
 
 import math
 import re
-from itertools import groupby, chain
+from itertools import groupby, chain, repeat
 from operator import attrgetter
 
 from pylons import url
@@ -128,6 +128,7 @@ def collapse_versions(things, key):
     for collapsed_key, group in groupby(chain([a_thing], things), key):
         yield get_versions(group), collapsed_key
 
+
 def filename_from_name(name):
     """Shorten the name of a whatever to something suitable as a filename.
 
@@ -165,11 +166,13 @@ def generation_icon(generation):
         generation = generation.id
 
     return pokedex_img('versions/generation-%d.png' % generation,
-                       alt="Generation %d" % generation)
+                       alt=u"Generation %d" % generation,
+                       title=u"Generation %d" % generation)
 
 def version_icons(*versions):
     """Returns some version icons, given a list of version names."""
-    version_icons = ''
+    version_icons = u''
+    comma = chain([u''], repeat(u', '))
     for version in versions:
         # Convert version to string if necessary
         if not isinstance(version, basestring):
@@ -177,7 +180,7 @@ def version_icons(*versions):
 
         version_filename = filename_from_name(version)
         version_icons += pokedex_img(u'versions/%s.png' % version_filename,
-                                     alt=version)
+                                     alt=comma.next() + version, title=version)
 
     return version_icons
 
@@ -276,7 +279,7 @@ def damage_class_icon(damage_class):
 def type_icon(type):
     if not isinstance(type, basestring):
         type = type.name
-    return pokedex_img('chrome/types/%s.png' % type, alt=type)
+    return pokedex_img('chrome/types/%s.png' % type, alt=type, title=type)
 
 def type_link(type):
     return h.HTML.a(
