@@ -62,7 +62,7 @@ ${getattr(self, 'col_' + column)()}
                 # parent somewhere in the stack, in case this is a sibling.
                 # Yes, this will die if the parent hasn't been seen
                 while evolution_chain_stack[-1] != \
-                    result.evolution_parent_pokemon_id:
+                    result.evolution_parent.id:
 
                     evolution_chain_stack.pop()
 

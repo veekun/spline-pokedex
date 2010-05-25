@@ -616,7 +616,8 @@ class PokedexSearchController(BaseController):
         # Evolution stuff
         # Try to limit our joins without duplicating too much code
         # Stage and position generally need to know parents:
-        if c.form.evolution_stage.data or c.form.evolution_position.data:
+        if c.form.evolution_stage.data or c.form.evolution_position.data or \
+           c.form.evolution_special.data:
             # NOTE: This makes the assumption that evolution chains are never
             # more than three Pokémon long.  So far, this is pretty safe, as in
             # 10+ years no Pokémon has ever been able to evolve more than
@@ -625,25 +626,19 @@ class PokedexSearchController(BaseController):
             parent_pokemon = aliased(tables.Pokemon)
             grandparent_pokemon = aliased(tables.Pokemon)
 
-            # Make it an outer join; could be a search for e.g. 'baby', which
-            # definitely doesn't want inner
-            query = query.outerjoin((
-                parent_pokemon,
-                me.evolution_parent_pokemon_id == parent_pokemon.id
-            )) \
-            .outerjoin((
-                grandparent_pokemon,
-                parent_pokemon.evolution_parent_pokemon_id == grandparent_pokemon.id
-            ))
+            query = query.outerjoin(
+                (parent_pokemon, me.evolution_parent),
+                (grandparent_pokemon, parent_pokemon.evolution_parent),
+            )
 
         # ...whereas position and special tend to need children
         if c.form.evolution_position.data or c.form.evolution_special.data:
-            child_pokemon = aliased(tables.Pokemon)
+            child_evolution = aliased(tables.PokemonEvolution)
             child_subquery = pokedex_session.query(
-                    child_pokemon.evolution_parent_pokemon_id.label('parent_id'),
+                    child_evolution.from_pokemon_id.label('parent_id'),
                     func.count('*').label('child_count'),
                 ) \
-                .group_by(child_pokemon.evolution_parent_pokemon_id) \
+                .group_by(child_evolution.from_pokemon_id) \
                 .subquery()
 
             query = query.outerjoin((
@@ -737,18 +732,17 @@ class PokedexSearchController(BaseController):
 
             if u'branched' in c.form.evolution_special.data:
                 # Need to join to..  siblings.  Ugh.
-                sibling_pokemon = aliased(tables.Pokemon)
+                sibling_evolution = aliased(tables.PokemonEvolution)
                 sibling_subquery = pokedex_session.query(
-                    sibling_pokemon.evolution_parent_pokemon_id.label('parent_id'),
+                    sibling_evolution.from_pokemon_id.label('parent_id'),
                     func.count('*').label('sibling_count'),
                 ) \
-                    .group_by(sibling_pokemon.evolution_parent_pokemon_id) \
+                    .group_by(sibling_evolution.from_pokemon_id) \
                     .subquery()
 
                 query = query.outerjoin((
                     sibling_subquery,
-                    me.evolution_parent_pokemon_id
-                        == sibling_subquery.c.parent_id
+                    parent_pokemon.id == sibling_subquery.c.parent_id
                 ))
 
                 clauses.append( sibling_subquery.c.sibling_count > 1 )
