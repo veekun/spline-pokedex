@@ -283,14 +283,9 @@ ${h.h1('Evolution')}
             class_='dex-evolution-chain-pokemon',
         )}
         % endif
-        % if col['pokemon'].evolution_method:
+        % if col['pokemon'].parent_evolution:
         <span class="dex-evolution-chain-method">
-            % if col['pokemon'].evolution_parameter:
-            ${col['pokemon'].evolution_method.name}:
-            ${col['pokemon'].evolution_parameter}
-            % else:
-            ${col['pokemon'].evolution_method.name}
-            % endif
+            ${h.pokedex.evolution_description(col['pokemon'].parent_evolution)}
         </span>
         % endif
     </td>

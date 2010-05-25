@@ -422,8 +422,6 @@ class PokedexController(BaseController):
             # Need to eagerload some, uh, little stuff
             pokemon_q = pokemon_q.options(
                 eagerload('evolution_chain.pokemon'),
-                eagerload('evolution_chain.pokemon.evolution_method'),
-                eagerload('evolution_chain.pokemon.evolution_parent'),
                 eagerload('generation'),
                 eagerload('items.item'),
                 eagerload('items.version'),
@@ -495,10 +493,12 @@ class PokedexController(BaseController):
             pass
         else:
             parent_a = aliased(tables.Pokemon)
+            grandparent_a = aliased(tables.Pokemon)
             egg_group_ids = [_.id for _ in c.pokemon.egg_groups]
             q = pokedex_session.query(tables.Pokemon)
             q = q.join(tables.PokemonEggGroup) \
                  .outerjoin((parent_a, tables.Pokemon.evolution_parent)) \
+                 .outerjoin((grandparent_a, parent_a.evolution_parent)) \
                  .filter(tables.Pokemon.gender_rate != -1) \
                  .filter(tables.Pokemon.forme_base_pokemon_id == None) \
                  .filter(
@@ -511,7 +511,7 @@ class PokedexController(BaseController):
                         # Or this can breed and evolves from something that
                         # can't
                         and_(parent_a.egg_groups.any(id=15),
-                             parent_a.evolution_parent_pokemon_id == None),
+                             grandparent_a.id == None),
                     )
                  ) \
                  .filter(tables.PokemonEggGroup.egg_group_id.in_(egg_group_ids)) \
@@ -577,6 +577,18 @@ class PokedexController(BaseController):
         # total of seven descendents, so it would need to span 7 rows.
         c.evolution_table = []
         family = c.pokemon.evolution_chain.pokemon
+        # Prefetch the evolution details
+        pokedex_session.query(tables.Pokemon) \
+            .filter(tables.Pokemon.id.in_(_.id for _ in family)) \
+            .options(
+                eagerload_all('parent_evolution.trigger'),
+                eagerload_all('parent_evolution.trigger_item'),
+                eagerload_all('parent_evolution.held_item'),
+                eagerload_all('parent_evolution.location'),
+                eagerload_all('parent_evolution.known_move'),
+                eagerload_all('parent_evolution.party_pokemon'),
+            ) \
+            .all()
         # Strategy: build this table going backwards.
         # Find a leaf, build the path going back up to its root.  Remember all
         # of the nodes seen along the way.  Find another leaf not seen so far.

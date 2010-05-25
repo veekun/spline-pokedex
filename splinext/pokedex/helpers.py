@@ -1,6 +1,7 @@
 # encoding: utf8
-"""Small library of bits and pieces useful to the Web interface that don't
-really belong in the pokedex core.
+"""Collection of small functions and scraps of data that don't belong in the
+pokedex core -- either because they're inherently Web-related, or because
+they're very flavorful and don't belong or fit well in a database.
 """
 
 from __future__ import absolute_import, division
@@ -78,6 +79,8 @@ def render_flavor_text(flavor_text, literal=False):
 
     return h.literal(html)
 
+## Collapsing
+
 def collapse_flavor_text_key(literal=True):
     """A wrapper around `render_flavor_text`. Returns a function to be used
     as a key for `collapse_versions`, or any other function which takes a key.
@@ -128,6 +131,7 @@ def collapse_versions(things, key):
     for collapsed_key, group in groupby(chain([a_thing], things), key):
         yield get_versions(group), collapsed_key
 
+### Images and links
 
 def filename_from_name(name):
     """Shorten the name of a whatever to something suitable as a filename.
@@ -308,6 +312,8 @@ def item_link(item):
     )
 
 
+### Labels
+
 # Type efficacy, from percents to Unicode fractions
 type_efficacy_label = {
     0: '0',
@@ -332,6 +338,74 @@ gender_rate_label = {
     8: u'always female',
 }
 
+def article(noun):
+    """Returns 'a' or 'an', as appropriate."""
+    if noun[0].lower() in u'aeiou':
+        return u'an'
+    return u'a'
+
+def evolution_description(evolution):
+    """Crafts a human-readable description from a `pokemon_evolution` row
+    object.
+    """
+    chunks = []
+
+    # Trigger
+    if evolution.trigger.identifier == u'level_up':
+        chunks.append(u'Level up')
+    elif evolution.trigger.identifier == u'trade':
+        chunks.append(u'Trade')
+    elif evolution.trigger.identifier == u'use_item':
+        chunks.append(u"Use {article} {item}".format(
+            article=article(evolution.trigger_item.name),
+            item=evolution.trigger_item.name))
+    elif evolution.trigger.identifier == u'shed':
+        chunks.append(
+            u"Evolve {from_pokemon} ({to_pokemon} will consume "
+            u"a Poké Ball and appear in a free party slot)".format(
+                from_pokemon=evolution.from_pokemon.full_name,
+                to_pokemon=evolution.to_pokemon.full_name))
+    else:
+        chunks.append(u'Do something')
+
+    # Conditions
+    if evolution.gender:
+        chunks.append(u"{0}s only".format(evolution.gender))
+    if evolution.time_of_day:
+        chunks.append(u"during the {0}".format(evolution.time_of_day))
+
+    if evolution.minimum_level:
+        chunks.append(u"starting at level {0}".format(evolution.minimum_level))
+    if evolution.location_id:
+        chunks.append(u"around {0}".format(evolution.location.name))
+    if evolution.held_item_id:
+        chunks.append(u"while holding {article} {item}".format(
+            article=article(evolution.held_item.name),
+            item=evolution.held_item.name))
+    if evolution.known_move_id:
+        chunks.append(u"knowing {0}".format(evolution.known_move.name))
+    if evolution.minimum_happiness:
+        chunks.append(u"with at least {0} happiness".format(
+            evolution.minimum_happiness))
+    if evolution.minimum_beauty:
+        chunks.append(u"with at least {0} beauty".format(
+            evolution.minimum_beauty))
+
+    if evolution.relative_physical_stats is not None:
+        if evolution.relative_physical_stats < 0:
+            op = u'<'
+        elif evolution.relative_physical_stats > 0:
+            op = u'>'
+        else:
+            op = u'='
+
+        chunks.append(u"when Attack {0} Defense".format(op))
+
+    return u', '.join(chunks)
+
+
+### Formatting
+
 def format_height_metric(height):
     """Formats a height in decimeters as M m."""
     return "%.1f m" % (height / 10)
@@ -350,6 +424,9 @@ def format_weight_metric(weight):
 def format_weight_imperial(weight):
     """Formats a weight in hectograms as L lb."""
     return "%.1f lb" % (weight / 10 * 2.20462262)
+
+
+### General data munging
 
 def scale_sizes(size_dict, dimensions=1):
     """Normalizes a list of sizes so the largest is 1.0.
