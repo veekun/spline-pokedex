@@ -497,8 +497,8 @@ class PokedexController(BaseController):
             egg_group_ids = [_.id for _ in c.pokemon.egg_groups]
             q = pokedex_session.query(tables.Pokemon)
             q = q.join(tables.PokemonEggGroup) \
-                 .outerjoin((parent_a, tables.Pokemon.evolution_parent)) \
-                 .outerjoin((grandparent_a, parent_a.evolution_parent)) \
+                 .outerjoin((parent_a, tables.Pokemon.parent_pokemon)) \
+                 .outerjoin((grandparent_a, parent_a.parent_pokemon)) \
                  .filter(tables.Pokemon.gender_rate != -1) \
                  .filter(tables.Pokemon.forme_base_pokemon_id == None) \
                  .filter(
@@ -607,7 +607,7 @@ class PokedexController(BaseController):
                 for possible_child in family:
                     if possible_child in seen_nodes:
                         continue
-                    if possible_child.evolution_parent == pokemon:
+                    if possible_child.parent_pokemon == pokemon:
                         children.append(possible_child)
                 if len(children) == 0:
                     unseen_leaves.append(pokemon)
@@ -652,7 +652,7 @@ class PokedexController(BaseController):
                 # This node has one more row to span: our current leaf
                 current_node['span'] += 1
 
-                current_pokemon = current_pokemon.evolution_parent
+                current_pokemon = current_pokemon.parent_pokemon
 
             # We want every path to have four nodes: baby, basic, stage 1 and 2.
             # Every root node is basic, unless it's defined as being a baby.

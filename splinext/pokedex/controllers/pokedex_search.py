@@ -627,8 +627,8 @@ class PokedexSearchController(BaseController):
             grandparent_pokemon = aliased(tables.Pokemon)
 
             query = query.outerjoin(
-                (parent_pokemon, me.evolution_parent),
-                (grandparent_pokemon, parent_pokemon.evolution_parent),
+                (parent_pokemon, me.parent_pokemon),
+                (grandparent_pokemon, parent_pokemon.parent_pokemon),
             )
 
         # ...whereas position and special tend to need children
