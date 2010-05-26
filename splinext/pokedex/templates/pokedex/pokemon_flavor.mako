@@ -29,7 +29,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
     )}</li>
 % endfor
 </ul>
-<p> ${c.pokemon.normal_form.form_group.description} </p>
+<p> ${c.pokemon.normal_form.form_group.description.as_html | n} </p>
 % endif
 
 % if c.introduced_in.id <= 2:

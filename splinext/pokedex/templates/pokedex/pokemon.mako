@@ -307,7 +307,7 @@ ${h.h1('Evolution')}
     <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_sprite(c.pokemon, 'heartgold-soulsilver', form=form), form=form, class_=link_class)}</li>
     % endfor
 </ul>
-<p> ${c.pokemon.normal_form.form_group.description} </p>
+<p> ${c.pokemon.normal_form.form_group.description.as_html | n} </p>
 % endif
 
 ${h.h1('Stats')}
