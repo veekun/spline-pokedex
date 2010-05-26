@@ -57,24 +57,25 @@ ${getattr(self, 'col_' + column)()}
             # Indenting is kept right by keeping a running list of this
             # Pokémon's ancestry.  Luckily, except for babies, National Dex
             # order is always post-order
-            if last_evolution_chain_id == result.evolution_chain_id:
+            if last_evolution_chain_id == result.evolution_chain_id and \
+               result.parent_pokemon in evolution_chain_stack:
                 # Still in the same family.  Look for this Pokémon's immediate
                 # parent somewhere in the stack, in case this is a sibling.
                 # Yes, this will die if the parent hasn't been seen
-                while evolution_chain_stack[-1] != \
-                    result.parent_pokemon.id:
-
+                while evolution_chain_stack[-1] != result.parent_pokemon:
                     evolution_chain_stack.pop()
 
             else:
-                # New family; reset everything and show a divider
+                # New family or new sub-chain; reset everything and show a
+                # divider
                 if result.is_baby:
                     evolution_chain_stack = []
                 else:
                     # Stub out a baby
                     evolution_chain_stack = [None]
 
-                if last_evolution_chain_id is not None:
+                if last_evolution_chain_id is not None and \
+                   last_evolution_chain_id != result.evolution_chain_id:
                     tr_classes.append(u'chain-divider')
                 last_evolution_chain_id = result.evolution_chain_id
 
@@ -87,7 +88,7 @@ ${getattr(self, 'col_' + column)()}
                 # Fake!
                 tr_classes.append(u'fake-result')
 
-            evolution_chain_stack.append(result.id)
+            evolution_chain_stack.append(result)
     %>\
 
     <tr class="${u' '.join(tr_classes)}">
