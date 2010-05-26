@@ -9,21 +9,24 @@
 </form>
 
 ${h.h1('Introduction')}
-<img style="float: right;"
-     src="${h.static_uri('local', 'images/engiveer.png')}"
-     alt="UNDER CONSTRUCTION LOL"
-     title="I solve practical problems">
+<p>Pretty much anything that exists in the Pokémon world can be found in the Pokédex.  Just type in a name and try it out.</p>
 
-<p>There's not much to say at the moment.  The Pokédex is still being rebuilt from <a href="http://old.veekun.com/">the ashes</a>.  This would be a jumping-off point for parts of the Pokédex, but the various lists don't exist yet!</p>
+<p>Or you can browse by category:</p>
+
+<ul class="classic-list">
+    <li><a href="${url(controller='dex', action='pokemon_list')}">Pokémon</a></li>
+    <li>Moves</li>
+    <li><a href="${url(controller='dex', action='types_list')}">Types</a></li>
+    <li><a href="${url(controller='dex', action='abilities_list')}">Abilities</a></li>
+    <li><a href="${url(controller='dex', action='items_list')}">Items</a></li>
+    <li><a href="${url(controller='dex', action='natures_list')}">Natures</a></li>
+</ul>
 
 <p>The <a href="http://old.veekun.com/dex">old Pokédex</a> is, for now, still available.</p>
 
 
-${h.h1('Finding Stuff')}
+${h.h1('Finding stuff')}
 
-<p>You can look up Pokémon, moves, types, abilities, and items in the Pokédex.  Just type what you want to see, and it'll figure it out from there.</p>
-
-<h2>Specifics</h2>
 <p>Lookup works the same way anywhere you can type a name.  Keep in mind that "lookup" is used to mean entering a name to find something(s) specific.  "Searching" is <a href="${url(controller='dex_search', action='pokemon_search')}">a bit more complicated</a>.</p>
 
 <p>Case (${lookup_examples(u'kecleon')} vs ${lookup_examples(u'KECLEON')}) and extra spaces are ignored.</p>
