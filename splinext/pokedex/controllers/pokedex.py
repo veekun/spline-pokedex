@@ -428,9 +428,8 @@ class PokedexController(BaseController):
                 eagerload('pokemon_color'),
                 eagerload('pokemon_habitat'),
                 eagerload('shape'),
-                eagerload('stats.stat'),
-                eagerload('types.target_efficacies'),
-                eagerload('types.target_efficacies.damage_type'),
+                subqueryload_all('stats.stat'),
+                subqueryload_all('types.target_efficacies.damage_type'),
 
                 # XXX SQLAlchemy totally barfs if I try to eagerload things
                 # that are only on the normal_form.  No idea why.  This
@@ -1114,15 +1113,7 @@ class PokedexController(BaseController):
 
     def moves(self, name):
         try:
-            c.move = db.get_by_name_query(tables.Move, name) \
-                .options(
-                    eagerload('damage_class'),
-                    eagerload('type.damage_efficacies.target_type'),
-                    eagerload('move_effect'),
-                    eagerload('contest_effect'),
-                    eagerload('super_contest_effect'),
-                ) \
-                .one()
+            c.move = db.get_by_name_query(tables.Move, name).one()
         except NoResultFound:
             return self._not_found()
 
@@ -1140,6 +1131,30 @@ class PokedexController(BaseController):
         )
 
     def _do_moves(self, name):
+        # Eagerload
+        pokedex_session.query(tables.Move) \
+            .filter_by(id=c.move.id) \
+            .options(
+                eagerload('damage_class'),
+                eagerload('type'),
+                eagerload('target'),
+                eagerload('move_effect'),
+                eagerload('move_effect.category_map.category'),
+                eagerload('contest_effect'),
+                eagerload('contest_type'),
+                eagerload('super_contest_effect'),
+                subqueryload_all('move_flags.flag'),
+                subqueryload_all('type.damage_efficacies.target_type'),
+                subqueryload_all('foreign_names.language'),
+                subqueryload_all('flavor_text.version_group.generation'),
+                subqueryload_all('flavor_text.version_group.versions'),
+                subqueryload_all('contest_combo_first.second'),
+                subqueryload_all('contest_combo_second.first'),
+                subqueryload_all('super_contest_combo_first.second'),
+                subqueryload_all('super_contest_combo_second.first'),
+            ) \
+            .one()
+
         # Used for item linkage
         c.pp_up = pokedex_session.query(tables.Item) \
             .filter_by(name=u'PP Up').one()
@@ -1160,8 +1175,11 @@ class PokedexController(BaseController):
 
         ### Machines
         q = pokedex_session.query(tables.Generation) \
-                           .filter(tables.Generation.id >= c.move.generation.id) \
-                           .order_by(tables.Generation.id.asc())
+            .filter(tables.Generation.id >= c.move.generation.id) \
+            .options(
+                eagerload('version_groups'),
+            ) \
+            .order_by(tables.Generation.id.asc())
         raw_machines = {}
         # raw_machines = { generation: { version_group: machine_number } }
         c.machines = {}
@@ -1204,34 +1222,32 @@ class PokedexController(BaseController):
             .join(tables.Move.move_effect) \
             .filter(tables.MoveEffect.id == c.move.effect_id) \
             .filter(tables.Move.id != c.move.id) \
-            .options(
-                eagerload_all('type'),
-            ) \
+            .options(eagerload('type')) \
             .all()
 
         ### Pokémon
         # This is kinda like the moves for Pokémon, but backwards.  Imagine
         # that!  We have the same basic structure, a list of:
-        #     ( method, [ (pokemon, { version_group => data, ... }), ... ] )
-        pokemon_methods = defaultdict(list)
+        #     (method, [ (pokemon, { version_group => data, ... }), ... ])
+        pokemon_methods = defaultdict(dict)
+        # Sort by descending level because the LAST level seen is the one that
+        # ends up in the table, and the lowest level is the most useful
         q = pokedex_session.query(tables.PokemonMove) \
             .options(
                 eagerload('method'),
                 eagerload('pokemon'),
                 eagerload('version_group'),
-
-                # Pokémon table trappings
                 eagerload('pokemon.form_group'),
+
+                # Pokémon table stuff
                 subqueryload('pokemon.abilities'),
                 subqueryload('pokemon.egg_groups'),
                 subqueryload('pokemon.formes'),
                 subqueryload('pokemon.stats'),
                 subqueryload('pokemon.types'),
             ) \
-            .filter_by(move=c.move) \
-            .order_by(tables.PokemonMove.level.asc(),
-                      tables.PokemonMove.order.asc(),
-                      tables.PokemonMove.version_group_id.asc())
+            .filter(tables.PokemonMove.move_id == c.move.id) \
+            .order_by(tables.PokemonMove.level.desc())
         for pokemon_move in q:
             method_list = pokemon_methods[pokemon_move.method]
             this_vg = pokemon_move.version_group
@@ -1245,29 +1261,24 @@ class PokedexController(BaseController):
             elif pokemon_move.method.name == 'Machine':
                 # TMs need to know their own TM number
                 machine = first(lambda _: _.version_group == this_vg,
-                                pokemon_move.move.machines)
+                                c.move.machines)
                 if machine:
                     vg_data['machine'] = machine.machine_number
 
             # The Pokémon version does sorting here, but we're just going to
             # sort by name regardless of method, so leave that until last
 
-            # Check for a free existing row for this move; if one exists, we
-            # can just add our data to that same row
-            valid_row = first(
-                lambda (pokemon, version_group_data):
-                    pokemon == pokemon_move.pokemon and \
-                    this_vg not in version_group_data,
-                method_list
-            )
-            if valid_row:
-                valid_row[1][this_vg] = vg_data
-                continue
+            # Add in the move method for this Pokémon
+            if pokemon_move.pokemon not in method_list:
+                method_list[pokemon_move.pokemon] = dict()
 
-            # Otherwise, we need a new row
-            method_list.append(( pokemon_move.pokemon, { this_vg: vg_data } ))
+            method_list[pokemon_move.pokemon][this_vg] = vg_data
 
-        # Convert dictionary to our desired list of tuples
+        # Convert each method dictionary to a list of tuples
+        for method in pokemon_methods.keys():
+            pokemon_methods[method] = pokemon_methods[method].items()
+
+        # Convert the entire dictionary to a list of tuples and sort it
         c.pokemon = pokemon_methods.items()
         c.pokemon.sort(key=_pokemon_move_method_sort_key)
 
