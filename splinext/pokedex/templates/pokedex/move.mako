@@ -244,40 +244,44 @@ ${h.h1(u'Pokémon', id='pokemon')}
 <table class="dex-pokemon-moves striped-rows">
 ## COLUMNS
 % for column_group in c.pokemon_columns:
-<colgroup>
+<colgroup class="dex-colgroup-versions">
     % for column in column_group:
     <col class="dex-col-version">
     % endfor
 </colgroup>
 % endfor
 
-<colgroup>
-    ${dexlib.pokemon_table_columns()}
+<colgroup>\
+    ${dexlib.pokemon_table_columns()}\
 </colgroup>
 
-## HEADERS
 % for method, method_list in c.pokemon:
+## HEADERS
+<tbody>
 <%
     method_id = "pokemon:" + re.sub("\W+", "-", method.name.lower())
 %>\
-<tr class="header-row" id="${method_id}">
-    % for column in columns:
-    ${dexlib.pokemon_move_table_column_header(column)}
-    % endfor
-    ${dexlib.pokemon_table_header()}
-</tr>
-<tr class="subheader-row">
-    <th colspan="${len(columns) + 13}"><a href="#${method_id}" class="subtle"><strong>${method.name}</a></strong>: ${method.description}</th>
-</tr>
+    <tr class="header-row" id="${method_id}">
+        % for column in columns:
+        ${dexlib.pokemon_move_table_column_header(column)}
+        % endfor
+        ${dexlib.pokemon_table_header()}
+    </tr>
+    <tr class="subheader-row">
+        <th colspan="${len(columns) + 13}"><a href="#${method_id}" class="subtle"><strong>${method.name}</a></strong>: ${method.description}</th>
+    </tr>
+</tbody>
 ## DATA
+<tbody>
 % for pokemon, version_group_data in method_list:
-<tr>
-    % for column in columns:
-    ${dexlib.pokemon_move_table_method_cell(column, method, version_group_data)}
-    % endfor
-    ${dexlib.pokemon_table_row(pokemon)}
-</tr>
+    <tr>
+        % for column in columns:
+        ${dexlib.pokemon_move_table_method_cell(column, method, version_group_data)}
+        % endfor
+        ${dexlib.pokemon_table_row(pokemon)}
+    </tr>
 % endfor
+</tbody>
 % endfor
 </table>
 

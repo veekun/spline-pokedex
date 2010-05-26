@@ -75,7 +75,7 @@ def _collapse_pokemon_move_columns(table, thing):
                        .filter(tables.Generation.id >= thing.generation_id) \
                        .order_by(tables.Generation.id.asc())
     for generation in q:
-        move_columns.append( [] ) # a new column group for this generation
+        move_columns.append( [] ) # A new column group for this generation
         for i, version_group in enumerate(generation.version_groups):
             if i == 0:
                 # Can't collapse these versions anywhere!  Create a new column
@@ -94,20 +94,20 @@ def _collapse_pokemon_move_columns(table, thing):
                     continue
 
                 for move, version_group_data in method_list:
-                    if version_group_data.get(version_group, None) \
-                        != version_group_data.get(move_columns[-1][-1][-1], None): # yep
-                        squashable = False
+                    if version_group_data.get(version_group, None) != \
+                       version_group_data.get(move_columns[-1][-1][-1], None):
                         break
-                if not squashable:
-                    # Definitely can't collapse.  Bail
-                    break
+                else:
+                    continue
 
-            if squashable:
+                break # We broke out and didn't get to continue—not squashable
+            else:
                 # Stick this version group in the previous column
                 move_columns[-1][-1].append(version_group)
-            else:
-                # Create a new column
-                move_columns[-1].append( [version_group] )
+                continue
+
+            # Create a new column
+            move_columns[-1].append( [version_group] )
 
     return move_columns
 

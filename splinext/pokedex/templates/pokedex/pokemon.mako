@@ -547,8 +547,8 @@ ${h.h1('Moves')}
 </colgroup>
 % endfor
 
-<colgroup>
-    ${dexlib.move_table_columns()}
+<colgroup>\
+    ${dexlib.move_table_columns()}\
 </colgroup>
 
 % for method, method_list in c.moves:
@@ -569,7 +569,7 @@ ${h.h1('Moves')}
 </tbody>
 ## DATA
 <tbody>
-    % for move, version_group_data in method_list:
+% for move, version_group_data in method_list:
     <tr class="\
         % if move.type in c.pokemon.types:
         better-move-type\
@@ -583,7 +583,7 @@ ${h.h1('Moves')}
         % endfor
         ${dexlib.move_table_row(move)}
     </tr>
-    % endfor
+% endfor
 </tbody>
 % endfor
 </table>
