@@ -247,6 +247,29 @@ ${h.h1('Contests')}
 </div>
 </div>
 
+${h.h1(u'Similar moves')}
+% if c.similar_moves:
+<p>These moves all have the same effect as ${c.move.name}.</p>
+<table class="dex-pokemon-moves striped-rows">
+## COLUMNS
+<colgroup>
+    ${dexlib.move_table_columns()}
+</colgroup>
+## HEADERS
+<tr class="header-row">
+    ${dexlib.move_table_header()}
+</tr>
+## DATA
+% for move in c.similar_moves:
+<tr>
+    ${dexlib.move_table_row(move)}
+</tr>
+% endfor
+</table>
+% else:
+<p>No other moves have the same effect as ${c.move.name}.</p>
+% endif
+
 ${h.h1(u'Pokémon', id='pokemon')}
 <% columns = sum(c.pokemon_columns, []) %>
 <table class="dex-pokemon-moves striped-rows">

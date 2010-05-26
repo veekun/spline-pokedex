@@ -1199,6 +1199,16 @@ class PokedexController(BaseController):
                 # Otherwise, sort by version group
                 vg_numbers.sort(key=lambda item: item.version_group.id)
 
+        ### Similar moves
+        c.similar_moves = pokedex_session.query(tables.Move) \
+            .join(tables.Move.move_effect) \
+            .filter(tables.MoveEffect.id == c.move.effect_id) \
+            .filter(tables.Move.id != c.move.id) \
+            .options(
+                eagerload_all('type'),
+            ) \
+            .all()
+
         ### Pokémon
         # This is kinda like the moves for Pokémon, but backwards.  Imagine
         # that!  We have the same basic structure, a list of:
