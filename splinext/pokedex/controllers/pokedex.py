@@ -693,16 +693,7 @@ class PokedexController(BaseController):
             stat_info['background'] = bar_color(percentile, 0.9)
             stat_info['border'] = bar_color(percentile, 0.8)
 
-            if pokemon_stat.stat.name == u'Attack':
-                physical_attack = pokemon_stat.base_stat
-            elif pokemon_stat.stat.name == u'Special Attack':
-                special_attack = pokemon_stat.base_stat
-
-        c.better_damage_class = None
-        if physical_attack > special_attack:
-            c.better_damage_class = u'Physical'
-        elif physical_attack < special_attack:
-            c.better_damage_class = u'Special'
+        c.better_damage_class = c.pokemon.better_damage_class
 
         # Percentile for the total
         # Need to make a derived table that fakes pokemon_id, total_stats
@@ -1238,6 +1229,8 @@ class PokedexController(BaseController):
                 eagerload('pokemon'),
                 eagerload('version_group'),
                 eagerload('pokemon.form_group'),
+                eagerload('pokemon.stats.stat'),
+                eagerload('pokemon.stats.stat.damage_class'),
 
                 # Pokémon table stuff
                 subqueryload('pokemon.abilities'),
@@ -1275,7 +1268,14 @@ class PokedexController(BaseController):
             method_list[pokemon_move.pokemon][this_vg] = vg_data
 
         # Convert each method dictionary to a list of tuples
+        c.better_damage_classes = {}
         for method in pokemon_methods.keys():
+            # Also grab Pokémon's better damage classes
+            for pokemon in pokemon_methods[method].keys():
+                if pokemon not in c.better_damage_classes:
+                    c.better_damage_classes[pokemon] = \
+                        pokemon.better_damage_class
+
             pokemon_methods[method] = pokemon_methods[method].items()
 
         # Convert the entire dictionary to a list of tuples and sort it

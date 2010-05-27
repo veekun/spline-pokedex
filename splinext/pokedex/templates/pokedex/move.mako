@@ -271,6 +271,10 @@ ${h.h1(u'Similar moves')}
 % endif
 
 ${h.h1(u'Pokémon', id='pokemon')}
+% if c.move.damage_class.name != u'None':
+<p>${c.move.type.name.capitalize()} Pokémon get STAB, and have their types highlighted in green.</p>
+<p>Pokémon with higher ${u'Special Attack' if c.move.damage_class.name == u'Special' else u'Attack'} are more suited to ${c.move.name}'s ${c.move.damage_class.name} damage, and have the stat highlighted in green.</p>
+% endif
 <% columns = sum(c.pokemon_columns, []) %>
 <table class="dex-pokemon-moves striped-rows">
 ## COLUMNS
@@ -305,7 +309,14 @@ ${h.h1(u'Pokémon', id='pokemon')}
 ## DATA
 <tbody>
 % for pokemon, version_group_data in method_list:
-    <tr>
+    <tr class="\
+        % if c.move.damage_class.name != u'None' and c.move.type in pokemon.types:
+        better-move-type\
+        % endif
+        % if c.move.damage_class == c.better_damage_classes[pokemon]:
+        better-move-stat-${c.better_damage_classes[pokemon].name.lower()}\
+        % endif
+    ">
         % for column in columns:
         ${dexlib.pokemon_move_table_method_cell(column, method, version_group_data)}
         % endfor

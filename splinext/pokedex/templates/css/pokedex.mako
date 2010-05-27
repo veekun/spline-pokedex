@@ -46,6 +46,7 @@ col.dex-col-name        { width: 10em; }
 col.dex-col-link        { width: 16px; }
 col.dex-col-max-exp     { width: 7em; }
 col.dex-col-ability     { width: 8em; }
+col.dex-col-gender      { width: 7em; }
 col.dex-col-egg-group   { width: 7em; }
 col.dex-col-height      { width: 5em; }
 col.dex-col-weight      { width: 6em; }
@@ -53,12 +54,14 @@ col.dex-col-species     { width: 8em; }
 col.dex-col-color       { width: 5em; }
 col.dex-col-habitat     { width: 9em; }
 col.dex-col-stat        { width: 3em; }
+col.dex-col-stat-total  { width: 4em; }
 col.dex-col-stat-name   { width: 10em; }
 col.dex-col-stat-bar    { width: auto; }
 col.dex-col-stat-pctile { width: 5em; }
 col.dex-col-stat-result { width: 5em; }
 col.dex-col-effort      { width: 8em; }
 col.dex-col-type        { width: 3em; }
+col.dex-col-type2       { width: 7em; }
 col.dex-col-version     { width: 3.5em; }  /* two versions (32px < 33px == 3em) plus 0.17em padding < 3.5em */
 col.dex-col-encounter-name { width: 10em; }
 col.dex-col-encounter-version { width: 12em; }
@@ -86,6 +89,16 @@ table.dex-pokemon-moves td.size { text-align: right; }
 table.dex-pokemon-moves td.color { }
 table.dex-pokemon-moves td.species { }
 table.dex-pokemon-moves td.effort { font-size: 0.75em; padding: 0.25em; text-align: left; }
+table.dex-pokemon-moves tr.better-move-type:nth-child(2n) td.type,
+table.dex-pokemon-moves tr.better-move-type:nth-child(2n) td.type2,
+table.dex-pokemon-moves tr.better-move-stat-physical:nth-child(2n) td.stat-attack,
+table.dex-pokemon-moves tr.better-move-stat-special:nth-child(2n) td.stat-special-attack,
+table.dex-pokemon-moves tr.better-move-stat:nth-child(2n) td.class { background: #afcfaf; }
+table.dex-pokemon-moves tr.better-move-type:nth-child(2n+1) td.type,
+table.dex-pokemon-moves tr.better-move-type:nth-child(2n+1) td.type2,
+table.dex-pokemon-moves tr.better-move-stat-physical:nth-child(2n+1) td.stat-attack,
+table.dex-pokemon-moves tr.better-move-stat-special:nth-child(2n+1) td.stat-special-attack,
+table.dex-pokemon-moves tr.better-move-stat:nth-child(2n+1) td.class { background: #c0d8c0; }
 
 /* "Sorting" Pokémon search results by evolution chain */
 table.dex-pokemon-moves tr.fake-result td { opacity: 0.25; }
@@ -103,10 +116,6 @@ table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls td.js-not-a-button:hove
 table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls td.js-sorted-by { background: #f0efe6; }
 table.dex-pokemon-moves tr:nth-child(2n) td.js-sorted-by { background: #f0efe6; }
 table.dex-pokemon-moves tr:nth-child(2n+1) td.js-sorted-by { background: #f6f4ea; }
-table.dex-pokemon-moves tr.better-move-type:nth-child(2n) td.type,
-table.dex-pokemon-moves tr.better-move-stat:nth-child(2n) td.class { background: #afcfaf; }
-table.dex-pokemon-moves tr.better-move-type:nth-child(2n+1) td.type,
-table.dex-pokemon-moves tr.better-move-stat:nth-child(2n+1) td.class { background: #c0d8c0; }
 
 
 /*** Individual pages -- shared ***/

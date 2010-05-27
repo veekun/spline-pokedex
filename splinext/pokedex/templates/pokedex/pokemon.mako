@@ -536,6 +536,10 @@ ${h.h1('Locations')}
 </dl>
 
 ${h.h1('Moves')}
+<p>${u' and '.join(t.name for t in c.pokemon.types).capitalize()} moves get STAB, and have their type highlighted in green.</p>
+% if c.better_damage_class:
+<p>${c.better_damage_class.name} moves better suit ${c.pokemon.full_name}'s higher ${u'Special Attack' if c.better_damage_class.name == u'Special' else u'Attack'}, and have their class highlighted in green.</p>
+% endif
 <% columns = sum(c.move_columns, []) %>
 <table class="dex-pokemon-moves dex-pokemon-pokemon-moves striped-rows">
 ## COLUMNS
@@ -574,7 +578,7 @@ ${h.h1('Moves')}
         % if move.type in c.pokemon.types:
         better-move-type\
         % endif
-        % if move.damage_class.name == c.better_damage_class:
+        % if move.damage_class == c.better_damage_class:
         better-move-stat\
         % endif
     ">
