@@ -15,8 +15,8 @@
     ${c.ability.id}: ${c.ability.name}
 </div>
 
-${h.h1('Essentials')}
 
+${h.h1('Essentials')}
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.ability.name}</p>
     <p>${h.pokedex.generation_icon(c.ability.generation)}</p>
@@ -27,12 +27,36 @@ ${h.h1('Essentials')}
     <p>${h.literal(c.ability.short_effect.as_html)}</p>
 </div>
 
+
 ${h.h1('Effect')}
 <div class="dex-effect">
     ${h.literal(c.ability.effect.as_html)}
 </div>
-<h2>Flavor Text</h2>
-${dexlib.flavor_text_list(c.ability.flavor_text)}
+
+
+${h.h1('Flavor')}
+<div class="dex-column-container">
+<div class="dex-column-2x">
+    <h2>Flavor Text</h2>
+    ${dexlib.flavor_text_list(c.ability.flavor_text)}
+</div>
+
+<div class="dex-column">
+    <h2>Foreign Names</h2>
+    <dl>
+        % for foreign_name in c.ability.foreign_names:
+        <dt>${foreign_name.language.name}
+        <img src="${h.static_uri('spline', "flags/{0}.png".format(foreign_name.language.iso3166))}" alt=""></dt>
+        % if foreign_name.language.name == 'Japanese':
+        <dd>${foreign_name.name} (${h.pokedex.romanize(foreign_name.name)})</dd>
+        % else:
+        <dd>${foreign_name.name}</dd>
+        % endif
+        % endfor
+    </dl>
+</div>
+</div>
+
 
 ${h.h1(u'Pokémon', id='pokemon')}
 <table class="dex-pokemon-moves striped-rows">
@@ -50,6 +74,7 @@ ${h.h1(u'Pokémon', id='pokemon')}
         % endfor
     </tbody>
 </table>
+
 
 ${h.h1('External Links', id='links')}
 <ul class="classic-list">
