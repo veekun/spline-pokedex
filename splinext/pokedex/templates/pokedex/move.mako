@@ -95,20 +95,6 @@ ${h.h1('Essentials')}
 </div>
 
 <div class="dex-column">
-    <h2>Names</h2>
-    <dl>
-        % for foreign_name in c.move.foreign_names:
-        ## </dt> needs to come right after the flag or else there's space between it and the colon
-        <dt>${foreign_name.language.name}
-        <img src="${h.static_uri('spline', "flags/{0}.png".format(foreign_name.language.iso3166))}" alt=""></dt>
-        % if foreign_name.language.name == 'Japanese':
-        <dd>${foreign_name.name} (${h.pokedex.romanize(foreign_name.name)})</dd>
-        % else:
-        <dd>${foreign_name.name}</dd>
-        % endif
-        % endfor
-    </dl>
-
     <h2>Machines</h2>
     <dl>
     % for generation, version_numbers in sorted(c.machines.items(), \
@@ -140,8 +126,6 @@ ${h.h1('Effect')}
 <div class="dex-effect">
 ${h.literal(c.move.effect.as_html)}
 </div>
-<h2>Flavor Text</h2>
-${dexlib.flavor_text_list(c.move.flavor_text)}
 
 <h2>Categories</h2>
 <ul>
@@ -150,6 +134,30 @@ ${dexlib.flavor_text_list(c.move.flavor_text)}
     % endfor
 </ul>
 
+
+${h.h1('Flavor')}
+<div class="dex-column-container">
+<div class="dex-column-2x">
+    <h2>Flavor Text</h2>
+    ${dexlib.flavor_text_list(c.move.flavor_text)}
+</div>
+
+<div class="dex-column">
+    <h2>Foreign Names</h2>
+    <dl>
+        % for foreign_name in c.move.foreign_names:
+        ## </dt> needs to come right after the flag or else there's space between it and the colon
+        <dt>${foreign_name.language.name}
+        <img src="${h.static_uri('spline', "flags/{0}.png".format(foreign_name.language.iso3166))}" alt=""></dt>
+        % if foreign_name.language.name == 'Japanese':
+        <dd>${foreign_name.name} (${h.pokedex.romanize(foreign_name.name)})</dd>
+        % else:
+        <dd>${foreign_name.name}</dd>
+        % endif
+        % endfor
+    </dl>
+</div>
+</div>
 
 
 ${h.h1('Contests')}

@@ -64,8 +64,11 @@ ${h.h1('Effect')}
 </dl>
 % endif
 
+
+${h.h1('Flavor')}
 <h2>Flavor text</h2>
 ${dexlib.flavor_text_list(c.item.flavor_text)}
+
 
 % if c.item.berry:
 ${h.h1('Berry tag')}
