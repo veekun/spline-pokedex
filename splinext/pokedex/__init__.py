@@ -2,16 +2,18 @@
 import os.path
 from pkg_resources import resource_filename
 
-from docutils import nodes
-from docutils.parsers.rst import roles
+import markdown
+import markdown.inlinepatterns
 from pylons import config, tmpl_context as c
 from routes import url_for as url
 from sqlalchemy.orm.exc import NoResultFound
 
 import pokedex.db
+from pokedex.db.markdown import MarkdownString
 import pokedex.db.tables as tables
 import pokedex.lookup
 import splinext.pokedex.model
+import splinext.pokedex.db
 from splinext.pokedex import helpers as pokedex_helpers
 import spline.lib.helpers as h
 from spline.lib.plugin import PluginBase, PluginLink, Priority
@@ -46,47 +48,63 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/dex/gadgets/pokeballs', controller='dex_gadgets', action='capture_rate')
 
 
-def get_role(table):
-    """Need a separate function here to avoid problems with generating closures
-    inside a loop below.
-    """
+### Extend markdown to turn [Eevee]{pokemon} into a link in effects and
+### descriptions
 
-    table_name = table.__tablename__
+class PokedexLinkPattern(markdown.inlinepatterns.Pattern):
+    def __init__(self, table):
+        """Generates a pattern-matcher for a type of link, given a table."""
+        self.thingy_table = table
+        self.thingy_type = table.__name__
 
-    def role(name, rawtext, text, lineno, inliner, options={}, content=[]):
-        # Import here so this module is safe to load
-        from splinext.pokedex.db import get_by_name_query, pokemon_query
+        # Match [...]{tablename}
+        regex = ur'(?x) \[ ([^]]+) \] \s* \{' + table.__singlename__ + ur'\}'
 
-        try:
-            # Find the object and get a link to it
-            if name == 'pokemon':
-                obj = pokemon_query(text).one()
-            else:
-                obj = get_by_name_query(table, text).one()
-            options['refuri'] = pokedex_helpers.make_thingy_url(obj)
-            node = nodes.reference(rawtext, obj.name, **options)
-        except NoResultFound:
-            # Invalid name.  Just ignore the tag I guess
-            node = nodes.inline(rawtext, text, **options)
-        return [node], []
+        # old-style classes augh!
+        markdown.inlinepatterns.Pattern.__init__(self, regex)
 
-    return role
+    def handleMatch(self, m):
+        raw_name = m.group(2)
+
+        # Find the thingy and figure out its URL
+        if self.thingy_type == u'pokemon':
+            obj = splinext.pokedex.db.pokemon_query(raw_name).one()
+            name = obj.full_name
+        else:
+            obj = splinext.pokedex.db.get_by_name_query(self.thingy_table, raw_name).one()
+            name = obj.name
+        url = pokedex_helpers.make_thingy_url(obj)
+
+        # Construct a link node
+        el = markdown.etree.Element('a')
+        el.set('href', url)
+        el.text = markdown.AtomicString(name)
+        return el
+
+class PokedexMechanicsPattern(markdown.inlinepatterns.Pattern):
+    """Matches [...]{mechanic}.  For now, this doesn't actually do anything."""
+    def handleMatch(self, m):
+        # Don't do anything for now
+        el = markdown.etree.Element('span')
+        el.text = markdown.AtomicString(m.group(2))
+        return el
+
+class PokedexExtension(markdown.Extension):
+    """Plugs the [foo]{bar} syntax into the markdown parser."""
+    def extendMarkdown(self, md, md_globals):
+        for table in (tables.Ability, tables.Item, tables.Move, tables.Pokemon,
+                      tables.Type):
+            key = "pokedex-link-{table.__tablename__}".format(table=table)
+            md.inlinePatterns[key] = PokedexLinkPattern(table)
+
+        mechanics_regex = ur'(?x) \[ ([^]]+) \] \s* \{mechanic\}'
+        md.inlinePatterns['pokedex-mechanics'] \
+            = PokedexMechanicsPattern(mechanics_regex)
+
 
 def after_setup_hook(*args, **kwargs):
     """Hook to do some housekeeping after the app starts."""
-    ### reST text roles
-
-    for table in (tables.Ability, tables.Item, tables.Move, tables.Pokemon,
-                  tables.Type):
-        roles.register_local_role(table.__singlename__, get_role(table))
-
-    # For now, simply remove mechanic links
-    def mechanic_role(name, rawtext, text, lineno, inliner, options={},
-                      content=[]):
-        node = nodes.inline(rawtext, text, **options)
-        return [node], []
-
-    roles.register_local_role('mechanic', mechanic_role)
+    MarkdownString.markdown_extensions.append(PokedexExtension())
 
 def before_controller_hook(*args, **kwargs):
     """Hook to inject suggestion-box Javascript into every page."""
