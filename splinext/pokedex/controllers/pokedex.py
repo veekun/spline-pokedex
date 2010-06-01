@@ -1301,6 +1301,19 @@ class PokedexController(BaseController):
             .order_by(tables.Type.name) \
             .options(eagerload('damage_efficacies')) \
             .all()
+
+        try:
+            c.secondary_type = pokedex_session.query(tables.Type) \
+                .filter(tables.Type.name == request.params['secondary']) \
+                .one()
+
+            c.secondary_efficacy = dict(
+                [(efficacy.damage_type, efficacy.damage_factor) for efficacy in c.secondary_type.target_efficacies]
+            )
+        except (KeyError, NoResultFound):
+            c.secondary_type = None
+            c.secondary_efficacy = defaultdict(lambda: 100)
+
         return render('/pokedex/type_list.mako')
 
     def types(self, name):
