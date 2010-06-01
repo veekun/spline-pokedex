@@ -141,8 +141,8 @@ def parse_size(size, height_or_weight):
     `size` is the string to parse.  `height_or_weight` should be either
     'height' or 'weight'.
 
-    Returns a number of meters or kilograms.
-    XXX use Pokémon units  :T
+    Returns a number of Pokémon units.  Height in decimeters; weight in
+    hectograms.
 
     This function assumes the input is valid.  If it dies for any reason, the
     input is bogus.

@@ -12,6 +12,7 @@ import pokedex.db.tables as tables
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
+from pylons.decorators import jsonify
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join
 from sqlalchemy.orm import subqueryload, subqueryload_all
@@ -25,6 +26,7 @@ from spline.lib import helpers as h
 
 from splinext.pokedex import db, helpers as pokedex_helpers
 from splinext.pokedex.db import pokedex_lookup, pokedex_session
+from splinext.pokedex.magnitude import parse_size
 
 log = logging.getLogger(__name__)
 
@@ -410,6 +412,27 @@ class PokedexController(BaseController):
         next_pokemon = pokedex_session.query(tables.Pokemon).get(
             (c.pokemon.national_id - 1 + 1) % max_id + 1)
         return prev_pokemon, next_pokemon
+
+    @jsonify
+    def parse_size(self):
+        u"""Parses a height or weight and returns a bare number in Pokémon
+        units.
+
+        Query params are `size`, the string, and `mode`, either 'height' or
+        'weight'.
+        """
+
+        size = request.params.get('size', None)
+        mode = request.params.get('mode', None)
+
+        if not size or mode not in (u'height', u'weight'):
+            # Totally bogus!
+            abort(400)
+
+        try:
+            return parse_size(size, mode)
+        except ValueError:
+            abort(400)
 
     def pokemon_list(self):
         return render('/pokedex/pokemon_list.mako')

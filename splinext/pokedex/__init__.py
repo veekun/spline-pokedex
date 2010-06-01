@@ -24,6 +24,7 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/dex/media/*path', controller='dex', action='media')
     map.connect('/dex/lookup', controller='dex', action='lookup')
     map.connect('/dex/suggest', controller='dex', action='suggest')
+    map.connect('/dex/parse_size', controller='dex', action='parse_size')
 
     # These are more specific than the general pages below, so must be first
     map.connect('/dex/pokemon/search', controller='dex_search', action='pokemon_search')
