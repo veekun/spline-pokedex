@@ -38,7 +38,7 @@ ${h.h1('Essentials')}
 <dl class="pokemon-abilities">
     % for ability in c.pokemon.abilities:
     <dt><a href="${url(controller='dex', action='abilities', name=ability.name.lower())}">${ability.name}</a></dt>
-    <dd>${h.literal(ability.short_effect.as_html)}</dd>
+    <dd class="markdown">${ability.short_effect.as_html | n}</dd>
     % endfor
 </dl>
 

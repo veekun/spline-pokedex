@@ -31,7 +31,9 @@ ${h.h1('Essentials')}
 
 <div class="dex-page-beside-portrait">
     <h2>Summary</h2>
-    ${h.literal(c.move.short_effect.as_html)}
+    <div class="markdown">
+        ${h.literal(c.move.short_effect.as_html)}
+    </div>
 
     <h2>Damage Dealt</h2>
     <ul class="dex-type-list">
@@ -81,7 +83,7 @@ ${h.h1('Essentials')}
 
 <div class="dex-column">
     <h2>Flags</h2>
-    <ul class="classic">
+    <ul class="classic-list">
       % for flag, has_flag in c.flags:
         % if has_flag:
         <li>${flag.name}</li>
@@ -123,7 +125,7 @@ ${h.h1('Essentials')}
 
 
 ${h.h1('Effect')}
-<div class="dex-effect">
+<div class="markdown">
 ${h.literal(c.move.effect.as_html)}
 </div>
 

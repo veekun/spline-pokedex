@@ -1,6 +1,5 @@
 <%inherit file="/base.mako"/>
 <%namespace name="dexlib" file="lib.mako"/>
-<%from pokedex.db import rst%>
 
 <%def name="title()">${c.type.name.title()} – Type #${c.type.id}</%def>
 
@@ -52,15 +51,18 @@ ${h.h1('Essentials')}
 
 ${h.h1(u'Pokémon', id='pokemon')}
 % if c.type.name == '???':
-${h.literal(rst.RstString(u"""In Generation IV, pure :type:`flying`-types become ???-type during :move:`Roost`. This can be
-accomplished with :move:`Conversion`, :move:`Conversion 2`, or the ability :ability:`Color Change`. A Pokémon can legitimately have
-both Roost and one of these only through the use of :move:`Mimic`, :move:`Sketch`, :move:`Role Play`, or :move:`Skill Swap`.  (No
-Pokémon that has :ability:`Trace` or :ability:`Multitype` learns Roost, and Multitype cannot be copied.)
+<%! from pokedex.db import markdown %>
+<div class="markdown">
+${markdown.MarkdownString(u"""
+In Generation IV, pure [flying]{type}-types become ???-type during [Roost]{move}. This can be accomplished with
+[Conversion]{move}, [Conversion 2]{move}, or the ability [Color Change]{ability}. A Pokémon can legitimately have both
+Roost and one of these only through the use of [Mimic]{move}, [Sketch]{move}, [Role Play]{move}, or [Skill Swap]{move}.
+(No Pokémon that has [Trace]{ability} or [Multitype]{ability} learns Roost, and Multitype cannot be copied.)
 
-There are `sprites for a ???-type Arceus <{arceus_link}>`_ even though Arceus cannot become ???-type through regular play. Eggs are
-purely ???-type before hatching, and are displayed as such in the Generation III status screen.""".format(
-    arceus_link=url(controller='dex', action='pokemon_flavor', name='arceus', form='???')
-)).as_html)}
+There are [sprites for a ???-type Arceus](%s), even though Arceus cannot become ???-type through regular play. Eggs
+are purely ???-type before hatching, and are displayed as such in the Generation III status screen.
+""" % url(controller='dex', action='pokemon_flavor', name='arceus', form='???')).as_html | n}
+</div>
 % else:
 <table class="dex-pokemon-moves striped-rows">
     ${dexlib.pokemon_table_columns()}

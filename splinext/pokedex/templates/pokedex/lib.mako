@@ -204,7 +204,7 @@
 % else:
 <td class="dex-priority-slow">${move.priority}</td>
 % endif
-<td class="effect">${h.literal(move.short_effect.as_html)}</td>
+<td class="markdown effect">${move.short_effect.as_html | n}</td>
 </%def>
 
 <%def name="flavor_text_list(flavor_text, classes='')">

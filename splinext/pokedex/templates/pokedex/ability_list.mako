@@ -22,7 +22,7 @@ ${h.h1('Ability list')}
         <td class="number-cell">${ability.id}</td>
         <td>${h.pokedex.generation_icon(ability.generation)}</td>
         <td><a href="${url(controller='dex', action='abilities', name=ability.name.lower())}">${ability.name}</a></td>
-        <td>${h.literal(ability.short_effect.as_html)}</td>
+        <td class="markdown effect">${ability.short_effect.as_html | n}</td>
     </tr>
     % endfor
 </tbody>

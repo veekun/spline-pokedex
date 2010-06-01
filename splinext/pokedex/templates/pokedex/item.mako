@@ -48,7 +48,9 @@ ${h.h1('Essentials')}
 
 
 ${h.h1('Effect')}
-<p>${c.item.effect.as_html | n}</p>
+<div class="markdown">
+${c.item.effect.as_html | n}
+</div>
 
 % if c.item.fling_effect or c.item.berry:
 <h2>Special move effects</h2>

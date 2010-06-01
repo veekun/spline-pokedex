@@ -24,13 +24,15 @@ ${h.h1('Essentials')}
 
 <div class="dex-page-beside-portrait">
     <h2>Summary</h2>
-    <p>${h.literal(c.ability.short_effect.as_html)}</p>
+    <div class="markdown">
+        ${c.ability.short_effect.as_html | n}
+    </div>
 </div>
 
 
 ${h.h1('Effect')}
-<div class="dex-effect">
-    ${h.literal(c.ability.effect.as_html)}
+<div class="markdown">
+    ${c.ability.effect.as_html | n}
 </div>
 
 

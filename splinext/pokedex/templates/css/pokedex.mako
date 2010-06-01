@@ -163,9 +163,6 @@ ul.dex-type-list li img { display: block; margin-bottom: 0.25em; }
 .dex-size .dex-size-trainer .dex-size-value { right: 0.25em; }
 .dex-size .dex-size-pokemon .dex-size-value { left: 0.25em; }
 
-/* reST effect prose (for moves, abilities, etc) */
-.dex-effect a { font-weight: normal; }
-
 
 /*** Individual pages ***/
 
