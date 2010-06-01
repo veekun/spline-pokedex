@@ -456,8 +456,9 @@ pokedex.pokemon_moves = {
 
 $(function() { pokedex.pokemon_moves.init() });
 
-// onload: damage taken/dealt tables
+// onload stuff
 $(function() {
+    //// Damage dealt/taken tables
     // Damage-by-type table is more useful if people can see all the types that
     // do 2x damage, etc., at a time.  Let's facilitate that: when a user
     // hovers over a type, fade out all the types that do NOT have the same
@@ -466,6 +467,25 @@ $(function() {
         $(this).closest('ul').find('li:not(.' + this.className + ')').addClass('faded');
     }, function() {
         $(this).closest('ul').find('li').removeClass('faded');
+    });
+
+    //// Table column hovering
+    $('table.js-hover-columns td:not([colspan]):not([rowspan]), ' +
+      'table.js-hover-columns th:not([colspan]):not([rowspan])').hover(function() {
+        var $tr = $(this).closest('tr');
+        var $table = $tr.closest('table.js-hover-columns');
+
+        // Pick columns based on index.  Skipping rowspans is a chump move but
+        // necessary because of the rowspan in the type chart; if column
+        // hovering is ever used on a more complex table, this will need a real
+        // solution.
+        var idx = $tr.children(':not([rowspan])').index(this);
+        $table.find('tr :nth-child(' + (idx + 1) + ')').addClass('js-hover');
+    }, function() {
+        var $table = $(this).closest('table.js-hover-columns');
+        $table.find('.js-hover').each(function() {
+            $(this).removeClass('js-hover');
+        });
     });
 });
 

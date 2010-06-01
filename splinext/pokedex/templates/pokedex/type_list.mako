@@ -5,19 +5,23 @@
 
 ${h.h1('Type chart')}
 
-<table class="dex-type-chart striped-rows">
+<table class="dex-type-chart striped-rows js-hover-columns">
 <tr class="header-row">
-    <th>Move</th>
+    <th></th>
+    <th></th>
     <th colspan="${len(c.types)}">Pokémon</th>
 </tr>
 <tr class="subheader-row">
+    <th rowspan="${len(c.types) + 1}">
+        <div class="vertical-text">Move</div>
+    </th>
     <th></th>
     % for type in c.types:
     <th>${h.pokedex.type_link(type)}</th>
     % endfor
 </tr>
 % for type in c.types:
-<tr>
+<tr class="subheader-row">
     <th>${h.pokedex.type_link(type)}</th>
     % for efficacy in sorted(type.damage_efficacies, key=lambda _: _.target_type.name):
     <td class="dex-damage-dealt-${efficacy.damage_factor}">${h.pokedex.type_efficacy_label[efficacy.damage_factor]}</td>

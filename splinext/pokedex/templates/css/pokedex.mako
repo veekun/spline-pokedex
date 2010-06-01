@@ -254,6 +254,9 @@ table.dex-nature-list td.flavor { text-align: right; }
 
 table.dex-type-chart td { text-align: center; }
 table.dex-type-chart td.dex-damage-dealt-100 { color: #e0e0e0; }
+/* Hover colors clash; dim the 100% color a bit less on hover */
+table.dex-type-chart.striped-rows tr td.js-hover.dex-damage-dealt-100,
+table.dex-type-chart.striped-rows tr:hover td.dex-damage-dealt-100 { color: #aaa; }
 
 
 /*** Searches ***/
