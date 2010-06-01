@@ -137,7 +137,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 <% show_frlg = (c.pokemon.generation_id == 1
                 or c.pokemon.name == u'Teddiursa'
                 or (c.pokemon.name == u'Deoxys' and c.form in (u'attack', u'defense', u'normal'))) %>\
-<h2 id="main-sprites:gen-iii"><a href="#main-sprites:gen-iii" class="subtle">${h.pokedex.generation_icon(3)} Ruby &amp; Sapphire, Emerald, Fire Red &amp; Leaf Green</a></h2>
+<h2 id="main-sprites:gen-iii"><a href="#main-sprites:gen-iii" class="subtle">${h.pokedex.generation_icon(3)} Ruby &amp; Sapphire, Emerald, FireRed &amp; LeafGreen</a></h2>
 ## Deoxys is a bit of a mess.
 ## Normal exists everywhere.  Speed only in Emerald; Attack only in LG; Defense only in FR.
 <table class="dex-pokemon-flavor-sprites">
@@ -161,7 +161,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         <th>${h.pokedex.version_icons(u'Emerald')}</th>
     % endif
     % if show_frlg:
-        <th colspan="2">${h.pokedex.version_icons(u'Fire Red', u'Leaf Green')}</th>
+        <th colspan="2">${h.pokedex.version_icons(u'FireRed', u'LeafGreen')}</th>
     % endif
     </tr>
 </thead>
@@ -216,7 +216,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 % endif
 
 % if c.pokemon.generation_id <= 4:
-<h2 id="main-sprites:gen-iv"><a href="#main-sprites:gen-iv" class="subtle">${h.pokedex.generation_icon(4)} Diamond &amp; Pearl, Platinum, Heart Gold &amp; Soul Silver</a></h2>
+<h2 id="main-sprites:gen-iv"><a href="#main-sprites:gen-iv" class="subtle">${h.pokedex.generation_icon(4)} Diamond &amp; Pearl, Platinum, HeartGold &amp; SoulSilver</a></h2>
 <table class="dex-pokemon-flavor-sprites">
 <colgroup span="1"></colgroup> <!-- row headers -->
 % if c.introduced_in.id <= 8:
@@ -238,7 +238,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         % if c.introduced_in.id <= 9:
         <th colspan="2">${h.pokedex.version_icons(u'Platinum')}</th>
         % endif
-        <th colspan="2">${h.pokedex.version_icons(u'Heart Gold', u'Soul Silver')}</th>
+        <th colspan="2">${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')}</th>
     </tr>
 </thead>
 <tbody>
@@ -410,7 +410,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 ${h.h1('Miscellaneous Game Art', id='misc-sprites')}
 
 % if c.pokemon.generation_id <= 4:
-<h2> ${h.pokedex.version_icons(u'Heart Gold', u'Soul Silver')} Heart Gold &amp; Soul Silver Overworld </h2>
+<h2> ${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')} HeartGold &amp; SoulSilver Overworld </h2>
 <table class="dex-pokemon-flavor-sprites">
 % if c.pokemon.has_gen4_fem_sprite:
 <colgroup span="1"></colgroup> <!-- row headers -->
