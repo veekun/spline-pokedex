@@ -136,27 +136,58 @@ function scale_sizes(sizes, dimensions) {
 $(function() {
     // Also, if there's a cookie containing previously-chosen sizes, let's
     // fill them in.
-    var sizes_cookie = $.cookie('dex-trainer-size');
-    if (sizes_cookie) {
+    var sizes_cookie = $.cookies.get('dex-trainer-size');
+    if (sizes_cookie && typeof(sizes_cookie) == typeof("")) {
+        // If it's a string, it's old.  Promote to an object
+        // XXX remove this shim
         var cookie_parts = sizes_cookie.split(';');
-        $('input#dex-pokemon-height').val(cookie_parts[0]);
-        $('input#dex-pokemon-weight').val(cookie_parts[1]);
+        sizes_cookie = {
+            height: { input: cookie_parts[0] },
+            weight: { input: cookie_parts[1] },
+        };
     }
-    // Need to remember the last valid height and weight so we can store
-    // them in a cookie.
-    var last_sizes = {
-        'height': $('input#dex-pokemon-height').val(),
-        'weight': $('input#dex-pokemon-weight').val(),
-    };
+
+    if (sizes_cookie) {
+        $('input#dex-pokemon-height').val(sizes_cookie.height.input);
+        $('input#dex-pokemon-weight').val(sizes_cookie.weight.input);
+    }
+    else {
+        // Blank; fill in some defaults
+        sizes_cookie = {
+            height: { input: $('input#dex-pokemon-height').val() },
+            weight: { input: $('input#dex-pokemon-weight').val() },
+        };
+    }
 
     var $textboxes = $('input#dex-pokemon-height, input#dex-pokemon-weight');
 
     // Since JS is obviously enabled, let people change the trainers' sizes
     $textboxes.removeAttr('disabled');
 
+    // Little function that actually applies the size
+    function do_size_change($element, units, dimensions) {
+        $element.removeClass('error');
+
+        // Scale stuff proportionally
+        var sizes = {
+            'trainer': units,
+            'pokemon': $element.parents('.dex-size')
+                              .find('.js-dex-size-raw')
+                              .text(),
+        };
+        sizes = scale_sizes(sizes, dimensions);
+
+        // Resize trainer and shape proportionally
+        var $container = $element.parents('.dex-size');
+        $container.find('.dex-size-trainer img')
+                  .css('height', sizes.trainer * 100 + '%');
+        $container.find('.dex-size-pokemon img')
+                  .css('height', sizes.pokemon * 100 + '%');
+    };
+
     // Event handler to update the relative sizes
-    var update_sizes_handler = function(event) {
-        var $target = $(event.target);
+    var update_sizes_handler = function() {
+        var $target = $(this);
         var input = $target.val();
         var dimensions, size_key;
 
@@ -169,9 +200,31 @@ $(function() {
             dimensions = 2;
         }
 
+        // If what's been written is what's already in the cookie and there's a
+        // value there, no need to hit the server
+        if (sizes_cookie[size_key].input == input &&
+            sizes_cookie[size_key].output !== undefined)
+        {
+            do_size_change($target, sizes_cookie[size_key].output, dimensions);
+            return;
+        }
+
+        // Ajax request conservation
+        // If the text didn't actually change, do nothing.
+        var last_input = $target.data('pokedex-trainer-size-input');
+        if (last_input !== undefined && last_input == input) {
+            return;
+        }
+        $target.data('pokedex-trainer-size-input', input);
+        // If there's already a request going, kill it
+        var last_req = $target.data('pokedex-trainer-size-request');
+        if (last_req) {
+            last_req.abort();
+        }
+
         // Let Python take care of the parsing, because it has to for Pokémon
         // search, and JavaScript parsing sucks
-        $.ajax({
+        var req = $.ajax({
             type: "GET",
             url: '/dex/parse_size',
             data: {
@@ -181,28 +234,16 @@ $(function() {
 
             // Got a size, already in Pokémon units
             success: function(res) {
-                $target.removeClass('error');
+                var units = parseFloat(res);
 
                 // Store the validated value in a cookie
-                last_sizes[size_key] = input;
-                $.cookie('dex-trainer-size',
-                         last_sizes.height + ';' + last_sizes.weight)
-
-                // Scale stuff proportionally
-                var sizes = {
-                    'trainer': parseFloat(res),
-                    'pokemon': $target.parents('.dex-size')
-                                      .find('.js-dex-size-raw')
-                                      .text(),
+                sizes_cookie[size_key] = {
+                    input: input,
+                    output: units,
                 };
-                sizes = scale_sizes(sizes, dimensions);
+                $.cookies.set('dex-trainer-size', sizes_cookie);
 
-                // Resize trainer and shape proportionally
-                var $container = $target.parents('.dex-size');
-                $container.find('.dex-size-trainer img')
-                          .css('height', sizes.trainer * 100 + '%');
-                $container.find('.dex-size-pokemon img')
-                          .css('height', sizes.pokemon * 100 + '%');
+                do_size_change($target, units, dimensions);
             },
 
             // Miserable failure results in a 400, which will be interpreted as
@@ -211,6 +252,7 @@ $(function() {
                 $target.addClass('error');
             },
         });
+        $target.data('pokedex-trainer-size-request', req);
     };
 
     $textboxes.keyup(update_sizes_handler);
