@@ -55,7 +55,12 @@ ${h.h1('Essentials')}
         % if c.move.damage_class.name == 'None':
         <dd>n/a</dd>
         % else:
-        <dd>${c.move.power}</dd>
+        <dd>
+            ${c.move.power}
+            % if c.power_percentile is not None:
+            — ${"{0:.1f}".format(c.power_percentile * 100)} percentile
+            % endif
+        </dd>
         % endif
         <dt>Accuracy</dt>
         <dd>

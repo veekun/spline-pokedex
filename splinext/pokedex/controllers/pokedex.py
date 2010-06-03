@@ -1178,6 +1178,16 @@ class PokedexController(BaseController):
             c.type_efficacies[type_efficacy.target_type] = \
                 type_efficacy.damage_factor
 
+        ### Power percentile
+        if c.move.power in (0, 1):
+            c.power_percentile = None
+        else:
+            q = pokedex_session.query(tables.Move) \
+                .filter(tables.Move.power > 1)
+            less = q.filter(tables.Move.power < c.move.power).count()
+            equal = q.filter(tables.Move.power == c.move.power).count()
+            c.power_percentile = (less + equal * 0.5) / q.count()
+
         ### Flags
         c.flags = []
         move_flags = pokedex_session.query(tables.MoveFlagType) \
