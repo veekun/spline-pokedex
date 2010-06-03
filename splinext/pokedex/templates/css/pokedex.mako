@@ -261,6 +261,10 @@ table.dex-type-chart.striped-rows tr:hover td.dex-damage-dealt-100 { color: #aaa
 
 /*** Searches ***/
 
+/* Pokémon search -- showing a list */
+.dex-pokemon-search-list { line-height: 1.33; font-family: monospace; }
+.dex-pokemon-search-list a { font-weight: normal; }
+
 /* Pokémon search -- move versions */
 table#dex-pokemon-search-move-versions td { padding-right: 2em; }
 

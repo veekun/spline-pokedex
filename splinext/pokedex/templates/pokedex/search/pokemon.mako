@@ -101,7 +101,7 @@ ${getattr(self, 'col_' + column)()}
 
 % elif c.display_mode == 'custom-list-bullets':
 ## Plain bulleted list with a Template.
-<ul class="classic-list">
+<ul class="dex-pokemon-search-list classic-list">
     % for result in c.results:
     <li>${h.pokedex.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_template, result))}</li>
     % endfor
