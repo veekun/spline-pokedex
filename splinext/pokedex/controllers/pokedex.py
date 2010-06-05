@@ -1411,6 +1411,7 @@ class PokedexController(BaseController):
         try:
             c.item_pocket = pokedex_session.query(tables.ItemPocket) \
                 .filter(tables.ItemPocket.identifier == pocket) \
+                .options(eagerload_all('categories.items.berry')) \
                 .one()
         except NoResultFound:
             # It's possible this is an old item URL; redirect if so
@@ -1422,6 +1423,12 @@ class PokedexController(BaseController):
                 return self._not_found()
 
         # OK, got a valid pocket
+
+        # Eagerload TM info if it's actually needed
+        if c.item_pocket.identifier == u'machines':
+            pokedex_session.query(tables.ItemPocket) \
+                .options(eagerload_all('categories.items.machines.move.type')) \
+                .get(c.item_pocket.id)
 
         c.item_pockets = pokedex_session.query(tables.ItemPocket) \
             .order_by(tables.ItemPocket.id.asc())

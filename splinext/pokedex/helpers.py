@@ -297,8 +297,8 @@ def item_link(item):
 
     item_name = item.name
 
-    machines = item.machines
-    if machines:
+    if item.pocket.identifier == u'machines':
+        machines = item.machines
         prefix = u'hm' if machines[-1].is_hm else u'tm'
         filename = prefix + u'-' + machines[-1].move.type.name.lower()
     else:
