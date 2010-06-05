@@ -3,7 +3,15 @@
 <%namespace name="dexlib" file="lib.mako"/>
 <%! import re %>\
 
-<%def name="title()">${c.move.name} – Move #${c.move.id}</%def>
+<%def name="title()">${c.move.name} - Moves</%def>
+
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li>Moves</li>
+    <li>${c.move.name}</li>
+</ul>
+</%def>
 
 <div id="dex-header">
     <a href="${url.current(name=c.prev_move.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">

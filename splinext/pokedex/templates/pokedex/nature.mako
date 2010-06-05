@@ -2,7 +2,15 @@
 <%namespace name="dexlib" file="lib.mako"/>
 <%namespace name="lib" file="/lib.mako"/>
 
-<%def name="title()">${c.nature.name} - Nature</%def>
+<%def name="title()">${c.nature.name} - Natures</%def>
+
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li><a href="${url(controller='dex', action='natures_list')}">Natures</a></li>
+    <li>${c.nature.name}</li>
+</ul>
+</%def>
 
 ${h.h1('Essentials')}
 

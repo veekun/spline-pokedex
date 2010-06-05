@@ -4,6 +4,14 @@
 
 <%def name="title()">Pokéball performance</%def>
 
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li>Gadgets</li>
+    <li>Pokéball performance</li>
+</ul>
+</%def>
+
 <p>Have you spent the past six hours trying to catch Giratina in Ultra Balls?  Me, too!  What a jerk.  This gadget will tell you which ball is the best choice against your target, and about how long it'll take to catch.</p>
 
 <h1>Target Pokémon</h1>

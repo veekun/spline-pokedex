@@ -252,7 +252,7 @@ table.dex-ability-list p { margin: 0; padding: 0; }
 table.dex-nature-list td { padding: 0.33em 1em 0.33em 0.75em; }
 table.dex-nature-list td.flavor { text-align: right; }
 
-table.dex-type-chart td { text-align: center; }
+table.dex-type-chart td { text-align: center; vertical-align: middle; }
 table.dex-type-chart td.dex-damage-dealt-100 { color: #e0e0e0; }
 /* Hover colors clash; dim the 100% color a bit less on hover */
 table.dex-type-chart.striped-rows tr td.js-hover.dex-damage-dealt-100,

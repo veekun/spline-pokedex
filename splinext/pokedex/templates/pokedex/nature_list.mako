@@ -3,6 +3,13 @@
 
 <%def name="title()">Natures</%def>
 
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li>Natures</li>
+</ul>
+</%def>
+
 ${h.h1('Nature list')}
 
 <p>

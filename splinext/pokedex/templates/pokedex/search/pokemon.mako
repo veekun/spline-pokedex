@@ -4,6 +4,14 @@
 
 <%def name="title()">Pokémon Search</%def>
 
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li><a href="${url(controller='dex', action='pokemon_list')}">Pokémon</a></li>
+    <li>Pokémon Search</li>
+</ul>
+</%def>
+
 ### RESULTS ###
 ## Four possibilities here: the form wasn't submitted, the form was submitted
 ## but was bogus, the form was submitted and there are no results, or the form

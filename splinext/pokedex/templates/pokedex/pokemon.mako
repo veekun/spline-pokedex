@@ -4,11 +4,14 @@
 <%! from splinext.pokedex import db %>\
 <%! import re %>\
 
-<%def name="title()">\
-% if c.pokemon.forme_name:
-${c.pokemon.forme_name.capitalize()} \
-% endif
-${c.pokemon.name} – Pokémon #${c.pokemon.national_id}\
+<%def name="title()">${c.pokemon.full_name} - Pokémon #${c.pokemon.national_id}</%def>
+
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li><a href="${url(controller='dex', action='pokemon_list')}">Pokémon</a></li>
+    <li>${c.pokemon.full_name}</li>
+</ul>
 </%def>
 
 ${dexlib.pokemon_page_header()}

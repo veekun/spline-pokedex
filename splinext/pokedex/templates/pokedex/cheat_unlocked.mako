@@ -1,14 +1,17 @@
 <%inherit file="/base.mako"/>
-<%! import random %>\
-<%def name="title()">${random.choice([
-    'idspispopd',
-    'iddqd',
-    'cass',
-    'uuddlrlrba',
-    'hold down+b',
-    'talk to oak 250 times',
-    'its a secret to everyone',
-])}</%def>
+<%!
+    import random
+    random_title = random.choice([
+        'idspispopd',
+        'iddqd',
+        'cass',
+        'uuddlrlrba',
+        'hold down+b',
+        'talk to oak 250 times',
+        'its a secret to everyone',
+    ])
+%>
+<%def name="title()">${random_title}</%def>
 
 <div id="dex-cheat-unlocked">
     <img src="${h.static_uri('pokedex', 'images/cheat-unlocked.gif')}" alt="YEAH" class="dex-cheat-unlocked-left">

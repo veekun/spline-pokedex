@@ -2,6 +2,13 @@
 
 <%def name="title()">Abilities</%def>
 
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li>Abilities</li>
+</ul>
+</%def>
+
 ${h.h1('Ability list')}
 
 <table class="striped-rows dex-ability-list">

@@ -2,6 +2,13 @@
 
 <%def name="title()">Disambiguation</%def>
 
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li>Disambiguation</li>
+</ul>
+</%def>
+
 <h1>${c.input}</h1>
 % if c.exact:
 <p>Hmmm, there are several things with that name.  Did you mean:</p>

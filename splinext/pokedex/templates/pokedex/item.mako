@@ -1,7 +1,16 @@
 <%inherit file="/base.mako"/>
 <%namespace name="dexlib" file="lib.mako"/>
 
-<%def name="title()">${c.item.name} - Items (${c.item.pocket.name})</%def>
+<%def name="title()">${c.item.name} - Items</%def>
+
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li><a href="${url(controller='dex', action='items_list')}">Items</a></li>
+    <li><a href="${url(controller='dex', action='item_pockets', pocket=c.item.pocket.identifier)}">${c.item.pocket.name} pocket</a></li>
+    <li>${c.item.name}</li>
+</ul>
+</%def>
 
 ${h.h1('Essentials')}
 

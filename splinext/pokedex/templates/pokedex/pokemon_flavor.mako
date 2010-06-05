@@ -2,13 +2,25 @@
 <%namespace name="lib" file="lib.mako"/>
 <%! import re %>\
 
-<%def name="title()">\
+<%def name="flavor_name()">\
 % if c.pokemon.name == 'Unown' and c.form:
-Unown ${c.form.capitalize()} \
+Unown ${c.form.capitalize()}\
+% elif c.form:
+${c.form.title()} ${c.pokemon.name}\
 % else:
-${c.form.title() if c.form else u''} ${c.pokemon.name} \
+${c.pokemon.name}\
 % endif
-– Pokémon #${c.pokemon.national_id} – Flavor\
+</%def>
+
+<%def name="title()">${flavor_name()} flavor - Pokémon #${c.pokemon.national_id}</%def>
+
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li><a href="${url(controller='dex', action='pokemon_list')}">Pokémon</a></li>
+    <li>${h.pokedex.pokemon_link(c.pokemon)}</li>
+    <li>${flavor_name()} flavor</li>
+</ul>
 </%def>
 
 ${lib.pokemon_page_header()}

@@ -3,6 +3,13 @@
 
 <%def name="title()">Pokémon</%def>
 
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li>Pokémon</li>
+</ul>
+</%def>
+
 <h1>Pokémon lists</h1>
 <p>The following are all links to the <a href="${url(controller='dex_search', action='pokemon_search')}">Pokémon search</a>, so you can filter and sort however you want.</p>
 

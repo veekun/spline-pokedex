@@ -1,7 +1,15 @@
 <%inherit file="/base.mako"/>
 <%namespace name="dexlib" file="lib.mako"/>
 
-<%def name="title()">${c.type.name.title()} – Type #${c.type.id}</%def>
+<%def name="title()">${c.type.name.title()} - Types</%def>
+
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li><a href="${url(controller='dex', action='types_list')}">Types</a></li>
+    <li>${c.type.name.title()}</li>
+</ul>
+</%def>
 
 <div id="dex-header">
     <a href="${url.current(name=c.prev_type.name)}" id="dex-header-prev" class="dex-box-link">

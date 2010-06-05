@@ -3,6 +3,13 @@
 
 <%def name="title()">Types</%def>
 
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li>Types</li>
+</ul>
+</%def>
+
 % if c.secondary_type:
 <p>Showing part-${h.pokedex.type_link(c.secondary_type)} types.</p>
 % else:

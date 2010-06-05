@@ -3,6 +3,13 @@
 
 <%def name="title()">Items</%def>
 
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li>Items</li>
+</ul>
+</%def>
+
 <h1>Items</h1>
 
 <p>Pick your pocket:</p>
