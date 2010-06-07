@@ -66,21 +66,7 @@ ${h.h1('Essentials')}
         <dt>Introduced in</dt>
         <dd>${h.pokedex.generation_icon(c.pokemon.generation)}</dd>\
 
-<%
-        to_skip = "Internal ID",
-        show_pt_dex = True
-%>\
-        ## Sort by first appearance, then second, ....  Probably not the cleanest way to acheive this.
-        % for number in sorted(c.pokemon.normal_form.dex_numbers, key=lambda _: sorted(group.id for group in _.pokedex.version_groups)):
-        % if number.pokedex.name not in to_skip:
-<%
-        generations = [group.generation.id for group in number.pokedex.version_groups]
-        if generations:
-            shown_generation = min(generations)
-        else:
-            shown_generation = None
-%>\
-
+        % for number in c.pokemon.normal_form.dex_numbers:
         <dt>${number.pokedex.name}</dt>
         <dd>
             ${number.pokedex_number}
@@ -89,7 +75,6 @@ ${h.h1('Essentials')}
             % endif
         </dd>
 
-        % endif
         % endfor
     </dl>
 
