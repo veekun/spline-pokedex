@@ -74,6 +74,7 @@ ${h.h1('Not-so-essentials')}
         </dd>
     </dl>
 </div>
+
 <div class="dex-column">
     <h2>Pokéathlon Stats</h2>
     <ul class="classic-list">
@@ -81,6 +82,20 @@ ${h.h1('Not-so-essentials')}
         <li>Up to ${effect.max_change} ${effect.pokeathlon_stat.name}</li>
         % endfor
     </ul>
+</div>
+
+<div class="dex-column">
+    <h2>Foreign Names</h2>
+    <dl>
+        % for foreign_name in c.nature.foreign_names:
+        <dt>${foreign_name.language.name} <img src="${h.static_uri('spline', "flags/{0}.png".format(foreign_name.language.iso3166))}" alt=""></dt>
+        % if foreign_name.language.name == 'Japanese':
+        <dd>${foreign_name.name} (${h.pokedex.romanize(foreign_name.name)})</dd>
+        % else:
+        <dd>${foreign_name.name}</dd>
+        % endif
+        % endfor
+    </dl>
 </div>
 </div>
 
