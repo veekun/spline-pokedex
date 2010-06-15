@@ -77,8 +77,27 @@ ${c.item.effect.as_html | n}
 
 
 ${h.h1('Flavor')}
-<h2>Flavor text</h2>
-${dexlib.flavor_text_list(c.item.flavor_text)}
+<div class="dex-column-container">
+<div class="dex-column-2x">
+    <h2>Flavor text</h2>
+    ${dexlib.flavor_text_list(c.item.flavor_text)}
+</div>
+
+<div class="dex-column">
+    <h2>Foreign names</h2>
+    <dl>
+        % for foreign_name in c.item.foreign_names:
+        <dt>${foreign_name.language.name}
+        <img src="${h.static_uri('spline', "flags/{0}.png".format(foreign_name.language.iso3166))}" alt=""></dt>
+        % if foreign_name.language.name == 'Japanese':
+        <dd>${foreign_name.name} (${h.pokedex.romanize(foreign_name.name)})</dd>
+        % else:
+        <dd>${foreign_name.name}</dd>
+        % endif
+        % endfor
+    </dl>
+</div>
+</div>
 
 
 % if c.item.berry:
