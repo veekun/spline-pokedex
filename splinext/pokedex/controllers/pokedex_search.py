@@ -73,11 +73,68 @@ def in_pokedex_label(pokedex):
         name=pokedex.name,
     )
 
-class PokemonSearchForm(Form):
+class BaseSearchForm(Form):
     # Defaults are set to match what the client will actually send if the field
     # is left blank
     shorten = fields.HiddenField(default=u'')
 
+    def __init__(self, formdata=None, *args, **kwargs):
+        """Saves a copy of the passed form data, with default values removed,
+        in the `formdata` property.
+        """
+
+        super(BaseSearchForm, self).__init__(formdata, *args, **kwargs)
+
+        # Two factoids we need to remember about this form: was it submitted at
+        # all, and is it valid?
+        self.is_valid = None
+        self.was_submitted = None
+        self.needs_shortening = bool(formdata.get('shorten', False))
+        self.cleansed_data = dict()
+
+        # Need to make a copy and delete items, rather than creating a new
+        # dict, because formdata is some variant of a multi-dict
+        if self.needs_shortening and formdata:
+            self.was_submitted = True
+            self.cleansed_data = formdata.copy()
+            del self.cleansed_data['shorten']
+
+            for name, field in self._fields.iteritems():
+                # Shorten: nuke anything that's a default
+                if field.data == field.default and name in self.cleansed_data:
+                    del self.cleansed_data[name]
+
+        elif not self.needs_shortening:
+            # Only count the form as submitted if there are any actual
+            # searching fields
+            self.was_submitted = not all(
+                key in (u'sort', u'display', u'column', u'format')
+                for key in formdata.keys()
+            )
+
+            # Unshortening.  Fields that are missing entirely from the form
+            # data need to be FILLED IN with their defaults.
+            # Note that this will cheerfully fill in a multi-select field where
+            # nothing was selected; it's assumed that a multi-select field with
+            # a default makes no sense with nothing selected
+            for name, field in self._fields.iteritems():
+                if field.default and name not in formdata:
+                    field.data = field.default
+
+    def validate(self):
+        # XXX this works around a wtforms bug; QueryMultiSelectField (or
+        # whatever it's called) lazily checks or errors when field.data is
+        # accessed, but that's not likely to happen before validating!  Ping
+        # all the field data
+        for name, field in self._fields.iteritems():
+            field.data
+
+        self.is_valid = super(BaseSearchForm, self).validate()
+
+        return self.is_valid
+
+
+class PokemonSearchForm(BaseSearchForm):
     id = RangeTextField('National ID', inflator=int)
 
     # Core stuff
@@ -348,62 +405,11 @@ class PokemonSearchForm(Form):
     )
     format = fields.TextField('Custom list format', default=u'$icon $name')
 
+class MoveSearchForm(BaseSearchForm):
+    id = RangeTextField('ID', inflator=int)
 
-
-    def __init__(self, formdata=None, *args, **kwargs):
-        """Saves a copy of the passed form data, with default values removed,
-        in the `formdata` property.
-        """
-
-        super(PokemonSearchForm, self).__init__(formdata, *args, **kwargs)
-
-        # Two factoids we need to remember about this form: was it submitted at
-        # all, and is it valid?
-        self.is_valid = None
-        self.was_submitted = None
-        self.needs_shortening = bool(formdata.get('shorten', False))
-        self.cleansed_data = dict()
-
-        # Need to make a copy and delete items, rather than creating a new
-        # dict, because formdata is some variant of a multi-dict
-        if self.needs_shortening and formdata:
-            self.was_submitted = True
-            self.cleansed_data = formdata.copy()
-            del self.cleansed_data['shorten']
-
-            for name, field in self._fields.iteritems():
-                # Shorten: nuke anything that's a default
-                if field.data == field.default and name in self.cleansed_data:
-                    del self.cleansed_data[name]
-
-        elif not self.needs_shortening:
-            # Only count the form as submitted if there are any actual
-            # searching fields
-            self.was_submitted = not all(
-                key in (u'sort', u'display', u'column', u'format')
-                for key in formdata.keys()
-            )
-
-            # Unshortening.  Fields that are missing entirely from the form
-            # data need to be FILLED IN with their defaults.
-            # Note that this will cheerfully fill in a multi-select field where
-            # nothing was selected; it's assumed that a multi-select field with
-            # a default makes no sense with nothing selected
-            for name, field in self._fields.iteritems():
-                if field.default and name not in formdata:
-                    field.data = field.default
-
-    def validate(self):
-        # XXX this works around a wtforms bug; QueryMultiSelectField (or
-        # whatever it's called) lazily checks or errors when field.data is
-        # accessed, but that's not likely to happen before validating!  Ping
-        # all the field data
-        for name, field in self._fields.iteritems():
-            field.data
-
-        self.is_valid = super(PokemonSearchForm, self).validate()
-
-        return self.is_valid
+    # Core stuff
+    name = fields.TextField('Name', default=u'')
 
 
 class PokedexSearchController(BaseController):
@@ -1133,3 +1139,31 @@ class PokedexSearchController(BaseController):
 
         ### Done.
         return render('/pokedex/search/pokemon.mako')
+
+    def move_search(self):
+        ### Parse form, etc etc
+        c.form = MoveSearchForm(request.params)
+        c.form.validate()
+
+        # If this is the first time the form was submitted, redirect to a URL
+        # with only non-default values
+        if c.form.is_valid and c.form.was_submitted and c.form.needs_shortening:
+            redirect_to(url.current(**c.form.cleansed_data.mixed()))
+
+        if not c.form.was_submitted or not c.form.is_valid:
+            # Either blank, or errortastic.  Skip the logic and just send the
+            # form back
+            return render('/pokedex/search/moves.mako')
+
+
+        ### Do the searching!
+        me = tables.Move
+        query = pokedex_session.query(me)
+
+        if c.form.name.data:
+            query = query.filter(me.name == c.form.name.data)
+
+        c.results = query.all()
+
+        ### Done.
+        return render('/pokedex/search/moves.mako')
