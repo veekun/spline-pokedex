@@ -21,10 +21,10 @@ from spline import model
 from spline.model import meta
 from spline.lib import helpers as h
 from spline.lib.base import BaseController, render
-from spline.lib.forms import QueryTextField
+from spline.lib.forms import DuplicateField, QueryTextField
 
 from splinext.pokedex import db, helpers as pokedex_helpers
-from splinext.pokedex.db import pokedex_session
+from splinext.pokedex.db import pokedex_lookup, pokedex_session
 from splinext.pokedex.forms import PokedexLookupField
 
 log = logging.getLogger(__name__)
@@ -388,3 +388,36 @@ class PokedexGadgetsController(BaseController):
             c.results = None
 
         return render('/pokedex/gadgets/capture_rate.mako')
+
+    NUM_COMPARED_POKEMON = 8
+    def compare_pokemon(self):
+        u"""Pokémon comparison.  Takes up to eight Pokémon and shows a page
+        that lists their stats, moves, etc. side-by-side.
+        """
+        # Note that this gadget doesn't use wtforms at all, since there's only
+        # one field and it's handled very specially.
+
+        # The Pokémon themselves go into c.pokemon.  This list should always
+        # have eight elements, each either a Pokémon or None
+        c.pokemon = [None] * self.NUM_COMPARED_POKEMON
+        for i, raw_pokemon in enumerate(request.params.getall('pokemon')):
+            if i >= self.NUM_COMPARED_POKEMON:
+                break
+
+            raw_pokemon = raw_pokemon.strip()
+            if not raw_pokemon:
+                continue
+
+            results = pokedex_lookup.lookup(raw_pokemon,
+                                            valid_types=['pokemon'])
+            if not results:
+                # XXX what to do here
+                pass
+            elif results[0].exact:
+                # An exact match, hurrah
+                c.pokemon[i] = results[0].object
+            else:
+                # XXX or here!
+                pass
+
+        return render('/pokedex/gadgets/compare_pokemon.mako')

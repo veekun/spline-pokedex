@@ -295,6 +295,11 @@ table.dex-capture-rates tr.inactive div.dex-capture-rate-graph { opacity: 0.25; 
 .dex-hp-bar .dex-hp-bar-bar.yellow { background-color: #d7ac00; }
 .dex-hp-bar .dex-hp-bar-bar.red    { background-color: #be2821; }
 
+/* Pokémon comparison */
+table.dex-compare-pokemon { width: 100%; table-layout: fixed; }
+table.dex-compare-pokemon col.labels { width: 10em; }
+table.dex-compare-pokemon .header-row input[type='text'] { width: 95%; }
+
 
 /*** Static pages ***/
 
