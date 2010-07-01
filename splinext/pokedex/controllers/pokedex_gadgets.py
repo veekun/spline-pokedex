@@ -397,11 +397,18 @@ class PokedexGadgetsController(BaseController):
         # Note that this gadget doesn't use wtforms at all, since there's only
         # one field and it's handled very specially.
 
+        c.did_anything = False
+
+        FoundPokemon = namedtuple('FoundPokemon',
+            ['pokemon', 'suggestions', 'input'])
+
         # The Pokémon themselves go into c.pokemon.  This list should always
-        # have eight elements, each either a Pokémon or None
-        c.pokemon = [None] * self.NUM_COMPARED_POKEMON
+        # have eight elements, each either a tuple as above or None
+        c.found_pokemon = [None] * self.NUM_COMPARED_POKEMON
+
         for i, raw_pokemon in enumerate(request.params.getall('pokemon')):
             if i >= self.NUM_COMPARED_POKEMON:
+                # Skip any extras; someone has been screwin around
                 break
 
             raw_pokemon = raw_pokemon.strip()
@@ -410,14 +417,46 @@ class PokedexGadgetsController(BaseController):
 
             results = pokedex_lookup.lookup(raw_pokemon,
                                             valid_types=['pokemon'])
+
+            # Two separate things to do here.
+            # 1: Use the first result as the actual Pokémon
+            pokemon = None
+            if results:
+                pokemon = results[0].object
+                c.did_anything = True
+
+            # 2: Use the other results as suggestions.  Doing this informs the
+            # template that this was a multi-match
+            suggestions = None
             if not results:
-                # XXX what to do here
+                # Don't do anything for totally junk searches
                 pass
-            elif results[0].exact:
-                # An exact match, hurrah
-                c.pokemon[i] = results[0].object
+            if len(results) == 1 and results[0].exact:
+                # Don't do anything for exact single matches
+                pass
             else:
-                # XXX or here!
-                pass
+                # OK, extract options.  But no more than, say, three.
+                suggestions = [_.object for _ in results[1:4]]
+
+            # Construct a tuple and slap that bitch in there
+            c.found_pokemon[i] = FoundPokemon(pokemon, suggestions, raw_pokemon)
+
+        # There are a lot of links to similar incarnations of this page.
+        # Provide a closure for constructing the links easily
+        def create_comparison_link(replace=None, replace_to=None):
+            query_pokemon = []
+            for found_pokemon in c.found_pokemon:
+                if found_pokemon is None:
+                    # Empty slot
+                    query_pokemon.append(u'')
+                elif found_pokemon is replace:
+                    # Substitute a new Pokémon
+                    query_pokemon.append(replace_to)
+                else:
+                    # Keep what we have now
+                    query_pokemon.append(found_pokemon.input)
+
+            return url.current(pokemon=query_pokemon)
+        c.create_comparison_link = create_comparison_link
 
         return render('/pokedex/gadgets/compare_pokemon.mako')
