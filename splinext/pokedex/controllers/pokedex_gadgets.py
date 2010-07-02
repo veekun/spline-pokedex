@@ -428,9 +428,6 @@ class PokedexGadgetsController(BaseController):
             # 2: Use the other results as suggestions.  Doing this informs the
             # template that this was a multi-match
             suggestions = None
-            if not results:
-                # Don't do anything for totally junk searches
-                pass
             if len(results) == 1 and results[0].exact:
                 # Don't do anything for exact single matches
                 pass
@@ -443,20 +440,40 @@ class PokedexGadgetsController(BaseController):
 
         # There are a lot of links to similar incarnations of this page.
         # Provide a closure for constructing the links easily
-        def create_comparison_link(replace=None, replace_to=None):
+        def create_comparison_link(target, replace_with=None, move=0):
+            u"""Manipulates the list of Pokémon before creating a link.
+
+            `target` is the FoundPokemon to be operated upon.  It can be either
+            replaced with a new string or moved left/right.
+            """
+
+            new_found_pokemon = c.found_pokemon[:]
+
+            # Do the swapping first
+            if move:
+                idx1 = new_found_pokemon.index(target)
+                idx2 = (idx1 + move) % len(new_found_pokemon)
+                new_found_pokemon[idx1], new_found_pokemon[idx2] = \
+                    new_found_pokemon[idx2], new_found_pokemon[idx1]
+
+            # Construct a new query
             query_pokemon = []
-            for found_pokemon in c.found_pokemon:
+            for found_pokemon in new_found_pokemon:
                 if found_pokemon is None:
                     # Empty slot
                     query_pokemon.append(u'')
-                elif found_pokemon is replace:
+                elif found_pokemon is target and replace_with:
                     # Substitute a new Pokémon
-                    query_pokemon.append(replace_to)
+                    query_pokemon.append(replace_with)
                 else:
                     # Keep what we have now
                     query_pokemon.append(found_pokemon.input)
 
             return url.current(pokemon=query_pokemon)
         c.create_comparison_link = create_comparison_link
+
+        # Bit of setup only done if the page is actually showing
+        if c.did_anything:
+            c.stats = pokedex_session.query(tables.Stat).all()
 
         return render('/pokedex/gadgets/compare_pokemon.mako')
