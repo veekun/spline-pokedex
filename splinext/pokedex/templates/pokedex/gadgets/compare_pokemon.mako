@@ -28,8 +28,13 @@ ${h.form(url.current(), method='GET')}
             no matches
             % else:
             <ul>
-                % for suggestion in found_pokemon.suggestions:
-                <li><a href="${c.create_comparison_link(target=found_pokemon, replace_with=suggestion.full_name)}">${suggestion.full_name}?</a></li>
+                % for suggestion, iso3166 in found_pokemon.suggestions:
+                <li><a href="${c.create_comparison_link(target=found_pokemon, replace_with=suggestion)}">
+                    % if iso3166:
+                    <img src="${h.static_uri('spline', "flags/{0}.png".format(iso3166))}" alt="">
+                    % endif
+                    ${suggestion}?
+                </a></li>
                 % endfor
             </ul>
             % endif

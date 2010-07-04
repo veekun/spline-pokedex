@@ -433,7 +433,12 @@ class PokedexGadgetsController(BaseController):
                 pass
             else:
                 # OK, extract options.  But no more than, say, three.
-                suggestions = [_.object for _ in results[1:4]]
+                # Remember both the language and the Pokémon, in the case of
+                # foreign matches
+                suggestions = [
+                    (_.name, _.iso3166)
+                    for _ in results[1:4]
+                ]
 
             # Construct a tuple and slap that bitch in there
             c.found_pokemon[i] = FoundPokemon(pokemon, suggestions, raw_pokemon)
