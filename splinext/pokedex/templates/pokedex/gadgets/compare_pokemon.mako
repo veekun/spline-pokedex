@@ -22,7 +22,7 @@ ${h.form(url.current(), method='GET')}
         <th><!-- label column --></th>
         % for found_pokemon in c.found_pokemon:
         <th>
-            % if found_pokemon is None or found_pokemon.suggestions is None:
+            % if found_pokemon.suggestions is None:
             <% pass %>\
             % elif found_pokemon.pokemon is None:
             no matches
@@ -46,13 +46,13 @@ ${h.form(url.current(), method='GET')}
         <th><button type="submit">Compare:</button></th>
         % for found_pokemon in c.found_pokemon:
         <th>
-            % if found_pokemon and found_pokemon.pokemon:
+            % if found_pokemon.pokemon:
             ${h.pokedex.pokemon_link(found_pokemon.pokemon,
                 h.pokedex.pokemon_sprite(found_pokemon.pokemon, prefix=u'icons'),
                 class_='dex-box-link',
             )}<br>
             % endif
-            <input type="text" name="pokemon" value="${found_pokemon.input if found_pokemon else u''}">
+            <input type="text" name="pokemon" value="${found_pokemon.input}">
         </th>
         % endfor
     </tr>
@@ -110,7 +110,7 @@ ${h.end_form()}
         <th>${h.pokedex.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.heights['trainer'] * 100))}</th>
         % for i, found_pokemon in enumerate(c.found_pokemon):
         <td>
-            % if found_pokemon and found_pokemon.pokemon:
+            % if found_pokemon.pokemon:
             ${h.pokedex.pokemon_sprite(found_pokemon.pokemon, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.heights[i] * 100))}
             % endif
         </td>
@@ -122,7 +122,7 @@ ${h.end_form()}
         <th>${h.pokedex.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.weights['trainer'] * 100))}</th>
         % for i, found_pokemon in enumerate(c.found_pokemon):
         <td>
-            % if found_pokemon and found_pokemon.pokemon:
+            % if found_pokemon.pokemon:
             ${h.pokedex.pokemon_sprite(found_pokemon.pokemon, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.weights[i] * 100))}
             % endif
         </td>
@@ -147,7 +147,7 @@ ${h.end_form()}
         <th><!-- label column --></th>
         % for found_pokemon in c.found_pokemon:
         <th>
-            % if found_pokemon and found_pokemon.pokemon:
+            % if found_pokemon.pokemon:
             ${h.pokedex.pokemon_link(found_pokemon.pokemon,
                 h.pokedex.pokemon_sprite(found_pokemon.pokemon, prefix=u'icons')
                 + h.literal('<br>')
@@ -165,7 +165,7 @@ ${h.end_form()}
         <th>${label}</th>
         % for found_pokemon in c.found_pokemon:
         <td>
-            % if found_pokemon and found_pokemon.pokemon:
+            % if found_pokemon.pokemon:
             ${cell_func(found_pokemon.pokemon, *args, **kwargs)}
             % endif
         </td>

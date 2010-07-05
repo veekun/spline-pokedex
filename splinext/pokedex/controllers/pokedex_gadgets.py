@@ -403,16 +403,18 @@ class PokedexGadgetsController(BaseController):
             ['pokemon', 'suggestions', 'input'])
 
         # The Pokémon themselves go into c.pokemon.  This list should always
-        # have eight elements, each either a tuple as above or None
+        # have eight FoundPokemon elements
         c.found_pokemon = [None] * self.NUM_COMPARED_POKEMON
 
-        for i, raw_pokemon in enumerate(request.params.getall('pokemon')):
-            if i >= self.NUM_COMPARED_POKEMON:
-                # Skip any extras; someone has been screwin around
-                break
-
-            raw_pokemon = raw_pokemon.strip()
+        # Run through the list, ensuring at least 8 Pokémon are entered
+        pokemon_input = request.params.getall('pokemon') \
+            + [u''] * self.NUM_COMPARED_POKEMON
+        for i in range(self.NUM_COMPARED_POKEMON):
+            raw_pokemon = pokemon_input[i].strip()
             if not raw_pokemon:
+                # Use a junk placeholder tuple
+                c.found_pokemon[i] = FoundPokemon(
+                    pokemon=None, suggestions=None, input=u'')
                 continue
 
             results = pokedex_lookup.lookup(raw_pokemon,
