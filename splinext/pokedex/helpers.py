@@ -406,6 +406,11 @@ def evolution_description(evolution):
 
 ### Formatting
 
+# Attempts at reasonable defaults for trainer size, based on the average
+# American
+trainer_height = 17.8  # dm
+trainer_weight = 780   # hg
+
 def format_height_metric(height):
     """Formats a height in decimeters as M m."""
     return "%.1f m" % (height / 10)

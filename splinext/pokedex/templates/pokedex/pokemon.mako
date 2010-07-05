@@ -415,7 +415,7 @@ ${h.h1('Flavor')}
             </a>
         </dd>
         <dt>Color</dt>
-        <dd>
+        <dd style="color: ${c.pokemon.color};">
             ${c.pokemon.color}
             <a href="${url(controller='dex_search', action='pokemon_search', color=c.pokemon.color)}"
                 class="dex-subtle-search-link">
@@ -439,7 +439,7 @@ ${h.h1('Flavor')}
         <dd>${h.pokedex.pokemon_sprite(c.pokemon, prefix='pawprints', form=None)}</dd>
         <dt>Shape</dt>
         <dd>
-            ${h.pokedex.pokedex_img('chrome/shapes/%d.png' % c.pokemon.shape.id, alt='')}
+            ${h.pokedex.pokedex_img('chrome/shapes/%d.png' % c.pokemon.shape.id, alt='', title=c.pokemon.shape.name)}
             ${c.pokemon.shape.awesome_name}
             <a href="${url(controller='dex_search', action='pokemon_search', shape=c.pokemon.shape.name.lower())}"
                 class="dex-subtle-search-link">

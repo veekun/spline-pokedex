@@ -105,8 +105,36 @@ ${h.end_form()}
     <tr class="subheader-row">
         <th colspan="${len(c.found_pokemon) + 1}">Flavor</th>
     </tr>
-    ${row(u'Height', height_cell)}
-    ${row(u'Weight', weight_cell)}
+
+    <tr class="size">
+        <th>${h.pokedex.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.heights['trainer'] * 100))}</th>
+        % for i, found_pokemon in enumerate(c.found_pokemon):
+        <td>
+            % if found_pokemon and found_pokemon.pokemon:
+            ${h.pokedex.pokemon_sprite(found_pokemon.pokemon, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.heights[i] * 100))}
+            % endif
+        </td>
+        % endfor
+    </tr>
+    ${row(u'Height', height_cell, class_='dex-compare-flavor-text')}
+
+    <tr class="size">
+        <th>${h.pokedex.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.weights['trainer'] * 100))}</th>
+        % for i, found_pokemon in enumerate(c.found_pokemon):
+        <td>
+            % if found_pokemon and found_pokemon.pokemon:
+            ${h.pokedex.pokemon_sprite(found_pokemon.pokemon, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.weights[i] * 100))}
+            % endif
+        </td>
+        % endfor
+    </tr>
+    ${row(u'Weight', weight_cell, class_='dex-compare-flavor-text')}
+
+    ${row(u'Species',   species_cell,   class_='dex-compare-flavor-text')}
+    ${row(u'Color',     color_cell,     class_='dex-compare-flavor-text')}
+    ${row(u'Habitat',   habitat_cell,   class_='dex-compare-flavor-text')}
+    ${row(u'Pawprint',  pawprint_cell,  class_='dex-compare-flavor-text')}
+    ${row(u'Shape',     shape_cell,     class_='dex-compare-flavor-text')}
 </tbody>
 </table>
 % endif  ## did anything
@@ -133,7 +161,7 @@ ${h.end_form()}
 
 ## Print a row of 8
 <%def name="row(label, cell_func, *args, **kwargs)">
-    <tr>
+    <tr class="${kwargs.pop('class_', u'')}">
         <th>${label}</th>
         % for found_pokemon in c.found_pokemon:
         <td>
@@ -198,5 +226,30 @@ ${h.pokedex.gender_rate_label[pokemon.gender_rate]}
 </ul>
 </%def>
 
-<%def name="height_cell(pokemon)">${h.pokedex.format_height_imperial(pokemon.height)}</%def>
-<%def name="weight_cell(pokemon)">${h.pokedex.format_weight_imperial(pokemon.weight)}</%def>
+## Flavor cells
+<%def name="height_cell(pokemon)">
+${h.pokedex.format_height_imperial(pokemon.height)}<br>
+${h.pokedex.format_height_metric(pokemon.height)}
+</%def>
+<%def name="weight_cell(pokemon)">
+${h.pokedex.format_weight_imperial(pokemon.weight)}<br>
+${h.pokedex.format_weight_metric(pokemon.weight)}
+</%def>
+
+<%def name="species_cell(pokemon)">${pokemon.species}</%def>
+<%def name="color_cell(pokemon)"><span style="color: ${pokemon.color};">${pokemon.color}</span></%def>
+<%def name="habitat_cell(pokemon)">
+% if pokemon.generation.id <= 3:
+${h.pokedex.pokedex_img('chrome/habitats/%s.png' % h.pokedex.filename_from_name(pokemon.habitat), \
+    alt='', title=pokemon.habitat)}<br>
+% else:
+n/a
+% endif
+</%def>
+
+<%def name="pawprint_cell(pokemon)">${h.pokedex.pokemon_sprite(pokemon, prefix='pawprints', form=None)}</%def>
+
+<%def name="shape_cell(pokemon)">
+${h.pokedex.pokedex_img('chrome/shapes/%d.png' % pokemon.shape.id, alt='', title=pokemon.shape.name)}<br>
+${pokemon.shape.awesome_name}
+</%def>

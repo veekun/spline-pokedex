@@ -737,9 +737,8 @@ class PokedexController(BaseController):
         }
 
         ### Sizing
-        # These are totally hardcoded average sizes in Pokémon units:
-        c.trainer_height = 17.8  # dm
-        c.trainer_weight = 780   # hg
+        c.trainer_height = pokedex_helpers.trainer_height
+        c.trainer_weight = pokedex_helpers.trainer_weight
         heights = dict(pokemon=c.pokemon.height, trainer=c.trainer_height)
         c.heights = pokedex_helpers.scale_sizes(heights)
         # Strictly speaking, weight takes three dimensions.  But the real

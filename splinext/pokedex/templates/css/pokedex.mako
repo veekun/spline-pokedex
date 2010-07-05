@@ -304,6 +304,13 @@ table.dex-compare-pokemon td { line-height: 1.33; }
 table.dex-compare-pokemon tbody th { text-align: left; }
 table.dex-compare-pokemon tr.subheader-row th { padding: 0.33em 0.5em; font-weight: bold; }
 
+table.dex-compare-pokemon tr.size td,
+table.dex-compare-pokemon tr.size th { height: 96px; line-height: 96px; text-align: left; vertical-align: bottom; }
+table.dex-compare-pokemon tr.size td { text-align: center; }
+table.dex-compare-pokemon tr.size th { text-align: left; }
+table.dex-compare-pokemon tr.size img { vertical-align: bottom; image-rendering: -moz-crisp-edges; -ms-interpolation-mode: nearest-neighbor; }
+table.dex-compare-pokemon tr.dex-compare-flavor-text td { text-align: center; }
+
 
 /*** Static pages ***/
 

@@ -477,8 +477,22 @@ class PokedexGadgetsController(BaseController):
             return url.current(pokemon=query_pokemon)
         c.create_comparison_link = create_comparison_link
 
-        # Bit of setup only done if the page is actually showing
+        # Setup only done if the page is actually showing
         if c.did_anything:
             c.stats = pokedex_session.query(tables.Stat).all()
+
+            raw_heights = dict(enumerate(
+                fp.pokemon.height if fp and fp.pokemon else 0
+                for fp in c.found_pokemon
+            ))
+            raw_heights['trainer'] = pokedex_helpers.trainer_height
+            c.heights = pokedex_helpers.scale_sizes(raw_heights)
+
+            raw_weights = dict(enumerate(
+                fp.pokemon.weight if fp and fp.pokemon else 0
+                for fp in c.found_pokemon
+            ))
+            raw_weights['trainer'] = pokedex_helpers.trainer_weight
+            c.weights = pokedex_helpers.scale_sizes(raw_weights, dimensions=2)
 
         return render('/pokedex/gadgets/compare_pokemon.mako')
