@@ -483,6 +483,51 @@ class PokedexGadgetsController(BaseController):
         if c.did_anything:
             c.stats = pokedex_session.query(tables.Stat).all()
 
+            # Relative numbers -- breeding and stats
+            # Construct a nested dictionary of label => pokemon => (value, pct)
+            # `pct` is percentage from the minimum to maximum value
+            c.relatives = dict()
+            # Use the label from the page as the key, because why not
+            relative_things = [
+                (u'Base EXP',       lambda pokemon: pokemon.base_experience),
+                (u'Base happiness', lambda pokemon: pokemon.base_happiness),
+                (u'Capture rate',   lambda pokemon: pokemon.capture_rate),
+            ]
+            def relative_stat_factory(local_stat):
+                return lambda pokemon: pokemon.stat(local_stat).base_stat
+            for stat in c.stats:
+                relative_things.append((stat.name, relative_stat_factory(stat)))
+
+            # Assemble the data
+            unique_pokemon = set(fp.pokemon
+                for fp in c.found_pokemon
+                if fp.pokemon
+            )
+            for label, getter in relative_things:
+                c.relatives[label] = dict()
+
+                # Get all the values at once; need to get min and max to figure
+                # out relative position
+                numbers = dict()
+                for pokemon in unique_pokemon:
+                    numbers[pokemon] = getter(pokemon)
+
+                min_number = min(numbers.values())
+                max_number = max(numbers.values())
+
+                # Rig a little function to figure out the percentage, making
+                # sure to avoid division by zero
+                if min_number == max_number:
+                    calc = lambda n: 1.0
+                else:
+                    calc = lambda n: 1.0 * (n - min_number) \
+                                         / (max_number - min_number)
+
+                for pokemon in unique_pokemon:
+                    c.relatives[label][pokemon] \
+                        = numbers[pokemon], calc(numbers[pokemon])
+
+            # Relative sizes
             raw_heights = dict(enumerate(
                 fp.pokemon.height if fp and fp.pokemon else 0
                 for fp in c.found_pokemon

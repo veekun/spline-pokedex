@@ -48,8 +48,8 @@ ${h.form(url.current(), method='GET')}
         <th>
             % if found_pokemon.pokemon:
             ${h.pokedex.pokemon_link(found_pokemon.pokemon,
-                h.pokedex.pokemon_sprite(found_pokemon.pokemon, prefix=u'icons'),
-                class_='dex-box-link',
+                h.pokedex.pokemon_sprite(found_pokemon.pokemon, prefix=u'icons')
+                    + h.literal(u'<br>') + found_pokemon.pokemon.full_name,
             )}<br>
             % endif
             <input type="text" name="pokemon" value="${found_pokemon.input}">
@@ -82,23 +82,23 @@ ${h.end_form()}
 <table class="striped-rows dex-compare-pokemon">
 <col class="labels">
 <tbody>
-    ${row(u'Type', type_cell)}
-    ${row(u'Abilities', abilities_cell)}
+    ${row(u'Type', type_cell, class_='dex-compare-list')}
+    ${row(u'Abilities', abilities_cell, class_='dex-compare-list')}
 
     <tr class="subheader-row">
         <th colspan="${len(c.found_pokemon) + 1}">Breeding + Training</th>
     </tr>
-    ${row(u'Egg groups', egg_groups_cell)}
-    ${row(u'Gender', gender_cell)}
-    ${row(u'Base EXP', base_exp_cell)}
-    ${row(u'Base happiness', base_happiness_cell)}
-    ${row(u'Capture rate', capture_rate_cell)}
+    ${row(u'Egg groups', egg_groups_cell, class_='dex-compare-list')}
+    ${row(u'Gender', gender_cell, class_='dex-compare-flavor-text')}
+    ${relative_row(u'Base EXP')}
+    ${relative_row(u'Base happiness')}
+    ${relative_row(u'Capture rate')}
 
     <tr class="subheader-row">
         <th colspan="${len(c.found_pokemon) + 1}">Stats</th>
     </tr>
     % for stat in c.stats:
-    ${row(stat.name, stat_cell, stat)}
+    ${relative_row(stat.name)}
     % endfor
     ${row(u'Effort', effort_cell)}
 
@@ -173,6 +173,21 @@ ${h.end_form()}
     </tr>
 </%def>
 
+## Print a row of 8 relatively-colored numbers
+<%def name="relative_row(label)">
+    <tr class="dex-compare-relative">
+        <th>${label}</th>
+        % for found_pokemon in c.found_pokemon:
+        % if found_pokemon.pokemon:
+        <% value, pct = c.relatives[label][found_pokemon.pokemon] %>\
+        <td style="color: #${'{0:02x}'.format(int((1 - pct) * 192)) * 3};">${value}</td>
+        % else:
+        <td></td>
+        % endif
+        % endfor
+    </tr>
+</%def>
+
 ## Cells
 <%def name="type_cell(pokemon)">
 <ul>
@@ -203,7 +218,12 @@ ${h.pokedex.pokedex_img('gender-rates/%d.png' % pokemon.gender_rate, alt='')}<br
 ${h.pokedex.gender_rate_label[pokemon.gender_rate]}
 </%def>
 
-<%def name="base_exp_cell(pokemon)">${pokemon.base_experience}</%def>
+<%def name="base_exp_cell(pokemon)">
+<% value, pct = c.relatives[u'Base EXP'][pokemon] %>\
+<span style="font-size: ${u'2.5' if pct == 1 else u'2'}em; font-weight: bold; color: #${'{0:02x}'.format(192 - int(pct * 192)) * 3};">
+    ${value}
+</span>
+</%def>
 
 <%def name="base_happiness_cell(pokemon)">${pokemon.base_happiness}</%def>
 
@@ -215,13 +235,9 @@ ${h.pokedex.gender_rate_label[pokemon.gender_rate]}
 <ul>
     % for stat in c.stats:
     <% effort = pokemon.stat(stat).effort %>\
-    <li>
-        % if effort:
-        ${effort} ${stat.name}
-        % else:
-        &nbsp;
-        % endif
-    </li>
+    % if effort:
+    <li>${effort} ${stat.name}</li>
+    % endif
     % endfor
 </ul>
 </%def>
