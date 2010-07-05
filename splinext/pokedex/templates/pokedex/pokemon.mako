@@ -236,6 +236,14 @@ ${h.h1('Essentials')}
 </div>
 
 ${h.h1('Evolution')}
+<ul class="see-also">
+<li>
+    <img src="${h.static_uri('spline', 'icons/chart--arrow.png')}" alt="See also:">
+    <a href="${url(controller='dex_gadgets', action='compare_pokemon', \
+        pokemon=[pokemon.full_name for pokemon in c.pokemon.evolution_chain.pokemon])}">Compare these Pokémon</a>
+</li>
+</ul>
+
 <table class="dex-evolution-chain">
 <thead>
 <tr>

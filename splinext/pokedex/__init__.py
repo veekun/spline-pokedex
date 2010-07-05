@@ -153,6 +153,7 @@ class PokedexPlugin(PluginBase):
                     PluginLink(u'Natures', url(controller='dex', action='natures_list')),
                 ]),
                 PluginLink(u'Gadgets', None, children=[
+                    PluginLink(u'Compare Pokémon', url(controller='dex_gadgets', action='compare_pokemon')),
                     PluginLink(u'Pokéball performance', url(controller='dex_gadgets', action='capture_rate')),
                 ]),
             ]),
