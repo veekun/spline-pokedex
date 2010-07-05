@@ -112,7 +112,7 @@ class TestMoveSearchController(TestController):
         )
 
         self.check_search(
-            dict(type=[u'fire', u'electric'],
+            dict(type=[u'fire', u'electric']),
             [u'Thunder', u'Thundershock', u'Flamethrower', u'Ember'],
             'searching for multiple types',
         )
