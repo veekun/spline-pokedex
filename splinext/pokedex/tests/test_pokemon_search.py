@@ -709,11 +709,22 @@ class TestPokemonSearchController(TestController):
 
 
     def test_crash_vague_join(self):
-        """Tests for a crash that occurred when searching by evolution position
-        and sorting by color, because the join to PokemonColor was vague.
+        """Tests for crashes that occur when searching by evolution position
+        and sorting by some other criterion, because the join between 'pokemon'
+        and that criterion's table is vague due to the multiple 'pokemon'
+        aliases in the join.
         """
         self.check_search(
             dict(evolution_stage=u'stage1', sort=u'color'),
             [ u'Raichu' ],
-            u'joins to other tables still work when searching by evo',
+            u'joins to color still work when searching by evo',
+        )
+        self.check_search(
+            dict(
+                evolution_stage=u'basic',
+                move=u'water gun', move_method=u'level-up', move_version_group=u'1',
+                sort=u'habitat',
+            ),
+            [ u'Staryu' ],
+            u'joins to habitat still work when searching by evo and move',
         )

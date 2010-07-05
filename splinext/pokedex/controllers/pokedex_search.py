@@ -1041,7 +1041,7 @@ class PokedexSearchController(BaseController):
             sort_clauses.insert(0, tables.PokemonColor.name.asc())
 
         elif c.form.sort.data == 'habitat':
-            query = query.outerjoin(tables.PokemonHabitat)
+            query = query.outerjoin(me.pokemon_habitat)
             sort_clauses.insert(0, tables.PokemonHabitat.name.asc())
 
         elif c.form.sort.data == 'steps-to-hatch':
