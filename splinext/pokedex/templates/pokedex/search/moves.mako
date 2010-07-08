@@ -30,9 +30,55 @@ ${h.form(url.current(), method='GET')}
 <p>Unless otherwise specified: matching moves must match ALL of the criteria, but can match ANY selections within a group.</p>
 <p>Anything left blank is ignored entirely.</p>
 
+<h2>Essentials</h2>
 <dl class="standard-form">
     ${lib.field('name')}
+    <dt>Damage class</dt>
+    <dd>
+        <ul>
+            % for a_field in c.form.damage_class:
+            <li> <label>
+                ${a_field() | n}
+                ${h.pokedex.pokedex_img("chrome/damage-classes/{0}.png".format(a_field.data), alt=u'')}
+                ${a_field.label}
+            </label> </li>
+            % endfor
+        </ul>
+        % for error in c.form.damage_class.errors:
+        <p class="error">${error}</p>
+        % endfor
+    </dd>
+    <dt>Generation</dt>
+    <dd>
+        <ul>
+            % for a_field in c.form.generation:
+            <li> <label>
+                ${a_field() | n}
+                ${h.pokedex.pokedex_img("versions/generation-{0}.png".format(a_field.data), alt=u'')}
+                ${a_field.label}
+            </label> </li>
+            % endfor
+        </ul>
+        % for error in c.form.generation.errors:
+        <p class="error">${error}</p>
+        % endfor
+    </dd>
+    ${lib.field('similar_to')}
 </dl>
+
+<h2>Type</h2>
+<ul class="dex-type-list">
+    ## always sort ??? last
+    % for a_field in sorted(c.form.type, key=lambda field: field.label.text):
+    <li> <label>
+        ${h.pokedex.type_icon(a_field.label.text)}
+        ${a_field() | n}
+    </label> </li>
+    % endfor
+</ul>
+% for error in c.form.type.errors:
+<p class="error">${error}</p>
+% endfor
 
 <p>
     ## Always shorten when the form is submitted!

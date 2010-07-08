@@ -410,6 +410,29 @@ class MoveSearchForm(BaseSearchForm):
 
     # Core stuff
     name = fields.TextField('Name', default=u'')
+    damage_class = QueryCheckboxSelectMultipleField(
+        'Damage class',
+        query_factory=lambda: pokedex_session.query(tables.MoveDamageClass),
+        get_label=lambda _: _.name,
+        get_pk=lambda table: table.name.lower(),
+        allow_blank=True,
+    )
+    generation = QueryCheckboxSelectMultipleField(
+        'Generation',
+        query_factory=lambda: pokedex_session.query(tables.Generation),
+        get_label=lambda _: _.name,
+        get_pk=lambda table: table.id,
+        allow_blank=True,
+    )
+    similar_to = PokedexLookupField('Same effect as', valid_type='move', allow_blank=True)
+
+    type = QueryCheckboxSelectMultipleField(
+        'Type',
+        query_factory=lambda: pokedex_session.query(tables.Type),
+        get_label=lambda _: _.name,
+        get_pk=lambda table: table.name,
+        allow_blank=True,
+    )
 
 
 class PokedexSearchController(BaseController):
@@ -1160,8 +1183,30 @@ class PokedexSearchController(BaseController):
         me = tables.Move
         query = pokedex_session.query(me)
 
+        # Name
         if c.form.name.data:
-            query = query.filter(me.name == c.form.name.data)
+            query = query.filter( ilike(me.name, c.form.name.data) )
+
+        # Damage class
+        if c.form.damage_class.data:
+            query = query.filter(
+                me.damage_class_id.in_(_.id for _ in c.form.damage_class.data)
+            )
+
+        # Generation
+        if c.form.generation.data:
+            query = query.filter(
+                me.generation_id.in_(_.id for _ in c.form.generation.data)
+            )
+
+        # Effect
+        if c.form.similar_to.data:
+            query = query.filter_by(effect_id=c.form.similar_to.data.effect_id)
+
+        # Type
+        if c.form.type.data:
+            type_ids = [_.id for _ in c.form.type.data]
+            query = query.filter( me.type_id.in_(type_ids) )
 
         c.results = query.all()
 

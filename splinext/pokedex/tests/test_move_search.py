@@ -33,7 +33,7 @@ class TestMoveSearchController(TestController):
         )
 
         leftover_results = []
-        leftover_expected = []
+        leftover_expected = expected[:]
 
         # Remove expected results from the 'leftover' list, and add unexpected
         # results to the other leftover list
@@ -84,7 +84,7 @@ class TestMoveSearchController(TestController):
 
         self.check_search(
             dict(name=u'thunder'),
-            [ u'Thunder', u'ThunderBolt', u'Thunder Wave',
+            [ u'Thunder', u'Thunderbolt', u'Thunder Wave',
               u'ThunderShock', u'ThunderPunch', u'Thunder Fang'],
             'no wildcards is treated as substring',
             exact=True,
@@ -113,7 +113,7 @@ class TestMoveSearchController(TestController):
 
         self.check_search(
             dict(type=[u'fire', u'electric']),
-            [u'Thunder', u'Thundershock', u'Flamethrower', u'Ember'],
+            [u'Thunder', u'ThunderShock', u'Flamethrower', u'Ember'],
             'searching for multiple types',
         )
 
