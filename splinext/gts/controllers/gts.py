@@ -12,7 +12,7 @@ import struct
 import pokedex.db
 import pokedex.db.tables as tables
 import pokedex.formulae
-from pokedex.savefile import PokemonSave
+from pokedex.struct import SaveFilePokemon
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
 from sqlalchemy import and_, or_, not_
@@ -156,7 +156,7 @@ class GTSController(BaseController):
                 .one()
             # We've got one!  Cool, send it back.  The game will ask us to
             # delete it after receiving successfully
-            pokemon_save = PokemonSave(stored_pokemon.pokemon_blob)
+            pokemon_save = SaveFilePokemon(stored_pokemon.pokemon_blob)
             return pokemon_save.as_encrypted
 
         except:
@@ -186,7 +186,7 @@ class GTSController(BaseController):
 
         try:
             # The uploaded Pokémon is encrypted, which is not very useful
-            pokemon_save = PokemonSave(data, encrypted=True)
+            pokemon_save = SaveFilePokemon(data, encrypted=True)
 
             # Create a record...
             stored_pokemon = gts_model.GTSPokemon(
