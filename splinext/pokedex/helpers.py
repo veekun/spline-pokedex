@@ -507,8 +507,8 @@ def apply_pokemon_template(template, pokemon):
     if 'shape' in template.template:
         d['shape'] = pokemon.shape.name
 
-    if 'steps_to_hatch' in template.template:
-        d['steps_to_hatch'] = pokemon.evolution_chain.steps_to_hatch
+    if 'hatch_counter' in template.template:
+        d['hatch_counter'] = pokemon.hatch_counter
 
     if 'stat' in template.template or \
        'hp' in template.template or \

@@ -623,12 +623,13 @@ class TestPokemonSearchController(TestController):
             exact=True,
         )
 
-    def test_steps_to_hatch(self):
-        """Checks searching by base experience."""
+    def test_hatch_counter(self):
+        """Checks searching by initial hatch counter."""
         self.check_search(
-            dict(base_experience=u'255'),
-            [ u'Arceus', u'Blissey', u'Chansey', u'Happiny' ],
-            'base EXP',
+            dict(hatch_counter=u'5'),
+            [ u'Gyarados', u'Magikarp' ],
+            'hatch counter',
+            exact=True,
         )
 
     def test_base_experience(self):

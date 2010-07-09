@@ -258,7 +258,7 @@ ${h.form(url.current(), method='GET')}
 <div class="dex-column">
     <h3>Breeding/Training</h3>
     <dl class="standard-form">
-        ${lib.field('steps_to_hatch')}
+        ${lib.field('hatch_counter')}
         ${lib.field('base_experience')}
         ${lib.field('capture_rate')}
         ${lib.field('base_happiness')}
@@ -351,7 +351,7 @@ ${h.form(url.current(), method='GET')}
             '$height', '$height_ft', '$height_m', \
             '$weight', '$weight_lb', '$weight_kg', \
             '$species', '$color', '$habitat', '$shape', \
-            '$steps_to_hatch', '$base_experience', '$capture_rate', '$base_happiness', \
+            '$hatch_counter', '$base_experience', '$capture_rate', '$base_happiness', \
         ):
         <%! from string import Template %>\
         <% template = Template(pattern) %>\
@@ -503,9 +503,9 @@ ${pokemon.habitat}\
 <%def name="th_shape()"><th>Shape</th></%def>
 <%def name="td_shape(pokemon)"><td class="icon">${h.pokedex.pokedex_img('chrome/shapes/%d.png' % pokemon.shape.id, title=pokemon.shape.awesome_name, alt='')}</td></%def>
 
-<%def name="col_steps_to_hatch()"><col class="dex-col-stat"></%def>
-<%def name="th_steps_to_hatch()"><th>Steps</th></%def>
-<%def name="td_steps_to_hatch(pokemon)"><td class="stat">${pokemon.evolution_chain.steps_to_hatch}</td></%def>
+<%def name="col_hatch_counter()"><col class="dex-col-stat"></%def>
+<%def name="th_hatch_counter()"><th><abbr title="Initial hatch counter">Hatch</abbr></th></%def>
+<%def name="td_hatch_counter(pokemon)"><td class="stat">${pokemon.hatch_counter}</td></%def>
 
 <%def name="col_base_experience()"><col class="dex-col-stat"></%def>
 <%def name="th_base_experience()"><th>EXP</th></%def>

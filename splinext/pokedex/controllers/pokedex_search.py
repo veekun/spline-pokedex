@@ -292,7 +292,8 @@ class PokemonSearchForm(BaseSearchForm):
     # Numbers
     # Effort and stats are pulled from the database, so those fields are added
     # dynamically
-    steps_to_hatch = RangeTextField('Steps to hatch', inflator=int)
+    # steps_to_hatch = RangeTextField('Steps to hatch', inflator=int)
+    hatch_counter = RangeTextField('Initial hatch counter', inflator=int)
     base_experience = RangeTextField('Base EXP', inflator=int)
     capture_rate = RangeTextField('Capture rate', inflator=int)
     base_happiness = RangeTextField('Base happiness', inflator=int)
@@ -331,7 +332,7 @@ class PokemonSearchForm(BaseSearchForm):
             ('evolution-chain', 'Evolution family'),
             ('name', 'Name'),
             ('type', 'Type'),
-            ('steps-to-hatch', 'Steps to hatch'),
+            ('hatch-counter', 'Initial hatch counter'),
             ('base-experience', 'Base EXP'),
             ('capture-rate', 'Capture rate'),
             ('base-happiness', 'Base happiness'),
@@ -387,7 +388,7 @@ class PokemonSearchForm(BaseSearchForm):
             ('color', 'Color'),
             ('habitat', 'Habitat'),
             ('shape', 'Shape'),
-            ('steps_to_hatch', 'Steps to hatch'),
+            ('hatch_counter', 'Initial hatch counter'),
             ('base_experience', 'Base EXP'),
             ('capture_rate', 'Capture rate'),
             ('base_happiness', 'Base happiness'),
@@ -856,10 +857,8 @@ class PokedexSearchController(BaseController):
                 if effort_field.data:
                     query = query.filter(effort_field.data(stat_alias.effort))
 
-        if c.form.steps_to_hatch.data:
-            query = join_once(me.evolution_chain) \
-                .filter(c.form.steps_to_hatch.data(
-                    tables.EvolutionChain.steps_to_hatch))
+        if c.form.hatch_counter.data:
+            query = query.filter(c.form.hatch_counter.data(me.hatch_counter))
 
         if c.form.base_experience.data:
             query = query.filter(c.form.base_experience.data(me.base_experience))
@@ -1067,9 +1066,8 @@ class PokedexSearchController(BaseController):
             query = query.outerjoin(me.pokemon_habitat)
             sort_clauses.insert(0, tables.PokemonHabitat.name.asc())
 
-        elif c.form.sort.data == 'steps-to-hatch':
-            query = join_once(me.evolution_chain)
-            sort_clauses.insert(0, tables.EvolutionChain.steps_to_hatch.asc())
+        elif c.form.sort.data == 'hatch-counter':
+            sort_clauses.insert(0, me.hatch_counter.asc())
 
         elif c.form.sort.data == 'base-experience':
             sort_clauses.insert(0, me.base_experience.desc())
