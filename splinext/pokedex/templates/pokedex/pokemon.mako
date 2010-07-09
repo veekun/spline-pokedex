@@ -104,6 +104,7 @@ ${h.h1('Essentials')}
                 <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
             </a>
         </dd>
+
         <dt>Egg groups</dt>
         <dd>
             <ul class="inline-commas">
@@ -118,13 +119,27 @@ ${h.h1('Essentials')}
             </a>
             % endif
         </dd>
-        <dt>Steps to hatch</dt>
+
+        <dt>Hatch counter</dt>
         <dd>
-            ${c.pokemon.evolution_chain.steps_to_hatch}
-            <a href="${url(controller='dex_search', action='pokemon_search', steps_to_hatch=c.pokemon.evolution_chain.steps_to_hatch)}"
+            ${c.pokemon.hatch_counter}
+            <a href="${url(controller='dex_search', action='pokemon_search', hatch_counter=c.pokemon.hatch_counter, sort='evolution-chain')}"
                 class="dex-subtle-search-link">
                 <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
             </a>
+        </dd>
+
+        <dt>Steps to hatch</dt>
+        <dd>
+            ${(c.pokemon.hatch_counter + 1) * 255}<br />
+
+            ## The presence of a Pokémon with Magma Armor or Flame Body makes eggs' hatch counters go down by 2 instead of 1, bottoming at 0.
+            ## Then there's the final lap after the egg hits zero.  So, for MA/FB steps: (ceil(counter / 2.0) + 1) * 255
+            ## However, we can avoid a messy int(ceil(...)), because: ceil(x / 2.0) == floor((x + 1) / 2.0) == (x + 1) // 2
+            ## and so: (ceil(x / 2.0) + 1) * 255 == ((x + 1) // 2 + 1) * 255 == (x + 3) // 2 * 255
+            ${(c.pokemon.hatch_counter + 3) // 2 * 255}
+            (<abbr title="With Magma Armor or Flame Body"><a href="${url(controller='dex', action='abilities', name='magma armor')}">MA</a>\
+            / <a href="${url(controller='dex', action='abilities', name='flame body')}">FB</a></abbr>)
         </dd>
     </dl>
 
@@ -158,7 +173,8 @@ ${h.h1('Essentials')}
                 <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
             </a>
             <br/>
-            <span id="dex-pokemon-exp">${h.pokedex.formulae.earned_exp(base_exp=c.pokemon.base_experience, level=100)}</span> EXP at level <input type="text" size="3" value="100" id="dex-pokemon-exp-level">
+            <span id="dex-pokemon-exp">${h.pokedex.formulae.earned_exp(base_exp=c.pokemon.base_experience, level=100)}</span> EXP
+            at level <input type="text" size="3" value="100" id="dex-pokemon-exp-level">
         </dd>
         <dt>Effort points</dt>
         <dd>
