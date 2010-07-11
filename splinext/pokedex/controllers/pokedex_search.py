@@ -1162,8 +1162,30 @@ class PokedexSearchController(BaseController):
         return render('/pokedex/search/pokemon.mako')
 
     def move_search(self):
+        class F(MoveSearchForm):
+            pass
+
+        # Add flag fields dynamically
+        c.flag_fields = []
+        c.flags = pokedex_session.query(tables.MoveFlagType) \
+            .order_by(tables.MoveFlagType.id)
+        for flag in c.flags:
+            field_name = 'flag_' + flag.identifier
+            field = fields.SelectField(flag.name,
+                choices=[
+                    (u'any',    u''),
+                    (u'yes',    u'Yes'),
+                    (u'no',     u'No'),
+                ],
+                default=u'any',
+            )
+
+            c.flag_fields.append((field_name, flag.id))
+            setattr(F, field_name, field)
+
+
         ### Parse form, etc etc
-        c.form = MoveSearchForm(request.params)
+        c.form = F(request.params)
         c.form.validate()
 
         # If this is the first time the form was submitted, redirect to a URL
@@ -1205,6 +1227,22 @@ class PokedexSearchController(BaseController):
         if c.form.type.data:
             type_ids = [_.id for _ in c.form.type.data]
             query = query.filter( me.type_id.in_(type_ids) )
+
+        # Flags
+        for field, flag_id in c.flag_fields:
+            if c.form[field].data != u'any':
+                # Join to a move-flag table that's cut down to just this flag
+                flag_alias = aliased(tables.MoveFlag)
+                subq = pokedex_session.query(flag_alias) \
+                    .filter(flag_alias.move_flag_type_id == flag_id) \
+                    .subquery()
+
+                # Then join or nega-join against it
+                if c.form[field].data == u'yes':
+                    query = query.join((subq, me.id == subq.c.move_id))
+                else:
+                    query = query.outerjoin((subq, me.id == subq.c.move_id)) \
+                        .filter(subq.c.move_id == None)
 
         c.results = query.all()
 

@@ -64,6 +64,15 @@ ${h.form(url.current(), method='GET')}
         % endfor
     </dd>
     ${lib.field('similar_to')}
+
+    <dt>Flags</dt>
+    <dd>
+        <ul>
+            % for field, _ in c.flag_fields:
+            <li>${c.form[field]() | n} ${c.form[field].label() | n}</li>
+            % endfor
+        </ul>
+    </dd>
 </dl>
 
 <h2>Type</h2>

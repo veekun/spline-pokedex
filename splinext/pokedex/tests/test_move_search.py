@@ -163,13 +163,13 @@ class TestMoveSearchController(TestController):
         u"""Checks searching by some combination of flags."""
         self.check_search(
             dict(flag_contact=u'yes'),
-            [u'Tackle', u'Double-Slap', u'Ice Punch', u'Bite', u'Fly'],
+            [u'Tackle', u'DoubleSlap', u'Ice Punch', u'Bite', u'Fly'],
             'flimsy search by flag',
         )
 
         self.check_search(
             dict(flag_accuracy=u'no'),
-            [u'Swift'],
+            [u'Counter', u'Curse', u'Focus Punch', u'Sunny Day'],
             'better search by flag',
         )
 
