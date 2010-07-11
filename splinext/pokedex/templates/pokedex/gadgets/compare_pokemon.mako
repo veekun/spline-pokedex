@@ -100,6 +100,7 @@ ${h.end_form()}
     % for stat in c.stats:
     ${relative_row(stat.name)}
     % endfor
+    ${relative_row(u'Base stat total')}
     ${row(u'Effort', effort_cell)}
 
     <tr class="subheader-row">

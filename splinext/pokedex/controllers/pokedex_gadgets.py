@@ -498,6 +498,11 @@ class PokedexGadgetsController(BaseController):
             for stat in c.stats:
                 relative_things.append((stat.name, relative_stat_factory(stat)))
 
+            relative_things.append((
+                u'Base stat total',
+                lambda pokemon: sum(pokemon.stat(stat).base_stat for stat in c.stats)
+            ))
+
             # Assemble the data
             unique_pokemon = set(fp.pokemon
                 for fp in c.found_pokemon
