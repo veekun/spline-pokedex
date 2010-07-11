@@ -96,14 +96,23 @@ ${h.h1('Essentials')}
 
 <div class="dex-column">
     <h2>Flags</h2>
-    <ul class="classic-list">
+    <ul class="classic-list dex-move-flags">
       % for flag, has_flag in c.flags:
+        <%
+            search_param = 'flag_' + flag.identifier
+            search_query = { search_param: u'yes' if has_flag else u'no' }
+        %>\
         % if has_flag:
-        <li>${flag.name}</li>
-        <!-- XXX -->
-        <!-- {h.literal(flag.description.as_html)} -->
+        <li>
+            <a href="${url(controller='dex_search', action='move_search', **search_query)}">${flag.name}</a>
+            <div class="markdown">
+                ${h.literal(flag.description.as_html)}
+            </div>
+        </li>
         % else:
-        <li class="disabled">${flag.name}</li>
+        <li class="disabled">
+            <a href="${url(controller='dex_search', action='move_search', **search_query)}">${flag.name}</a>
+        </li>
         % endif
       % endfor
     </ul>

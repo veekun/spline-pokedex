@@ -220,6 +220,12 @@ dl.dex-flavor-text dt.dex-flavor-generation + dd { padding-left: 32px; }
 dl.dex-pokemon-flavor-text dt { width: 64px /* enough for 3 versions and padding */; }
 dl.dex-pokemon-flavor-text dd { padding-left: 64px; }
 
+/* Move page -- flags list */
+ul.dex-move-flags .markdown { font-size: 0.8em; font-style: italic; color: #404040; }
+ul.dex-move-flags .markdown p { margin-bottom: 0.33em; }
+ul.dex-move-flags li.disabled a { font-weight: normal; color: #c0c0c0; }
+ul.dex-move-flags li.disabled a:hover { color: #ce3131; }
+
 /* Location page and Pokémon location page -- entire bigass table */
 table.dex-encounters td { padding-left: 0.5em; padding-right: 0.5em; vertical-align: top; }
 table.dex-encounters td.location { vertical-align: top; }
