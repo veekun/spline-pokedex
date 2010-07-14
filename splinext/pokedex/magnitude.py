@@ -180,6 +180,7 @@ def parse_size(size, height_or_weight):
     # This monstrosity breaks on things that look like numbers, BUT assumes
     # that dots not preceded by a space go on the end of the unit, not the
     # beginning of the number
+    size = size.strip()
     rough_parts = re.split(
         ur'(?x) ( (?: (?: [0-9]+ | (?<=[\s.]) ) [,.] )? [0-9]+ )',
         size
@@ -207,8 +208,8 @@ def parse_size(size, height_or_weight):
     # numbers
     parts = []
     while rough_parts:
-        number = rough_parts.pop(0)
-        unit = rough_parts.pop(0)
+        number = rough_parts.pop(0).strip()
+        unit = rough_parts.pop(0).strip()
 
         number = number.replace(',', '.')  # euro decimal point
         number = float(number)  # XXX support 0xff, why not
@@ -280,7 +281,7 @@ def parse_size(size, height_or_weight):
                     ))
 
         # Prefix in possible_units is now guaranteed to be valid or None, so
-        # part of the problem is solved.  
+        # part of the problem is solved.
         # See if the rest of the unit of any of these possibilities is good
         for prefix, base_unit_chunks in possible_units:
             base_unit = u''.join(base_unit_chunks)  # unit names have no spaces
