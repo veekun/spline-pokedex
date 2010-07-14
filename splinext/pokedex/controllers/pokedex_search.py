@@ -292,7 +292,6 @@ class PokemonSearchForm(BaseSearchForm):
     # Numbers
     # Effort and stats are pulled from the database, so those fields are added
     # dynamically
-    # steps_to_hatch = RangeTextField('Steps to hatch', inflator=int)
     hatch_counter = RangeTextField('Initial hatch counter', inflator=int)
     base_experience = RangeTextField('Base EXP', inflator=int)
     capture_rate = RangeTextField('Capture rate', inflator=int)
@@ -332,7 +331,7 @@ class PokemonSearchForm(BaseSearchForm):
             ('evolution-chain', 'Evolution family'),
             ('name', 'Name'),
             ('type', 'Type'),
-            ('hatch-counter', 'Initial hatch counter'),
+            ('hatch-counter', 'Hatch counter/steps'),
             ('base-experience', 'Base EXP'),
             ('capture-rate', 'Capture rate'),
             ('base-happiness', 'Base happiness'),
@@ -389,6 +388,7 @@ class PokemonSearchForm(BaseSearchForm):
             ('habitat', 'Habitat'),
             ('shape', 'Shape'),
             ('hatch_counter', 'Initial hatch counter'),
+            ('steps_to_hatch', 'Steps to hatch'),
             ('base_experience', 'Base EXP'),
             ('capture_rate', 'Capture rate'),
             ('base_happiness', 'Base happiness'),

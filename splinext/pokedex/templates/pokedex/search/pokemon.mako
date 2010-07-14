@@ -351,7 +351,7 @@ ${h.form(url.current(), method='GET')}
             '$height', '$height_ft', '$height_m', \
             '$weight', '$weight_lb', '$weight_kg', \
             '$species', '$color', '$habitat', '$shape', \
-            '$hatch_counter', '$base_experience', '$capture_rate', '$base_happiness', \
+            '$hatch_counter', '$steps_to_hatch', '$base_experience', '$capture_rate', '$base_happiness', \
         ):
         <%! from string import Template %>\
         <% template = Template(pattern) %>\
@@ -506,6 +506,10 @@ ${pokemon.habitat}\
 <%def name="col_hatch_counter()"><col class="dex-col-stat"></%def>
 <%def name="th_hatch_counter()"><th><abbr title="Initial hatch counter">Hatch</abbr></th></%def>
 <%def name="td_hatch_counter(pokemon)"><td class="stat">${pokemon.hatch_counter}</td></%def>
+
+<%def name="col_steps_to_hatch()"><col class="dex-col-stat"></%def>
+<%def name="th_steps_to_hatch()"><th><abbr title="Steps to hatch">Steps</abbr></th></%def>
+<%def name="td_steps_to_hatch(pokemon)"><td class="stat">${(pokemon.hatch_counter + 1) * 255}</td></%def>
 
 <%def name="col_base_experience()"><col class="dex-col-stat"></%def>
 <%def name="th_base_experience()"><th>EXP</th></%def>

@@ -510,6 +510,9 @@ def apply_pokemon_template(template, pokemon):
     if 'hatch_counter' in template.template:
         d['hatch_counter'] = pokemon.hatch_counter
 
+    if 'steps_to_hatch' in template.template:
+        d['steps_to_hatch'] = (pokemon.hatch_counter + 1) * 255
+
     if 'stat' in template.template or \
        'hp' in template.template or \
        'attack' in template.template or \
