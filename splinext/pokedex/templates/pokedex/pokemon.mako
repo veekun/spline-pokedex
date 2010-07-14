@@ -131,15 +131,13 @@ ${h.h1('Essentials')}
 
         <dt>Steps to hatch</dt>
         <dd>
-            ${(c.pokemon.hatch_counter + 1) * 255}<br />
+            ${(c.pokemon.hatch_counter + 1) * 255} /
 
-            ## The presence of a Pokémon with Magma Armor or Flame Body makes eggs' hatch counters go down by 2 instead of 1, bottoming at 0.
+            ## If any party Pokémon has Magma Armor or Flame Body, hatch counters go down by two (instead of one) every 255 steps.
             ## Then there's the final lap after the egg hits zero.  So, for MA/FB steps: (ceil(counter / 2.0) + 1) * 255
-            ## However, we can avoid a messy int(ceil(...)), because: ceil(x / 2.0) == floor((x + 1) / 2.0) == (x + 1) // 2
-            ## and so: (ceil(x / 2.0) + 1) * 255 == ((x + 1) // 2 + 1) * 255 == (x + 3) // 2 * 255
-            ${(c.pokemon.hatch_counter + 3) // 2 * 255}
-            (<abbr title="With Magma Armor or Flame Body"><a href="${url(controller='dex', action='abilities', name='magma armor')}">MA</a>\
-            / <a href="${url(controller='dex', action='abilities', name='flame body')}">FB</a></abbr>)
+            ## ceil() returns a float, but we can avoid a messy int(ceil(...)) like so: ceil(x / 2.0) == floor((x + 1) / 2.0) == (x + 1) // 2
+            ## And thus: (ceil(x / 2.0) + 1) * 255 == ((x + 1) // 2 + 1) * 255 == (x + 3) // 2 * 255
+            <span class="annotation" title="With Magma Armor or Flame Body">${(c.pokemon.hatch_counter + 3) // 2 * 255}</span>
         </dd>
     </dl>
 
