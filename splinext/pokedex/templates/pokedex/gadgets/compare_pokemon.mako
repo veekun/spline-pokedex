@@ -138,6 +138,51 @@ ${h.end_form()}
     ${row(u'Shape',     shape_cell,     class_='dex-compare-flavor-text')}
 </tbody>
 </table>
+
+<h1>Level-up moves</h1>
+<table class="striped-rows dex-compare-pokemon dex-compare-pokemon-moves">
+<col class="labels">
+${table_header()}
+<tbody>
+    % for level, pokemon_moves in sorted(c.level_moves.items()):
+    <tr>
+        <th>Level ${level}</th>
+        % for found_pokemon in c.found_pokemon:
+        <td>
+            % for move in pokemon_moves[found_pokemon.pokemon]:
+            <a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a> <br>
+            % endfor
+        </td>
+        % endfor
+    </tr>
+    % endfor
+</tbody>
+</table>
+
+<h1>Moves</h1>
+<table class="striped-rows dex-compare-pokemon dex-compare-pokemon-moves">
+<col class="labels">
+${table_header()}
+<tbody>
+    % for method, move_pokemons in sorted(c.moves.items(), key=lambda (k, v): k.id):
+    <tr class="subheader-row">
+        <th colspan="${len(c.found_pokemon) + 1}">${method.name}</th>
+    </tr>
+    % for move, pokemons in sorted(move_pokemons.items(), key=lambda (k, v): k.name):
+    <tr>
+        <th><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></th>
+        % for found_pokemon in c.found_pokemon:
+        <td>
+            % if found_pokemon.pokemon in pokemons:
+            ✔
+            % endif
+        </td>
+        % endfor
+    </tr>
+    % endfor
+    % endfor
+</tbody>
+</table>
 % endif  ## did anything
 
 

@@ -318,6 +318,7 @@ table.dex-compare-pokemon tr.size img { vertical-align: bottom; image-rendering:
 table.dex-compare-pokemon tr.dex-compare-list td { text-align: center; vertical-align: top; }
 table.dex-compare-pokemon tr.dex-compare-relative td { font-size: 1.5em; padding-right: 3%; text-align: right; font-weight: bold; }
 table.dex-compare-pokemon tr.dex-compare-flavor-text td { text-align: center; }
+table.dex-compare-pokemon.dex-compare-pokemon-moves td { text-align: center; }
 
 
 /*** Static pages ***/

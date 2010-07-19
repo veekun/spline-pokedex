@@ -1,7 +1,7 @@
 # encoding: utf8
 from __future__ import absolute_import, division
 
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 import logging
 
 import wtforms.validators
@@ -399,6 +399,10 @@ class PokedexGadgetsController(BaseController):
 
         c.did_anything = False
 
+        version_group = pokedex_session.query(tables.VersionGroup) \
+            .order_by(tables.VersionGroup.id.desc()) \
+            [0]
+
         FoundPokemon = namedtuple('FoundPokemon',
             ['pokemon', 'suggestions', 'input'])
 
@@ -546,5 +550,29 @@ class PokedexGadgetsController(BaseController):
             ))
             raw_weights['trainer'] = pokedex_helpers.trainer_weight
             c.weights = pokedex_helpers.scale_sizes(raw_weights, dimensions=2)
+
+            # Moves
+            # Constructs a table like the pokemon-moves table, except each row
+            # is a move and it indicates which Pokémon learn it.  Still broken
+            # up by method.
+            # So, need a dict of method => move => pokemons.
+            c.moves = defaultdict(lambda: defaultdict(set))
+            # And similarly for level moves, level => pokemon => moves
+            c.level_moves = defaultdict(lambda: defaultdict(list))
+            q = pokedex_session.query(tables.PokemonMove) \
+                .filter(tables.PokemonMove.version_group == version_group) \
+                .filter(tables.PokemonMove.pokemon_id.in_(
+                    _.id for _ in unique_pokemon)) \
+                .options(
+                    eagerload('move'),
+                    eagerload('method'),
+                )
+            for pokemon_move in q:
+                c.moves[pokemon_move.method][pokemon_move.move].add(
+                    pokemon_move.pokemon)
+
+                if pokemon_move.level:
+                    c.level_moves[pokemon_move.level] \
+                        [pokemon_move.pokemon].append(pokemon_move.move)
 
         return render('/pokedex/gadgets/compare_pokemon.mako')
