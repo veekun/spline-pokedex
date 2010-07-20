@@ -390,18 +390,51 @@ class PokedexGadgetsController(BaseController):
         return render('/pokedex/gadgets/capture_rate.mako')
 
     NUM_COMPARED_POKEMON = 8
+    def _shorten_compare_pokemon(self, pokemon):
+        u"""Returns a query dict for the given list of Pokémon to compare,
+        shortened as much as possible.
+
+        This is a bit naughty and examines the context for part of the query.
+        """
+        params = dict()
+
+        # Drop blank Pokémon off the end of the list
+        while pokemon and not pokemon[-1]:
+            del pokemon[-1]
+        params['pokemon'] = pokemon
+
+        # Only include version group if it's not the default
+        if c.version_group != c.version_groups[-1]:
+            params['version_group'] = c.version_group.id
+
+        return params
+
     def compare_pokemon(self):
         u"""Pokémon comparison.  Takes up to eight Pokémon and shows a page
         that lists their stats, moves, etc. side-by-side.
         """
-        # Note that this gadget doesn't use wtforms at all, since there's only
-        # one field and it's handled very specially.
+        # Note that this gadget doesn't use wtforms at all, since there're only
+        # two fields and the major one is handled very specially.
 
         c.did_anything = False
 
-        version_group = pokedex_session.query(tables.VersionGroup) \
-            .order_by(tables.VersionGroup.id.desc()) \
-            [0]
+        # Form controls use version group
+        c.version_groups = pokedex_session.query(tables.VersionGroup) \
+            .order_by(tables.VersionGroup.id.asc()) \
+            .options(eagerload('versions')) \
+            .all()
+        # Grab the version to use for moves, defaulting to the most current
+        try:
+            c.version_group = pokedex_session.query(tables.VersionGroup) \
+                .get(request.params['version_group'])
+        except (KeyError, NoResultFound):
+            c.version_group = c.version_groups[-1]
+
+        # Some manual URL shortening, if necessary...
+        if request.params.get('shorten', False):
+            short_params = self._shorten_compare_pokemon(
+                request.params.getall('pokemon'))
+            redirect_to(url.current(**short_params))
 
         FoundPokemon = namedtuple('FoundPokemon',
             ['pokemon', 'suggestions', 'input'])
@@ -473,14 +506,15 @@ class PokedexGadgetsController(BaseController):
                 if found_pokemon is None:
                     # Empty slot
                     query_pokemon.append(u'')
-                elif found_pokemon is target and replace_with:
+                elif found_pokemon is target and replace_with != None:
                     # Substitute a new Pokémon
                     query_pokemon.append(replace_with)
                 else:
                     # Keep what we have now
                     query_pokemon.append(found_pokemon.input)
 
-            return url.current(pokemon=query_pokemon)
+            short_params = self._shorten_compare_pokemon(query_pokemon)
+            return url.current(**short_params)
         c.create_comparison_link = create_comparison_link
 
         # Setup only done if the page is actually showing
@@ -536,7 +570,7 @@ class PokedexGadgetsController(BaseController):
                     c.relatives[label][pokemon] \
                         = numbers[pokemon], calc(numbers[pokemon])
 
-            # Relative sizes
+            ### Relative sizes
             raw_heights = dict(enumerate(
                 fp.pokemon.height if fp and fp.pokemon else 0
                 for fp in c.found_pokemon
@@ -551,7 +585,7 @@ class PokedexGadgetsController(BaseController):
             raw_weights['trainer'] = pokedex_helpers.trainer_weight
             c.weights = pokedex_helpers.scale_sizes(raw_weights, dimensions=2)
 
-            # Moves
+            ### Moves
             # Constructs a table like the pokemon-moves table, except each row
             # is a move and it indicates which Pokémon learn it.  Still broken
             # up by method.
@@ -560,7 +594,7 @@ class PokedexGadgetsController(BaseController):
             # And similarly for level moves, level => pokemon => moves
             c.level_moves = defaultdict(lambda: defaultdict(list))
             q = pokedex_session.query(tables.PokemonMove) \
-                .filter(tables.PokemonMove.version_group == version_group) \
+                .filter(tables.PokemonMove.version_group == c.version_group) \
                 .filter(tables.PokemonMove.pokemon_id.in_(
                     _.id for _ in unique_pokemon)) \
                 .options(

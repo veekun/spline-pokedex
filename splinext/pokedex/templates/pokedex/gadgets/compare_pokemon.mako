@@ -14,6 +14,22 @@
 <p>Select up to eight Pokémon to compare their stats, moves, etc.</p>
 
 ${h.form(url.current(), method='GET')}
+<input type="hidden" name="shorten" value="1">
+<div>
+    Version to use for moves:
+    <ul class="dex-compare-pokemon-version-list">
+        % for version_group in c.version_groups:
+        <li> <label>
+            <input type="radio" name="version_group" value="${version_group.id}" \
+                % if c.version_group == version_group:
+                checked="checked" \
+                % endif
+            >
+            ${h.pokedex.version_icons(*version_group.versions)}
+        </label> </li>
+        % endfor
+    </ul>
+</div>
 <table class="dex-compare-pokemon">
 <col class="labels">
 <thead>
@@ -142,7 +158,7 @@ ${h.end_form()}
 <h1>Level-up moves</h1>
 <table class="striped-rows dex-compare-pokemon dex-compare-pokemon-moves">
 <col class="labels">
-${table_header()}
+${move_table_header()}
 <tbody>
     % for level, pokemon_moves in sorted(c.level_moves.items()):
     <tr>
@@ -162,7 +178,7 @@ ${table_header()}
 <h1>Moves</h1>
 <table class="striped-rows dex-compare-pokemon dex-compare-pokemon-moves">
 <col class="labels">
-${table_header()}
+${move_table_header()}
 <tbody>
     % for method, move_pokemons in sorted(c.moves.items(), key=lambda (k, v): k.id):
     <tr class="subheader-row">
@@ -187,10 +203,10 @@ ${table_header()}
 
 
 ## Column headers for a new table
-<%def name="table_header()">
+<%def name="move_table_header()">
 <thead>
     <tr class="header-row">
-        <th><!-- label column --></th>
+        <th class="versions">${h.pokedex.version_icons(*c.version_group.versions)}</th>
         % for found_pokemon in c.found_pokemon:
         <th>
             % if found_pokemon.pokemon:

@@ -302,7 +302,10 @@ table.dex-capture-rates tr.inactive div.dex-capture-rate-graph { opacity: 0.25; 
 .dex-hp-bar .dex-hp-bar-bar.red    { background-color: #be2821; }
 
 /* Pokémon comparison */
-table.dex-compare-pokemon { width: 100%; table-layout: fixed; }
+ul.dex-compare-pokemon-version-list { display: inline-block; }
+ul.dex-compare-pokemon-version-list li { display: inline-block; padding: 0 0.5em; }
+
+table.dex-compare-pokemon { width: 100%; margin-top: 0.5em; table-layout: fixed; }
 table.dex-compare-pokemon col.labels { width: 10em; }
 table.dex-compare-pokemon .dex-compare-suggestions th { padding: 0.5em; vertical-align: bottom; text-align: left; }
 table.dex-compare-pokemon .header-row input[type='text'] { width: 95%; }
@@ -319,6 +322,7 @@ table.dex-compare-pokemon tr.dex-compare-list td { text-align: center; vertical-
 table.dex-compare-pokemon tr.dex-compare-relative td { font-size: 1.5em; padding-right: 3%; text-align: right; font-weight: bold; }
 table.dex-compare-pokemon tr.dex-compare-flavor-text td { text-align: center; }
 table.dex-compare-pokemon.dex-compare-pokemon-moves td { text-align: center; }
+table.dex-compare-pokemon.dex-compare-pokemon-moves th.versions { text-align: left; }
 
 
 /*** Static pages ***/
