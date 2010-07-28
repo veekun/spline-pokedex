@@ -1148,6 +1148,11 @@ class PokedexSearchController(BaseController):
 
                 eagerloads.append('stats.stat')
 
+            if c.form.sort.data == 'evolution-chain':
+                # Gotta know the chain itself and the parent Pokémon to make
+                # the cool indented tree work
+                eagerloads.append('parent_pokemon')
+
 
             ids = [_.id for _ in c.results]
             for relation in eagerloads:

@@ -67,7 +67,7 @@ col.dex-col-encounter-name { width: 10em; }
 col.dex-col-encounter-version { width: 12em; }
 
 /* Generic Pokémon and move lists; originally used for a Pokémon's moves, or a move's Pokémon */
-table.dex-pokemon-moves {;}
+table.dex-pokemon-moves { table-layout: fixed; }
 table.dex-pokemon-pokemon-moves { width: 100%; }
 table.dex-pokemon-moves td { padding: 0.33em; vertical-align: middle; text-align: center; }
 table.dex-pokemon-moves th { padding: 0.33em 0.17em; text-align: center; }
