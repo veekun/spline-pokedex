@@ -73,6 +73,16 @@ ${h.form(url.current(), method='GET')}
             % endfor
         </ul>
     </dd>
+
+    <dt>Categories</dt>
+    <dd>
+        ${lib.bare_field('category_operator')}
+        <ul>
+            % for field in c.form.category:
+            <li>${field() | n} ${field.label() | n}</li>
+            % endfor
+        </ul>
+    </dd>
 </dl>
 
 <h2>Type</h2>

@@ -319,9 +319,19 @@ class TestMoveSearchController(TestController):
             exact=True,
         )
 
+        # Multiple categories
+        # sleep OR attack up
         self.check_search(
-            dict(category=[u'29:self', u'15:target']),  # sleep; attack up
+            dict(category=[u'29:self', u'15:target'], category_operator=u'any'),
             [u'Rest', u'Swagger'],
-            'multiple category search',
+            'multiple category search (OR)',
+            exact=True,
+        )
+
+        # sleep AND heal self
+        self.check_search(
+            dict(category=[u'29:self', u'13:self'], category_operator=u'all'),
+            [u'Rest'],
+            'multiple category search (AND)',
             exact=True,
         )

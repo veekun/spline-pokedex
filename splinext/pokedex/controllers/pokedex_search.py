@@ -435,6 +435,15 @@ class MoveSearchForm(BaseSearchForm):
         allow_blank=True,
     )
 
+    # Category operator; the actual categories are dynamic, below
+    category_operator = fields.SelectField('',
+        choices=[
+            (u'any', u'Any of these'),
+            (u'all', u'All of these'),
+        ],
+        default=u'all',
+    )
+
     # Numbers
     accuracy = RangeTextField('Accuracy', inflator=int)
     pp = RangeTextField('PP', inflator=int)
@@ -1174,8 +1183,27 @@ class PokedexSearchController(BaseController):
         return render('/pokedex/search/pokemon.mako')
 
     def move_search(self):
+        ### First tack some database-driven fields onto the form
+        # Category fields; they look like 32:self or 4:target
+        category_choices = []
+        categories = pokedex_session.query(tables.MoveEffectCategory) \
+            .order_by(tables.MoveEffectCategory.id)
+        for category in categories:
+            category_choices.append((
+                u"{0}:target".format(category.id),
+                u"{0}, vs target".format(category.name),
+            ))
+
+            if category.can_affect_user:
+                category_choices.append((
+                    u"{0}:self".format(category.id),
+                    u"{0}, vs user".format(category.name),
+                ))
+
         class F(MoveSearchForm):
-            pass
+            category = MultiCheckboxField('Categories',
+                choices=category_choices,
+            )
 
         # Add flag fields dynamically
         c.flag_fields = []
@@ -1255,6 +1283,42 @@ class PokedexSearchController(BaseController):
                 else:
                     query = query.outerjoin((subq, me.id == subq.c.move_id)) \
                         .filter(subq.c.move_id == None)
+
+        # Category -- subquerying works differently for AND vs OR
+        if c.form.category_operator.data == u'all':
+            # AND: join to a separate subquery for each category
+            for category_gunk in c.form.category.data:
+                category_id, category_target = category_gunk.split(u':')
+
+                # Need to make a subquery and tack it on!
+                category_alias = aliased(tables.MoveEffectCategoryMap)
+                subq = pokedex_session.query(category_alias) \
+                    .filter_by(
+                        move_effect_category_id = int(category_id),
+                        affects_user = (category_target == u'self'),
+                    ) \
+                    .subquery()
+
+                query = query.join(
+                    (subq, subq.c.move_effect_id == me.effect_id))
+        else:
+            # OR: make one join to a subquery with an OR stack
+            criteria = []
+
+            for category_gunk in c.form.category.data:
+                category_id, category_target = category_gunk.split(u':')
+
+                criterion = and_(
+                    tables.MoveEffectCategoryMap.move_effect_category_id
+                        == int(category_id),
+                    tables.MoveEffectCategoryMap.affects_user
+                        == (category_target == u'self'),
+                )
+                criteria.append(criterion)
+
+            if criteria:
+                query = query.join(tables.MoveEffectCategoryMap) \
+                    .filter(or_(*criteria))
 
         # Numbers
         if c.form.accuracy.data:
