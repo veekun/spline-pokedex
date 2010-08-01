@@ -89,6 +89,15 @@ ${h.form(url.current(), method='GET')}
 <p class="error">${error}</p>
 % endfor
 
+<h2>Numbers</h2>
+<dl class="standard-form">
+    ${lib.field('accuracy')}
+    ${lib.field('pp')}
+    ${lib.field('power')}
+    ${lib.field('effect_chance')}
+    ${lib.field('priority')}
+</dl>
+
 <p>
     ## Always shorten when the form is submitted!
     ${c.form.shorten(value=1) | n}

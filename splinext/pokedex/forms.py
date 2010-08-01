@@ -100,14 +100,20 @@ class RangeTextField(fields.TextField):
 
     `inflator` converts each chunk (a, b, c, and e) to a number.  If it dies,
     the range is taken to be invalid.
+
+    If `signed` is true, then input of "-foo" won't be taken to mean "0-foo",
+    and "--foo" will be allowed.
     """
-    def __init__(self, label=u'', validators=[], inflator=None, **kwargs):
+    def __init__(self, label=u'', validators=[], inflator=None, signed=False,
+        **kwargs):
+
         super(fields.TextField, self).__init__(label, validators, **kwargs)
 
         if not inflator:
             raise ValueError('RangeTextField requires an inflator')
 
         self.inflator = inflator
+        self.signed = signed
         self._original_data = u''
 
     def __call__(self, *args, **kwargs):
@@ -137,7 +143,12 @@ class RangeTextField(fields.TextField):
         sentence = valuelist[0].strip()
         for phrase in re.split(r'\s*,\s*', sentence):
             # Allowed separators: - – .. + ~ ±
-            endpoints = re.split(ur'([.]{2}|[-–+~±]|[<>]=?)', phrase, 1)
+            # For signed ranges, - in front of a digit is interpreted as part
+            # of that digit
+            if self.signed:
+                endpoints = re.split(ur'([.]{2}|[–+~±]|[<>]=?|-(?!\d))', phrase, 1)
+            else:
+                endpoints = re.split(ur'([.]{2}|[-–+~±]|[<>]=?)', phrase, 1)
 
             if len(endpoints) > 3:
                 # Can't handle this yet.  TODO: try it each way

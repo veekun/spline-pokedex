@@ -435,6 +435,13 @@ class MoveSearchForm(BaseSearchForm):
         allow_blank=True,
     )
 
+    # Numbers
+    accuracy = RangeTextField('Accuracy', inflator=int)
+    pp = RangeTextField('PP', inflator=int)
+    power = RangeTextField('Power', inflator=int)
+    effect_chance = RangeTextField('Effect chance', inflator=int)
+    priority = RangeTextField('Priority', inflator=int, signed=True)
+
 
 class PokedexSearchController(BaseController):
 
@@ -1206,7 +1213,7 @@ class PokedexSearchController(BaseController):
 
         ### Do the searching!
         me = tables.Move
-        query = pokedex_session.query(me)
+        query = pokedex_session.query(me).join(tables.MoveEffect)
 
         # Name
         if c.form.name.data:
@@ -1226,7 +1233,7 @@ class PokedexSearchController(BaseController):
 
         # Effect
         if c.form.similar_to.data:
-            query = query.filter_by(effect_id=c.form.similar_to.data.effect_id)
+            query = query.filter(me.effect_id == c.form.similar_to.data.effect_id)
 
         # Type
         if c.form.type.data:
@@ -1248,6 +1255,23 @@ class PokedexSearchController(BaseController):
                 else:
                     query = query.outerjoin((subq, me.id == subq.c.move_id)) \
                         .filter(subq.c.move_id == None)
+
+        # Numbers
+        if c.form.accuracy.data:
+            query = query.filter(c.form.accuracy.data(me.accuracy))
+
+        if c.form.pp.data:
+            query = query.filter(c.form.pp.data(me.pp))
+
+        if c.form.power.data:
+            query = query.filter(c.form.power.data(me.power))
+
+        if c.form.effect_chance.data:
+            query = query.filter(c.form.effect_chance.data(me.effect_chance))
+
+        if c.form.priority.data:
+            query = query.filter(c.form.priority.data(tables.MoveEffect.priority))
+
 
         c.results = query.all()
 
