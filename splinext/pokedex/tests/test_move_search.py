@@ -284,7 +284,7 @@ class TestMoveSearchController(TestController):
         self.check_search(
             dict(name=u'Volt Tackle',
                  pokemon=u'Pichu',
-                 move_method=[u'level-up', u'tutor', u'machine', u'egg']),
+                 pokemon_method=[u'level-up', u'tutor', u'machine', u'egg']),
             [],
             '...but not by normal means',
             exact=True,
@@ -292,9 +292,9 @@ class TestMoveSearchController(TestController):
 
         # Simple combo
         self.check_search(
-            dict(move=u'Venusaur',
-                 move_method=u'tutor',
-                 move_version_group=[u'7']),
+            dict(pokemon=u'Venusaur',
+                 pokemon_method=u'tutor',
+                 pokemon_version_group=[u'7']),
             [ u'Frenzy Plant' ],
             'Venusaur gets elemental beam in FR',
         )

@@ -108,6 +108,31 @@ ${h.form(url.current(), method='GET')}
     ${lib.field('priority')}
 </dl>
 
+<h2>Pokémon</h2>
+<div class="dex-column-container">
+<div class="dex-column">
+    <h3>Pokémon</h3>
+    <ul>
+        % for field in c.form.pokemon:
+        <li>
+            ${field(class_='js-dex-suggest js-dex-suggest-pokemon') | n}
+            % for error in field.errors:
+            <p class="error">${error}</p>
+            % endfor
+        </li>
+        % endfor
+    </ul>
+</div>
+<div class="dex-column">
+    <h3>Learned by</h3>
+    ${lib.bare_field('pokemon_method')}
+</div>
+<div class="dex-column">
+    <h3>Version</h3>
+    ${dexlib.pretty_version_group_field(c.form.pokemon_version_group, c.generations)}
+</div>
+</div>
+
 <p>
     ## Always shorten when the form is submitted!
     ${c.form.shorten(value=1) | n}

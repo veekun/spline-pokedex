@@ -27,6 +27,27 @@
 </%def>
 
 
+## Pretty-prints a version group selector, arranged by generation
+<%def name="pretty_version_group_field(field, generations)">
+<% version_group_controls = dict((control.data, control) for control in field) %>\
+<table id="dex-pokemon-search-move-versions">
+    % for generation in generations:
+    <tr>
+        % for version_group in generation.version_groups:
+        <td>
+            ${version_group_controls[ unicode(version_group.id) ]()}
+            ${version_group_controls[ unicode(version_group.id) ].label()}
+        </td>
+        % endfor
+    </tr>
+    % endfor
+</table>
+% for error in field.errors:
+<p class="error">${error}</p>
+% endfor
+</%def>
+
+
 ###### Common tables
 <%def name="pokemon_move_table_column_header(column)">
 <th class="version">

@@ -294,26 +294,7 @@ ${h.form(url.current(), method='GET')}
 </div>
 <div class="dex-column">
     <h3>Version</h3>
-    ## Arrange versions by generation
-
-    <% version_group_controls = dict((control.data, control)
-        for control in c.form.move_version_group) %>\
-    <table id="dex-pokemon-search-move-versions">
-        % for generation in c.generations:
-        <tr>
-            % for version_group in generation.version_groups:
-            <td>
-                ${version_group_controls[ unicode(version_group.id) ]()}
-                ${version_group_controls[ unicode(version_group.id) ].label()}
-            </td>
-            % endfor
-        </tr>
-        % endfor
-    </table>
-
-    % for error in c.form.move_version_group.errors:
-    <p class="error">${error}</p>
-    % endfor
+    ${dexlib.pretty_version_group_field(c.form.move_version_group, c.generations)}
 </div>
 </div>
 

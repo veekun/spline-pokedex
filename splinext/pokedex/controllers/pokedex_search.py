@@ -251,14 +251,7 @@ class PokemonSearchForm(BaseSearchForm):
 
     # Moves
     move = DuplicateField(
-        QueryTextField(
-            u'',
-            query_factory=
-                lambda value: pokedex_session.query(tables.Move)
-                    .filter( func.lower(tables.Move.name) == value.lower() ),
-            get_label=lambda _: _.name,
-            allow_blank=True,
-        ),
+        PokedexLookupField(u'Move', valid_type='move', allow_blank=True),
         min_entries=4,
         max_entries=4,
     )
@@ -442,6 +435,31 @@ class MoveSearchForm(BaseSearchForm):
             (u'all', u'All of these'),
         ],
         default=u'all',
+    )
+
+    # Pokémon
+    pokemon = DuplicateField(
+        PokedexLookupField(u'Pokémon', valid_type='pokemon', allow_blank=True),
+        min_entries=6,
+        max_entries=6,
+    )
+    # XXX perhaps share this stuff with the definitions above
+    pokemon_method = QueryCheckboxSelectMultipleField(
+        'Learned by',
+        query_factory=lambda: pokedex_session.query(tables.PokemonMoveMethod)
+            # XXX move methods need to identify themselves as "common"
+            .filter(tables.PokemonMoveMethod.id <= 4),
+        get_label=lambda row: row.name,
+        get_pk=lambda table: table.name.lower().replace(' ', '-'),
+        allow_blank=True,
+    )
+    pokemon_version_group = QueryCheckboxSelectMultipleField(
+        'Versions',
+        query_factory=lambda: pokedex_session.query(tables.VersionGroup) \
+                                             .options(eagerload('versions')),
+        get_label=lambda row: pokedex_helpers.version_icons(*row.versions),
+        get_pk=lambda table: table.id,
+        allow_blank=True,
     )
 
     # Numbers
@@ -1228,6 +1246,11 @@ class PokedexSearchController(BaseController):
         c.form = F(request.params)
         c.form.validate()
 
+        # Rendering needs to know which version groups go with which
+        # generations for the move-version-group list
+        c.generations = pokedex_session.query(tables.Generation) \
+            .order_by(tables.Generation.id.asc())
+
         # If this is the first time the form was submitted, redirect to a URL
         # with only non-default values
         if c.form.is_valid and c.form.was_submitted and c.form.needs_shortening:
@@ -1335,6 +1358,28 @@ class PokedexSearchController(BaseController):
 
         if c.form.priority.data:
             query = query.filter(c.form.priority.data(tables.MoveEffect.priority))
+
+        # Pokémon -- join with a subquery for each requested Pokémon
+        pokemon_version_groups = [_.id for _ in c.form.pokemon_version_group.data]
+        pokemon_methods = [_.id for _ in c.form.pokemon_method.data]
+        for pokemon in c.form.pokemon.data:
+            pokemon_alias = aliased(tables.PokemonMove)
+            pokemon_subq = pokedex_session.query(pokemon_alias.move_id) \
+                .filter(pokemon_alias.pokemon_id == pokemon.id)
+
+            if pokemon_methods:
+                pokemon_subq = pokemon_subq.filter(
+                    pokemon_alias.pokemon_move_method_id.in_(pokemon_methods))
+            if pokemon_version_groups:
+                pokemon_subq = pokemon_subq.filter(
+                    pokemon_alias.version_group_id.in_(pokemon_version_groups))
+
+            pokemon_subq = pokemon_subq.subquery()
+
+            query = query.join((
+                pokemon_subq,
+                pokemon_subq.c.move_id == me.id
+            ))
 
 
         c.results = query.all()
