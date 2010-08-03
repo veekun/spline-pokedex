@@ -152,9 +152,14 @@ ${h.literal(c.move.effect.as_html)}
 </div>
 
 <h2>Categories</h2>
-<ul>
+<ul class="classic-list">
     % for category_map in c.move.move_effect.category_map:
-    <li>${category_map.category.name} at ${'user' if category_map.affects_user else 'target'}</li>
+    <li>
+        <a href="${url(controller='dex_search', action='move_search', \
+            category="{0}:{1}".format(category_map.category.id, 'self' if category_map.affects_user else 'target'))}">
+        ${category_map.category.name}, vs ${'user' if category_map.affects_user else 'target'}
+        </a>
+    </li>
     % endfor
 </ul>
 
