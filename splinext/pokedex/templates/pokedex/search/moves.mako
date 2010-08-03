@@ -93,60 +93,64 @@ ${h.form(url.current(), method='GET')}
 <p>Unless otherwise specified: matching moves must match ALL of the criteria, but can match ANY selections within a group.</p>
 <p>Anything left blank is ignored entirely.</p>
 
-<h2>Essentials</h2>
-<dl class="standard-form">
-    ${lib.field('name')}
-    <dt>Damage class</dt>
-    <dd>
-        <ul>
-            % for a_field in c.form.damage_class:
-            <li> <label>
-                ${a_field() | n}
-                ${h.pokedex.pokedex_img("chrome/damage-classes/{0}.png".format(a_field.data), alt=u'')}
-                ${a_field.label}
-            </label> </li>
+<div class="dex-column-container">
+<div class="dex-column">
+    <h2>Essentials</h2>
+    <dl class="standard-form">
+        ${lib.field('name')}
+        <dt>Damage class</dt>
+        <dd>
+            <ul>
+                % for a_field in c.form.damage_class:
+                <li> <label>
+                    ${a_field() | n}
+                    ${h.pokedex.pokedex_img("chrome/damage-classes/{0}.png".format(a_field.data), alt=u'')}
+                    ${a_field.label}
+                </label> </li>
+                % endfor
+            </ul>
+            % for error in c.form.damage_class.errors:
+            <p class="error">${error}</p>
             % endfor
-        </ul>
-        % for error in c.form.damage_class.errors:
-        <p class="error">${error}</p>
+        </dd>
+        <dt>Generation</dt>
+        <dd>
+            <ul>
+                % for a_field in c.form.generation:
+                <li> <label>
+                    ${a_field() | n}
+                    ${h.pokedex.pokedex_img("versions/generation-{0}.png".format(a_field.data), alt=u'')}
+                    ${a_field.label}
+                </label> </li>
+                % endfor
+            </ul>
+            % for error in c.form.generation.errors:
+            <p class="error">${error}</p>
+            % endfor
+        </dd>
+    </dl>
+</div>
+<div class="dex-column">
+    <h2>Flags</h2>
+    <p>Exact same effect as: ${lib.bare_field('similar_to')}</p>
+    <ul>
+        % for field, _ in c.flag_fields:
+        <li>${c.form[field]() | n} ${c.form[field].label() | n}</li>
         % endfor
-    </dd>
-    <dt>Generation</dt>
-    <dd>
-        <ul>
-            % for a_field in c.form.generation:
-            <li> <label>
-                ${a_field() | n}
-                ${h.pokedex.pokedex_img("versions/generation-{0}.png".format(a_field.data), alt=u'')}
-                ${a_field.label}
-            </label> </li>
-            % endfor
-        </ul>
-        % for error in c.form.generation.errors:
-        <p class="error">${error}</p>
-        % endfor
-    </dd>
-    ${lib.field('similar_to')}
-
-    <dt>Flags</dt>
-    <dd>
-        <ul>
-            % for field, _ in c.flag_fields:
-            <li>${c.form[field]() | n} ${c.form[field].label() | n}</li>
-            % endfor
-        </ul>
-    </dd>
-
-    <dt>Categories</dt>
-    <dd>
+    </ul>
+</div>
+<div class="dex-column">
+    <h2>Categories</h2>
+    <div class="dex-move-search-categories">
         ${lib.bare_field('category_operator')}
         <ul>
             % for field in c.form.category:
             <li>${field() | n} ${field.label() | n}</li>
             % endfor
         </ul>
-    </dd>
-</dl>
+    </div>
+</div>
+</div>
 
 <h2>Type</h2>
 <ul class="dex-type-list">

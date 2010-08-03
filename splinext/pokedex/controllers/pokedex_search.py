@@ -1513,6 +1513,13 @@ class PokedexSearchController(BaseController):
 
         query = query.order_by(*sort_clauses)
 
+        # Eagerload the obvious stuff: type and damage class
+        query = query.options(
+            eagerload('type'),
+            eagerload('damage_class'),
+            eagerload('move_effect'),
+        )
+
         c.results = query.all()
 
         ### Done.

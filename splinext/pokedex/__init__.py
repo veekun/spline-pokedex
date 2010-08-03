@@ -148,6 +148,9 @@ class PokedexPlugin(PluginBase):
                     PluginLink(u'Pokémon', url(controller='dex', action='pokemon_list'), children=[
                         PluginLink(u'Awesome search', url(controller='dex_search', action='pokemon_search')),
                     ]),
+                    PluginLink(u'Moves', url(controller='dex', action='moves_list'), children=[
+                        PluginLink(u'Awesome search', url(controller='dex_search', action='move_search')),
+                    ]),
                     PluginLink(u'Types', url(controller='dex', action='types_list')),
                     PluginLink(u'Abilities', url(controller='dex', action='abilities_list')),
                     PluginLink(u'Items', url(controller='dex', action='items_list')),

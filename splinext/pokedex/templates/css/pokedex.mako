@@ -277,6 +277,9 @@ table.dex-type-chart.striped-rows tr:hover td.dex-damage-dealt-100 { color: #aaa
 /* Pokémon search -- move versions */
 table#dex-pokemon-search-move-versions td { padding-right: 2em; }
 
+/* Move search -- category list */
+.dex-move-search-categories { overflow: auto; max-height: 15em; }
+
 
 /*** Gadgets ***/
 
