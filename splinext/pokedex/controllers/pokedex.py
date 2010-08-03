@@ -1123,6 +1123,9 @@ class PokedexController(BaseController):
 
         return render('/pokedex/pokemon_locations.mako')
 
+    def moves_list(self):
+        return render('/pokedex/move_list.mako')
+
     def moves(self, name):
         try:
             c.move = db.get_by_name_query(tables.Move, name).one()

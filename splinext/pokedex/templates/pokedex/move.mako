@@ -8,7 +8,7 @@
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
     <li><a href="${url('/dex')}">Pokédex</a></li>
-    <li>Moves</li>
+    <li><a href="${url(controller='dex', action='moves_list')}">Moves</a></li>
     <li>${c.move.name}</li>
 </ul>
 </%def>
