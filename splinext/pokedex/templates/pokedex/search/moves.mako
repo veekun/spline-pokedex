@@ -12,15 +12,78 @@
 </ul>
 </%def>
 
-## RESULTS ##
+### RESULTS ###
+## Based pretty heavily on the Pokémon search results.  Surprise!
+## Four possibilities here: the form wasn't submitted, the form was submitted
+## but was bogus, the form was submitted and there are no results, or the form
+## was submitted and is good.
+
 % if c.form.was_submitted:
 <h1>Results</h1>
-<ol>
-    % for move in c.results:
-    <li>${move.name}</li>
+<p><a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/eraser.png')}" alt=""> Start over</a></p>
+
+% if not c.form.is_valid:
+## Errors
+<p>It seems you entered something bogus for:</p>
+<ul class="classic-list">
+    % for field_name in c.form.errors.keys():
+    <li>${c.form[field_name].label.text}</li>
     % endfor
-</ol>
-% endif
+</ul>
+
+% elif c.form.is_valid and not c.results:
+## No results
+<p>Nothing found.</p>
+
+% elif c.form.is_valid:
+## Got something
+
+## Display.  Could be one of several options...
+% if c.display_mode == 'custom-table':
+## Some sort of table.  (Standard table is also done this way.)
+## These defs are all at the bottom of this file
+<table class="dex-pokemon-moves striped-rows">
+% for column in c.display_columns:
+${getattr(self, 'col_' + column)()}
+% endfor
+<tr class="header-row">
+    % for column in c.display_columns:
+    ${getattr(self, 'th_' + column)()}
+    % endfor
+</tr>
+
+% for result in c.results:
+    <tr>
+        % for column in c.display_columns:
+        ${getattr(self, 'td_' + column)(result)}
+        % endfor
+    </tr>
+% endfor
+</table>
+
+% elif c.display_mode == 'custom-list-bullets':
+## Plain bulleted list with a Template.
+<ul class="dex-pokemon-search-list classic-list">
+    % for result in c.results:
+    <li><a href="${url(controller='dex', action='moves', name=result.name.lower())}">h.pokedex.apply_move_template(c.display_template, result)</a></li>
+    % endfor
+</ul>
+
+% elif c.display_mode == 'custom-list':
+## Plain unbulleted list with a Template.  Less semantic HTML, but more
+## friendly to clipboards.
+<div class="dex-pokemon-search-list">
+% for result in c.results:
+<a href="${url(controller='dex', action='moves', name=result.name.lower())}">h.pokedex.apply_move_template(c.display_template, result)</a><br>
+% endfor
+</div>
+
+% endif  ## display_mode
+
+% endif  ## search performed
+% endif  ## form submitted
+
+
 
 
 ### SEARCH FORM ###
@@ -133,6 +196,43 @@ ${h.form(url.current(), method='GET')}
 </div>
 </div>
 
+<h2>Display and sorting</h2>
+<div class="dex-column-container">
+<div class="dex-column">
+    <dl class="standard-form">
+        ${lib.field('display')}
+        ${lib.field('sort')}
+        ${lib.field('sort_backwards')}
+    </dl>
+</div>
+<div class="dex-column-2x">
+    <h3>${c.form.column.label() | n}</h3>
+    ${lib.bare_field('column')}
+</div>
+<div class="dex-column-2x">
+    <h3>${c.form.format.label() | n}</h3>
+    ${lib.bare_field('format')}
+
+    <h3>Format</h3>
+    <p>e.g.: <code>* $name ($type)</code> becomes <code>&bull; Surf (water)</code></p>
+    <dl class="standard-form">
+        <dt><code>*</code></dt>
+        <dd>&bull;</dd>
+
+        % for pattern in ( \
+            '$id', '$name', '$type', '$damage_class', \
+            '$pp', '$power', '$accuracy', '$priority', '$effect_chance', \
+            '$effect', \
+        ):
+        <%! from string import Template %>\
+        <% template = Template(pattern) %>\
+        <dt><code>${pattern}</code></dt>
+        <dd>${h.pokedex.apply_move_template(template, c.surf)}</dd>
+        % endfor
+    </dl>
+</div>
+</div>
+
 <p>
     ## Always shorten when the form is submitted!
     ${c.form.shorten(value=1) | n}
@@ -140,3 +240,62 @@ ${h.form(url.current(), method='GET')}
     <button type="reset">Reset form</button>
 </p>
 ${h.end_form()}
+
+
+### Display columns defs
+<%def name="col_id()"><col class="dex-col-id"></%def>
+<%def name="th_id()"><th>Num</th></%def>
+<%def name="td_id(move)"><td>${move.id}</td></%def>
+
+<%def name="col_name()"><col class="dex-col-name"></%def>
+<%def name="th_name()"><th>Name</th></%def>
+<%def name="td_name(move)"><td><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></td></%def>
+
+<%def name="col_type()"><col class="dex-col-type"></%def>
+<%def name="th_type()"><th>Type</th></%def>
+<%def name="td_type(move)"><td>${h.pokedex.type_link(move.type)}</td></%def>
+
+<%def name="col_class()"><col class="dex-col-type"></%def>
+<%def name="th_class()"><th>Class</th></%def>
+<%def name="td_class(move)"><td>${h.pokedex.damage_class_icon(move.damage_class)}</td></%def>
+
+<%def name="col_pp()"><col class="dex-col-stat"></%def>
+<%def name="th_pp()"><th>PP</th></%def>
+<%def name="td_pp(move)"><td>${move.pp}</td></%def>
+
+<%def name="col_power()"><col class="dex-col-stat"></%def>
+<%def name="th_power()"><th>Power</th></%def>
+<%def name="td_power(move)"><td>${move.power}</td></%def>
+
+<%def name="col_accuracy()"><col class="dex-col-stat"></%def>
+<%def name="th_accuracy()"><th>Acc</th></%def>
+<%def name="td_accuracy(move)"><td>${move.accuracy}%</td></%def>
+
+<%def name="col_priority()"><col class="dex-col-stat"></%def>
+<%def name="th_priority()"><th>Pri</th></%def>
+<%def name="td_priority(move)">\
+## Priority is colored red for slow and green for fast
+% if move.priority == 0:
+<td></td>\
+% elif move.priority > 0:
+<td class="dex-priority-fast">${move.priority}</td>\
+% else:
+<td class="dex-priority-slow">${move.priority}</td>\
+% endif
+</%def>
+
+<%def name="col_effect_chance()"><col class="dex-col-stat"></%def>
+<%def name="th_effect_chance()"><th>Eff</th></%def>
+<%def name="td_effect_chance(move)">\
+<td>\
+% if move.effect_chance:
+${move.effect_chance}% \
+% else:
+&mdash; \
+% endif
+</td>\
+</%def>
+
+<%def name="col_effect()"><col class="dex-col-effect"></%def>
+<%def name="th_effect()"><th>Effect</th></%def>
+<%def name="td_effect(move)"><td class="markdown effect">${move.short_effect.as_html | n}</td></%def>

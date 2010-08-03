@@ -1,6 +1,8 @@
 # encoding: utf8
 from spline.tests import *
 
+from splinext.pokedex.controllers.pokedex_search import MoveSearchForm
+
 class TestMoveSearchController(TestController):
 
     def do_search(self, **criteria):
@@ -22,7 +24,7 @@ class TestMoveSearchController(TestController):
         # Unless otherwise specified, the test doesn't care about display or
         # sorting, so skip all the effort the template goes through generating
         # the default table
-        criteria.setdefault('display', 'simple-list')
+        criteria.setdefault('display', 'custom-list')
         criteria.setdefault('sort', 'id')
 
         results = self.do_search(**criteria).c.results
@@ -334,4 +336,30 @@ class TestMoveSearchController(TestController):
             [u'Rest'],
             'multiple category search (AND)',
             exact=True,
+        )
+
+
+    def test_sort(self):
+        """Make sure all the sort methods actually work."""
+        sort_field = MoveSearchForm.sort
+        for value, label in sort_field.kwargs['choices']:
+            response = self.do_search(id=u'1', sort=value)
+            self.assert_(
+                response.c.results,
+                """Sort by {0} doesn't crash""".format(value)
+            )
+
+    def test_display_custom_table(self):
+        """Try spitting out a custom table with every column, and make sure it
+        doesn't explode.
+        """
+
+        column_field = MoveSearchForm.column
+        columns = [value for (value, label) in column_field.kwargs['choices']]
+
+        response = self.do_search(id=u'1', display='custom-table',
+                                           column=columns)
+        self.assert_(
+            response.c.results,
+            """Custom table columns don't crash""".format(value)
         )

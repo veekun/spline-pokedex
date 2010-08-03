@@ -529,3 +529,26 @@ def apply_pokemon_template(template, pokemon):
             d[key] = pokemon_stat.base_stat
 
     return h.literal(template.safe_substitute(d))
+
+def apply_move_template(template, move):
+    u"""`template` should be a string.Template object.
+
+    Uses safe_substitute to inject some fields from the move into the template,
+    just like the above.
+    """
+
+    d = dict(
+        id=move.id,
+        name=move.name,
+        type=move.type.name,
+        damage_class=move.damage_class.name,
+        pp=move.pp,
+        power=move.power,
+        accuracy=move.accuracy,
+
+        priority=move.move_effect.priority,
+        effect_chance=move.effect_chance,
+        effect=move.move_effect.short_effect,
+    )
+
+    return h.literal(template.safe_substitute(d))

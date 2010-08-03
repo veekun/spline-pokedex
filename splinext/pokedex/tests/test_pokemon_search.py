@@ -22,7 +22,7 @@ class TestPokemonSearchController(TestController):
         # Unless otherwise specified, the test doesn't care about display or
         # sorting, so skip all the effort the template goes through generating
         # the default table
-        criteria.setdefault('display', 'simple-list')
+        criteria.setdefault('display', 'custom-list')
         criteria.setdefault('sort', 'id')
 
         results = self.do_search(**criteria).c.results

@@ -43,6 +43,16 @@ default_pokemon_table_columns = [
     'stat_speed',
     'stat_total',
 ]
+default_move_table_columns = [
+    'name',
+    'type',
+    'class',
+    'pp',
+    'power',
+    'accuracy',
+    'priority',
+    'effect',
+]
 
 def ilike(column, string):
     string = string.lower()
@@ -349,10 +359,8 @@ class PokemonSearchForm(BaseSearchForm):
 
     display = fields.SelectField('Display',
         choices=[
-            ('standard-table', 'Standard table'),
             ('smart-table', 'Smart table'),
             ('custom-table', 'Custom table'),
-            ('simple-list', 'Simple list'),
             ('custom-list', 'Custom list'),
             ('icons', 'Icons'),
             ('sprites', 'Sprites'),
@@ -468,6 +476,51 @@ class MoveSearchForm(BaseSearchForm):
     power = RangeTextField('Power', inflator=int)
     effect_chance = RangeTextField('Effect chance', inflator=int)
     priority = RangeTextField('Priority', inflator=int, signed=True)
+
+    # Order and display
+    sort = fields.SelectField('Sort by',
+        choices=[
+            ('id', 'Internal ID'),
+            ('name', 'Name'),
+            ('type', 'Type'),
+            ('class', 'Damage class'),
+            ('pp', 'PP'),
+            ('power', 'Power'),
+            ('accuracy', 'Accuracy'),
+            ('priority', 'Priority'),
+            ('effect_chance', 'Effect chance'),
+            ('effect', 'Effect'),
+        ],
+        default='name',
+    )
+    sort_backwards = fields.BooleanField('Sort backwards')
+
+    display = fields.SelectField('Display',
+        choices=[
+            ('smart-table', 'Smart table'),
+            ('custom-table', 'Custom table'),
+            ('custom-list', 'Custom list'),
+        ],
+        default='smart-table',
+    )
+
+    column = MultiCheckboxField(
+        'Custom table columns',
+        choices=[
+            ('id', 'Internal ID'),
+            ('name', 'Name'),
+            ('type', 'Type'),
+            ('class', 'Damage class'),
+            ('pp', 'PP'),
+            ('power', 'Power'),
+            ('accuracy', 'Accuracy'),
+            ('priority', 'Priority'),
+            ('effect_chance', 'Effect chance'),
+            ('effect', 'Effect'),
+        ],
+        default=default_move_table_columns,
+    )
+    format = fields.TextField('Custom list format', default=u'$name')
 
 
 class PokedexSearchController(BaseController):
@@ -931,13 +984,7 @@ class PokedexSearchController(BaseController):
         c.display_columns = []
         c.original_results = None  # evolution chain thing
 
-        if c.display_mode == 'standard-table':
-            # Just do a "custom" table with a manual set of columns that happen
-            # to be the standard columns...
-            c.display_mode = 'custom-table'
-            c.display_columns = default_pokemon_table_columns
-
-        elif c.display_mode == 'smart-table':
+        if c.display_mode == 'smart-table':
             # Based on the standard table, but a little more clever.  For
             # example: searching by moves will show how the move is learned by
             # each resulting Pokémon.
@@ -951,12 +998,6 @@ class PokedexSearchController(BaseController):
             if not c.display_columns:
                 # Hmm.  Show name, at least.
                 c.display_columns = ['name']
-
-        elif c.display_mode == 'simple-list':
-            # This is a custom list with a fixed format string.
-            # Should look like: * [icon] Eevee
-            c.display_mode = 'custom-list-bullets'
-            c.display_template = Template(u'$icon $name')
 
         elif c.display_mode == 'custom-list':
             # Use whatever they asked for; it'll get pumped through
@@ -1251,6 +1292,10 @@ class PokedexSearchController(BaseController):
         c.generations = pokedex_session.query(tables.Generation) \
             .order_by(tables.Generation.id.asc())
 
+        # Rendering also needs an example move, to make the custom list docs
+        # reliable
+        c.surf = pokedex_session.query(tables.Move).get(57)
+
         # If this is the first time the form was submitted, redirect to a URL
         # with only non-default values
         if c.form.is_valid and c.form.was_submitted and c.form.needs_shortening:
@@ -1381,6 +1426,92 @@ class PokedexSearchController(BaseController):
                 pokemon_subq.c.move_id == me.id
             ))
 
+
+        ### Display
+        c.display_mode = c.form.display.data
+        c.display_columns = []
+
+        if c.display_mode == 'smart-table':
+            # Based on the standard table, but a little more clever.  For
+            # example: searching by moves will show how the move is learned by
+            # each resulting Pokémon.
+            # TODO actually do that.
+            c.display_mode = 'custom-table'
+            c.display_columns = default_move_table_columns
+
+        elif c.display_mode == 'custom-table':
+            # User can pick whatever columns, in any order.  Woo!
+            c.display_columns = c.form.column.data
+            if not c.display_columns:
+                # Hmm.  Show name, at least.
+                c.display_columns = ['name']
+
+        elif c.display_mode == 'custom-list':
+            # Use whatever they asked for; it'll get pumped through
+            # safe_substitute anyway.  This uses apply_pokemon_template from
+            # the pokedex helpers
+            list_format = c.form.format.data.strip()
+
+            # Asterisk at the beginning is secret code to make this a
+            # traditional list
+            if list_format[0] == u'*':
+                c.display_mode = 'custom-list-bullets'
+                list_format = list_format[1:]
+
+            c.display_template = Template( h.escape(list_format) )
+
+        # "Name" is the field that actually links to the page.  If it's
+        # missing, add a little link column
+        if c.display_mode == 'custom-table' and 'name' not in c.display_columns:
+            c.display_columns.append('link')
+
+        ### Sorting
+        # nb: the below sort ascending for words (a->z) and descending for
+        # numbers (9->1), because that's how it should be, okay
+        # Default fallback sort is by name, then by id (in case of form)
+        sort_clauses = [ me.name.asc(), me.id.asc() ]
+        if c.form.sort.data == 'id':
+            sort_clauses.insert(0,
+                me.id.asc()
+            )
+
+        elif c.form.sort.data == 'name':
+            # Name is fallback, so don't do anything
+            pass
+
+        elif c.form.sort.data == 'type':
+            # Sort by type name
+            query = query.join(me.type)
+            sort_clauses.insert(0, tables.Type.name.asc())
+
+        elif c.form.sort.data == 'class':
+            sort_clauses.insert(0, me.damage_class_id.asc())
+
+        elif c.form.sort.data == 'pp':
+            sort_clauses.insert(0, me.pp.desc())
+
+        elif c.form.sort.data == 'power':
+            sort_clauses.insert(0, me.power.desc())
+
+        elif c.form.sort.data == 'accuracy':
+            sort_clauses.insert(0, me.accuracy.desc())
+
+        elif c.form.sort.data == 'priority':
+            sort_clauses.insert(0, tables.MoveEffect.priority.desc())
+
+        elif c.form.sort.data == 'effect':
+            sort_clauses.insert(0, tables.MoveEffect.effect.desc())
+
+        # Reverse sort
+        if c.form.sort_backwards.data:
+            for i, clause in enumerate(sort_clauses):
+                # This is some semi-black SQLA magic...
+                if clause.modifier == asc_op:
+                    sort_clauses[i] = clause.element.desc()
+                else:
+                    sort_clauses[i] = clause.element.asc()
+
+        query = query.order_by(*sort_clauses)
 
         c.results = query.all()
 
