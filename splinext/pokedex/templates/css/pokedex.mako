@@ -205,6 +205,9 @@ dl.dex-simple-encounters ul li { display: inline; }
 dl.dex-simple-encounters ul li:after { content: '; '; }
 dl.dex-simple-encounters ul li:last-child:after { content: ''; }
 
+/* Pokémon page -- cry */
+audio.cry { width: 100%; }
+
 /* Pokémon flavor page -- tables of sprites */
 table.dex-pokemon-flavor-sprites td { vertical-align: middle /* sprites aren't always the same height within a row */; }
 table.dex-pokemon-flavor-sprites td.dex-pokemon-flavor-no-sprite { text-align: center; }

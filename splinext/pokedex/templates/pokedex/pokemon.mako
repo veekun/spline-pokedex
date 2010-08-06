@@ -436,6 +436,7 @@ ${h.h1('Flavor')}
                 <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
             </a>
         </dd>
+
         <dt>Color</dt>
         <dd style="color: ${c.pokemon.color};">
             ${c.pokemon.color}
@@ -444,8 +445,24 @@ ${h.h1('Flavor')}
                 <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
             </a>
         </dd>
+
         <dt>Cry</dt>
-        <dd>${h.HTML.a('download mp3', href=url(controller='dex', action='media', path='cries/%d.mp3' % c.pokemon.national_id))}</dd>
+<%
+        # Shaymin (and nothing else) has different cries for its different forms
+        if c.pokemon.national_id == 492:
+            cry_path = 'cries/{0}-{1}.ogg'.format(c.pokemon.national_id, c.pokemon.forme_name)
+        else:
+            cry_path = 'cries/{0}.ogg'.format(c.pokemon.national_id)
+
+        cry_path = url(controller='dex', action='media', path=cry_path)
+%>\
+        <dd>
+            <audio src="${cry_path}" controls preload="auto" class="cry">
+                <!-- Totally the best fallback -->
+                <a href="${cry_path}">Download</a>
+            </audio>
+        </dd>
+
         % if c.pokemon.generation.id <= 3:
         <dt>Habitat ${h.pokedex.generation_icon(3)}</dt>
         <dd>
@@ -457,8 +474,10 @@ ${h.h1('Flavor')}
             </a>
         </dd>
         % endif
+
         <dt>Pawprint</dt>
         <dd>${h.pokedex.pokemon_sprite(c.pokemon, prefix='pawprints', form=None)}</dd>
+
         <dt>Shape</dt>
         <dd>
             ${h.pokedex.pokedex_img('chrome/shapes/%d.png' % c.pokemon.shape.id, alt='', title=c.pokemon.shape.name)}
