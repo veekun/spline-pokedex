@@ -99,7 +99,7 @@ ${h.h1('Essentials')}
     <ul class="classic-list dex-move-flags">
       % for flag, has_flag in c.flags:
         <%
-            search_param = 'flag_' + flag.identifier
+            search_param = "flag_{0}".format(flag.identifier)
             search_query = { search_param: u'yes' if has_flag else u'no' }
         %>\
         % if has_flag:
