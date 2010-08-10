@@ -15,7 +15,7 @@ ${h.h1('Introduction')}
 
 <ul class="classic-list">
     <li><a href="${url(controller='dex', action='pokemon_list')}">Pokémon</a></li>
-    <li>Moves</li>
+    <li><a href="${url(controller='dex', action='moves_list')}">Moves</a></li>
     <li><a href="${url(controller='dex', action='types_list')}">Types</a></li>
     <li><a href="${url(controller='dex', action='abilities_list')}">Abilities</a></li>
     <li><a href="${url(controller='dex', action='items_list')}">Items</a></li>
@@ -27,7 +27,7 @@ ${h.h1('Introduction')}
 
 ${h.h1('Finding stuff')}
 
-<p>Lookup works the same way anywhere you can type a name.  Keep in mind that "lookup" is used to mean entering a name to find something(s) specific.  "Searching" is <a href="${url(controller='dex_search', action='pokemon_search')}">a bit more complicated</a>.</p>
+<p>Lookup works the same way anywhere you can type a name.  ("Lookup" refers to entering a name to find something(s) specific.  "Searching" is <a href="${url(controller='dex_search', action='pokemon_search')}">a bit more complicated</a>.)</p>
 
 <p>Case (${lookup_examples(u'kecleon')} vs ${lookup_examples(u'KECLEON')}) and extra spaces are ignored.</p>
 
