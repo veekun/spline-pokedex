@@ -178,6 +178,12 @@ pokedex.pokemon_moves = {
         $original_rows.find('td, th').css('display', null);
         $original_rows.removeData('pokemon_moves.filtered_out');
 
+        // Unreduce headers with colspans
+        $original_rows.filter('.subheader-row').find('th[colspan]')
+            .attr('colspan', function() {
+                return $(this).data('pokemon_moves.original_colspan');
+            });
+
         // Blank the table
         $table.find('tr')
                .not('.js-dex-pokemon-moves-controls')
@@ -294,6 +300,14 @@ pokedex.pokemon_moves = {
         var $cells = $non_spanned_rows.find('th, td');
         $cells.filter( hidden_cell_css.join(',') )
               .css('display', 'none');
+
+        // Fix the colspans for subheaders
+        var $colspanned = $all_rows.filter('.subheader-row')
+            .children('th[colspan]');
+        var old_colspan = $colspanned.eq(0).attr('colspan');
+        var new_colspan = old_colspan - hidden_cell_css.length;
+        $colspanned.data('pokemon_moves.original_colspan', old_colspan)
+            .attr('colspan', new_colspan);
 
         // Hide any rows that only have empty cells remaining
         // i.e. hide any rows that AREN'T rows WITHOUT empty cells remaining.
