@@ -41,6 +41,7 @@ dd:hover .dex-subtle-search-link { visibility: visible; }
 /*** General tables ***/
 
 /* Columns woo */
+/* nb: these columns *include* cell padding */
 col.dex-col-icon        { width: 32px; }
 col.dex-col-name        { width: 10em; }
 col.dex-col-link        { width: 16px; }
@@ -60,8 +61,8 @@ col.dex-col-stat-bar    { width: auto; }
 col.dex-col-stat-pctile { width: 5em; }
 col.dex-col-stat-result { width: 5em; }
 col.dex-col-effort      { width: 8em; }
-col.dex-col-type        { width: 3em; }
-col.dex-col-type2       { width: 7em; }
+col.dex-col-type        { width: 40px; /* badges are 32px wide */ }
+col.dex-col-type2       { width: 80px; }
 col.dex-col-version     { width: 3.5em; }  /* two versions (32px < 33px == 3em) plus 0.17em padding < 3.5em */
 col.dex-col-encounter-name { width: 10em; }
 col.dex-col-encounter-version { width: 12em; }
