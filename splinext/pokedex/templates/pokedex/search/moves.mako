@@ -113,10 +113,10 @@ ${h.form(url.current(), method='GET')}
             <p class="error">${error}</p>
             % endfor
         </dd>
-        <dt>Generation</dt>
+        <dt>Introduced in</dt>
         <dd>
             <ul>
-                % for a_field in c.form.generation:
+                % for a_field in c.form.introduced_in:
                 <li> <label>
                     ${a_field() | n}
                     ${h.pokedex.pokedex_img("versions/generation-{0}.png".format(a_field.data), alt=u'')}
@@ -124,7 +124,7 @@ ${h.form(url.current(), method='GET')}
                 </label> </li>
                 % endfor
             </ul>
-            % for error in c.form.generation.errors:
+            % for error in c.form.introduced_in.errors:
             <p class="error">${error}</p>
             % endfor
         </dd>

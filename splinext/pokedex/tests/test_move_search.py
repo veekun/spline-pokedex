@@ -137,7 +137,7 @@ class TestMoveSearchController(TestController):
     def test_generation(self):
         u"""Checks generation searching."""
         self.check_search(
-            dict(generation=u'1'),
+            dict(introduced_in=u'1'),
             [u'Tackle', u'Gust', u'Thunder Wave', u'Hyper Beam'],
             'searching by generation',
         )

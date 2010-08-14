@@ -419,7 +419,7 @@ class MoveSearchForm(BaseSearchForm):
         get_pk=lambda table: table.name.lower(),
         allow_blank=True,
     )
-    generation = QueryCheckboxSelectMultipleField(
+    introduced_in = QueryCheckboxSelectMultipleField(
         'Generation',
         query_factory=lambda: pokedex_session.query(tables.Generation),
         get_label=lambda _: _.name,
@@ -1322,9 +1322,9 @@ class PokedexSearchController(BaseController):
             )
 
         # Generation
-        if c.form.generation.data:
+        if c.form.introduced_in.data:
             query = query.filter(
-                me.generation_id.in_(_.id for _ in c.form.generation.data)
+                me.generation_id.in_(_.id for _ in c.form.introduced_in.data)
             )
 
         # Effect
