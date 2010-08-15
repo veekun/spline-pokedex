@@ -205,7 +205,7 @@
 <th>Effect</th>
 </%def>
 
-<%def name="move_table_row(move, gen_instead_of_type=False)">
+<%def name="move_table_row(move, gen_instead_of_type=False, pp_override=None)">
 <td><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></td>
 % if gen_instead_of_type:
 ## Done on type pages; we already know the type, so show the generation instead
@@ -214,7 +214,13 @@
 <td class="type">${h.pokedex.type_link(move.type)}</td>
 % endif
 <td class="class">${h.pokedex.damage_class_icon(move.damage_class)}</td>
-<td>${move.pp}</td>
+<td>
+    % if pp_override and pp_override != move.pp:
+    <s>${move.pp}</s> <br> ${pp_override}
+    % else:
+    ${move.pp}
+    % endif
+</td>
 <td>${move.power}</td>
 <td>${move.accuracy}%</td>
 ## Priority is colored red for slow and green for fast
@@ -226,6 +232,11 @@
 <td class="dex-priority-slow">${move.priority}</td>
 % endif
 <td class="markdown effect">${move.short_effect.as_html | n}</td>
+</%def>
+
+<%def name="move_table_blank_row()">
+<td>&mdash;</td>
+<td colspan="7"></td>
 </%def>
 
 <%def name="flavor_text_list(flavor_text, classes='')">
