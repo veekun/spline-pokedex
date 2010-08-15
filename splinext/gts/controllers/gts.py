@@ -19,6 +19,7 @@ from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func
+from sqlalchemy.exc import IntegrityError
 
 from spline.model import meta
 from spline.lib.base import BaseController, render
@@ -196,9 +197,9 @@ class GTSController(BaseController):
             meta.Session.add(stored_pokemon)
             meta.Session.commit()
             return '\x01\x00'
-        except:
-            # If that failed (presumably due to unique key collision), we're
-            # already storing something.  Reject!
+        except IntegrityError:
+            # If that failed due to unique key collision, we're already storing
+            # something.  Reject!
             return '\x0c\x00'
 
     def page_post_finish(self, pid, data):
