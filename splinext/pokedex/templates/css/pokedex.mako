@@ -28,6 +28,9 @@ a.dex-box-link.selected { border: 1px solid #95b7ea; background: #bfd4f2; }
 .dex-damage-dealt-100 { font-weight: bold; color: #999; }
 .dex-damage-dealt-200 { font-weight: bold; color: #6c6; }
 .dex-damage-dealt-400 { font-weight: bold; color: #6cc; }
+.dex-damage-score-good { font-weight: bold; color: #4c4; }
+.dex-damage-score-bad  { font-weight: bold; color: #c44; }
+.dex-damage-score-eh   { font-weight: bold; color: #ccc; }
 
 /* Move priorities, used most prominently in the move table */
 .dex-priority-fast { font-weight: bold; color: green; }

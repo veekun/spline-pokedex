@@ -1348,6 +1348,33 @@ class PokedexController(BaseController):
             c.secondary_type = None
             c.secondary_efficacy = defaultdict(lambda: 100)
 
+        # Count up a relative score for each type, both attacking and
+        # defending.  Normal damage counts for 0; super effective counts for
+        # +1; not very effective counts for -1.  Ineffective counts for -2.
+        # With dual types, x4 is +2 and x1/4 is -2; ineffective is -4.
+        # Everything is of course the other way around for defense.
+        attacking_score_conversion = {
+            400: +2,
+            200: +1,
+            100:  0,
+             50: -1,
+             25: -2,
+              0: -2,
+        }
+        if c.secondary_type:
+            attacking_score_conversion[0] = -4
+
+        c.attacking_scores = defaultdict(int)
+        c.defending_scores = defaultdict(int)
+        for attacking_type in c.types:
+            for efficacy in attacking_type.damage_efficacies:
+                defending_type = efficacy.target_type
+                factor = efficacy.damage_factor * \
+                    c.secondary_efficacy[attacking_type] // 100
+
+                c.attacking_scores[attacking_type] += attacking_score_conversion[factor]
+                c.defending_scores[defending_type] -= attacking_score_conversion[factor]
+
         return render('/pokedex/type_list.mako')
 
     def types(self, name):
