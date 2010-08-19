@@ -160,6 +160,9 @@ class PokedexPlugin(PluginBase):
                     PluginLink(u'Compare Pokémon', url(controller='dex_gadgets', action='compare_pokemon')),
                     PluginLink(u'Pokéball performance', url(controller='dex_gadgets', action='capture_rate')),
                 ]),
+                PluginLink(u'Etc.', None, children=[
+                    PluginLink(u'Downloads', url('/dex/downloads')),
+                ]),
             ]),
         ]
 

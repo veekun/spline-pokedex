@@ -1,0 +1,260 @@
+<%inherit file="/base.mako" />
+
+<%def name="title()">Downloads - Pokédex</%def>
+
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li>Downloads</li>
+</ul>
+</%def>
+
+
+<p>You can use anything on this page however you want.  Nintendo made these, not me, so I don't claim to own them in any way.  If you want to credit me for collecting or ripping them, that's cool; if not, that's cool too.  Enjoy.</p>
+
+## TODO: It would be a good idea to stick these sizes in dynamically.
+${h.h1('Sprite packs')}
+<p>These are tarballs of all the sprites from each generation.  If your zip program can't open them, try <a href="http://www.7-zip.org/">7-zip</a>.</p>
+
+${h.h2(u'Main Pokémon sprites')}
+<ul class="classic-list">
+    <li>
+        <a href="${h.static_uri('pokedex', 'downloads/generation-1.tar.gz')}">Generation I (700KB)</a>
+        &mdash; all sprites from Green, Red, Blue, and Yellow
+    </li>
+    <li>
+        <a href="${h.static_uri('pokedex', 'downloads/generation-2.tar.gz')}">Generation II (2.3MB)</a>
+        &mdash; all sprites from Gold, Silver, and Crystal (including animations)
+    </li>
+    <li>
+        <a href="${h.static_uri('pokedex', 'downloads/generation-3.tar.gz')}">Generation III (9.4MB)</a>
+        &mdash; all sprites from Ruby, Sapphire, Emerald (including animations), FireRed, and LeafGreen
+    </li>
+    <li>
+        <a href="${h.static_uri('pokedex', 'downloads/generation-4.tar.gz')}">Generation IV (14MB)</a>
+        &mdash; all sprites from Diamond, Pearl, Platinum, HeartGold, and SoulSilver
+    </li>
+</ul>
+
+${h.h2('Others')}
+<ul class="classic-list">
+    <li>
+        <a href="${h.static_uri('pokedex', 'downloads/pokemon-icons.tar.gz')}">Pokémon icons (178KB)</a>
+        &mdash; sprites used in the Pokémon screen (no animations)
+    </li>
+    <li>
+        <a href="${h.static_uri('pokedex', 'downloads/overworld.tar.gz')}">Overworld (3.7MB)</a>
+        &mdash; overworld Pokémon sprites from HeartGold/SoulSilver, plus a few overworld trainers
+    </li>
+    <li>
+        <a href="${h.static_uri('pokedex', 'downloads/pokemon-footprints.tar.gz')}">Footprints (43KB)</a>
+    </li>
+    <li>
+        <a href="${h.static_uri('pokedex', 'downloads/pokemon-trozei.tar.gz')}">Trozei sprites (249KB)</a>
+        &mdash; sprite for each Pokémon from Pokémon Trozei
+    </li>
+    <li>
+        <a href="${h.static_uri('pokedex', 'downloads/items.tar.gz')}">Items (164KB)</a>
+        &mdash; includes large sprites from Berry Tags and the Sinnoh Underground
+    </li>
+    <li>
+        <a href="${h.static_uri('pokedex', 'downloads/chrome.tar.gz')}">Chrome (39KB)</a>
+        &mdash; sprites for types, contest types, habitats, shiny leaves, ribbons, et al.
+    </li>
+</ul>
+
+${h.h1('Main sprite montages')}
+<p>Every Pokémon combined into a single large image by the <a href="http://www.imagemagick.org/script/montage.php"><code>montage</code></a> program.</p>
+<dl>
+    <dt>${h.pokedex.version_icons(u'赤い', u'緑')}</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/red-green.png')}">Game Boy (60KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/red-green-sgb.png')}">Super Game Boy (79KB)</a>
+    </dd>
+    <dt>${h.pokedex.version_icons(u'Red', u'Blue')}</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/red-blue.png')}">Game Boy (58KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/red-blue-sgb.png')}">Super Game Boy (77KB)</a>
+    </li>
+    <dt>${h.pokedex.version_icons(u'Yellow')}</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/yellow.png')}">Game Boy (57KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/yellow-sgb.png')}">Super Game Boy (76KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/yellow-gbc.png')}">Game Boy Color (76KB)</a>
+    </dd>
+    <dt>${h.pokedex.generation_icon(1)} back</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/generation-1-back.png')}">Game Boy (19KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/red-green-blue-back-sgb.png')}">
+            ${h.pokedex.version_icons(u'赤い', u'緑', u'Red', u'Blue')}
+            Super Game Boy (26KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/yellow-back-sgb.png')}">
+            ${h.pokedex.version_icons(u'Yellow')}
+            Super Game Boy (26KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/yellow-back-gbc.png')}">
+            ${h.pokedex.version_icons(u'Yellow')}
+            Game Boy Color (26KB)</a>
+    </dd>
+</dl>
+<hr>
+<dl>
+    <dt>${h.pokedex.version_icons(u'Gold')}</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/gold.png')}">normal (154KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/gold-shiny.png')}">shiny (155KB)</a>
+    </dd>
+    <dt>${h.pokedex.version_icons(u'Silver')}</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/silver.png')}">normal (155KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/silver-shiny.png')}">shiny (156KB)</a>
+    </dd>
+    <dt>${h.pokedex.version_icons(u'Crystal')}</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/crystal.png')}">normal (155KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/crystal-shiny.png')}">shiny (156KB)</a>
+    </dd>
+    <dt>${h.pokedex.version_icons(u'Gold', u'Silver')} back</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/gold-silver-back.png')}">normal (116KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/gold-silver-back-shiny.png')}">shiny (117KB)</a>
+    </dd>
+    <dt>${h.pokedex.version_icons(u'Crystal')} back</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/crystal-back.png')}">normal (116KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/crystal-back-shiny.png')}">shiny (117KB)</a>
+    </dd>
+</dl>
+<hr>
+<dl>
+    <dt>${h.pokedex.generation_icon(3)}</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/generation-3.png')}">normal (363KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/generation-3-shiny.png')}">shiny (366KB)</a>
+    </dd>
+    <dt>${h.pokedex.version_icons(u'Emerald')}</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/emerald-frame2.png')}">frame 2 (356KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/emerald-frame2-shiny.png')}">frame 2 shiny (358KB)</a>
+    </dd>
+    <dt>${h.pokedex.version_icons(u'FireRed', u'LeafGreen')}</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/firered-leafgreen.png')}">
+            ${h.pokedex.generation_icon(1)} normal (144KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/firered-leafgreen-shiny.png')}">
+            ${h.pokedex.generation_icon(1)} shiny (143KB)</a>
+    </dd>
+    <dt>${h.pokedex.generation_icon(3)} back</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/generation-3-back.png')}">normal (297KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/generation-3-back-shiny.png')}">shiny (299KB)</a>
+    </dd>
+    <dt>${h.pokedex.version_icons(u'FireRed', u'LeafGreen')} back</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/firered-leafgreen-back.png')}">
+            ${h.pokedex.generation_icon(1)} normal (118KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/firered-leafgreen-back-shiny.png')}">
+            ${h.pokedex.generation_icon(1)} shiny (118KB)</a>
+    </dd>
+</dl>
+<hr>
+<dl>
+    <dt>${h.pokedex.version_icons(u'Diamond', u'Pearl')}</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl.png')}">normal (537KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl-shiny.png')}">shiny (537KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl-frame2.png')}">frame 2 (524KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl-shiny-frame2.png')}">shiny frame 2 (524KB)</a>
+    </dd>
+    <dt>${h.pokedex.version_icons(u'Platinum')}</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/platinum.png')}">normal (535KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/platinum-shiny.png')}">shiny (535KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/platinum-frame2.png')}">frame 2 (523KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/platinum-shiny-frame2.png')}">shiny frame 2 (524KB)</a>
+    </dd>
+    <dt>${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')}</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver.png')}">normal (531KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-shiny.png')}">shiny (531KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-frame2.png')}">frame 2 (518KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-shiny-frame2.png')}">shiny frame 2 (518KB)</a>
+    </dd>
+    <dt>${h.pokedex.version_icons(u'Diamond', u'Pearl')} back</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl-back.png')}">normal (495KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl-back-shiny.png')}">shiny (496KB)</a>
+    </dd>
+    <dt>${h.pokedex.version_icons(u'Platinum')} back</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/platinum-back.png')}">normal (495KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/platinum-back-shiny.png')}">shiny (496KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/platinum-back-frame2.png')}">frame 2 (496KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/platinum-back-shiny-frame2.png')}">shiny frame 2 (497KB)</a>
+    </dd>
+    <dt>${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')} back</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-back.png')}">normal (496KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-back-shiny.png')}">shiny (496KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-back-frame2.png')}">frame 2 (500KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-back-shiny-frame2.png')}">shiny frame 2 (500KB)</a>
+    </dd>
+    <dt>${h.pokedex.generation_icon(4)} ♂ vs ♀</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl-female-diff.png')}">
+            ${h.pokedex.version_icons(u'Diamond', u'Pearl')} front (606KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/platinum-female-diff.png')}">
+            ${h.pokedex.version_icons(u'Platinum')} front (602KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-female-diff.png')}">
+            ${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')} front (597KB)</a>
+        <br>
+        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl-back-female-diff.png')}">
+            ${h.pokedex.version_icons(u'Diamond', u'Pearl')} back (565KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/platinum-back-female-diff.png')}">
+            ${h.pokedex.version_icons(u'Platinum')} back (561KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-back-female-diff.png')}">
+            ${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')} back (561KB)</a>
+    </dd>
+</dl>
+
+${h.h1('Other montages')}
+<ul class="classic-list">
+    <li>
+        ${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')} overworld:
+        <a href="${h.static_uri('pokedex', 'downloads/overworld-down.png')}">
+            facing forwards (169KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/overworld-right.png')}">
+            facing right (156KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/overworld-up.png')}">
+            facing backwards (152KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/overworld-down-shiny.png')}">
+            shiny forwards (170KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/overworld-right-shiny.png')}">
+            shiny right (157KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/overworld-up-shiny.png')}">
+            shiny backwards (153KB)</a>
+    </li>
+    <li><a href="${h.static_uri('pokedex', 'downloads/footprints.png')}">Pokémon footprints (11KB)</a></li>
+    <li><a href="${h.static_uri('pokedex', 'downloads/sugimori.png')}">Pokémon sugimori art, shrunk down (10MB)</a></li>
+    <li><a href="${h.static_uri('pokedex', 'downloads/items.png')}">items (249KB)</a></li>
+    <li><a href="${h.static_uri('pokedex', 'downloads/berries.png')}">berries (47KB)</a></li>
+</ul>
+
+${h.h1('Other files')}
+<ul class="classic-list">
+    <li>
+        <a href="${h.static_uri('pokedex', 'downloads/pokemon-cries.tar.gz')}">Pokémon cries (1.9MB)</a>
+        &mdash; encoded as Ogg Vorbis quality 3
+    </li>
+    <li>
+        <a href="${h.static_uri('pokedex', 'downloads/pokemon-sugimori.tar.gz')}">Sugimori art (25MB)</a>
+        &mdash; official art for every Pokémon
+    </li>
+    <li>
+        <a href="${h.static_uri('pokedex', 'downloads/veekun-pokedex.sqlite.gz')}">Full database as gzipped SQLite (4.8MB)</a>.
+        But see <a href="http://bugs.veekun.com/projects/pokedex/wiki/GettingData">the documentation</a> for other databases or real instructions.
+    </li>
+    <li>
+        <a href="http://git.veekun.com/">Source code for everything</a>;
+        use "snapshot" links or <a href="http://bugs.veekun.com/projects/veekun/wiki/Documentation">the real way</a>
+    </li>
+</ul>
