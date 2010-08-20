@@ -9,4 +9,9 @@
 .gts-pokemon ul.gts-pokemon-markings li { display: inline; }
 .gts-pokemon ul.gts-pokemon-ribbons li { display: inline; }
 .gts-pokemon ul.gts-pokemon-leaves li { display: inline-block; width: 16px; height: 16px; }
+.gts-pokemon .gts-pokemon-columns { margin-bottom: 1em; }
 .gts-pokemon .gts-pokemon-columns table tbody th { text-align: left; }
+.gts-pokemon .gts-pokemon-columns table .gts-bar-container { width: 3em; }
+
+.gts-bar-container { width: 12em; line-height: 1.5; border: 1px solid #d8d8d8; background: #f0f0f0; }
+.gts-bar { font-size: 0.8em; min-height: 1em; white-space: nowrap; background: #d8d8d8; }

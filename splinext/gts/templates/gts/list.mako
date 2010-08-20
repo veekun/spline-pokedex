@@ -1,4 +1,5 @@
 <%inherit file="/base.mako" />
+<%namespace name="dexlib" file="/pokedex/lib.mako"/>
 
 <%def name="title()">Stored Pokémon</%def>
 
@@ -7,9 +8,9 @@
     % if savefile.structure.ivs.is_egg:
     ${h.pokedex.pokedex_img("heartgold-soulsilver/egg.png", class_='icon')}
     % else:
-    ${h.pokedex.pokedex_img("heartgold-soulsilver/{0}{1}.png".format(
-            'shiny/' if savefile.is_shiny else '',
-            savefile.structure.national_id),
+    ${h.pokedex.pokemon_sprite(savefile.species,
+        form=savefile.structure.alternate_form,
+        prefix='heartgold-soulsilver/' + ('shiny/' if savefile.is_shiny else ''),
         class_='icon')}
     % endif
     <div class="header">
@@ -17,8 +18,7 @@
             % if savefile.structure.ivs.is_nicknamed:
             “${savefile.structure.nickname}”
             % else:
-            ## XXX pokemon name
-            ${savefile.structure.nickname}
+            ${savefile.species.full_name}
             % endif
             <span class="gender ${savefile.structure.gender}">
                 % if savefile.structure.gender == 'male':
@@ -29,9 +29,6 @@
                 &empty;
                 % endif
             </span>
-            % if savefile.structure.alternate_form:
-            ~ ${savefile.structure.alternate_form}
-            % endif
         </div>
         <div class="personality">
             ${savefile.structure.personality}<br>
@@ -39,176 +36,155 @@
         </div>
     </div>
 
+    ## Met stuff
     <p>
         Original trainer:
         ${savefile.structure.original_trainer_name}
         ${u'♂' if savefile.structure.original_trainer_gender == 'male' else u'♀'}
         <img src="${h.static_uri('spline', "flags/{0}.png".format(savefile.structure.original_country))}" alt="${savefile.structure.original_country}">,
-        ID ${savefile.structure.original_trainer_id}
-        <span class="secret-id">/ ${savefile.structure.original_trainer_secret_id}</span>
+        ID ${"%05d" % savefile.structure.original_trainer_id}
+        <span class="secret-id">/ ${"%05d" % savefile.structure.original_trainer_secret_id}</span>
     </p>
     <p>
-        % if savefile.structure.date_egg_received == savefile.structure.date_met:
-        Born and hatched on ${savefile.structure.date_egg_received}
-        % elif savefile.structure.date_egg_received:
-        Born on ${savefile.structure.date_egg_received};
-        hatched on ${savefile.structure.date_met})
+        ${h.pokedex.pokedex_img("items/%s.png" % h.pokedex.filename_from_name(savefile.pokeball.name),
+                   alt=savefile.pokeball.name, title=savefile.pokeball.name)}
+        % if savefile.structure.date_egg_received:
+        Egg received on ${savefile.structure.date_egg_received} around ${savefile.egg_location.name}.
+        Hatched on ${savefile.structure.date_met} around ${savefile.met_location.name} at level 1.
         % else:
-        [${savefile.structure.dppt_pokeball} ${savefile.structure.hgss_pokeball}]
-        Caught on ${savefile.structure.date_met}
-        at level ${savefile.structure.met_at_level}
-        % endif
-
-        at place number ${savefile.structure.dp_met_location_id}
-        or maybe ${savefile.structure.dp_egg_location_id}
-        orrrr ${savefile.structure.pt_met_location_id}
-        or???? ${savefile.structure.pt_egg_location_id}
-        ${h.pokedex.pokedex_img("versions/{0}.png".format(savefile.structure.original_version))}
-
-        ps was a ${savefile.structure.encounter_type}
-        % if savefile.structure.fateful_encounter:
-        also fateful
+        Encountered via ${savefile.structure.encounter_type}
+        and caught on ${savefile.structure.date_met}
+        around 
+        ${h.pokedex.pokedex_img("versions/{0}.png".format(savefile.structure.original_version))} 
+        ${savefile.met_location.name}
+        at level ${savefile.structure.met_at_level}.
         % endif
     </p>
 
-    <h2>Stats</h2>
-    <dl>
-        <dt>Experience</dt>
-        <dd>${savefile.structure.exp}</dd>
-        <dt>Happiness</dt>
-        <dd>${savefile.structure.happiness}</dd>
-        <dt>Held item</dt>
-        <dd>${savefile.structure.held_item_id}</dd>
-        <dt>Ability</dt>
-        <dd>${savefile.structure.ability_id}</dd>
-        <dt>Pokérus</dt>
-        <dd>${savefile.structure.pokerus}</dd>
-        <dt>Markings</dt>
-        <dd>
-            <ul class="gts-pokemon-markings">
-                % if savefile.structure.markings.heart:
-                <li>&#x2665;</li>
-                % else:
-                <li>&#x2661;</li>
-                % endif
-                % if savefile.structure.markings.diamond:
-                <li>&#x25c6;</li>
-                % else:
-                <li>&#x25c7;</li>
-                % endif
-                % if savefile.structure.markings.triangle:
-                <li>&#x25b2;</li>
-                % else:
-                <li>&#x25b3;</li>
-                % endif
-                % if savefile.structure.markings.square:
-                <li>&#x25a0;</li>
-                % else:
-                <li>&#x25a1;</li>
-                % endif
-                % if savefile.structure.markings.star:
-                <li>&#x2605;</li>
-                % else:
-                <li>&#x2606;</li>
-                % endif
-                % if savefile.structure.markings.circle:
-                <li>&#x25cf;</li>
-                % else:
-                <li>&#x25cb;</li>
-                % endif
-            </ul>
-        </dd>
-        <dt>Shiny leaves</dt>
-        <dd>
-            % if savefile.structure.shining_leaves.crown:
-            ${h.pokedex.pokedex_img('chrome/leaf-crown.png', alt='Leaf Crown', title='Leaf Crown')}
-            % else:
-            <ul class="gts-pokemon-leaves">
-                % for leaf_n in range(1, 6):
-                <li>
-                    % if savefile.structure.shining_leaves['leaf' + str(leaf_n)]:
-                    ${h.pokedex.pokedex_img('chrome/shiny-leaf.png', alt='Shiny Leaf', title='Shiny Leaf')}
-                    % endif
-                </li>
-                % endfor
-            </ul>
-            % endif
-        </dd>
-        <dt>Ribbons</dt>
-        <dd>
-            <ul class="gts-pokemon-ribbons">
-            % for region, ribbon_container in ('hoenn',  savefile.structure.hoenn_ribbons), \
-                                              ('sinnoh', savefile.structure.sinnoh_ribbons), \
-                                              ('sinnoh', savefile.structure.sinnoh_contest_ribbons):
-                % for ribbon in reversed(ribbon_container.__attrs__):
-                % if ribbon_container[ribbon]:
-                <li>${h.pokedex.pokedex_img("ribbons/{0}/{1}.png".format(region, ribbon.replace(u'_', u'-')), alt=ribbon.replace(u'_', u' ').title(), title=ribbon.replace(u'_', u' ').title())}</li>
-                % endif
-                % endfor
-            % endfor
-            </ul>
-        </dd>
-    </dl>
+    ## Ribbons
+    <ul class="gts-pokemon-ribbons">
+    % for region, ribbon_container in ('hoenn',  savefile.structure.hoenn_ribbons), \
+                                      ('sinnoh', savefile.structure.sinnoh_ribbons), \
+                                      ('sinnoh', savefile.structure.sinnoh_contest_ribbons):
+        % for ribbon in reversed(ribbon_container.__attrs__):
+        % if ribbon_container[ribbon]:
+        <li>${h.pokedex.pokedex_img("ribbons/{0}/{1}.png".format(region, ribbon.replace(u'_', u'-')), alt=ribbon.replace(u'_', u' ').title(), title=ribbon.replace(u'_', u' ').title())}</li>
+        % endif
+        % endfor
+    % endfor
+    </ul>
 
+    ## Shiny leaves
+    % if savefile.structure.shining_leaves.crown:
+    <p>${h.pokedex.pokedex_img('chrome/leaf-crown.png', alt='Leaf Crown', title='Leaf Crown')}</p>
+    % elif any(savefile.shiny_leaves):
+    <ul class="gts-pokemon-leaves">
+        % for leaf in savefile.shiny_leaves:
+        <li>
+            % if leaf:
+            ${h.pokedex.pokedex_img('chrome/shiny-leaf.png', alt='Shiny Leaf', title='Shiny Leaf')}
+            % endif
+        </li>
+        % endfor
+    </ul>
+    % endif
+
+    <%! from pokedex import formulae %>\
     <div class="dex-column-container gts-pokemon-columns">
     <div class="dex-column">
-        <table>
-        <thead>
-            <tr class="header-row">
-                <th>Stat</th>
-                <th>Gene</th>
-                <th>Exp</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th>HP</th>
-                <td>${savefile.structure.ivs.iv_hp}</td>
-                <td>${savefile.structure.effort_hp}</td>
-            </tr>
-            <tr>
-                <th>Attack</th>
-                <td>${savefile.structure.ivs.iv_attack}</td>
-                <td>${savefile.structure.effort_attack}</td>
-            </tr>
-            <tr>
-                <th>Defense</th>
-                <td>${savefile.structure.ivs.iv_defense}</td>
-                <td>${savefile.structure.effort_defense}</td>
-            </tr>
-            <tr>
-                <th>Special Attack</th>
-                <td>${savefile.structure.ivs.iv_special_attack}</td>
-                <td>${savefile.structure.effort_special_attack}</td>
-            </tr>
-            <tr>
-                <th>Special Defense</th>
-                <td>${savefile.structure.ivs.iv_special_defense}</td>
-                <td>${savefile.structure.effort_special_defense}</td>
-            </tr>
-            <tr>
-                <th>Speed</th>
-                <td>${savefile.structure.ivs.iv_speed}</td>
-                <td>${savefile.structure.effort_speed}</td>
-            </tr>
-        </tbody>
-        </table>
+        <ul class="classic-list">
+            <li>Level ${savefile.level}: ${savefile.structure.exp} EXP</li>
+            % if savefile.exp_to_next:
+            <li>
+                <div class="gts-bar-container">
+                    <div class="gts-bar" style="width: ${savefile.progress_to_next * 100}%;">&nbsp;${savefile.exp_to_next} to level ${savefile.level + 1}</div>
+                </div>
+            </li>
+            % endif
+            <li>Has <a href="${url(controller='dex', action='abilities', name=savefile.ability.name.lower())}">${savefile.ability.name}</a></li>
+            <li>
+                % if savefile.held_item:
+                Holding ${h.pokedex.item_link(savefile.held_item)}
+                % else:
+                Holding nothing
+                % endif
+            </li>
+            <li>
+                <div class="gts-bar-container">
+                    <div class="gts-bar" style="width: ${savefile.structure.happiness / 255.0 * 100}%;">&nbsp;${savefile.structure.happiness} happiness</div>
+                </div>
+            </li>
+
+            % if savefile.structure.fateful_encounter:
+            <li class="fateful-encounter">fateful encounter</li>
+            % endif
+            % if savefile.structure.pokerus:
+            <li>PokéRUS!  ${savefile.structure.pokerus}</li>
+            % endif
+
+            <li>
+                <ul class="gts-pokemon-markings">
+                    % if savefile.structure.markings.heart:
+                    <li>&#x2665;</li>
+                    % else:
+                    <li>&#x2661;</li>
+                    % endif
+                    % if savefile.structure.markings.diamond:
+                    <li>&#x25c6;</li>
+                    % else:
+                    <li>&#x25c7;</li>
+                    % endif
+                    % if savefile.structure.markings.triangle:
+                    <li>&#x25b2;</li>
+                    % else:
+                    <li>&#x25b3;</li>
+                    % endif
+                    % if savefile.structure.markings.square:
+                    <li>&#x25a0;</li>
+                    % else:
+                    <li>&#x25a1;</li>
+                    % endif
+                    % if savefile.structure.markings.star:
+                    <li>&#x2605;</li>
+                    % else:
+                    <li>&#x2606;</li>
+                    % endif
+                    % if savefile.structure.markings.circle:
+                    <li>&#x25cf;</li>
+                    % else:
+                    <li>&#x25cb;</li>
+                    % endif
+                </ul>
+            </li>
+        </ul>
     </div>
     <div class="dex-column">
         <table>
         <thead>
             <tr class="header-row">
-                <th>move_id</th>
-                <th>pp</th>
-                <th>pp_ups</th>
+                <th></th>
+                <th>Base</th>
+                <th>Gene</th>
+                <th>Exp</th>
+                <th>Calc</th>
             </tr>
         </thead>
         <tbody>
-            % for i in range(1, 5):
+            % for stat_info in savefile.stats:
             <tr>
-                <td>${savefile.structure['move' + str(i) + '_id']}</td>
-                <td>${savefile.structure['move' + str(i) + '_pp']}</td>
-                <td>${savefile.structure['move' + str(i) + '_pp_ups']}</td>
+                <th>${stat_info.stat.name}</th>
+                <td>${stat_info.base}</td>
+                <td>
+                    <div class="gts-bar-container">
+                        <div class="gts-bar" style="width: ${stat_info.gene / 31.0 * 100}%;">&nbsp;${stat_info.gene}</div>
+                    </div>
+                </td>
+                <td>
+                    <div class="gts-bar-container">
+                        <div class="gts-bar" style="width: ${stat_info.exp / 255.0 * 100}%;">&nbsp;${stat_info.exp}</div>
+                    </div>
+                </td>
+                <td>${stat_info.calc}</td>
             </tr>
             % endfor
         </tbody>
@@ -218,20 +194,52 @@
         <table>
         <thead>
             <tr class="header-row">
-                <th></th>
-                <th></th>
+                <th colspan="2">Contest stats</th>
             </tr>
         </thead>
         <tbody>
             % for contest_stat in ('beauty', 'cool', 'cute', 'smart', 'tough'):
             <tr>
-                <th>${contest_stat}</th>
-                <td>${savefile.structure['contest_' + contest_stat]}</td>
+                <th>${h.pokedex.pokedex_img("chrome/contest/{0}.png".format(contest_stat))}</th>
+                <td>
+                    <div class="gts-bar-container">
+                        <div class="gts-bar" style="width: ${savefile.structure['contest_' + contest_stat] / 255.0 * 100}%;">&nbsp;${savefile.structure['contest_' + contest_stat]}</div>
+                    </div>
+                </td>
             </tr>
             % endfor
+            <tr>
+                <th>Sheen</th>
+                <td>
+                    <div class="gts-bar-container">
+                        <div class="gts-bar" style="width: ${savefile.structure.contest_sheen / 255.0 * 100}%;">&nbsp;${savefile.structure.contest_sheen}</div>
+                    </div>
+                </td>
+            </tr>
         </tbody>
         </table>
     </div>
     </div>
+
+    ## Moves
+    <table class="dex-pokemon-moves striped-rows">
+        ${dexlib.move_table_columns()}
+        <thead>
+            <tr class="header-row">
+                ${dexlib.move_table_header()}
+            </tr>
+        </thead>
+        <tbody>
+            % for move, pp in zip(savefile.moves, savefile.move_pp):
+            <tr>
+                % if move:
+                ${dexlib.move_table_row(move, pp_override=pp)}
+                % else:
+                ${dexlib.move_table_blank_row()}
+                % endif
+            </tr>
+            % endfor
+        </tbody>
+    </table>
 </div>
 % endfor

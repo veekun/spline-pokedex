@@ -14,6 +14,7 @@ from spline.model import meta
 from spline.lib.base import BaseController, render
 from spline.lib import helpers as h
 from splinext.gts import model as gts_model
+from splinext.pokedex.db import pokedex_session
 
 log = logging.getLogger(__name__)
 
@@ -27,6 +28,7 @@ class GTSBrowseController(BaseController):
         c.savefiles = []
         for gts_pokemon in gts_pokemons:
             savefile = SaveFilePokemon(gts_pokemon.pokemon_blob)
+            savefile.use_database_session(pokedex_session)
             c.savefiles.append(savefile)
 
         return render('/gts/list.mako')
