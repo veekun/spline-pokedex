@@ -14,7 +14,7 @@ import pokedex.db.tables as tables
 import pokedex.formulae
 from pokedex.struct import SaveFilePokemon
 from pylons import config, request, response, session, tmpl_context as c, url
-from pylons.controllers.util import abort, redirect_to
+from pylons.controllers.util import abort, redirect
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join
 from sqlalchemy.orm.exc import NoResultFound

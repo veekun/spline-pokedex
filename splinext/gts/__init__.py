@@ -1,6 +1,6 @@
 from pkg_resources import resource_filename
 
-from pylons import c, session
+from pylons import session, tmpl_context as c
 
 from spline.lib.plugin import PluginBase
 from spline.lib.plugin import PluginBase, PluginLink, Priority
