@@ -10,7 +10,7 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 import pokedex.db.tables as tables
 from pylons import config, request, response, session, tmpl_context as c, url
-from pylons.controllers.util import abort, redirect_to
+from pylons.controllers.util import abort, redirect
 from sqlalchemy.orm import aliased, eagerload, eagerload_all
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func, and_, not_, or_
@@ -21,7 +21,7 @@ from spline.lib.base import BaseController, render
 from spline.lib.forms import DuplicateField, MultiCheckboxField, QueryCheckboxSelectMultipleField, QueryTextField
 
 from splinext.pokedex import helpers as pokedex_helpers
-from splinext.pokedex.db import pokedex_session
+import splinext.pokedex.db as db
 from splinext.pokedex.forms import PokedexLookupField, RangeTextField
 from splinext.pokedex.magnitude import parse_size
 
@@ -152,7 +152,7 @@ class PokemonSearchForm(BaseSearchForm):
     ability = PokedexLookupField('Ability', valid_type='ability', allow_blank=True)
     held_item = PokedexLookupField('Held item', valid_type='item', allow_blank=True)
     growth_rate = QuerySelectField('Growth rate',
-        query_factory=lambda: pokedex_session.query(tables.GrowthRate),
+        query_factory=lambda: db.pokedex_session.query(tables.GrowthRate),
         get_pk=lambda _: _.max_experience,
         get_label=lambda _: """{0} ({1:n} EXP)""".format(_.name, _.max_experience),
         allow_blank=True,
@@ -169,7 +169,7 @@ class PokemonSearchForm(BaseSearchForm):
     )
     type = QueryCheckboxSelectMultipleField(
         'Type',
-        query_factory=lambda: pokedex_session.query(tables.Type),
+        query_factory=lambda: db.pokedex_session.query(tables.Type),
         get_label=lambda _: _.name,
         get_pk=lambda table: table.name,
         allow_blank=True,
@@ -208,7 +208,7 @@ class PokemonSearchForm(BaseSearchForm):
     egg_group = DuplicateField(
         QuerySelectField(
             'Egg group',
-            query_factory=lambda: pokedex_session.query(tables.EggGroup),
+            query_factory=lambda: db.pokedex_session.query(tables.EggGroup),
             get_label=lambda _: _.name,
             allow_blank=True,
         ),
@@ -243,14 +243,14 @@ class PokemonSearchForm(BaseSearchForm):
     # Generation
     introduced_in = QueryCheckboxSelectMultipleField(
         'Introduced in',
-        query_factory=lambda: pokedex_session.query(tables.Generation),
+        query_factory=lambda: db.pokedex_session.query(tables.Generation),
         get_label=lambda _: pokedex_helpers.generation_icon(_),
         get_pk=lambda table: table.id,
         allow_blank=True,
     )
     in_pokedex = QueryCheckboxSelectMultipleField(
         u'In regional Pokédex',
-        query_factory=lambda: pokedex_session.query(tables.Pokedex) \
+        query_factory=lambda: db.pokedex_session.query(tables.Pokedex) \
                                   .filter(tables.Pokedex.region_id != None) \
                                   .filter(tables.Pokedex.name != u'Internal ID') \
                                   .options(eagerload_all('region.generation')),
@@ -276,7 +276,7 @@ class PokemonSearchForm(BaseSearchForm):
     )
     move_method = QueryCheckboxSelectMultipleField(
         'Learned by',
-        query_factory=lambda: pokedex_session.query(tables.PokemonMoveMethod)
+        query_factory=lambda: db.pokedex_session.query(tables.PokemonMoveMethod)
             # XXX move methods need to identify themselves as "common"
             .filter(tables.PokemonMoveMethod.id <= 4),
         get_label=lambda row: row.name,
@@ -285,7 +285,7 @@ class PokemonSearchForm(BaseSearchForm):
     )
     move_version_group = QueryCheckboxSelectMultipleField(
         'Versions',
-        query_factory=lambda: pokedex_session.query(tables.VersionGroup) \
+        query_factory=lambda: db.pokedex_session.query(tables.VersionGroup) \
                                              .options(eagerload('versions')),
         get_label=lambda row: pokedex_helpers.version_icons(*row.versions),
         get_pk=lambda table: table.id,
@@ -306,19 +306,19 @@ class PokemonSearchForm(BaseSearchForm):
     # Flavor
     species = fields.TextField('Species', default=u'')
     color = QuerySelectField('Color',
-        query_factory=lambda: pokedex_session.query(tables.PokemonColor),
+        query_factory=lambda: db.pokedex_session.query(tables.PokemonColor),
         get_label=lambda _: _.name,
         allow_blank=True,
         get_pk=lambda table: table.name,
     )
     habitat = QuerySelectField('Habitat',
-        query_factory=lambda: pokedex_session.query(tables.PokemonHabitat),
+        query_factory=lambda: db.pokedex_session.query(tables.PokemonHabitat),
         get_label=lambda _: _.name,
         allow_blank=True,
         get_pk=lambda table: table.name,
     )
     shape = QuerySelectField('Shape',
-        query_factory=lambda: pokedex_session.query(tables.PokemonShape)
+        query_factory=lambda: db.pokedex_session.query(tables.PokemonShape)
             .order_by(tables.PokemonShape.name.asc()),
         get_label=lambda _: _.name,
         get_pk=lambda _: _.name.lower(),
@@ -414,14 +414,14 @@ class MoveSearchForm(BaseSearchForm):
     name = fields.TextField('Name', default=u'')
     damage_class = QueryCheckboxSelectMultipleField(
         'Damage class',
-        query_factory=lambda: pokedex_session.query(tables.MoveDamageClass),
+        query_factory=lambda: db.pokedex_session.query(tables.MoveDamageClass),
         get_label=lambda _: _.name,
         get_pk=lambda table: table.name.lower(),
         allow_blank=True,
     )
     introduced_in = QueryCheckboxSelectMultipleField(
         'Generation',
-        query_factory=lambda: pokedex_session.query(tables.Generation),
+        query_factory=lambda: db.pokedex_session.query(tables.Generation),
         get_label=lambda _: _.name,
         get_pk=lambda table: table.id,
         allow_blank=True,
@@ -430,7 +430,7 @@ class MoveSearchForm(BaseSearchForm):
 
     type = QueryCheckboxSelectMultipleField(
         'Type',
-        query_factory=lambda: pokedex_session.query(tables.Type),
+        query_factory=lambda: db.pokedex_session.query(tables.Type),
         get_label=lambda _: _.name,
         get_pk=lambda table: table.name,
         allow_blank=True,
@@ -454,7 +454,7 @@ class MoveSearchForm(BaseSearchForm):
     # XXX perhaps share this stuff with the definitions above
     pokemon_method = QueryCheckboxSelectMultipleField(
         'Learned by',
-        query_factory=lambda: pokedex_session.query(tables.PokemonMoveMethod)
+        query_factory=lambda: db.pokedex_session.query(tables.PokemonMoveMethod)
             # XXX move methods need to identify themselves as "common"
             .filter(tables.PokemonMoveMethod.id <= 4),
         get_label=lambda row: row.name,
@@ -463,7 +463,7 @@ class MoveSearchForm(BaseSearchForm):
     )
     pokemon_version_group = QueryCheckboxSelectMultipleField(
         'Versions',
-        query_factory=lambda: pokedex_session.query(tables.VersionGroup) \
+        query_factory=lambda: db.pokedex_session.query(tables.VersionGroup) \
                                              .options(eagerload('versions')),
         get_label=lambda row: pokedex_helpers.version_icons(*row.versions),
         get_pk=lambda table: table.id,
@@ -531,7 +531,7 @@ class PokedexSearchController(BaseController):
 
         # Add stat-based fields dynamically
         c.stat_fields = []
-        for stat in pokedex_session.query(tables.Stat) \
+        for stat in db.pokedex_session.query(tables.Stat) \
                                    .order_by(tables.Stat.id):
             field_name = stat.name.lower().replace(u' ', u'_')
 
@@ -550,17 +550,17 @@ class PokedexSearchController(BaseController):
 
         # Rendering needs to know which version groups go with which
         # generations for the move-version-group list
-        c.generations = pokedex_session.query(tables.Generation) \
+        c.generations = db.pokedex_session.query(tables.Generation) \
             .order_by(tables.Generation.id.asc())
 
         # Rendering also needs an example Pokémon, to make the custom list docs
         # reliable
-        c.eevee = pokedex_session.query(tables.Pokemon).get(133)
+        c.eevee = db.pokedex_session.query(tables.Pokemon).get(133)
 
         # If this is the first time the form was submitted, redirect to a URL
         # with only non-default values
         if c.form.is_valid and c.form.was_submitted and c.form.needs_shortening:
-            redirect_to(url.current(**c.form.cleansed_data.mixed()))
+            redirect(url.current(**c.form.cleansed_data.mixed()))
 
         if not c.form.was_submitted or not c.form.is_valid:
             # Either blank, or errortastic.  Skip the logic and just send the
@@ -570,7 +570,7 @@ class PokedexSearchController(BaseController):
 
         ### Do the searching!
         me = tables.Pokemon
-        query = pokedex_session.query(me)
+        query = db.pokedex_session.query(me)
 
         # Sorting and filtering by stat both need to join to the stat table for
         # the specific stat in question.  Keep track of these joins to avoid
@@ -579,10 +579,10 @@ class PokedexSearchController(BaseController):
         def join_to_stat(stat):
             # stat can be an id, object, or name
             if isinstance(stat, basestring):
-                stat = pokedex_session.query(tables.Stat).filter_by(name=stat) \
+                stat = db.pokedex_session.query(tables.Stat).filter_by(name=stat) \
                                       .one()
             elif isinstance(stat, int):
-                stat = pokedex_session.query(tables.Stat).get(stat)
+                stat = db.pokedex_session.query(tables.Stat).get(stat)
 
             if stat not in stat_aliases:
                 stat_alias = aliased(tables.PokemonStat)
@@ -648,7 +648,7 @@ class PokedexSearchController(BaseController):
 
         # Held item
         if c.form.held_item.data:
-            item_subquery = pokedex_session.query(
+            item_subquery = db.pokedex_session.query(
                     tables.PokemonItem.pokemon_id
                 ) \
                 .filter_by(item_id=c.form.held_item.data.id) \
@@ -751,7 +751,7 @@ class PokedexSearchController(BaseController):
         # ...whereas position and special tend to need children
         if c.form.evolution_position.data or c.form.evolution_special.data:
             child_evolution = aliased(tables.PokemonEvolution)
-            child_subquery = pokedex_session.query(
+            child_subquery = db.pokedex_session.query(
                     child_evolution.from_pokemon_id.label('parent_id'),
                     func.count('*').label('child_count'),
                 ) \
@@ -850,7 +850,7 @@ class PokedexSearchController(BaseController):
             if u'branched' in c.form.evolution_special.data:
                 # Need to join to..  siblings.  Ugh.
                 sibling_evolution = aliased(tables.PokemonEvolution)
-                sibling_subquery = pokedex_session.query(
+                sibling_subquery = db.pokedex_session.query(
                     sibling_evolution.from_pokemon_id.label('parent_id'),
                     func.count('*').label('sibling_count'),
                 ) \
@@ -876,7 +876,7 @@ class PokedexSearchController(BaseController):
             # Need a subquery that finds all the Pokémon in all the selected
             # Pokédexes
             pokedex_numbers = aliased(tables.PokemonDexNumber)
-            pokedex_subquery = pokedex_session.query(
+            pokedex_subquery = db.pokedex_session.query(
                 pokedex_numbers.pokemon_id,
             ) \
                 .filter(pokedex_numbers.pokedex_id.in_(
@@ -901,7 +901,7 @@ class PokedexSearchController(BaseController):
             for move in c.form.move.data:
                 # Apply fuzzing
                 if c.form.move_fuzz.data == 'same-effect':
-                    move_effect_query = pokedex_session.query(tables.Move) \
+                    move_effect_query = db.pokedex_session.query(tables.Move) \
                         .filter_by(effect_id=move.effect_id)
                     move_ids = [id for (id,) in
                         move_effect_query.values(tables.Move.id)]
@@ -909,7 +909,7 @@ class PokedexSearchController(BaseController):
                     move_ids = [move.id]
 
                 move_alias = aliased(tables.PokemonMove)
-                move_subquery = pokedex_session.query(move_alias.pokemon_id) \
+                move_subquery = db.pokedex_session.query(move_alias.pokemon_id) \
                     .filter(move_alias.move_id.in_(move_ids))
 
                 if move_methods:
@@ -1055,11 +1055,11 @@ class PokedexSearchController(BaseController):
 
             # Rebuild the query
             if c.display_mode in ('custom-table',):
-                query = pokedex_session.query(me).filter(
+                query = db.pokedex_session.query(me).filter(
                     me.evolution_chain_id.in_( list(evolution_chain_ids) )
                 )
             else:
-                query = pokedex_session.query(me) \
+                query = db.pokedex_session.query(me) \
                     .filter(me.id.in_(pokemon_ids.keys()))
 
             # Let the template know which Pokémon are actually in the original
@@ -1070,7 +1070,7 @@ class PokedexSearchController(BaseController):
             # their chain to actually appear in the results.  This is wonky,
             # but makes sure that fake results don't affect sorting
             chain_sorting_alias = aliased(tables.Pokemon)
-            chain_sorting_subquery = pokedex_session.query(
+            chain_sorting_subquery = db.pokedex_session.query(
                     chain_sorting_alias.evolution_chain_id,
                     func.min(chain_sorting_alias.id).label('chain_position')
                 ) \
@@ -1156,7 +1156,7 @@ class PokedexSearchController(BaseController):
         elif c.form.sort.data == 'stat-total':
             # Create a subquery that sums all base stats
             stat_total = aliased(tables.PokemonStat)
-            stat_total_subquery = pokedex_session.query(
+            stat_total_subquery = db.pokedex_session.query(
                     stat_total.pokemon_id,
                     func.sum(stat_total.base_stat).label('stat_total'),
                 ) \
@@ -1233,7 +1233,7 @@ class PokedexSearchController(BaseController):
             for relation in eagerloads:
                 # Run the query again, selecting only by id this time, but
                 # eagerloading some relation
-                pokedex_session.query(tables.Pokemon) \
+                db.pokedex_session.query(tables.Pokemon) \
                     .filter(tables.Pokemon.id.in_(ids)) \
                     .options(eagerload_all(relation)) \
                     .all()
@@ -1245,7 +1245,7 @@ class PokedexSearchController(BaseController):
         ### First tack some database-driven fields onto the form
         # Category fields; they look like 32:self or 4:target
         category_choices = []
-        categories = pokedex_session.query(tables.MoveEffectCategory) \
+        categories = db.pokedex_session.query(tables.MoveEffectCategory) \
             .order_by(tables.MoveEffectCategory.id)
         for category in categories:
             category_choices.append((
@@ -1266,7 +1266,7 @@ class PokedexSearchController(BaseController):
 
         # Add flag fields dynamically
         c.flag_fields = []
-        c.flags = pokedex_session.query(tables.MoveFlagType) \
+        c.flags = db.pokedex_session.query(tables.MoveFlagType) \
             .order_by(tables.MoveFlagType.id)
         for flag in c.flags:
             field_name = 'flag_' + flag.identifier
@@ -1289,17 +1289,17 @@ class PokedexSearchController(BaseController):
 
         # Rendering needs to know which version groups go with which
         # generations for the move-version-group list
-        c.generations = pokedex_session.query(tables.Generation) \
+        c.generations = db.pokedex_session.query(tables.Generation) \
             .order_by(tables.Generation.id.asc())
 
         # Rendering also needs an example move, to make the custom list docs
         # reliable
-        c.surf = pokedex_session.query(tables.Move).get(57)
+        c.surf = db.pokedex_session.query(tables.Move).get(57)
 
         # If this is the first time the form was submitted, redirect to a URL
         # with only non-default values
         if c.form.is_valid and c.form.was_submitted and c.form.needs_shortening:
-            redirect_to(url.current(**c.form.cleansed_data.mixed()))
+            redirect(url.current(**c.form.cleansed_data.mixed()))
 
         if not c.form.was_submitted or not c.form.is_valid:
             # Either blank, or errortastic.  Skip the logic and just send the
@@ -1309,7 +1309,7 @@ class PokedexSearchController(BaseController):
 
         ### Do the searching!
         me = tables.Move
-        query = pokedex_session.query(me).join(tables.MoveEffect)
+        query = db.pokedex_session.query(me).join(tables.MoveEffect)
 
         # Name
         if c.form.name.data:
@@ -1341,7 +1341,7 @@ class PokedexSearchController(BaseController):
             if c.form[field].data != u'any':
                 # Join to a move-flag table that's cut down to just this flag
                 flag_alias = aliased(tables.MoveFlag)
-                subq = pokedex_session.query(flag_alias) \
+                subq = db.pokedex_session.query(flag_alias) \
                     .filter(flag_alias.move_flag_type_id == flag_id) \
                     .subquery()
 
@@ -1360,7 +1360,7 @@ class PokedexSearchController(BaseController):
 
                 # Need to make a subquery and tack it on!
                 category_alias = aliased(tables.MoveEffectCategoryMap)
-                subq = pokedex_session.query(category_alias) \
+                subq = db.pokedex_session.query(category_alias) \
                     .filter_by(
                         move_effect_category_id = int(category_id),
                         affects_user = (category_target == u'self'),
@@ -1409,7 +1409,7 @@ class PokedexSearchController(BaseController):
         pokemon_methods = [_.id for _ in c.form.pokemon_method.data]
         for pokemon in c.form.pokemon.data:
             pokemon_alias = aliased(tables.PokemonMove)
-            pokemon_subq = pokedex_session.query(pokemon_alias.move_id) \
+            pokemon_subq = db.pokedex_session.query(pokemon_alias.move_id) \
                 .filter(pokemon_alias.pokemon_id == pokemon.id)
 
             if pokemon_methods:

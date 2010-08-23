@@ -25,7 +25,7 @@ class TestPokemonSearchController(TestController):
         criteria.setdefault('display', 'custom-list')
         criteria.setdefault('sort', 'id')
 
-        results = self.do_search(**criteria).c.results
+        results = self.do_search(**criteria).tmpl_context.results
 
         self.assert_(
             len(results) < 490,
@@ -329,7 +329,8 @@ class TestPokemonSearchController(TestController):
         # Check that "<= 0" doesn't include genderless (-1)
         res = self.do_search(gender_rate_operator=u'less_equal',
                              gender_rate=u'0')
-        self.assertFalse(any(_.name == u'Voltorb' for _ in res.c.results))
+        self.assertFalse(
+            any(_.name == u'Voltorb' for _ in res.tmpl_context.results))
 
 
     def test_egg_groups(self):
@@ -689,7 +690,7 @@ class TestPokemonSearchController(TestController):
         for value, label in sort_field.kwargs['choices']:
             response = self.do_search(id=u'1', sort=value)
             self.assert_(
-                response.c.results,
+                response.tmpl_context.results,
                 """Sort by {0} doesn't crash""".format(value)
             )
 
@@ -704,7 +705,7 @@ class TestPokemonSearchController(TestController):
         response = self.do_search(id=u'1', display='custom-table',
                                            column=columns)
         self.assert_(
-            response.c.results,
+            response.tmpl_context.results,
             """Custom table columns don't crash""".format(value)
         )
 

@@ -27,7 +27,7 @@ class TestMoveSearchController(TestController):
         criteria.setdefault('display', 'custom-list')
         criteria.setdefault('sort', 'id')
 
-        results = self.do_search(**criteria).c.results
+        results = self.do_search(**criteria).tmpl_context.results
 
         self.assert_(
             len(results) < 460,
@@ -345,7 +345,7 @@ class TestMoveSearchController(TestController):
         for value, label in sort_field.kwargs['choices']:
             response = self.do_search(id=u'1', sort=value)
             self.assert_(
-                response.c.results,
+                response.tmpl_context.results,
                 """Sort by {0} doesn't crash""".format(value)
             )
 
@@ -360,6 +360,6 @@ class TestMoveSearchController(TestController):
         response = self.do_search(id=u'1', display='custom-table',
                                            column=columns)
         self.assert_(
-            response.c.results,
+            response.tmpl_context.results,
             """Custom table columns don't crash""".format(value)
         )

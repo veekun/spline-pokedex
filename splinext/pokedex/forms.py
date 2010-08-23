@@ -6,7 +6,7 @@ import re
 from sqlalchemy.sql import and_, or_
 from wtforms import ValidationError, fields
 
-from splinext.pokedex.db import pokedex_lookup
+import splinext.pokedex.db as db
 
 class PokedexLookupField(fields.TextField):
     u"""Provides a lookup box for naming something in the Pokédex."""
@@ -44,7 +44,7 @@ class PokedexLookupField(fields.TextField):
                 else:
                     raise ValidationError('Gotta pick something')
 
-            results = pokedex_lookup.lookup(
+            results = db.pokedex_lookup.lookup(
                 valuelist[0],
                 valid_types=[self.valid_type],
             )

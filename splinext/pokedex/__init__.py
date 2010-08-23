@@ -106,8 +106,12 @@ class PokedexExtension(markdown.Extension):
             = PokedexMechanicsPattern(mechanics_regex)
 
 
-def after_setup_hook(*args, **kwargs):
+def after_setup_hook(config, *args, **kwargs):
     """Hook to do some housekeeping after the app starts."""
+    # Connect to the database
+    splinext.pokedex.db.connect(config)
+
+    # Extend Markdown via monkey-patching..  boo  :(
     MarkdownString.markdown_extensions.append(PokedexExtension())
 
 def before_controller_hook(*args, **kwargs):

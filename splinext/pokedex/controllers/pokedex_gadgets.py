@@ -11,7 +11,7 @@ import pokedex.db
 import pokedex.db.tables as tables
 import pokedex.formulae
 from pylons import config, request, response, session, tmpl_context as c, url
-from pylons.controllers.util import abort, redirect_to
+from pylons.controllers.util import abort, redirect
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join
 from sqlalchemy.orm.exc import NoResultFound
@@ -23,8 +23,8 @@ from spline.lib import helpers as h
 from spline.lib.base import BaseController, render
 from spline.lib.forms import DuplicateField, QueryTextField
 
-from splinext.pokedex import db, helpers as pokedex_helpers
-from splinext.pokedex.db import pokedex_lookup, pokedex_session
+from splinext.pokedex import helpers as pokedex_helpers
+import splinext.pokedex.db as db
 from splinext.pokedex.forms import PokedexLookupField
 
 log = logging.getLogger(__name__)
@@ -377,7 +377,7 @@ class PokedexGadgetsController(BaseController):
             c.expected_attempts_oh_no = expected_attempts_oh_no
 
             # Template also needs real item objects to create links
-            pokeball_query = pokedex_session.query(tables.Item) \
+            pokeball_query = db.pokedex_session.query(tables.Item) \
                 .join(tables.ItemCategory, tables.ItemPocket) \
                 .filter(tables.ItemPocket.identifier == 'pokeballs')
             c.pokeballs = dict(
@@ -419,13 +419,13 @@ class PokedexGadgetsController(BaseController):
         c.did_anything = False
 
         # Form controls use version group
-        c.version_groups = pokedex_session.query(tables.VersionGroup) \
+        c.version_groups = db.pokedex_session.query(tables.VersionGroup) \
             .order_by(tables.VersionGroup.id.asc()) \
             .options(eagerload('versions')) \
             .all()
         # Grab the version to use for moves, defaulting to the most current
         try:
-            c.version_group = pokedex_session.query(tables.VersionGroup) \
+            c.version_group = db.pokedex_session.query(tables.VersionGroup) \
                 .get(request.params['version_group'])
         except (KeyError, NoResultFound):
             c.version_group = c.version_groups[-1]
@@ -434,7 +434,7 @@ class PokedexGadgetsController(BaseController):
         if request.params.get('shorten', False):
             short_params = self._shorten_compare_pokemon(
                 request.params.getall('pokemon'))
-            redirect_to(url.current(**short_params))
+            redirect(url.current(**short_params))
 
         FoundPokemon = namedtuple('FoundPokemon',
             ['pokemon', 'suggestions', 'input'])
@@ -454,8 +454,8 @@ class PokedexGadgetsController(BaseController):
                     pokemon=None, suggestions=None, input=u'')
                 continue
 
-            results = pokedex_lookup.lookup(raw_pokemon,
-                                            valid_types=['pokemon'])
+            results = db.pokedex_lookup.lookup(
+                raw_pokemon, valid_types=['pokemon'])
 
             # Two separate things to do here.
             # 1: Use the first result as the actual Pokémon
@@ -519,7 +519,7 @@ class PokedexGadgetsController(BaseController):
 
         # Setup only done if the page is actually showing
         if c.did_anything:
-            c.stats = pokedex_session.query(tables.Stat).all()
+            c.stats = db.pokedex_session.query(tables.Stat).all()
 
             # Relative numbers -- breeding and stats
             # Construct a nested dictionary of label => pokemon => (value, pct)
@@ -593,7 +593,7 @@ class PokedexGadgetsController(BaseController):
             c.moves = defaultdict(lambda: defaultdict(set))
             # And similarly for level moves, level => pokemon => moves
             c.level_moves = defaultdict(lambda: defaultdict(list))
-            q = pokedex_session.query(tables.PokemonMove) \
+            q = db.pokedex_session.query(tables.PokemonMove) \
                 .filter(tables.PokemonMove.version_group == c.version_group) \
                 .filter(tables.PokemonMove.pokemon_id.in_(
                     _.id for _ in unique_pokemon)) \

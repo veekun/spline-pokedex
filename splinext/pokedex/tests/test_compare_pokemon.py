@@ -15,14 +15,14 @@ class TestComparePokemonController(TestController):
         should be no comparing.
         """
         res = self.do_request(u'eevee')
-        self.assertEquals(len(res.c.found_pokemon), 8, 'correct name gives right count...')
-        self.assertEquals(res.c.found_pokemon[0].pokemon.name, u'Eevee', '...and right name')
-        self.assert_(res.c.found_pokemon[1] is None, 'other slots are empty')
+        self.assertEquals(len(res.tmpl_context.found_pokemon), 8, 'correct name gives right count...')
+        self.assertEquals(res.tmpl_context.found_pokemon[0].pokemon.name, u'Eevee', '...and right name')
+        self.assert_(res.tmpl_context.found_pokemon[1].pokemon is None, 'other slots are empty')
 
         res = self.do_request(u'ee*ee')
-        self.assert_(res.c.found_pokemon[0].suggestions is None, 'single wildcard matches exactly...')
-        self.assertEquals(res.c.found_pokemon[0].pokemon.name, u'Eevee', '...and correctly')
+        self.assert_(res.tmpl_context.found_pokemon[0].suggestions is None, 'single wildcard matches exactly...')
+        self.assertEquals(res.tmpl_context.found_pokemon[0].pokemon.name, u'Eevee', '...and correctly')
 
         res = self.do_request(u'trtle')
-        self.assert_(res.c.found_pokemon[0].suggestions is not None, 'bad misspelling matches several times...')
-        self.assert_(res.c.found_pokemon[0].pokemon is not None, '...but something is still used')
+        self.assert_(res.tmpl_context.found_pokemon[0].suggestions is not None, 'bad misspelling matches several times...')
+        self.assert_(res.tmpl_context.found_pokemon[0].pokemon is not None, '...but something is still used')

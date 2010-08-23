@@ -6,30 +6,36 @@ import os.path
 
 import pokedex.db
 from pokedex.db import tables
-import pylons
 from sqlalchemy.sql import func
 
 from spline.lib.base import SQLATimerProxy
 
 
-# XXX should these really do all this connecting on import??
-# DB session for everyone to use.
-# This uses the same timer proxy as the main engine, so Pokédex queries are
-# counted towards the db time in the footer
-pokedex_session = pokedex.db.connect(
-    pylons.config['spline-pokedex.database_url'],
-    engine_args={'proxy': SQLATimerProxy()},
-)
+pokedex_session = None
+pokedex_lookup = None
 
-# Lookup object
-pokedex_lookup = pokedex.lookup.PokedexLookup(
-    # Keep our own whoosh index in the /data dir
-    directory=os.path.join(pylons.config['pylons.cache_dir'],
-                          'pokedex-index'),
-    session=pokedex_session,
-)
-if not pokedex_lookup.index:
-    pokedex_lookup.rebuild_index()
+def connect(config):
+    """Instantiates the `pokedex_session` and `pokedex_lookup` objects."""
+    # DB session for everyone to use.
+    # This uses the same timer proxy as the main engine, so Pokédex queries are
+    # counted towards the db time in the footer
+    global pokedex_session
+    pokedex_session = pokedex.db.connect(
+        config['spline-pokedex.database_url'],
+        engine_args={'proxy': SQLATimerProxy()},
+    )
+
+    # Lookup object
+    global pokedex_lookup
+    pokedex_lookup = pokedex.lookup.PokedexLookup(
+        # Keep our own whoosh index in the /data dir
+        directory=os.path.join(config['pylons.cache_dir'],
+                              'pokedex-index'),
+        session=pokedex_session,
+    )
+    if not pokedex_lookup.index:
+        pokedex_lookup.rebuild_index()
+
 
 # Quick access to a few database objects
 def get_by_name_query(table, name):

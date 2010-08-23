@@ -11,7 +11,7 @@ import pokedex.db
 import pokedex.db.tables as tables
 import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c, url
-from pylons.controllers.util import abort, redirect_to
+from pylons.controllers.util import abort, redirect
 from pylons.decorators import jsonify
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join
@@ -25,7 +25,7 @@ from spline.lib.base import BaseController, render
 from spline.lib import helpers as h
 
 from splinext.pokedex import db, helpers as pokedex_helpers
-from splinext.pokedex.db import pokedex_lookup, pokedex_session
+import splinext.pokedex.db as db
 from splinext.pokedex.magnitude import parse_size
 
 log = logging.getLogger(__name__)
@@ -73,7 +73,7 @@ def _collapse_pokemon_move_columns(table, thing):
     move_columns = []
 
     # Only even consider versions in which this thing actually exists
-    q = pokedex_session.query(tables.Generation) \
+    q = db.pokedex_session.query(tables.Generation) \
                        .filter(tables.Generation.id >= thing.generation_id) \
                        .order_by(tables.Generation.id.asc())
     for generation in q:
@@ -236,7 +236,7 @@ class PokedexController(BaseController):
         try:
             return super(PokedexController, self).__call__(*args, **params)
         finally:
-            pokedex_session.remove()
+            db.pokedex_session.remove()
 
     def index(self):
         return ''
@@ -268,7 +268,7 @@ class PokedexController(BaseController):
 
 
         ### Regular lookup
-        results = pokedex_lookup.lookup(name)
+        results = db.pokedex_lookup.lookup(name)
 
         if len(results) == 0:
             # Nothing found
@@ -285,7 +285,7 @@ class PokedexController(BaseController):
                         u"""This is the only close match.""".format(name),
                         icon='spell-check-error')
 
-            return redirect_to(
+            return redirect(
                 pokedex_helpers.make_thingy_url(results[0].object))
 
         else:
@@ -322,7 +322,7 @@ class PokedexController(BaseController):
 
         valid_types = request.params.getall('type')
 
-        suggestions = pokedex_lookup.prefix_lookup(
+        suggestions = db.pokedex_lookup.prefix_lookup(
             prefix,
             valid_types=valid_types,
         )
@@ -369,7 +369,7 @@ class PokedexController(BaseController):
 
             metadata.append(meta)
 
-        normalized_name = pokedex_lookup.normalize_name(prefix)
+        normalized_name = db.pokedex_lookup.normalize_name(prefix)
         if ':' in normalized_name:
             _, normalized_name = normalized_name.split(':', 1)
 
@@ -403,12 +403,12 @@ class PokedexController(BaseController):
 
     def _prev_next_pokemon(self, pokemon):
         """Returns a 2-tuple of the previous and next Pokémon."""
-        max_id = pokedex_session.query(tables.Pokemon) \
+        max_id = db.pokedex_session.query(tables.Pokemon) \
                                 .filter_by(forme_base_pokemon_id=None) \
                                 .count()
-        prev_pokemon = pokedex_session.query(tables.Pokemon).get(
+        prev_pokemon = db.pokedex_session.query(tables.Pokemon).get(
             (c.pokemon.national_id - 1 - 1) % max_id + 1)
-        next_pokemon = pokedex_session.query(tables.Pokemon).get(
+        next_pokemon = db.pokedex_session.query(tables.Pokemon).get(
             (c.pokemon.national_id - 1 + 1) % max_id + 1)
         return prev_pokemon, next_pokemon
 
@@ -506,7 +506,7 @@ class PokedexController(BaseController):
         # ASSUMPTION: Every family has the same breeding groups throughout.
         if c.pokemon.gender_rate == -1:
             # Genderless; Ditto only
-            ditto = pokedex_session.query(tables.Pokemon) \
+            ditto = db.pokedex_session.query(tables.Pokemon) \
                 .filter_by(name=u'Ditto').one()
             c.compatible_families = [ditto]
         elif c.pokemon.egg_groups[0].id == 15:
@@ -516,7 +516,7 @@ class PokedexController(BaseController):
             parent_a = aliased(tables.Pokemon)
             grandparent_a = aliased(tables.Pokemon)
             egg_group_ids = [_.id for _ in c.pokemon.egg_groups]
-            q = pokedex_session.query(tables.Pokemon)
+            q = db.pokedex_session.query(tables.Pokemon)
             q = q.join(tables.PokemonEggGroup) \
                  .outerjoin((parent_a, tables.Pokemon.parent_pokemon)) \
                  .outerjoin((grandparent_a, parent_a.parent_pokemon)) \
@@ -554,7 +554,7 @@ class PokedexController(BaseController):
         # n.b.: the keys are tuples of versions, not versions!
         version_held_items = {}
         # Preload with a list of versions so we know which ones are empty
-        generations = pokedex_session.query(tables.Generation) \
+        generations = db.pokedex_session.query(tables.Generation) \
             .options( eagerload('versions') ) \
             .filter(tables.Generation.id >= max(3, c.pokemon.generation.id))
         for generation in generations:
@@ -599,7 +599,7 @@ class PokedexController(BaseController):
         c.evolution_table = []
         family = c.pokemon.evolution_chain.pokemon
         # Prefetch the evolution details
-        pokedex_session.query(tables.Pokemon) \
+        db.pokedex_session.query(tables.Pokemon) \
             .filter(tables.Pokemon.id.in_(_.id for _ in family)) \
             .options(
                 eagerload_all('parent_evolution.trigger'),
@@ -694,7 +694,7 @@ class PokedexController(BaseController):
         c.stats = {}  # stat_name => { border, background, percentile }
                       #              (also 'value' for total)
         stat_total = 0
-        total_stat_rows = pokedex_session.query(tables.PokemonStat) \
+        total_stat_rows = db.pokedex_session.query(tables.PokemonStat) \
                                          .filter_by(stat=c.pokemon.stats[0].stat) \
                                          .count()
         physical_attack = None
@@ -702,7 +702,7 @@ class PokedexController(BaseController):
         for pokemon_stat in c.pokemon.stats:
             stat_info = c.stats[pokemon_stat.stat.name] = {}
             stat_total += pokemon_stat.base_stat
-            q = pokedex_session.query(tables.PokemonStat) \
+            q = db.pokedex_session.query(tables.PokemonStat) \
                                .filter_by(stat=pokemon_stat.stat)
             less = q.filter(tables.PokemonStat.base_stat < pokemon_stat.base_stat) \
                     .count()
@@ -719,13 +719,13 @@ class PokedexController(BaseController):
 
         # Percentile for the total
         # Need to make a derived table that fakes pokemon_id, total_stats
-        stat_sum_tbl = pokedex_session.query(
+        stat_sum_tbl = db.pokedex_session.query(
                 func.sum(tables.PokemonStat.base_stat).label('stat_total')
             ) \
             .group_by(tables.PokemonStat.pokemon_id) \
             .subquery()
 
-        q = pokedex_session.query(stat_sum_tbl)
+        q = db.pokedex_session.query(stat_sum_tbl)
         less = q.filter(stat_sum_tbl.c.stat_total < stat_total).count()
         equal = q.filter(stat_sum_tbl.c.stat_total == stat_total).count()
         percentile = (less + equal * 0.5) / total_stat_rows
@@ -760,7 +760,7 @@ class PokedexController(BaseController):
             )
         )
 
-        q = pokedex_session.query(tables.Encounter) \
+        q = db.pokedex_session.query(tables.Encounter) \
             .filter_by(pokemon=c.pokemon) \
             .options(
                 eagerload_all('condition_value_map.condition_value'),
@@ -816,7 +816,7 @@ class PokedexController(BaseController):
         # order they go in the table.  This should keep it as compact as
         # possible.  Levels go in level order, and machines go in TM number
         # order
-        q = pokedex_session.query(tables.PokemonMove) \
+        q = db.pokedex_session.query(tables.PokemonMove) \
             .filter_by(pokemon_id=c.pokemon.id) \
             .outerjoin((tables.Machine, tables.PokemonMove.machine)) \
             .options(
@@ -973,7 +973,7 @@ class PokedexController(BaseController):
             # you can't see flavor for "just Unown"; there's no such thing.
             # You have to pick one, and if you don't, then I'll pick one for
             # you
-            redirect_to(form=c.pokemon.default_form_sprite.name)
+            redirect(url.current(form=c.pokemon.default_form_sprite.name))
 
         c.forms = [_.name for _ in c.pokemon.form_sprites]
         c.forms.sort()
@@ -982,7 +982,7 @@ class PokedexController(BaseController):
         # Every form should have a recorded sprite; find it
         if c.form:
             try:
-                spr_form = pokedex_session \
+                spr_form = db.pokedex_session \
                     .query(tables.PokemonFormSprite) \
                     .filter_by(pokemon_id=c.pokemon.id, name=c.form) \
                     .one()
@@ -1033,7 +1033,7 @@ class PokedexController(BaseController):
         # Then by area -- table rows.
         # Then by version -- table columns.
         # Finally, condition values associated with levels/rarity.
-        q = pokedex_session.query(tables.Encounter) \
+        q = db.pokedex_session.query(tables.Encounter) \
             .options(
                 eagerload_all('condition_value_map.condition_value'),
                 eagerload_all('version'),
@@ -1133,10 +1133,10 @@ class PokedexController(BaseController):
             return self._not_found()
 
         ### Prev/next for header
-        max_id = pokedex_session.query(tables.Move).count()
-        c.prev_move = pokedex_session.query(tables.Move).get(
+        max_id = db.pokedex_session.query(tables.Move).count()
+        c.prev_move = db.pokedex_session.query(tables.Move).get(
             (c.move.id - 1 - 1) % max_id + 1)
-        c.next_move = pokedex_session.query(tables.Move).get(
+        c.next_move = db.pokedex_session.query(tables.Move).get(
             (c.move.id - 1 + 1) % max_id + 1)
 
         return self.cache_content(
@@ -1147,7 +1147,7 @@ class PokedexController(BaseController):
 
     def _do_moves(self, name):
         # Eagerload
-        pokedex_session.query(tables.Move) \
+        db.pokedex_session.query(tables.Move) \
             .filter_by(id=c.move.id) \
             .options(
                 eagerload('damage_class'),
@@ -1171,7 +1171,7 @@ class PokedexController(BaseController):
             .one()
 
         # Used for item linkage
-        c.pp_up = pokedex_session.query(tables.Item) \
+        c.pp_up = db.pokedex_session.query(tables.Item) \
             .filter_by(name=u'PP Up').one()
 
         ### Type efficacy
@@ -1184,7 +1184,7 @@ class PokedexController(BaseController):
         if c.move.power in (0, 1):
             c.power_percentile = None
         else:
-            q = pokedex_session.query(tables.Move) \
+            q = db.pokedex_session.query(tables.Move) \
                 .filter(tables.Move.power > 1)
             less = q.filter(tables.Move.power < c.move.power).count()
             equal = q.filter(tables.Move.power == c.move.power).count()
@@ -1192,14 +1192,14 @@ class PokedexController(BaseController):
 
         ### Flags
         c.flags = []
-        move_flags = pokedex_session.query(tables.MoveFlagType) \
+        move_flags = db.pokedex_session.query(tables.MoveFlagType) \
                                     .order_by(tables.MoveFlagType.id.asc())
         for flag in move_flags:
             has_flag = flag in c.move.flags
             c.flags.append((flag, has_flag))
 
         ### Machines
-        q = pokedex_session.query(tables.Generation) \
+        q = db.pokedex_session.query(tables.Generation) \
             .filter(tables.Generation.id >= c.move.generation.id) \
             .options(
                 eagerload('version_groups'),
@@ -1243,7 +1243,7 @@ class PokedexController(BaseController):
                 vg_numbers.sort(key=lambda item: item.version_group.id)
 
         ### Similar moves
-        c.similar_moves = pokedex_session.query(tables.Move) \
+        c.similar_moves = db.pokedex_session.query(tables.Move) \
             .join(tables.Move.move_effect) \
             .filter(tables.MoveEffect.id == c.move.effect_id) \
             .filter(tables.Move.id != c.move.id) \
@@ -1257,7 +1257,7 @@ class PokedexController(BaseController):
         pokemon_methods = defaultdict(dict)
         # Sort by descending level because the LAST level seen is the one that
         # ends up in the table, and the lowest level is the most useful
-        q = pokedex_session.query(tables.PokemonMove) \
+        q = db.pokedex_session.query(tables.PokemonMove) \
             .options(
                 eagerload('method'),
                 eagerload('pokemon'),
@@ -1331,13 +1331,13 @@ class PokedexController(BaseController):
 
 
     def types_list(self):
-        c.types = pokedex_session.query(tables.Type) \
+        c.types = db.pokedex_session.query(tables.Type) \
             .order_by(tables.Type.name) \
             .options(eagerload('damage_efficacies')) \
             .all()
 
         try:
-            c.secondary_type = pokedex_session.query(tables.Type) \
+            c.secondary_type = db.pokedex_session.query(tables.Type) \
                 .filter(tables.Type.name == request.params['secondary']) \
                 .one()
 
@@ -1384,17 +1384,17 @@ class PokedexController(BaseController):
             return self._not_found()
 
         ### Prev/next for header
-        max_id = pokedex_session.query(tables.Type).count()
-        c.prev_type = pokedex_session.query(tables.Type).get(
+        max_id = db.pokedex_session.query(tables.Type).count()
+        c.prev_type = db.pokedex_session.query(tables.Type).get(
             (c.type.id - 1 - 1) % max_id + 1)
-        c.next_type = pokedex_session.query(tables.Type).get(
+        c.next_type = db.pokedex_session.query(tables.Type).get(
             (c.type.id - 1 + 1) % max_id + 1)
 
-        c.moves = pokedex_session.query(tables.Move) \
+        c.moves = db.pokedex_session.query(tables.Move) \
                                  .filter_by(type_id=c.type.id) \
                                  .order_by(tables.Move.name.asc())
 
-        c.pokemon = pokedex_session.query(tables.Pokemon) \
+        c.pokemon = db.pokedex_session.query(tables.Pokemon) \
                                    .join(tables.PokemonType) \
                                    .filter(tables.PokemonType.type_id == c.type.id)
 
@@ -1403,7 +1403,7 @@ class PokedexController(BaseController):
         return render('/pokedex/type.mako')
 
     def abilities_list(sef):
-        c.abilities = pokedex_session.query(tables.Ability) \
+        c.abilities = db.pokedex_session.query(tables.Ability) \
             .order_by(tables.Ability.id) \
             .all()
         return render('/pokedex/ability_list.mako')
@@ -1415,13 +1415,13 @@ class PokedexController(BaseController):
             return self._not_found()
 
         ### Prev/next for header
-        max_id = pokedex_session.query(tables.Ability).count()
-        c.prev_ability = pokedex_session.query(tables.Ability).get(
+        max_id = db.pokedex_session.query(tables.Ability).count()
+        c.prev_ability = db.pokedex_session.query(tables.Ability).get(
             (c.ability.id - 1 - 1) % max_id + 1)
-        c.next_ability = pokedex_session.query(tables.Ability).get(
+        c.next_ability = db.pokedex_session.query(tables.Ability).get(
             (c.ability.id - 1 + 1) % max_id + 1)
 
-        c.pokemon = pokedex_session.query(tables.Pokemon) \
+        c.pokemon = db.pokedex_session.query(tables.Pokemon) \
                                    .join(tables.PokemonAbility) \
                                    .filter(tables.PokemonAbility.ability_id == c.ability.id)
 
@@ -1431,14 +1431,14 @@ class PokedexController(BaseController):
 
 
     def items_list(self):
-        c.item_pockets = pokedex_session.query(tables.ItemPocket) \
+        c.item_pockets = db.pokedex_session.query(tables.ItemPocket) \
             .order_by(tables.ItemPocket.id.asc())
 
         return render('/pokedex/item_list.mako')
 
     def item_pockets(self, pocket):
         try:
-            c.item_pocket = pokedex_session.query(tables.ItemPocket) \
+            c.item_pocket = db.pokedex_session.query(tables.ItemPocket) \
                 .filter(tables.ItemPocket.identifier == pocket) \
                 .options(eagerload_all('categories.items.berry')) \
                 .one()
@@ -1446,8 +1446,10 @@ class PokedexController(BaseController):
             # It's possible this is an old item URL; redirect if so
             try:
                 item = db.get_by_name(tables.Item, pocket)
-                return redirect_to(controller='dex', action='items',
-                                   pocket=item.pocket.identifier, name=pocket)
+                return redirect(
+                    url(controller='dex', action='items',
+                        pocket=item.pocket.identifier, name=pocket),
+                )
             except NoResultFound:
                 return self._not_found()
 
@@ -1455,11 +1457,11 @@ class PokedexController(BaseController):
 
         # Eagerload TM info if it's actually needed
         if c.item_pocket.identifier == u'machines':
-            pokedex_session.query(tables.ItemPocket) \
+            db.pokedex_session.query(tables.ItemPocket) \
                 .options(eagerload_all('categories.items.machines.move.type')) \
                 .get(c.item_pocket.id)
 
-        c.item_pockets = pokedex_session.query(tables.ItemPocket) \
+        c.item_pockets = db.pokedex_session.query(tables.ItemPocket) \
             .order_by(tables.ItemPocket.id.asc())
 
         return render('/pokedex/item_pockets.mako')
@@ -1471,9 +1473,9 @@ class PokedexController(BaseController):
             return self._not_found()
 
         # These are used for their item linkage
-        c.growth_mulch = pokedex_session.query(tables.Item) \
+        c.growth_mulch = db.pokedex_session.query(tables.Item) \
             .filter_by(name=u'Growth Mulch').one()
-        c.damp_mulch = pokedex_session.query(tables.Item) \
+        c.damp_mulch = db.pokedex_session.query(tables.Item) \
             .filter_by(name=u'Damp Mulch').one()
 
         # Pokémon that can hold this item are per version; break this up into a
@@ -1540,7 +1542,7 @@ class PokedexController(BaseController):
         # Note that it isn't against the rules for multiple locations to have
         # the same name.  To avoid complications, the name is stored in
         # c.location_name, and after that we only deal with areas.
-        c.locations = pokedex_session.query(tables.Location) \
+        c.locations = db.pokedex_session.query(tables.Location) \
             .filter(func.lower(tables.Location.name) == name) \
             .all()
 
@@ -1568,7 +1570,7 @@ class PokedexController(BaseController):
         # Then by pokemon -- table rows.
         # Then by version -- table columns.
         # Finally, condition values associated with levels/rarity.
-        q = pokedex_session.query(tables.Encounter) \
+        q = db.pokedex_session.query(tables.Encounter) \
             .options(
                 eagerload_all('condition_value_map.condition_value'),
                 eagerload_all('slot.terrain'),
@@ -1653,7 +1655,7 @@ class PokedexController(BaseController):
 
 
     def natures_list(self):
-        c.natures = pokedex_session.query(tables.Nature)
+        c.natures = db.pokedex_session.query(tables.Nature)
 
         # Figure out sort order
         c.sort_order = request.params.get('sort', None)
@@ -1681,13 +1683,13 @@ class PokedexController(BaseController):
         # Other neutral natures if this one is neutral; otherwise, the inverse
         # of this one
         if c.nature.increased_stat == c.nature.decreased_stat:
-            c.neutral_natures = pokedex_session.query(tables.Nature) \
+            c.neutral_natures = db.pokedex_session.query(tables.Nature) \
                 .filter(tables.Nature.increased_stat_id
                      == tables.Nature.decreased_stat_id) \
                 .filter(tables.Nature.id != c.nature.id) \
                 .order_by(tables.Nature.name)
         else:
-            c.inverse_nature = pokedex_session.query(tables.Nature) \
+            c.inverse_nature = db.pokedex_session.query(tables.Nature) \
                 .filter_by(
                     increased_stat_id=c.nature.decreased_stat_id,
                     decreased_stat_id=c.nature.increased_stat_id,
@@ -1704,11 +1706,11 @@ class PokedexController(BaseController):
         # The useful thing here is that this cannot be done in the Pokémon
         # search, as it requires comparing a Pokémon's stats to themselves.
         # Also, HP doesn't count.  Durp.
-        hp = pokedex_session.query(tables.Stat).filter_by(name=u'HP').one()
+        hp = db.pokedex_session.query(tables.Stat).filter_by(name=u'HP').one()
         if c.nature.increased_stat == c.nature.decreased_stat:
             # Neutral.  Boring!
             # Create a subquery of neutral-ish Pokémon
-            stat_subquery = pokedex_session.query(
+            stat_subquery = db.pokedex_session.query(
                     tables.PokemonStat.pokemon_id
                 ) \
                 .filter(tables.PokemonStat.stat_id != hp.id) \
@@ -1720,7 +1722,7 @@ class PokedexController(BaseController):
                 ) \
                 .subquery()
 
-            c.pokemon = pokedex_session.query(tables.Pokemon) \
+            c.pokemon = db.pokedex_session.query(tables.Pokemon) \
                 .join((stat_subquery,
                     stat_subquery.c.pokemon_id == tables.Pokemon.id))
 
@@ -1728,7 +1730,7 @@ class PokedexController(BaseController):
             # More interesting.
             # Create the subquery again, but..  the other way around.
             grouped_stats = aliased(tables.PokemonStat)
-            stat_range_subquery = pokedex_session.query(
+            stat_range_subquery = db.pokedex_session.query(
                     grouped_stats.pokemon_id,
                     func.max(grouped_stats.base_stat).label('max_stat'),
                     func.min(grouped_stats.base_stat).label('min_stat'),
@@ -1752,7 +1754,7 @@ class PokedexController(BaseController):
             # instead I do min --> range --> max.  :(  Whatever.
             min_stats = aliased(tables.PokemonStat)
             max_stats = aliased(tables.PokemonStat)
-            minmax_stat_subquery = pokedex_session.query(
+            minmax_stat_subquery = db.pokedex_session.query(
                     min_stats
                 ) \
                 .join((stat_range_subquery, and_(
@@ -1771,7 +1773,7 @@ class PokedexController(BaseController):
 
             # Finally, just join that mess to pokemon; INNER-ness will do all
             # the filtering
-            c.pokemon = pokedex_session.query(tables.Pokemon) \
+            c.pokemon = db.pokedex_session.query(tables.Pokemon) \
                 .join((minmax_stat_subquery,
                     minmax_stat_subquery.c.pokemon_id == tables.Pokemon.id))
 
