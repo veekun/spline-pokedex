@@ -117,6 +117,12 @@ var pokedex_suggestions = {
                                              + ' alt="[' + metadata.language + ']"> ');
                     }
 
+                    // Give it a totally unambiguous lookup query, so if the
+                    // user presses Enter or clicks it, they'll never get a
+                    // disambig page
+                    $suggestion_el.data('dex-suggestion-unique',
+                        '@' + metadata.language + ',' + metadata.type + ':' + suggestion);
+
                     $suggest_box.append($suggestion_el);
                 }
 
@@ -237,7 +243,7 @@ var pokedex_suggestions = {
             }
 
             // Otherwise, populate target lookup box...
-            var new_input = pokedex_suggestions.get_lookup_input($selected);
+            var new_input = $selected.data('dex-suggestion-unique');
             $lookup.val(new_input);
             pokedex_suggestions.previous_input = new_input;  // prevent ajaxing again
 
@@ -254,7 +260,7 @@ var pokedex_suggestions = {
         var $selected = $target.closest('li');
 
         pokedex_suggestions.$lookup_element.val(
-            pokedex_suggestions.get_lookup_input($selected)
+            $selected.data('dex-suggestion-unique')
         );
         pokedex_suggestions.hide();
     },
