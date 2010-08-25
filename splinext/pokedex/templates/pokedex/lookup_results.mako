@@ -23,7 +23,7 @@
 %>\
 <li>
     The ${c.table_labels[object.__class__]}
-    <a href="${h.pokedex.make_thingy_url(object)}">
+    <a href="${h.pokedex.make_thingy_url(object, subpage=c.subpage)}">
     % if object.__tablename__ == 'pokemon':
     ${h.pokedex.pokemon_sprite(object, prefix='icons')}
     % elif object.__tablename__ == 'items':
@@ -48,4 +48,8 @@
 % endfor
 </ul>
 
+% if c.exact and len(c.results) >= 20:
+<p>Boy, this is a lot of matches!  Maybe you want to use the full-blown <a href="${url(controller='dex_search', action='pokemon_search')}">Pokémon search</a> or <a href="${url(controller='dex_search', action='move_search')}">move search</a>, or check the various <a href="${url('/dex')}">lists of everything and lookup help</a>.</p>
+% else:
 <p><a href="${url('/dex')}">Need help?</a></p>
+% endif

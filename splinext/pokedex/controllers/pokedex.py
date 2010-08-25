@@ -6,6 +6,7 @@ import colorsys
 import json
 import logging
 import mimetypes
+import re
 
 import pokedex.db
 import pokedex.db.tables as tables
@@ -268,7 +269,19 @@ class PokedexController(BaseController):
 
 
         ### Regular lookup
-        results = db.pokedex_lookup.lookup(name)
+        valid_types = []
+        c.subpage = None
+        # Subpage suffixes: 'flavor' and 'locations' for Pokémon bits
+        if name.lower().endswith(u' flavor'):
+            c.subpage = 'flavor'
+            valid_types = [u'pokemon']
+            name = re.sub('(?i) flavor$', '', name)
+        elif name.lower().endswith(u' locations'):
+            c.subpage = 'locations'
+            valid_types = [u'pokemon']
+            name = re.sub('(?i) locations$', '', name)
+
+        results = db.pokedex_lookup.lookup(name, valid_types=valid_types)
 
         if len(results) == 0:
             # Nothing found
@@ -285,8 +298,8 @@ class PokedexController(BaseController):
                         u"""This is the only close match.""".format(name),
                         icon='spell-check-error')
 
-            return redirect(
-                pokedex_helpers.make_thingy_url(results[0].object))
+            return redirect(pokedex_helpers.make_thingy_url(
+                results[0].object, subpage=c.subpage))
 
         else:
             # Multiple matches.  Could be exact (e.g., Metronome) or a fuzzy

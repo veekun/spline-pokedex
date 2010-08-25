@@ -36,6 +36,8 @@ ${h.h1('Finding stuff')}
 
 <p>You can specify what sort of thing you're looking for by putting one or more before a colon, e.g. ${lookup_examples(u'pokemon:Kangaskhan')} or ${lookup_examples(u'item,move:metronome')}.  This is mostly useful when looking things up by national id (${lookup_examples(u'pokemon:151')}), because moves and types have ids, too.  It's also helpful when looking up something ambiguous (${lookup_examples(u'move:Psychic')} vs ${lookup_examples(u'type:psychic')}) if you want to skip the disambiguation page.</p>
 
+<p>Similarly, you can restrict lookup by language.  ${lookup_examples(u'charge')} will offer both <a href="${url(controller='dex', action='moves', name=u'tackle')}">Tackle</a> and <a href="${url(controller='dex', action='moves', name=u'charge')}">Charge</a>, because Tackle's French name is "Charge".  If you wanted one or the other, you could enter ${lookup_examples(u'@fr:charge')} or ${lookup_examples(u'@en:charge')}.  These also combine with the prefixes above, as in ${lookup_examples(u'@fr,move:charge')}.</p>
+
 
 <p>Lookup understands the following:</p>
 
@@ -55,6 +57,8 @@ ${h.h1('Finding stuff')}
     <dd>${lookup_examples(u'Eevee', u'Rough Skin', u'Super Rod', u'Route 202')}</dd>
     <dt>Pokémon forms</dt>
     <dd>${lookup_examples(u'Speed Deoxys', u'Wash Rotom')}</dd>
+    <dt>Jump to subpages</dt>
+    <dd>${lookup_examples(u'eevee flavor', u'eevee locations')}</dd>
     <dt>Foreign names</dt>
     <dd>${lookup_examples(u'イーブイ', u'Iibui', u'Eivui', u'Évoli', u'이브이')}</dd>
     <dt>Misspelled names</dt>

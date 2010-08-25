@@ -20,7 +20,7 @@ from pokedex.roomaji import romanize
 import spline.lib.helpers as h
 
 
-def make_thingy_url(thingy):
+def make_thingy_url(thingy, subpage=None):
     u"""Given a thingy (Pokémon, move, type, whatever), returns a URL to it.
     """
     # Using the table name as an action directly looks kinda gross, but I can't
@@ -36,8 +36,12 @@ def make_thingy_url(thingy):
     if isinstance(thingy, tables.Item):
         args['pocket'] = thingy.pocket.identifier
 
+    action = thingy.__tablename__
+    if subpage:
+        action += '_' + subpage
+
     return url(controller='dex',
-               action=thingy.__tablename__,
+               action=action,
                name=thingy.name.lower(),
                **args)
 
