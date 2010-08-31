@@ -338,6 +338,19 @@ table.dex-compare-pokemon tr.dex-compare-flavor-text td { text-align: center; }
 table.dex-compare-pokemon.dex-compare-pokemon-moves td { text-align: center; }
 table.dex-compare-pokemon.dex-compare-pokemon-moves th.versions { text-align: left; }
 
+/* Who's that Pokémon */
+/* Use the class on this element to toggle the game state; by default everything is hidden */
+#js-dex-wtp {}
+#js-dex-wtp                 #js-dex-wtp-start    { display: none; }
+#js-dex-wtp.state-off       #js-dex-wtp-start    { display: block; }
+#js-dex-wtp                 #js-dex-wtp-thinking { display: none; }
+#js-dex-wtp.state-thinking  #js-dex-wtp-thinking { display: block; }
+#js-dex-wtp                 #js-dex-wtp-board    { display: none; }
+#js-dex-wtp.state-playing   #js-dex-wtp-board    { display: block; }
+#js-dex-wtp.state-answering #js-dex-wtp-board    { display: block; }
+#js-dex-wtp                 #js-dex-wtp-result   { display: none; }
+#js-dex-wtp.state-answering #js-dex-wtp-result   { display: block; }
+
 
 /*** Static pages ***/
 

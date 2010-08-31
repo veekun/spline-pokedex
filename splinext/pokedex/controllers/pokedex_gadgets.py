@@ -610,3 +610,12 @@ class PokedexGadgetsController(BaseController):
                         [pokemon_move.pokemon].append(pokemon_move.move)
 
         return render('/pokedex/gadgets/compare_pokemon.mako')
+
+
+    def whos_that_pokemon(self):
+        u"""A silly game that asks you to identify Pokémon by silhouette, cry,
+        et al.
+        """
+        c.javascripts.append(('pokedex', 'whos-that-pokemon'))
+
+        return render('/pokedex/gadgets/whos_that_pokemon.mako')

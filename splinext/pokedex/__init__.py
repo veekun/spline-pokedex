@@ -50,6 +50,7 @@ def add_routes_hook(map, *args, **kwargs):
 
     map.connect('/dex/gadgets/compare_pokemon', controller='dex_gadgets', action='compare_pokemon')
     map.connect('/dex/gadgets/pokeballs', controller='dex_gadgets', action='capture_rate')
+    map.connect('/dex/gadgets/whos_that_pokemon', controller='dex_gadgets', action='whos_that_pokemon')
 
 
 ### Extend markdown to turn [Eevee]{pokemon} into a link in effects and
