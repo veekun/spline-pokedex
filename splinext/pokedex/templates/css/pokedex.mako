@@ -228,6 +228,9 @@ dl.dex-flavor-text dt.dex-flavor-generation + dd { padding-left: 32px; }
 dl.dex-pokemon-flavor-text dt { width: 64px /* enough for 3 versions and padding */; }
 dl.dex-pokemon-flavor-text dd { padding-left: 64px; }
 
+/* Pokémon flavor page -- client-resize Sugimori art */
+p.dex-sugimori img { max-width: 100%; }
+
 /* Move page -- flags list */
 ul.dex-move-flags .markdown { font-size: 0.8em; font-style: italic; color: #404040; }
 ul.dex-move-flags .markdown p { margin-bottom: 0.33em; }

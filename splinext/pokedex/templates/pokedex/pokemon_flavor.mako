@@ -640,5 +640,18 @@ ${h.h1('Miscellaneous Game Art', id='misc-sprites')}
 
 ${h.h1('Other Images', id='other')}
 
-<h2>Sugimori Art</h2>
-<p> ${h.pokedex.pokedex_img('sugimori/%d.png' % c.pokemon.national_id)} </p>
+<h2>Official artwork by Ken Sugimori</h2>
+## Shenanigans!  Most forms have official art, but a couple do not.
+## To resolve this:
+## 1. "Default" forms are just (number).png and are guaranteed to exist.
+## 2. Other forms are filenamed as usual.
+## So, there is no 479-normal.png or 422-west.png.  Ick.
+## Conveniently, though, the forms with official art are all "physical" forms
+## -- except Shellos and Gastrodon, which have East art.
+<p class="dex-sugimori">
+    % if (c.pokemon.forme_name and c.pokemon.forme_name != c.form) or (c.pokemon.id in (422, 423)):
+    ${h.pokedex.pokedex_img("sugimori/{0}-{1}.png".format(c.pokemon.national_id, c.form))}
+    % else:
+    ${h.pokedex.pokedex_img("sugimori/{0}.png".format(c.pokemon.national_id))}
+    % endif
+</p>
