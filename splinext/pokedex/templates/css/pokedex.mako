@@ -36,6 +36,10 @@ a.dex-box-link.selected { border: 1px solid #95b7ea; background: #bfd4f2; }
 .dex-priority-fast { font-weight: bold; color: green; }
 .dex-priority-slow { font-weight: bold; color: red; }
 
+/* Nature-affected stats */
+.dex-nature-buff { font-weight: bold; color: green; }
+.dex-nature-nerf { font-weight: bold; color: red; }
+
 /* Links to Pokémon search */
 dd .dex-subtle-search-link { visibility: hidden; }
 dd:hover .dex-subtle-search-link { visibility: visible; }
@@ -337,6 +341,12 @@ table.dex-compare-pokemon tr.dex-compare-relative td { font-size: 1.5em; padding
 table.dex-compare-pokemon tr.dex-compare-flavor-text td { text-align: center; }
 table.dex-compare-pokemon.dex-compare-pokemon-moves td { text-align: center; }
 table.dex-compare-pokemon.dex-compare-pokemon-moves th.versions { text-align: left; }
+
+/* Stat calculator */
+.dex-col-stat-calc { width: 6em; }
+table.dex-stat-calculator {}
+table.dex-stat-calculator td { text-align: center; }
+table.dex-stat-calculator td.protip { font-size: 0.8em; line-height: 1.33; text-align: left;; font-style: italic; color: #606060; }
 
 /* Who's that Pokémon */
 /* Use the class on this element to toggle the game state; by default everything is hidden */

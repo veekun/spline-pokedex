@@ -6,6 +6,7 @@ import logging
 
 import wtforms.validators
 from wtforms import Form, ValidationError, fields
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 import pokedex.db
 import pokedex.db.tables as tables
@@ -141,6 +142,18 @@ def expected_attempts_oh_no(partitions):
     return expected_attempts
 
 CaptureChance = namedtuple('CaptureChance', ['condition', 'is_active', 'chances'])
+
+
+class StatCalculatorForm(Form):
+    pokemon = PokedexLookupField(u'Pokémon', valid_type='pokemon')
+    level = fields.IntegerField(u'Level', [wtforms.validators.NumberRange(min=1, max=100)],
+                                     default=100)
+    nature = QuerySelectField('Nature',
+        query_factory=lambda: db.pokedex_session.query(tables.Nature).order_by(tables.Nature.name),
+        get_pk=lambda _: _.name.lower(),
+        get_label=lambda _: _.name,
+        allow_blank=True,
+    )
 
 
 class PokedexGadgetsController(BaseController):
@@ -611,6 +624,82 @@ class PokedexGadgetsController(BaseController):
 
         return render('/pokedex/gadgets/compare_pokemon.mako')
 
+    def stat_calculator(self):
+        """Calculates, well, stats."""
+
+        class F(StatCalculatorForm):
+            pass
+
+        # Add stat-based fields dynamically
+        c.stat_fields = []  # just field names
+        c.effort_fields = []
+        c.stats = db.pokedex_session.query(tables.Stat) \
+            .order_by(tables.Stat.id).all()
+        for stat in c.stats:
+            field_name = stat.name.lower().replace(u' ', u'_')
+
+            c.stat_fields.append('stat_' + field_name)
+            c.effort_fields.append('effort_' + field_name)
+
+            setattr(F, 'stat_' + field_name,
+                fields.IntegerField(u'', [wtforms.validators.NumberRange(min=5, max=700)]))
+
+            setattr(F, 'effort_' + field_name,
+                fields.IntegerField(u'', [wtforms.validators.NumberRange(min=0, max=255)]))
+
+        ### Parse form and so forth
+        c.form = F(request.params)
+
+        # XXX shim
+        c.results = None
+        if not request.GET or not c.form.validate():
+            return render('/pokedex/gadgets/stat_calculator.mako')
+
+        # Okay, do some work!
+        # Dumb method for now -- XXX change this to do a binary search.
+        # Run through every possible value for each stat, see if it matches
+        # input, and give the green light if so.
+        pokemon = c.form.pokemon.data
+        nature = c.form.nature.data
+        level = c.form.level.data
+        # Start with lists of possibly valid genes and cut down from there
+        valid_genes = dict((stat, range(32)) for stat in c.stats)
+        for stat, stat_field, effort_field in zip(c.stats, c.stat_fields, c.effort_fields):
+            # XXX let me stop typing this, christ
+            if stat.name == u'HP':
+                func = pokedex.formulae.calculated_hp
+            else:
+                func = pokedex.formulae.calculated_stat
+
+            base_stat = pokemon.stat(stat).base_stat
+
+            nature_mod = 1.0
+            if nature.is_neutral:
+                pass
+            elif nature.increased_stat == stat:
+                nature_mod = 1.1
+            elif nature.decreased_stat == stat:
+                nature_mod = 0.9
+
+            stat_in = c.form[stat_field].data
+            effort_in = c.form[effort_field].data
+
+            # Run through and maybe invalidate each gene.
+            # Use a copy of the valid_genes list to avoid mutating it while
+            # looping over it
+            for gene in valid_genes[stat][:]:
+                actual_stat = int(nature_mod *
+                    func(base_stat, level=level, iv=gene, effort=effort_in))
+
+                if actual_stat != stat_in:
+                    valid_genes[stat].remove(gene)
+
+        # Turn those results into something more readable
+        c.results = {}
+        for stat in c.stats:
+            c.results[stat] = u','.join(str(_) for _ in valid_genes[stat])
+
+        return render('/pokedex/gadgets/stat_calculator.mako')
 
     def whos_that_pokemon(self):
         u"""A silly game that asks you to identify Pokémon by silhouette, cry,
