@@ -210,7 +210,8 @@ dl.dex-simple-encounters ul li:after { content: '; '; }
 dl.dex-simple-encounters ul li:last-child:after { content: ''; }
 
 /* Pokémon page -- cry */
-audio.cry { width: 100%; }
+/* Mozilla's player changes its height proportionate to its width by default or something */
+audio.cry { width: 100%; height: 35px; }
 
 /* Pokémon flavor page -- tables of sprites */
 table.dex-pokemon-flavor-sprites td { vertical-align: middle /* sprites aren't always the same height within a row */; }
