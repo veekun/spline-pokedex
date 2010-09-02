@@ -397,7 +397,7 @@ ${h.h1('Stats')}
 
 ${h.h1('Flavor')}
 <ul class="see-also">
-<li> <img src="${h.static_uri('spline', 'icons/arrow-000-medium.png')}" alt="See also:"> <a href="${url.current(action='pokemon_flavor')}">All versions' flavor text and sprites</a> </li>
+<li> <img src="${h.static_uri('spline', 'icons/arrow-000-medium.png')}" alt="See also:"> <a href="${url.current(action='pokemon_flavor')}">Detailed flavor page covering all versions</a> </li>
 </ul>
 
 ## Only showing current generation's sprites and text
