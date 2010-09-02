@@ -297,6 +297,10 @@ ${h.h1('Evolution')}
         <span class="dex-evolution-chain-method">
             ${h.pokedex.evolution_description(col['pokemon'].parent_evolution)}
         </span>
+        % elif col['pokemon'].is_baby and c.pokemon.evolution_chain.baby_trigger_item:
+        <span class="dex-evolution-chain-method">
+            Either parent must hold ${h.pokedex.item_link(c.pokemon.evolution_chain.baby_trigger_item, include_icon=False)}
+        </span>
         % endif
     </td>
     % endif

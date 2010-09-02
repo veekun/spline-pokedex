@@ -296,21 +296,26 @@ def type_link(type):
     )
 
 
-def item_link(item):
+def item_link(item, include_icon=True):
     """Returns a link to the requested item."""
 
     item_name = item.name
 
-    if item.pocket.identifier == u'machines':
-        machines = item.machines
-        prefix = u'hm' if machines[-1].is_hm else u'tm'
-        filename = prefix + u'-' + machines[-1].move.type.name.lower()
-    else:
-        filename = filename_from_name(item_name)
+    if include_icon:
+        if item.pocket.identifier == u'machines':
+            machines = item.machines
+            prefix = u'hm' if machines[-1].is_hm else u'tm'
+            filename = prefix + u'-' + machines[-1].move.type.name.lower()
+        else:
+            filename = filename_from_name(item_name)
 
-    return h.HTML.a(
-        pokedex_img("items/%s.png" % filename,
-                   alt=item_name, title=item_name) + ' ' + item_name,
+        label = pokedex_img("items/%s.png" % filename,
+            alt=item_name, title=item_name) + ' ' + item_name
+
+    else:
+        label = item_name
+
+    return h.HTML.a(label,
         href=url(controller='dex', action='items',
                  pocket=item.pocket.identifier, name=item_name.lower()),
     )
