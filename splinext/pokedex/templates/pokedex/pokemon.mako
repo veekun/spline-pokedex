@@ -464,7 +464,7 @@ ${h.h1('Flavor')}
         </dd>
 
         % if c.pokemon.generation.id <= 3:
-        <dt>Habitat ${h.pokedex.generation_icon(3)}</dt>
+        <dt>Habitat ${h.pokedex.version_icons(u'FireRed', u'LeafGreen')}</dt>
         <dd>
             ${h.pokedex.pokedex_img('chrome/habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.habitat))}
             ${c.pokemon.habitat}
