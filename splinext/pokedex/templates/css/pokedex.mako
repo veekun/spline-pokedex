@@ -343,10 +343,22 @@ table.dex-compare-pokemon.dex-compare-pokemon-moves td { text-align: center; }
 table.dex-compare-pokemon.dex-compare-pokemon-moves th.versions { text-align: left; }
 
 /* Stat calculator */
+.dex-col-stat-calc-labels { width: 8em; }
 .dex-col-stat-calc { width: 6em; }
-table.dex-stat-calculator {}
+table.dex-stat-calculator { margin-bottom: 2em; }
+table.dex-stat-calculator tbody th { text-align: right; }
 table.dex-stat-calculator td { text-align: center; }
-table.dex-stat-calculator td.protip { font-size: 0.8em; line-height: 1.33; text-align: left;; font-style: italic; color: #606060; }
+table.dex-stat-calculator td,
+table.dex-stat-calculator th { line-height: 1.33; }
+table.dex-stat-calculator span.impossible { text-decoration: underline; color: darkred; }
+table.dex-stat-calculator td.protip { font-size: 0.8em; padding-left: 1em; line-height: 1.33; text-align: left; font-style: italic; color: #606060; }
+table.dex-stat-calculator p { margin: 0.67em 0.5em; text-align: left; }
+table.dex-stat-calculator p.clipboard { font-family: monospace; }
+
+div.dex-stat-vertical-graph { width: 1.5em; margin: 0 auto; border: 1px solid #c0c0c0; background: white; -moz-border-radius: 2px; }
+div.dex-stat-vertical-graph div.point,
+div.dex-stat-vertical-graph div.pointless { width: 1.5em; height: 0.5em; }
+div.dex-stat-vertical-graph div.point { background: #c0c0c0; }
 
 /* Who's that Pokémon */
 /* Use the class on this element to toggle the game state; by default everything is hidden */

@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division
 
 from collections import defaultdict, namedtuple
+import colorsys
 import logging
 
 import wtforms.validators
@@ -154,6 +155,12 @@ class StatCalculatorForm(Form):
         get_label=lambda _: _.name,
         allow_blank=True,
     )
+
+def stat_graph_chunk_color(gene):
+    """Returns a #rrggbb color, given a gene.  Used for the pretty graph."""
+    hue = gene / 31
+    r, g, b = colorsys.hls_to_rgb(hue, 0.75, 0.75)
+    return "#%02x%02x%02x" % (r * 256, g * 256, b * 256)
 
 
 class PokedexGadgetsController(BaseController):
@@ -626,6 +633,17 @@ class PokedexGadgetsController(BaseController):
 
     def stat_calculator(self):
         """Calculates, well, stats."""
+        # XXX features this needs:
+        # - short URLs
+        # - more better error checking
+        # - accept "characteristics"
+        # - accept and print out hidden power
+        # - accept..  anything else hint at IVs?
+        # - back-compat URL
+        # - also calculate stats or effort
+        # - multiple levels
+        # - track effort gained on the fly (as well as exp for auto level up?)
+        #   - UI would need to be different and everything, ugh
 
         class F(StatCalculatorForm):
             pass
@@ -650,8 +668,7 @@ class PokedexGadgetsController(BaseController):
         ### Parse form and so forth
         c.form = F(request.params)
 
-        # XXX shim
-        c.results = None
+        c.results = None  # XXX shim
         if not request.GET or not c.form.validate():
             return render('/pokedex/gadgets/stat_calculator.mako')
 
@@ -663,8 +680,10 @@ class PokedexGadgetsController(BaseController):
         nature = c.form.nature.data
         level = c.form.level.data
         # Start with lists of possibly valid genes and cut down from there
-        valid_genes = dict((stat, range(32)) for stat in c.stats)
+        c.valid_range = {}  # stat => (min, max)
+        valid_genes = {}
         for stat, stat_field, effort_field in zip(c.stats, c.stat_fields, c.effort_fields):
+            ### Bunch of setup, per stat
             # XXX let me stop typing this, christ
             if stat.name == u'HP':
                 func = pokedex.formulae.calculated_hp
@@ -684,20 +703,56 @@ class PokedexGadgetsController(BaseController):
             stat_in = c.form[stat_field].data
             effort_in = c.form[effort_field].data
 
-            # Run through and maybe invalidate each gene.
-            # Use a copy of the valid_genes list to avoid mutating it while
-            # looping over it
-            for gene in valid_genes[stat][:]:
-                actual_stat = int(nature_mod *
+            def calculate_stat(gene):
+                return int(nature_mod *
                     func(base_stat, level=level, iv=gene, effort=effort_in))
 
-                if actual_stat != stat_in:
-                    valid_genes[stat].remove(gene)
+            c.valid_range[stat] = min_stat, max_stat = \
+                calculate_stat(0), calculate_stat(31)
 
-        # Turn those results into something more readable
+            ### Actual work!
+            # Quick simple check: if the input is totally outside the valid
+            # range, no need to calculate anything
+            if not min_stat <= stat_in <= max_stat:
+                valid_genes[stat] = {}
+                continue
+
+            # Start out with everything being considered valid
+            valid_genes[stat] = dict((key, None) for key in range(32))
+
+            # Run through and maybe invalidate each gene
+            for gene in valid_genes[stat].keys():
+                if calculate_stat(gene) != stat_in:
+                    del valid_genes[stat][gene]
+
+        # Turn those results into something more readable.
+        # Template still needs valid_genes for drawing the graph
         c.results = {}
+        c.valid_genes = valid_genes
         for stat in c.stats:
-            c.results[stat] = u','.join(str(_) for _ in valid_genes[stat])
+            # 1, 2, 3, 5 => "1-3, 5"
+            # Find consecutive ranges of numbers and turn them into strings.
+            # nb: The final dummy iteration with n = None is to more easily add
+            # the last range to the parts list
+            left_endpoint = None
+            parts = []
+            elements = valid_genes[stat].keys()
+            elements.sort()
+
+            for last_n, n in zip([None] + elements, elements + [None]):
+                if (n is None and left_endpoint is not None) or \
+                    (last_n is not None and last_n + 1 < n):
+
+                    # End of a subrange; break off what we have
+                    parts.append(u"{0}–{1}".format(left_endpoint, last_n))
+
+                if left_endpoint is None or last_n + 1 < n:
+                    # Starting a new subrange; remember the new left end
+                    left_endpoint = n
+
+            c.results[stat] = u','.join(parts)
+
+        c.stat_graph_chunk_color = stat_graph_chunk_color
 
         return render('/pokedex/gadgets/stat_calculator.mako')
 
