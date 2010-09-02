@@ -24,6 +24,113 @@ ${c.pokemon.name}\
 </%def>
 
 ${lib.pokemon_page_header()}
+${h.h1('Essentials')}
+<div class="dex-column-container">
+<div class="dex-column">
+    <h2>Miscellany</h2>
+    <dl>
+        <dt>Species</dt>
+        <dd>
+            ${c.pokemon.species}
+            <a href="${url(controller='dex_search', action='pokemon_search', species=c.pokemon.species)}"
+                class="dex-subtle-search-link">
+                <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
+            </a>
+        </dd>
+
+        <dt>Color</dt>
+        <dd style="color: ${c.pokemon.color};">
+            ${c.pokemon.color}
+            <a href="${url(controller='dex_search', action='pokemon_search', color=c.pokemon.color)}"
+                class="dex-subtle-search-link">
+                <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
+            </a>
+        </dd>
+
+        <dt>Cry</dt>
+<%
+        # Shaymin (and nothing else) has different cries for its different forms
+        if c.pokemon.national_id == 492:
+            cry_path = 'cries/{0}-{1}.ogg'.format(c.pokemon.national_id, c.form)
+        else:
+            cry_path = 'cries/{0}.ogg'.format(c.pokemon.national_id)
+
+        cry_path = url(controller='dex', action='media', path=cry_path)
+%>\
+        <dd>
+            <audio src="${cry_path}" controls preload="auto" class="cry">
+                <!-- Totally the best fallback -->
+                <a href="${cry_path}">Download</a>
+            </audio>
+        </dd>
+
+        % if c.pokemon.generation.id <= 3:
+        <dt>Habitat ${h.pokedex.version_icons(u'FireRed', u'LeafGreen')}</dt>
+        <dd>
+            ${h.pokedex.pokedex_img('chrome/habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.habitat))}
+            ${c.pokemon.habitat}
+            <a href="${url(controller='dex_search', action='pokemon_search', habitat=c.pokemon.habitat)}"
+                class="dex-subtle-search-link">
+                <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
+            </a>
+        </dd>
+        % endif
+
+        <dt>Pawprint</dt>
+        <dd>${h.pokedex.pokemon_sprite(c.pokemon, prefix='pawprints', form=None)}</dd>
+
+        <dt>Shape</dt>
+        <dd>
+            ${h.pokedex.pokedex_img('chrome/shapes/%d.png' % c.pokemon.shape.id, alt='', title=c.pokemon.shape.name)}
+            ${c.pokemon.shape.awesome_name}
+            <a href="${url(controller='dex_search', action='pokemon_search', shape=c.pokemon.shape.name.lower())}"
+                class="dex-subtle-search-link">
+                <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
+            </a>
+        </dd>
+    </dl>
+</div>
+
+<div class="dex-column">
+    <h2>Height</h2>
+    <div class="dex-size">
+        <div class="dex-size-trainer">
+            ${h.pokedex.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.heights['trainer'] * 100))}
+            <p class="dex-size-value">
+                <input type="text" size="6" value="${h.pokedex.format_height_imperial(c.trainer_height)}" disabled="disabled" id="dex-pokemon-height">
+            </p>
+        </div>
+        <div class="dex-size-pokemon">
+            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.heights['pokemon'] * 100), form=c.form)}
+            <div class="js-dex-size-raw">${c.pokemon.height}</div>
+            <p class="dex-size-value">
+                ${h.pokedex.format_height_imperial(c.pokemon_height)} <br/>
+                ${h.pokedex.format_height_metric(c.pokemon_height)}
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="dex-column">
+    <h2>Weight</h2>
+    <div class="dex-size">
+        <div class="dex-size-trainer">
+            ${h.pokedex.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.weights['trainer'] * 100))}
+            <p class="dex-size-value">
+                <input type="text" size="6" value="${h.pokedex.format_weight_imperial(c.trainer_weight)}" disabled="disabled" id="dex-pokemon-weight">
+            </p>
+        </div>
+        <div class="dex-size-pokemon">
+            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.weights['pokemon'] * 100), form=c.form)}
+            <div class="js-dex-size-raw">${c.pokemon.weight}</div>
+            <p class="dex-size-value">
+                ${h.pokedex.format_weight_imperial(c.pokemon_weight)} <br/>
+                ${h.pokedex.format_weight_metric(c.pokemon_weight)}
+            </p>
+        </div>
+    </div>
+</div>
+</div>
 
 ${h.h1(u'Pokédex Description', id='pokedex')}
 ${lib.flavor_text_list(c.pokemon.flavor_text, 'dex-pokemon-flavor-text')}

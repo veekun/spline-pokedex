@@ -1020,6 +1020,30 @@ class PokedexController(BaseController):
         ### Previous and next for the header
         c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
 
+        ### Sizing
+        c.trainer_height = pokedex_helpers.trainer_height
+        c.trainer_weight = pokedex_helpers.trainer_weight
+        c.pokemon_height = c.pokemon.height
+        c.pokemon_weight = c.pokemon.weight
+
+        # Forms with separate Pokémon records sometimes differ
+        # XXX This kinda sucks, but it'll do until we fix Pokémon forms
+        if c.form:
+            for form in c.pokemon.formes:
+                if form.forme_name == c.form:
+                    c.pokemon_height = form.height
+                    c.pokemon_weight = form.weight
+                    break
+
+        heights = dict(pokemon=c.pokemon_height, trainer=c.trainer_height)
+        c.heights = pokedex_helpers.scale_sizes(heights)
+
+        # Strictly speaking, weight takes three dimensions.  But the real
+        # measurement here is just "space taken up", and these are sprites, so
+        # the space they actually take up is two-dimensional.
+        weights = dict(pokemon=c.pokemon_weight, trainer=c.trainer_weight)
+        c.weights = pokedex_helpers.scale_sizes(weights, dimensions=2)
+
         return render('/pokedex/pokemon_flavor.mako')
 
 
