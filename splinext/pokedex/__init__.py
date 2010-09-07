@@ -12,6 +12,7 @@ import pokedex.db
 from pokedex.db.markdown import MarkdownString
 import pokedex.db.tables as tables
 import pokedex.lookup
+import spline.lib.markdown
 import splinext.pokedex.model
 import splinext.pokedex.db
 from splinext.pokedex import helpers as pokedex_helpers
@@ -115,6 +116,9 @@ def after_setup_hook(config, *args, **kwargs):
 
     # Extend Markdown via monkey-patching..  boo  :(
     MarkdownString.markdown_extensions.append(PokedexExtension())
+
+    # And extend spline's markdowning a slightly less terrible way
+    spline.lib.markdown.register_extension(PokedexExtension())
 
 def before_controller_hook(*args, **kwargs):
     """Hook to inject suggestion-box Javascript into every page."""
