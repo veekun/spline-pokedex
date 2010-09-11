@@ -304,3 +304,7 @@ ${move.effect_chance}% \
 <%def name="col_effect()"><col class="dex-col-effect"></%def>
 <%def name="th_effect()"><th>Effect</th></%def>
 <%def name="td_effect(move)"><td class="markdown effect">${move.short_effect.as_html | n}</td></%def>
+
+<%def name="col_link()"><col class="dex-col-link"></%def>
+<%def name="th_link()"><th></th></%def>
+<%def name="td_link(move)"><td><a href="${url(controller='dex', action='moves', name=move.name.lower())}"><img src="${h.static_uri('spline', 'icons/arrow.png')}" alt="-&gt;"></a></td></%def>
