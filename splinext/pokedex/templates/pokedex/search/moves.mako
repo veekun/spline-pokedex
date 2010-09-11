@@ -179,6 +179,7 @@ ${h.form(url.current(), method='GET')}
 <div class="dex-column-container">
 <div class="dex-column">
     <h3>Pokémon</h3>
+    <p>Moves must be learnable by at least one of these Pokémon:</p>
     <ul>
         % for field in c.form.pokemon:
         <li>

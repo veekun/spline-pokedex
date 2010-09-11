@@ -276,6 +276,7 @@ ${h.form(url.current(), method='GET')}
 <div class="dex-column">
     <h3>Moves</h3>
     <p>Look for: ${lib.bare_field('move_fuzz')}</p>
+    <p>Pokémon must have all of these moves:</p>
     ## Render move fields manually; don't want the labels
     <ul>
         % for field in c.form.move:

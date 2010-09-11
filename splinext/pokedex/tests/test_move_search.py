@@ -232,7 +232,7 @@ class TestMoveSearchController(TestController):
     def test_pokemon(self):
         u"""Checks searching by learning Pokémon.
 
-        Just like the Pokémon search's search-by-move, results are ANDed.
+        Unlike the Pokémon search's search-by-move, results are ORed.
 
         Besides a Pokémon name, we can also specify:
         - The version(s) to search.
@@ -245,8 +245,8 @@ class TestMoveSearchController(TestController):
             exact=True,
         )
         self.check_search(
-            dict(pokemon=[u'Ditto', u'Mew']),
-            [u'Transform'],
+            dict(pokemon=[u'Ditto', u'Unown']),
+            [u'Transform', u'Hidden Power'],
             'search by multiple pokemon',
             exact=True,
         )

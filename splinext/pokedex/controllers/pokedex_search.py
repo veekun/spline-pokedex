@@ -891,44 +891,32 @@ class PokedexSearchController(BaseController):
             ))
 
         # Moves
-        if c.form.move.data:
-            # To avoid stupid group-by-having-count tricks, each move needs to
-            # join to a separate subquery of Pokémon that learn the given move
-            # under the given conditions.
-            move_version_groups = [_.id for _ in c.form.move_version_group.data]
-            move_methods = [_.id for _ in c.form.move_method.data]
+        # To avoid stupid group-by-having-count tricks, each move needs to
+        # check a separate subquery of Pokémon that learn the given move
+        # under the given conditions.
+        pokemoves_filter = []
+        if c.form.move_version_group.data:
+            pokemoves_filter.append(tables.PokemonMove.version_group_id.in_(
+                [_.id for _ in c.form.move_version_group.data]))
+        if c.form.move_method.data:
+            pokemoves_filter.append(
+                tables.PokemonMove.pokemon_move_method_id.in_(
+                    [_.id for _ in c.form.move_method.data])
+            )
+        for move in c.form.move.data:
+            # Apply fuzzing
+            if c.form.move_fuzz.data == 'same-effect':
+                move_effect_query = db.pokedex_session.query(tables.Move) \
+                    .filter_by(effect_id=move.effect_id)
+                move_ids = [id for (id,) in
+                    move_effect_query.values(tables.Move.id)]
+            else:
+                move_ids = [move.id]
 
-            for move in c.form.move.data:
-                # Apply fuzzing
-                if c.form.move_fuzz.data == 'same-effect':
-                    move_effect_query = db.pokedex_session.query(tables.Move) \
-                        .filter_by(effect_id=move.effect_id)
-                    move_ids = [id for (id,) in
-                        move_effect_query.values(tables.Move.id)]
-                else:
-                    move_ids = [move.id]
-
-                move_alias = aliased(tables.PokemonMove)
-                move_subquery = db.pokedex_session.query(move_alias.pokemon_id) \
-                    .filter(move_alias.move_id.in_(move_ids))
-
-                if move_methods:
-                    move_subquery = move_subquery.filter(
-                        move_alias.pokemon_move_method_id.in_(move_methods))
-                if move_version_groups:
-                    move_subquery = move_subquery.filter(
-                        move_alias.version_group_id.in_(move_version_groups))
-
-                move_subquery = move_subquery.subquery()  # ok, dumb, but...
-
-                query = query.join((
-                    move_subquery,
-                    move_subquery.c.pokemon_id == me.id
-                ))
-
-                # The INNER JOIN does the filtering automatically, so nothing
-                # else to do
-
+            query = query.filter(me.pokemon_moves.any(
+                and_(tables.PokemonMove.move_id.in_(move_ids),
+                    *pokemoves_filter)
+            ))
 
         # Numbers
         for stat_id, field_name in c.stat_fields:
@@ -1404,27 +1392,28 @@ class PokedexSearchController(BaseController):
         if c.form.priority.data:
             query = query.filter(c.form.priority.data(tables.MoveEffect.priority))
 
-        # Pokémon -- join with a subquery for each requested Pokémon
-        pokemon_version_groups = [_.id for _ in c.form.pokemon_version_group.data]
-        pokemon_methods = [_.id for _ in c.form.pokemon_method.data]
-        for pokemon in c.form.pokemon.data:
-            pokemon_alias = aliased(tables.PokemonMove)
-            pokemon_subq = db.pokedex_session.query(pokemon_alias.move_id) \
-                .filter(pokemon_alias.pokemon_id == pokemon.id)
+        # Pokémon -- they're ORed, so only one subquery is necessary
+        #for pokemon in c.form.pokemon.data:
+        if c.form.pokemon.data:
+            pokemoves_alias = aliased(tables.PokemonMove)
 
-            if pokemon_methods:
-                pokemon_subq = pokemon_subq.filter(
-                    pokemon_alias.pokemon_move_method_id.in_(pokemon_methods))
-            if pokemon_version_groups:
-                pokemon_subq = pokemon_subq.filter(
-                    pokemon_alias.version_group_id.in_(pokemon_version_groups))
+            ids = [_.id for _ in c.form.pokemon.data]
+            pokemoves_subq = db.pokedex_session.query(pokemoves_alias.move_id) \
+                .filter(pokemoves_alias.pokemon_id.in_(ids))
 
-            pokemon_subq = pokemon_subq.subquery()
+            if c.form.pokemon_method.data:
+                ids = [_.id for _ in c.form.pokemon_method.data]
+                pokemoves_subq = pokemoves_subq.filter(
+                    pokemoves_alias.pokemon_move_method_id.in_(ids))
 
-            query = query.join((
-                pokemon_subq,
-                pokemon_subq.c.move_id == me.id
-            ))
+            if c.form.pokemon_version_group.data:
+                ids = [_.id for _ in c.form.pokemon_version_group.data]
+                pokemoves_subq = pokemoves_subq.filter(
+                    pokemoves_alias.version_group_id.in_(ids))
+
+            pokemoves_subq = pokemoves_subq.subquery()
+
+            query = query.filter(me.id.in_(pokemoves_subq))
 
 
         ### Display
