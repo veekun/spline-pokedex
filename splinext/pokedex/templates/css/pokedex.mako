@@ -395,10 +395,12 @@ div.dex-stat-vertical-graph div.pointless { width: 1.5em; height: 0.5em; }
 div.dex-stat-vertical-graph div.point { background: #c0c0c0; }
 
 /* Who's that Pokémon */
+#js-dex-wtp { position: relative; width: 50em; height: 32em; margin: 2em auto; border: 1px solid #d0d0d0; background: #e8e8e8; }
 /* Use the class on this element to toggle the game state; by default everything is hidden */
-#js-dex-wtp {}
-#js-dex-wtp                 #js-dex-wtp-start    { display: none; }
-#js-dex-wtp.state-off       #js-dex-wtp-start    { display: block; }
+#js-dex-wtp                 #js-dex-wtp-loading  { display: none; }
+#js-dex-wtp.state-loading   #js-dex-wtp-loading  { display: block; }
+#js-dex-wtp                 #js-dex-wtp-options  { display: none; }
+#js-dex-wtp.state-off       #js-dex-wtp-options  { display: block; }
 #js-dex-wtp                 #js-dex-wtp-thinking { display: none; }
 #js-dex-wtp.state-thinking  #js-dex-wtp-thinking { display: block; }
 #js-dex-wtp                 #js-dex-wtp-board    { display: none; }
@@ -406,6 +408,17 @@ div.dex-stat-vertical-graph div.point { background: #c0c0c0; }
 #js-dex-wtp.state-answering #js-dex-wtp-board    { display: block; }
 #js-dex-wtp                 #js-dex-wtp-result   { display: none; }
 #js-dex-wtp.state-answering #js-dex-wtp-result   { display: block; }
+/* Starting options dialog thing */
+#js-dex-wtp-options p.intro { font-size: 1.5em; margin: 0.67em; text-align: center; }
+#js-dex-wtp-options ul.dex-column2 li { font-size: 1.5em; margin: 0.5em 2em; }
+#js-dex-wtp-options p.go { position: absolute; left: 1em; bottom: 1em; right: 1em; text-align: center; }
+#js-dex-wtp-options #js-dex-wtp-start { font-size: 2em; padding: 0.33em 2em; }
+/* Questions */
+#js-dex-wtp-thinking { font-size: 2em; height: 100%; width: 100%; line-height: 16em; color: #808080; text-align: center; vertical-align: middle; }
+#js-dex-wtp-board { height: 75%; }
+#js-dex-wtp-board .question { height: 61%; padding: 5% 1em; text-align: center; }
+#js-dex-wtp-board .answer { font-size: 1.25em; height: 33%; padding: 0 3em; text-align: center; }
+#js-dex-wtp-result { height: 15%; padding: 5% 3em; text-align: center; }
 
 
 /*** Static pages ***/

@@ -13,7 +13,30 @@
 <h1>Who's that Pokémon?</h1>
 
 <div id="js-dex-wtp">
-    <button id="js-dex-wtp-start">Start</button>
+    <div id="js-dex-wtp-loading">
+        loadin'
+    </div>
+
+    <div id="js-dex-wtp-options">
+        <p class="intro">Pick your poison, and hit Start!</p>
+        <div class="dex-column-container">
+        <ul class="dex-column2">
+            <li><label><input type="checkbox" name="category" value="cry"> Silhouettes</label></li>
+            <li><label><input type="checkbox" name="category" value="cry"> Cries</label></li>
+            <li><label><input type="checkbox" name="category" value="cry"> Pokédex flavor text</label></li>
+            <li><label><input type="checkbox" name="category" value="cry"> Pokédex numbers</label></li>
+        </ul>
+        <ul class="dex-column2">
+            <li><label><input type="radio" name="difficulty" value="baby"> Easy</label></li>
+            <li><label><input type="radio" name="difficulty" value="normal" checked="checked"> Medium</label></li>
+            <li><label><input type="radio" name="difficulty" value="spergin"> Hard</label></li>
+        </ul>
+        </div>
+
+        <p class="go">
+            <button id="js-dex-wtp-start">Start</button>
+        </p>
+    </div>
 
     <div id="js-dex-wtp-thinking">
         Hang on, I'm thinking...
