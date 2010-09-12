@@ -524,6 +524,10 @@ class MoveSearchForm(BaseSearchForm):
 
 
 class PokedexSearchController(BaseController):
+    def __before__(self, action, **params):
+        super(PokedexSearchController, self).__before__(action, **params)
+
+        c.javascripts.append(('pokedex', 'pokedex'))
 
     def pokemon_search(self):
         class F(PokemonSearchForm):

@@ -501,11 +501,81 @@ $(function() {
             $(this).removeClass('js-hover');
         });
     });
-});
 
+    // Pokémon and move search: only show custom display options when the right
+    // display mode is selected
+    var fix_search_display_class = function() {
+        var $this = $(this);
+        var $container = $this.closest('.dex-column-container');
 
-// Easter egg: obdurate
-$(function() {
+        $container.removeClass('js-dex-search-display-table')
+                  .removeClass('js-dex-search-display-list');
+
+        if ($this.val() == 'custom-table') {
+            $container.addClass('js-dex-search-display-table');
+        }
+        else if ($this.val() == 'custom-list') {
+            $container.addClass('js-dex-search-display-list');
+        }
+    };
+    $('select.js-dex-search-display')
+        .change(fix_search_display_class)
+        .each(fix_search_display_class);
+
+    // Pokémon and move search: break the custom-list options into two jqui
+    // sortable lists
+    $('ul.js-dex-search-column-picker').each(function() {
+        var $this = $(this);
+        var $include = $('<ul class="checked js-search-columns-sortable"></ul>');
+        var $exclude = $('<ul class="unchecked js-search-columns-sortable"></ul>');
+        $this.after($exclude).after($include);
+
+        $this.find('li').each(function() {
+            var $li = $(this);
+            if ($li.find('input').is(':checked')) {
+                $include.append($li);
+            }
+            else {
+                $exclude.append($li);
+            }
+        });
+
+        // Function to fix a checkbox's checkiness when moving across lists.  'this' should be an li
+        var fix_checkbox = function() {
+            var $li = $(this);
+            if ($li.closest('ul').is('.checked')) {
+                $li.find('input').attr('checked', 'checked');
+            }
+            else {
+                $li.find('input').removeAttr('checked');
+            }
+        };
+
+        // Make the things user-sortable!
+        var $sortables = $('ul.js-search-columns-sortable');
+        $sortables.sortable({
+            connectWith: $sortables,
+            cursor: 'move',
+            helper: 'clone',
+            opacity: 0.75,
+
+            receive: fix_checkbox,
+        });
+
+        // Allow double-clicking to quickly toss one thing into the other list
+        $sortables.find('li').dblclick(function() {
+            if ($(this).closest('ul').is('.checked')) {
+                $exclude.append(this);
+            }
+            else {
+                $include.append(this);
+            }
+
+            fix_checkbox.call(this);
+        });
+    });
+
+    ////// Easter egg: obdurate
     // Run through text nodes individually, so <br>s are untouched.
     // nb: 3 is Node.TEXT_NODE
     $('.dex-obdurate')

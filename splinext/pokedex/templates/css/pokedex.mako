@@ -14,6 +14,8 @@ a.dex-box-link.selected { border: 1px solid #95b7ea; background: #bfd4f2; }
 .dex-column:first-child { margin-left: 0; }
 .dex-column-2x { float: left; width: 66.333%; margin-left: 1%; }
 .dex-column-2x:first-child { margin-left: 0; }
+.dex-column2 { float: left; width: 49%; margin-left: 1%; }
+.dex-column2:first-child { margin-left: 0; }
 
 /* Type damage colors */
 .dex-damage-taken-0   { font-weight: bold; color: #66c; }
@@ -281,6 +283,30 @@ table.dex-type-chart.striped-rows tr:hover td.dex-damage-dealt-100 { color: #aaa
 
 
 /*** Searches ***/
+
+/* Custom table and custom list display */
+.no-js .js-instructions { display: none; }
+.dex-search-display-columns ul.js-dex-search-column-picker { column-count: 2; -moz-column-count: 2; -webkit-column-count: 2; }
+.no-js .dex-column.dex-search-display-list { margin-left: 33.666%; }
+.dex-search-display-list-reference dl { overflow: auto; max-height: 24em; }
+/* Only show the table/list controls when the right display mode is selected */
+body.js .dex-column-container .dex-search-display-columns { display: none; }
+body.js .dex-column-container .dex-search-display-list    { display: none; }
+body.js .dex-column-container .dex-search-display-list-reference { display: none; }
+body.js .dex-column-container.js-dex-search-display-table .dex-search-display-columns { display: block; }
+body.js .dex-column-container.js-dex-search-display-list  .dex-search-display-list    { display: block; }
+body.js .dex-column-container.js-dex-search-display-list  .dex-search-display-list-reference { display: block; }
+/* Style the js sortables */
+.dex-search-display-columns ul.checked { float: left; width: 48%; margin: 0 1%; border: 1px solid #bfd3f1; }
+.dex-search-display-columns ul.unchecked { margin: 0 1% 0 51%; }
+.dex-search-display-columns ul.checked li,
+.dex-search-display-columns ul.unchecked li { padding: 0.33em 0.5em; cursor: move; }
+.dex-search-display-columns ul.checked li label,
+.dex-search-display-columns ul.unchecked li label { cursor: move; }
+.dex-search-display-columns ul.checked li { background: #e6eefa; }
+.dex-search-display-columns ul.unchecked li { background: #f4f4f4; color: #606060; }
+.dex-search-display-columns ul.checked input,
+.dex-search-display-columns ul.unchecked input { display: none; }
 
 /* Pokémon search -- showing a list */
 .dex-pokemon-search-list { line-height: 1.33; font-family: monospace; }
