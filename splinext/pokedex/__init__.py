@@ -54,6 +54,9 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/dex/gadgets/stat_calculator', controller='dex_gadgets', action='stat_calculator')
     map.connect('/dex/gadgets/whos_that_pokemon', controller='dex_gadgets', action='whos_that_pokemon')
 
+    # JSON API
+    map.connect('/dex/api/pokemon', controller='dex_api', action='pokemon')
+
 
 ### Extend markdown to turn [Eevee]{pokemon} into a link in effects and
 ### descriptions
@@ -135,11 +138,13 @@ class PokedexPlugin(PluginBase):
 
     def controllers(self):
         import splinext.pokedex.controllers.pokedex
+        import splinext.pokedex.controllers.pokedex_api
         import splinext.pokedex.controllers.pokedex_search
         import splinext.pokedex.controllers.pokedex_gadgets
 
         return {
             'dex': controllers.pokedex.PokedexController,
+            'dex_api': controllers.pokedex_api.PokedexAPIController,
             'dex_search': controllers.pokedex_search.PokedexSearchController,
             'dex_gadgets': controllers.pokedex_gadgets.PokedexGadgetsController,
         }
