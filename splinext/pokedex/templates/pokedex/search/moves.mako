@@ -205,20 +205,25 @@ ${h.form(url.current(), method='GET')}
 <div class="dex-column-container">
 <div class="dex-column">
     <dl class="standard-form">
-        ${lib.field('display')}
+        ${lib.field('display', class_='js-dex-search-display')}
         ${lib.field('sort')}
         ${lib.field('sort_backwards')}
     </dl>
 </div>
-<div class="dex-column-2x">
+<div class="dex-column-2x dex-search-display-columns">
     <h3>${c.form.column.label() | n}</h3>
-    ${lib.bare_field('column')}
+    <p class="js-instructions">
+        <img src="${h.static_uri('spline', 'icons/arrow-move.png')}" alt="">
+        Drag or double-click us!
+    </p>
+    ${lib.bare_field('column', class_='js-dex-search-column-picker')}
 </div>
-<div class="dex-column-2x">
+<div class="dex-column dex-search-display-list">
     <h3>${c.form.format.label() | n}</h3>
     ${lib.bare_field('format')}
-
-    <h3>Format</h3>
+</div>
+<div class="dex-column dex-search-display-list-reference">
+    <h3>Formatting codes</h3>
     <p>e.g.: <code>* $name ($type)</code> becomes <code>&bull; Surf (water)</code></p>
     <dl class="standard-form">
         <dt><code>*</code></dt>
