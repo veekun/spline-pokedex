@@ -141,11 +141,39 @@ pokedex.pokemon_moves = {
             // Add controls to the document
             $first_tr.before($controls);
 
-            if ($last_filter_control) {
-                // Initially filter to only the most recent games, i.e., the last
-                // column
+            // Create a teeny options dialog
+            var $options = $(
+                '<div class="js-dex-pokemon-moves-options">'
+                + '<div class="title">'
+                    + '<img src="/static/spline/icons/gear.png" alt="">'
+                    + 'Options'
+                + '</div>'
+                + '<div class="body">'
+                    + '<label><input type="checkbox" name="autofilter">'
+                        + 'For tables with versions, hide old games by default</label>'
+                + '</div>'
+            + '</div>'
+            );
+
+            // Option: Auto-filtering
+            var $autofilter_cbox = $options.find('input[name="autofilter"]');
+            $autofilter_cbox.click(function() {
+                $.cookies.set('dex-rich-table-autofilter',
+                    $(this).is(':checked') ? '1' : '');
+            });
+            if ($.cookies.get('dex-rich-table-autofilter')) {
+                $autofilter_cbox.attr('checked', 'checked');
+
+                // Filter to only the most recent games, i.e., the last column
                 $last_filter_control.click();
             }
+
+            // Put the options in their own container, just before the table
+            var $extras = $('<div class="js-dex-pokemon-moves-extras"></div>');
+            $extras.append($options);
+            $this.before($extras);
+            // So the particular table can remember it
+            $this.data('pokemon-moves.$extras', $extras);
         });
     },
 

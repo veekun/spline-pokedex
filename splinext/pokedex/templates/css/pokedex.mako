@@ -119,6 +119,14 @@ table.dex-pokemon-moves tr.evolution-depth-2 td.name { padding-left: 2em; text-a
 table.dex-pokemon-moves tr.evolution-depth-3 td.name { padding-left: 3em; text-align: left; }
 
 /* JavaScript filtering/sorting */
+.js-dex-pokemon-moves-extras { margin-bottom: 0.25em; text-align: right; }
+.js-dex-pokemon-moves-options { display: inline-block; position: relative; margin-bottom: 0.25em; }
+.js-dex-pokemon-moves-options .title { font-size: 0.8em; padding: 0.33em 0.5em; background: #cfdcf0; -moz-border-radius: 0.5em; }
+.js-dex-pokemon-moves-options .title img { margin-right: 0.33em; }
+.js-dex-pokemon-moves-options .body { display: none; position: absolute; right: 0; width: 32em; padding: 0.33em; border: 1px solid #668dcc; text-align: left; background: white; -moz-box-shadow: 0.125em 0.125em 0.25em rgba(0, 0, 0, 0.5); }
+.js-dex-pokemon-moves-options:hover .title { background: #3173ce; color: white; -moz-border-radius: 0; -moz-border-radius-topleft: 0.5em; -moz-border-radius-topright: 0.5em; }
+.js-dex-pokemon-moves-options:hover .body { display: block; }
+.js-dex-pokemon-moves-options:hover .body label { display: block; }
 table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls .js-label { font-size: 0.67em; }
 table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls:hover { background: transparent; }
 table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls td:hover { cursor: pointer; background: #e6eefa; }
