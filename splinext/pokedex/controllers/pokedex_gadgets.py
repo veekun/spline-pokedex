@@ -678,6 +678,9 @@ class PokedexGadgetsController(BaseController):
         # input, and give the green light if so.
         pokemon = c.form.pokemon.data
         nature = c.form.nature.data
+        if nature and nature.is_neutral:
+            # Neutral nature is equivalent to none at all
+            nature = None
         level = c.form.level.data
         # Start with lists of possibly valid genes and cut down from there
         c.valid_range = {}  # stat => (min, max)
@@ -693,7 +696,7 @@ class PokedexGadgetsController(BaseController):
             base_stat = pokemon.stat(stat).base_stat
 
             nature_mod = 1.0
-            if nature.is_neutral:
+            if not nature:
                 pass
             elif nature.increased_stat == stat:
                 nature_mod = 1.1

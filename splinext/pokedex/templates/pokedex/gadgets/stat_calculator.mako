@@ -74,7 +74,7 @@ ${h.form(url.current(), method=u'GET')}
         <th>Possible range</th>
         % for stat in c.stats:
         <td
-            % if c.form.nature.data.is_neutral:
+            % if not c.form.nature.data or c.form.nature.data.is_neutral:
             <% pass %>\
             % elif c.form.nature.data.increased_stat == stat:
             class="dex-nature-buff"
