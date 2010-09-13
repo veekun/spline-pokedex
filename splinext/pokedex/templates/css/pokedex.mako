@@ -358,6 +358,7 @@ ul.dex-compare-pokemon-version-list { display: inline-block; }
 ul.dex-compare-pokemon-version-list li { display: inline-block; padding: 0 0.5em; }
 
 table.dex-compare-pokemon { width: 100%; margin-top: 0.5em; table-layout: fixed; }
+form + table.dex-compare-pokemon { margin-top: 0; }
 table.dex-compare-pokemon col.labels { width: 10em; }
 table.dex-compare-pokemon .dex-compare-suggestions th { padding: 0.5em; vertical-align: bottom; text-align: left; }
 table.dex-compare-pokemon .header-row input[type='text'] { width: 95%; }
