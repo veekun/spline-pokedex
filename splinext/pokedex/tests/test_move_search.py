@@ -170,7 +170,7 @@ class TestMoveSearchController(TestController):
         )
 
         self.check_search(
-            dict(flag_accuracy=u'no'),
+            dict(flag_mirror=u'no'),
             [u'Counter', u'Curse', u'Focus Punch', u'Sunny Day'],
             'better search by flag',
         )
