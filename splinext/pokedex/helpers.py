@@ -514,7 +514,10 @@ def apply_pokemon_template(template, pokemon):
         d['habitat'] = pokemon.habitat
 
     if 'shape' in template.template:
-        d['shape'] = pokemon.shape.name
+        if pokemon.shape:
+            d['shape'] = pokemon.shape.name
+        else:
+            d['shape'] = ''
 
     if 'hatch_counter' in template.template:
         d['hatch_counter'] = pokemon.hatch_counter

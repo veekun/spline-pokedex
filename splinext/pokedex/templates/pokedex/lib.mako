@@ -222,7 +222,13 @@
     % endif
 </td>
 <td>${move.power}</td>
-<td>${move.accuracy}%</td>
+<td>
+    % if move.accuracy is None:
+    —
+    % else:
+    ${move.accuracy}%
+    % endif
+</td>
 ## Priority is colored red for slow and green for fast
 % if move.priority == 0:
 <td></td>

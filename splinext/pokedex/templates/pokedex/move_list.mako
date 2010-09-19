@@ -20,4 +20,5 @@
     <li><a href="${url(controller='dex_search', action='move_search', introduced_in='2', sort='id')}">${h.pokedex.generation_icon(2)} Gold/Silver/Crystal</a></li>
     <li><a href="${url(controller='dex_search', action='move_search', introduced_in='3', sort='id')}">${h.pokedex.generation_icon(3)} Ruby/Sapphire/Emerald</a></li>
     <li><a href="${url(controller='dex_search', action='move_search', introduced_in='4', sort='id')}">${h.pokedex.generation_icon(4)} Diamond/Pearl/Platinum</a></li>
+    <li><a href="${url(controller='dex_search', action='move_search', introduced_in='5', sort='id')}">${h.pokedex.generation_icon(5)} Black/White</a></li>
 </ul>

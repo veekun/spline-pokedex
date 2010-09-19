@@ -79,7 +79,8 @@ ${h.h1('Essentials')}
         <dt>Pawprint</dt>
         <dd>${h.pokedex.pokemon_sprite(c.pokemon, prefix='pawprints', form=None)}</dd>
 
-        <dt>Shape</dt>
+        % if c.pokemon.generation.id <= 4:
+        <dt>Shape ${h.pokedex.generation_icon(4)}</dt>
         <dd>
             ${h.pokedex.pokedex_img('chrome/shapes/%d.png' % c.pokemon.shape.id, alt='', title=c.pokemon.shape.name)}
             ${c.pokemon.shape.awesome_name}
@@ -88,6 +89,7 @@ ${h.h1('Essentials')}
                 <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="Search: " title="Search">
             </a>
         </dd>
+        % endif
     </dl>
 </div>
 
@@ -142,7 +144,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 % for form in c.forms:
     <li>${h.pokedex.pokemon_link(
             c.pokemon,
-            h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver', form=form),
+            h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white', form=form),
             to_flavor=True, form=form,
             class_='dex-icon-link' + (' selected' if form == c.form else ''),
     )}</li>
@@ -516,6 +518,74 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         </td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
+        % endif
+    </tr>
+</tbody>
+% endif
+</table>
+% endif
+
+% if c.pokemon.generation_id <= 5:
+<h2 id="main-sprites:gen-v"><a href="#main-sprites:gen-v" class="subtle">${h.pokedex.generation_icon(5)} Black &amp; White</a></h2>
+<table class="dex-pokemon-flavor-sprites">
+<colgroup span="1"></colgroup> <!-- row headers -->
+% if c.introduced_in.id <= 11:
+<colgroup span="2"></colgroup> <!-- Black/White -->
+% endif
+<thead>
+    <tr class="header-row">
+        <th></th>
+        <th colspan="2">${h.pokedex.version_icons(u'Black', u'White')}</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <th class="vertical-text">
+            Normal
+            % if c.pokemon.has_gen4_fem_sprite:
+            <br/> (male)
+            % endif
+        </th>
+        % if c.introduced_in.id <= 11:
+        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/back', form=c.form)}</td>
+        % endif
+    </tr>
+    <tr>
+        <th class="vertical-text">
+            Shiny
+            % if c.pokemon.has_gen4_fem_sprite:
+            <br/> (male)
+            % endif
+        </th>
+        % if c.introduced_in.id <= 11:
+        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/shiny', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/back/shiny', form=c.form)}</td>
+        % endif
+    </tr>
+</tbody>
+% if c.pokemon.has_gen4_fem_sprite:
+<tbody>
+    <tr>
+        <th class="vertical-text">Normal <br/> (female)</th>
+        % if c.introduced_in.id <= 11:
+        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/female', form=c.form)}</td>
+        % if c.pokemon.has_gen4_fem_back_sprite:
+        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/female/back', form=c.form)}</td>
+        % else:
+        <td class="dex-pokemon-flavor-no-sprite">—</td>
+        % endif
+        % endif
+    </tr>
+    <tr>
+        <th class="vertical-text">Shiny <br/> (female)</th>
+        % if c.introduced_in.id <= 11:
+        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/female/shiny', form=c.form)}</td>
+        % if c.pokemon.has_gen4_fem_back_sprite:
+        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/female/back/shiny', form=c.form)}</td>
+        % else:
+        <td class="dex-pokemon-flavor-no-sprite">—</td>
+        % endif
         % endif
     </tr>
 </tbody>

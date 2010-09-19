@@ -159,7 +159,7 @@ ul.inline-menu > li:last-child:after { content: none; }
 .dex-page-beside-portrait:after { display: block; clear: both; content: ""; }
 p#dex-page-name { font-size: 2em; margin: 0.12em 0; }
 #dex-pokemon-forme { font-size: 1.25em; font-weight: bold; }
-#dex-pokemon-portrait-sprite { height: 80px; width: 80px; margin: 0.33em auto; padding: 7px; line-height: 80px; vertical-align: middle; text-align: center; background: url(/dex/media/chrome/sprite-frame.png) center center no-repeat; }
+#dex-pokemon-portrait-sprite { height: 96px; width: 96px; margin: 0.33em auto; padding: 7px; line-height: 96px; vertical-align: middle; text-align: center; background: url(/dex/media/chrome/sprite-frame.png) center center no-repeat; }
 
 /* List of types with damage (or whatever) below */
 ul.dex-type-list { overflow: hidden /* new float context */; margin-bottom: 2em; }

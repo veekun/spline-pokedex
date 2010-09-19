@@ -488,7 +488,11 @@ ${pokemon.habitat}\
 
 <%def name="col_shape()"><col class="dex-col-icon"></%def>
 <%def name="th_shape()"><th>Shape</th></%def>
-<%def name="td_shape(pokemon)"><td class="icon">${h.pokedex.pokedex_img('chrome/shapes/%d.png' % pokemon.shape.id, title=pokemon.shape.awesome_name, alt='')}</td></%def>
+<%def name="td_shape(pokemon)"><td class="icon">
+% if pokemon.shape:
+${h.pokedex.pokedex_img('chrome/shapes/%d.png' % pokemon.shape.id, title=pokemon.shape.awesome_name, alt='')}
+% endif
+</td></%def>
 
 <%def name="col_hatch_counter()"><col class="dex-col-stat"></%def>
 <%def name="th_hatch_counter()"><th><abbr title="Initial hatch counter">Hatch</abbr></th></%def>
