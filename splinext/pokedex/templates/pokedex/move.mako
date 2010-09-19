@@ -64,17 +64,22 @@ ${h.h1('Essentials')}
         <dd>n/a</dd>
         % else:
         <dd>
+            % if c.power_percentile is None:
             ${c.move.power}
-            % if c.power_percentile is not None:
-            — ${"{0:.1f}".format(c.power_percentile * 100)} percentile
+            % else:
+            ${c.move.power}; percentile ${"{0:.1f}".format(c.power_percentile * 100)}
             % endif
         </dd>
         % endif
         <dt>Accuracy</dt>
         <dd>
+            % if c.move.accuracy is None:
+            —  (cannot miss)
+            % else:
             ${c.move.accuracy}%
             % if c.move.accuracy != 100 and c.move.damage_class.name != 'None':
             ≈ ${"%.1f" % (c.move.power * c.move.accuracy / 100.0)} power
+            % endif
             % endif
         </dd>
         <dt>PP</dt>
