@@ -328,6 +328,10 @@ n/a
 <%def name="pawprint_cell(pokemon)">${h.pokedex.pokemon_sprite(pokemon, prefix='pawprints', form=None)}</%def>
 
 <%def name="shape_cell(pokemon)">
+% if pokemon.shape:
 ${h.pokedex.pokedex_img('chrome/shapes/%d.png' % pokemon.shape.id, alt='', title=pokemon.shape.name)}<br>
 ${pokemon.shape.awesome_name}
+% else:
+n/a
+% endif
 </%def>
