@@ -571,7 +571,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         % if c.introduced_in.id <= 11:
         <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/female', form=c.form)}</td>
         % if c.pokemon.has_gen4_fem_back_sprite:
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/female/back', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/back/female', form=c.form)}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
@@ -580,9 +580,9 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
     <tr>
         <th class="vertical-text">Shiny <br/> (female)</th>
         % if c.introduced_in.id <= 11:
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/female/shiny', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/shiny/female', form=c.form)}</td>
         % if c.pokemon.has_gen4_fem_back_sprite:
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/female/back/shiny', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/back/shiny/female', form=c.form)}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
