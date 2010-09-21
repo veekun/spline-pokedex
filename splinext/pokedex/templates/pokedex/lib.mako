@@ -1,3 +1,12 @@
+<%def name="pokemon_icon(pokemon)">\
+% if pokemon.forme_base_pokemon_id:
+${h.pokedex.pokemon_sprite(pokemon, prefix='icons')}\
+% else:
+<span class="sprite-icon sprite-icon-${pokemon.national_id}"></span>\
+% endif
+</%def>
+
+
 <%def name="pokemon_page_header()">
 <div id="dex-header">
     <a href="${url.current(name=c.prev_pokemon.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">

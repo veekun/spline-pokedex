@@ -368,7 +368,7 @@ ${h.end_form()}
 
 <%def name="col_icon()"><col class="dex-col-icon"></%def>
 <%def name="th_icon()"><th></th></%def>
-<%def name="td_icon(pokemon)"><td class="icon">${h.pokedex.pokemon_sprite(pokemon, prefix='icons')}</td></%def>
+<%def name="td_icon(pokemon)"><td class="icon">${dexlib.pokemon_icon(pokemon)}</td></%def>
 
 <%def name="col_name()"><col class="dex-col-name"></%def>
 <%def name="th_name()"><th>Name</th></%def>

@@ -153,8 +153,9 @@ ${h.h1('Essentials')}
         % for pokemon in c.compatible_families:
         <li>${h.pokedex.pokemon_link(
             pokemon,
-            h.pokedex.pokemon_sprite(pokemon, prefix='icons'),
+            h.literal(capture(dexlib.pokemon_icon, pokemon)),
             class_='dex-icon-link',
+            title=pokemon.full_name,
         )}</li>
         % endfor
     </ul>
@@ -282,13 +283,13 @@ ${h.h1('Evolution')}
     >
         % if col['pokemon'] == c.pokemon:
         <span class="dex-evolution-chain-pokemon">
-            ${h.pokedex.pokemon_sprite(col['pokemon'], prefix='icons')}
+            ${dexlib.pokemon_icon(col['pokemon'])}
             ${col['pokemon'].full_name}
         </span>
         % else:
         ${h.pokedex.pokemon_link(
             pokemon=col['pokemon'],
-            content=h.pokedex.pokemon_sprite(col['pokemon'], prefix='icons')
+            content=h.literal(capture(dexlib.pokemon_icon, col['pokemon']))
                    + col['pokemon'].full_name,
             class_='dex-evolution-chain-pokemon',
         )}
