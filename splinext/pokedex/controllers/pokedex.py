@@ -564,7 +564,7 @@ class PokedexController(BaseController):
         c.held_items = {}
 
         # First group by the things we care about
-        # n.b.: the keys are tuples of versions, not versions!
+        # n.b.: the keys are tuples of versions, not individual versions!
         version_held_items = {}
         # Preload with a list of versions so we know which ones are empty
         generations = db.pokedex_session.query(tables.Generation) \
