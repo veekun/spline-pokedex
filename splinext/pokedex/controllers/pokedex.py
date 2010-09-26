@@ -1488,9 +1488,27 @@ class PokedexController(BaseController):
         c.next_ability = db.pokedex_session.query(tables.Ability).get(
             (c.ability.id - 1 + 1) % max_id + 1)
 
+        # Eagerload
+        db.pokedex_session.query(tables.Ability) \
+            .filter_by(id=c.ability.id) \
+            .options(
+                subqueryload('foreign_names'),
+                joinedload('foreign_names.language'),
+                subqueryload('flavor_text'),
+                joinedload('flavor_text.version_group'),
+                joinedload('flavor_text.version_group.versions'),
+            ) \
+            .one()
+
         c.pokemon = db.pokedex_session.query(tables.Pokemon) \
-                                   .join(tables.PokemonAbility) \
-                                   .filter(tables.PokemonAbility.ability_id == c.ability.id)
+            .join(tables.PokemonAbility) \
+            .filter(tables.PokemonAbility.ability_id == c.ability.id) \
+            .options(
+                subqueryload('abilities'),
+                subqueryload('egg_groups'),
+                subqueryload('types'),
+                subqueryload_all('stats.stat'),
+            )
 
         c.pokemon = sorted(c.pokemon, key=lambda (pokemon): (pokemon.national_id, pokemon.forme_name))
 
