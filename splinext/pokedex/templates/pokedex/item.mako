@@ -153,51 +153,57 @@ ${h.h1('Berry tag')}
 
 
 % if c.holding_pokemon:
-${h.h1(u'Held by wild Pokémon')}
+${h.h1(u'Held by wild Pokémon', id='pokemon')}
 <table class="dex-pokemon-moves striped-rows">
 ## Columns
-% for i, column in enumerate(c.held_version_columns):
-% if i in c.held_version_last_columns:
-<col class="dex-col-version dex-col-last-version">
-% else:
-<col class="dex-col-version">
-% endif
+% for column_group in c.held_version_columns:
+<colgroup class="dex-colgroup-versions">
+    % for column in column_group:
+    <col class="dex-col-version">
+    % endfor
+</colgroup>
 % endfor
-${dexlib.pokemon_table_columns()}
+<colgroup>${dexlib.pokemon_table_columns()}</colgroup>
 
 ## Headers
-<tr class="header-row">
-    <%! import itertools %>\
-    % for i, column in enumerate(c.held_version_columns):
-    <th>
+<thead>
+  <tr class="header-row">
+    <% from itertools import groupby %>
+    % for column_group in c.held_version_columns:
       ## Only print a generation icon if the whole gen is one column
-      % if i in c.held_version_last_columns and \
-          (i == 0 or i - 1 in c.held_version_last_columns):
-        ${h.pokedex.generation_icon(column[0].generation)}
+      % if len(column_group) == 1:
+        <th>${h.pokedex.generation_icon(column_group[0][0].generation)}</th>
       % else:
-        % for _, versions in itertools.groupby(column, key=lambda version: version.version_group):
-        ${h.pokedex.version_icons(*versions)}<br>
+        % for column in column_group:
+        <th>
+          % for _, version_group in groupby(column, lambda version: version.version_group):
+          ${h.pokedex.version_icons(*version_group)}<br />
+          % endfor
+        </th>
         % endfor
       % endif
-    </th>
     % endfor
+
     ${dexlib.pokemon_table_header()}
-</tr>
+  </tr>
+</thead>
 
 ## Rows
+<tbody>
 % for pokemon, version_rarities in sorted(c.holding_pokemon.items(), \
                                           key=lambda (k, v): k.id):
-<tr>
-    % for column in c.held_version_columns:
-    <td>
-        % if version_rarities[column[0]]:
-        ${version_rarities[column[0]]}%
-        % endif
-    </td>
-    % endfor
+    <tr>
+        % for column in sum(c.held_version_columns, []):
+            % if version_rarities[column[0]]:
+            <td>${version_rarities[column[0]]}%</td>
+            % else:
+            <td></td>
+            % endif
+        % endfor
 
-    ${dexlib.pokemon_table_row(pokemon)}
-</tr>
+        ${dexlib.pokemon_table_row(pokemon)}
+    </tr>
 % endfor
+</tbody>
 </table>
 % endif
