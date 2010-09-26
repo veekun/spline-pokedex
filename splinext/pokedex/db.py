@@ -22,7 +22,7 @@ def connect(config):
     global pokedex_session
     pokedex_session = pokedex.db.connect(
         config['spline-pokedex.database_url'],
-        engine_args={'proxy': SQLATimerProxy()},
+        engine_args={'proxy': config['spline._sqlalchemy_proxy']},
     )
 
     # Lookup object
