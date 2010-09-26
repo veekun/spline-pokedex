@@ -1,4 +1,5 @@
 <%inherit file="/base.mako"/>
+<%namespace name="lib" file="/lib.mako"/>
 <%namespace name="dexlib" file="lib.mako"/>
 
 <%def name="title()">${c.type.name.title()} - Types</%def>
@@ -23,6 +24,7 @@
     ${c.type.id}: ${h.pokedex.type_icon(c.type)}
 </div>
 
+<%lib:cache_content>
 ${h.h1('Essentials')}
 
 <div class="dex-page-portrait">
@@ -119,3 +121,4 @@ ${h.h1('External Links', id='links')}
     <li><a href="http://www.smogon.com/dp/types/${c.type.name}">Smogon</a></li>
     % endif
 </ul>
+</%lib:cache_content>

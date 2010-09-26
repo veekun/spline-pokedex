@@ -484,7 +484,7 @@ class PokedexController(BaseController):
 
         # Let's cache this bitch
         return self.cache_content(
-            key=u';'.join( [name, form or u''] ),
+            key=u';'.join([c.pokemon.name, c.pokemon.forme_name or u'']),
             template='/pokedex/pokemon.mako',
             do_work=self._do_pokemon,
         )
@@ -1177,7 +1177,7 @@ class PokedexController(BaseController):
             (c.move.id - 1 + 1) % max_id + 1)
 
         return self.cache_content(
-            key=name,
+            key=c.move.name,
             template='/pokedex/move.mako',
             do_work=self._do_moves,
         )
@@ -1427,6 +1427,13 @@ class PokedexController(BaseController):
         c.next_type = db.pokedex_session.query(tables.Type).get(
             (c.type.id - 1 + 1) % max_id + 1)
 
+        return self.cache_content(
+            key=c.type.name,
+            template='/pokedex/type.mako',
+            do_work=self._do_types,
+        )
+
+    def _do_types(self, name):
         # Eagerload a bit of type stuff
         db.pokedex_session.query(tables.Type) \
             .filter_by(id=c.type.id) \
@@ -1460,7 +1467,7 @@ class PokedexController(BaseController):
 
         c.pokemon = sorted(c.pokemon, key=lambda (pokemon): (pokemon.national_id, pokemon.forme_name))
 
-        return render('/pokedex/type.mako')
+        return
 
     def abilities_list(sef):
         c.abilities = db.pokedex_session.query(tables.Ability) \
