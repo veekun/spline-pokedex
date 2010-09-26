@@ -15,7 +15,7 @@ from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from pylons.decorators import jsonify
 from sqlalchemy import and_, or_, not_
-from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join
+from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join, joinedload, subqueryload, subqueryload_all
 from sqlalchemy.orm import subqueryload, subqueryload_all
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func
@@ -1427,13 +1427,36 @@ class PokedexController(BaseController):
         c.next_type = db.pokedex_session.query(tables.Type).get(
             (c.type.id - 1 + 1) % max_id + 1)
 
+        # Eagerload a bit of type stuff
+        db.pokedex_session.query(tables.Type) \
+            .filter_by(id=c.type.id) \
+            .options(
+                subqueryload('damage_efficacies'),
+                joinedload('damage_efficacies.target_type'),
+                subqueryload('target_efficacies'),
+                joinedload('target_efficacies.damage_type'),
+            ) \
+            .one()
+
         c.moves = db.pokedex_session.query(tables.Move) \
-                                 .filter_by(type_id=c.type.id) \
-                                 .order_by(tables.Move.name.asc())
+            .filter_by(type_id=c.type.id) \
+            .order_by(tables.Move.name.asc()) \
+            .options(
+                joinedload('damage_class'),
+                joinedload('generation'),
+                joinedload('move_effect'),
+                joinedload('type'),
+            )
 
         c.pokemon = db.pokedex_session.query(tables.Pokemon) \
-                                   .join(tables.PokemonType) \
-                                   .filter(tables.PokemonType.type_id == c.type.id)
+            .join(tables.PokemonType) \
+            .filter(tables.PokemonType.type_id == c.type.id) \
+            .options(
+                subqueryload('abilities'),
+                subqueryload('egg_groups'),
+                subqueryload('types'),
+                subqueryload_all('stats.stat'),
+            )
 
         c.pokemon = sorted(c.pokemon, key=lambda (pokemon): (pokemon.national_id, pokemon.forme_name))
 
