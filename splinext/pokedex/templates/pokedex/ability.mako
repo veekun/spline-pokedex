@@ -1,4 +1,5 @@
 <%inherit file="/base.mako"/>
+<%namespace name="lib" file="/lib.mako"/>
 <%namespace name='dexlib' file='lib.mako'/>
 
 <%def name="title()">${c.ability.name} - Abilities</%def>
@@ -24,6 +25,7 @@
 </div>
 
 
+<%lib:cache_content>
 ${h.h1('Essentials')}
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.ability.name}</p>
@@ -93,3 +95,4 @@ ${h.h1('External Links', id='links')}
     <li><a href="http://serebii.net/abilitydex/${c.ability.name.lower().replace(' ', '')}.shtml">Serebii.net</a></li>
     <li><a href="http://smogon.com/dp/abilities/${c.ability.name.lower().replace(' ', '_')}">Smogon</a></li>
 </ul>
+</%lib:cache_content>

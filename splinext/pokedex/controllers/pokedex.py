@@ -1488,6 +1488,13 @@ class PokedexController(BaseController):
         c.next_ability = db.pokedex_session.query(tables.Ability).get(
             (c.ability.id - 1 + 1) % max_id + 1)
 
+        return self.cache_content(
+            key=c.ability.name,
+            template='/pokedex/ability.mako',
+            do_work=self._do_ability,
+        )
+
+    def _do_ability(self, name):
         # Eagerload
         db.pokedex_session.query(tables.Ability) \
             .filter_by(id=c.ability.id) \
@@ -1512,7 +1519,7 @@ class PokedexController(BaseController):
 
         c.pokemon = sorted(c.pokemon, key=lambda (pokemon): (pokemon.national_id, pokemon.forme_name))
 
-        return render('/pokedex/ability.mako')
+        return
 
 
     def items_list(self):
