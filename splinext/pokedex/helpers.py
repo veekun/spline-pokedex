@@ -215,7 +215,8 @@ def pokemon_sprite(pokemon, prefix='heartgold-soulsilver', **attr):
     attr.setdefault('title', alt_text)
 
     if form:
-        filename = '%d-%s.%s' % (pokemon.national_id, form, ext)
+        filename = '%d-%s.%s' % (pokemon.national_id,
+                                 filename_from_name(form), ext)
     else:
         filename = '%d.%s' % (pokemon.national_id, ext)
 
