@@ -474,7 +474,7 @@ ${pokemon_stat.effort} ${pokemon_stat.stat.name}<br>
 
 <%def name="col_color()"><col class="dex-col-color"></%def>
 <%def name="th_color()"><th>Color</th></%def>
-<%def name="td_color(pokemon)"><td class="color">${pokemon.color}</td></%def>
+<%def name="td_color(pokemon)"><td class="color"><span class="dex-color-${pokemon.color}"></span> ${pokemon.color}</td></%def>
 
 <%def name="col_habitat()"><col class="dex-col-habitat"></%def>
 <%def name="th_habitat()"><th>Habitat</th></%def>

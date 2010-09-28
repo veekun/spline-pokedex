@@ -61,7 +61,7 @@ col.dex-col-egg-group   { width: 7em; }
 col.dex-col-height      { width: 5em; }
 col.dex-col-weight      { width: 6em; }
 col.dex-col-species     { width: 8em; }
-col.dex-col-color       { width: 5em; }
+col.dex-col-color       { width: 7em; }
 col.dex-col-habitat     { width: 9em; }
 col.dex-col-stat        { width: 3em; }
 col.dex-col-stat-total  { width: 4em; }
@@ -96,7 +96,7 @@ table.dex-pokemon-moves td.ability { font-size: 0.75em; padding: 0.25em; white-s
 table.dex-pokemon-moves td.egg-group { font-size: 0.75em; padding: 0.25em; }
 table.dex-pokemon-moves td.stat { text-align: right; }
 table.dex-pokemon-moves td.size { text-align: right; }
-table.dex-pokemon-moves td.color { }
+table.dex-pokemon-moves td.color { text-align: left; }
 table.dex-pokemon-moves td.species { }
 table.dex-pokemon-moves td.effort { font-size: 0.75em; padding: 0.25em; text-align: left; }
 table.dex-pokemon-moves tr.better-move-type:nth-child(2n) td.type,
@@ -227,6 +227,28 @@ dl.dex-simple-encounters ul li:last-child:after { content: ''; }
 /* Pokémon page -- cry */
 /* Mozilla's player changes its height proportionate to its width by default or something */
 audio.cry { width: 100%; height: 35px; }
+
+/* Pokémon flavor -- color */
+.dex-color-black,
+.dex-color-blue,
+.dex-color-brown,
+.dex-color-gray,
+.dex-color-green,
+.dex-color-pink,
+.dex-color-purple,
+.dex-color-red,
+.dex-color-white,
+.dex-color-yellow { display: inline-block; height: 1em; width: 1em; border: 1px solid #606060; vertical-align: middle; }
+.dex-color-black    { background: black; }
+.dex-color-blue     { background: blue; }
+.dex-color-brown    { background: brown; }
+.dex-color-gray     { background: gray; }
+.dex-color-green    { background: green; }
+.dex-color-pink     { background: pink; }
+.dex-color-purple   { background: purple; }
+.dex-color-red      { background: red; }
+.dex-color-white    { background: white; }
+.dex-color-yellow   { background: yellow; }
 
 /* Pokémon flavor page -- tables of sprites */
 table.dex-pokemon-flavor-sprites td { vertical-align: middle /* sprites aren't always the same height within a row */; }

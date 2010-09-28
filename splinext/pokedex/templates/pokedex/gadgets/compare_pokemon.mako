@@ -315,7 +315,7 @@ ${h.pokedex.format_weight_metric(pokemon.weight)}
 </%def>
 
 <%def name="species_cell(pokemon)">${pokemon.species}</%def>
-<%def name="color_cell(pokemon)"><span style="color: ${pokemon.color};">${pokemon.color}</span></%def>
+<%def name="color_cell(pokemon)"><span class="dex-color-${pokemon.color}"></span> ${pokemon.color}</%def>
 <%def name="habitat_cell(pokemon)">
 % if pokemon.generation.id <= 3:
 ${h.pokedex.pokedex_img('chrome/habitats/%s.png' % h.pokedex.filename_from_name(pokemon.habitat), \

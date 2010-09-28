@@ -39,7 +39,8 @@ ${h.h1('Essentials')}
         </dd>
 
         <dt>Color</dt>
-        <dd style="color: ${c.pokemon.color};">
+        <dd>
+            <span class="dex-color-${c.pokemon.color}"></span>
             ${c.pokemon.color}
             <a href="${url(controller='dex_search', action='pokemon_search', color=c.pokemon.color)}"
                 class="dex-subtle-search-link">
