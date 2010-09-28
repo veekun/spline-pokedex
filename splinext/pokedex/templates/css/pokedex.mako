@@ -188,7 +188,8 @@ ul.dex-type-list li img { display: block; margin-bottom: 0.25em; }
 dl.pokemon-abilities p { margin: 0; padding: 0; }
 
 /* Pokémon page -- grid of compatible breeding partners */
-ul.dex-pokemon-compatibility { max-height: 136px /* four rows of icons plus borders */; overflow: auto; }
+ul.dex-pokemon-compatibility { max-height: 136px /* four rows of icons plus borders */; }
+ul.inline.dex-pokemon-compatibility { overflow: auto; }
 
 /* Pokémon page -- wild held items */
 table.dex-pokemon-held-items { width: 100%; }
