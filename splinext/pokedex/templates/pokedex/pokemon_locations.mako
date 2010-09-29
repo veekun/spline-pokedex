@@ -1,5 +1,6 @@
 <%inherit file="/base.mako"/>
-<%namespace name="lib" file="lib.mako"/>
+<%namespace name="lib" file="/lib.mako"/>
+<%namespace name="dexlib" file="lib.mako"/>
 
 <%def name="title()">${c.pokemon.full_name} locations - Pokémon #${c.pokemon.national_id}</%def>
 
@@ -12,8 +13,9 @@
 </ul>
 </%def>
 
-${lib.pokemon_page_header()}
+${dexlib.pokemon_page_header()}
 
+<%lib:cache_content>
 ## Sort regions by the generation that introduced them
 % for region, terrain_area_version_condition_encounters \
    in sorted( c.grouped_encounters.items(), key=lambda (k, v): k.generation.id):
@@ -125,3 +127,4 @@ ${h.h1(region.name)}
     % endfor
 </table>
 % endfor
+</%lib:cache_content>

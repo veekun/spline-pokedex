@@ -957,7 +957,7 @@ class PokedexController(BaseController):
         return
 
 
-    def pokemon_flavor(self, name=None):
+    def pokemon_flavor(self, name):
         try:
             c.pokemon = db.pokemon_query(name).one()
         except NoResultFound:
@@ -1059,6 +1059,14 @@ class PokedexController(BaseController):
         ### Previous and next for the header
         c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
 
+        # Cache it yo
+        return self.cache_content(
+            key=c.pokemon.name,
+            template='/pokedex/pokemon_locations.mako',
+            do_work=self._do_pokemon_locations,
+        )
+
+    def _do_pokemon_locations(self, name):
         # For the most part, our data represents exactly what we're going to
         # show.  For a given area in a given game, this Pokémon is guaranteed
         # to appear some x% of the time no matter what the state of the world
@@ -1158,7 +1166,7 @@ class PokedexController(BaseController):
                     continue
                 c.region_versions[region][0:0] = version_group.versions
 
-        return render('/pokedex/pokemon_locations.mako')
+        return
 
     def moves_list(self):
         return render('/pokedex/move_list.mako')
