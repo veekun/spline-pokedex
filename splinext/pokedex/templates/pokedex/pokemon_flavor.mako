@@ -77,8 +77,8 @@ ${h.h1('Essentials')}
         </dd>
         % endif
 
-        <dt>Pawprint</dt>
-        <dd>${h.pokedex.pokemon_sprite(c.pokemon, prefix='pawprints', form=None)}</dd>
+        <dt>Footprint</dt>
+        <dd>${h.pokedex.pokemon_sprite(c.pokemon, prefix='footprints', form=None)}</dd>
 
         % if c.pokemon.generation.id <= 4:
         <dt>Shape ${h.pokedex.generation_icon(4)}</dt>

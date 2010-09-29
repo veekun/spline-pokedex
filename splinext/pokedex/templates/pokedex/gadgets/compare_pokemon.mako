@@ -150,7 +150,7 @@ ${h.end_form()}
     ${row(u'Species',   species_cell,   class_='dex-compare-flavor-text')}
     ${row(u'Color',     color_cell,     class_='dex-compare-flavor-text')}
     ${row(u'Habitat',   habitat_cell,   class_='dex-compare-flavor-text')}
-    ${row(u'Pawprint',  pawprint_cell,  class_='dex-compare-flavor-text')}
+    ${row(u'Footprint', footprint_cell, class_='dex-compare-flavor-text')}
     ${row(u'Shape',     shape_cell,     class_='dex-compare-flavor-text')}
 </tbody>
 </table>
@@ -325,7 +325,7 @@ n/a
 % endif
 </%def>
 
-<%def name="pawprint_cell(pokemon)">${h.pokedex.pokemon_sprite(pokemon, prefix='pawprints', form=None)}</%def>
+<%def name="footprint_cell(pokemon)">${h.pokedex.pokemon_sprite(pokemon, prefix='footprints', form=None)}</%def>
 
 <%def name="shape_cell(pokemon)">
 % if pokemon.shape:

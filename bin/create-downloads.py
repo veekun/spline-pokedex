@@ -38,7 +38,7 @@ def create_downloads():
     make_tarball('overworld.tar.gz', ['overworld'])
     make_tarball('pokemon-cries.tar.gz', ['cries'])
     make_tarball('pokemon-sugimori.tar.gz', ['sugimori'])
-    make_tarball('pokemon-footprints.tar.gz', ['pawprints'])
+    make_tarball('pokemon-footprints.tar.gz', ['footprints'])
     make_tarball('pokemon-trozei.tar.gz', ['trozei'])
     make_tarball('pokemon-icons.tar.gz', ['icons'])
 
@@ -207,7 +207,7 @@ def create_downloads():
         'overworld/shiny/up/{0}.png', 32, 493, transparent=True)
 
     # Other miscellaneous
-    make_montage('footprints.png', 'pawprints/{0}.png', 48, 493,
+    make_montage('footprints.png', 'footprints/{0}.png', 48, 493,
         subst_forms=False)
     make_montage('sugimori.png', 'sugimori/{0}.png', 96, 493,
         padding=2, subst_forms=False, filter='lanczos')
