@@ -68,27 +68,34 @@ class PokedexLinkPattern(markdown.inlinepatterns.Pattern):
         self.thingy_type = table.__name__
 
         # Match [...]{tablename}
-        regex = ur'(?x) \[ ([^]]+) \] \s* \{' + table.__singlename__ + ur'\}'
+        regex = ur'(?x) \[ ([^]]+) \] \s* \{' + table.__singlename__ + ur'(:[^}]+)?\}'
 
         # old-style classes augh!
         markdown.inlinepatterns.Pattern.__init__(self, regex)
 
     def handleMatch(self, m):
-        raw_name = m.group(2)
+        if m.group(3):
+            # [A]{foo:B} -- A is the label, B is the target
+            manual_label = m.group(2)
+            target = m.group(3)
+        else:
+            # [A]{foo} -- A is the label and the target
+            manual_label = None
+            target = m.group(2)
 
         # Find the thingy and figure out its URL
         if self.thingy_type.lower() == u'pokemon':
-            obj = splinext.pokedex.db.pokemon_query(raw_name).one()
+            obj = splinext.pokedex.db.pokemon_query(target).one()
             name = obj.full_name
         else:
-            obj = splinext.pokedex.db.get_by_name_query(self.thingy_table, raw_name).one()
+            obj = splinext.pokedex.db.get_by_name_query(self.thingy_table, target).one()
             name = obj.name
         url = pokedex_helpers.make_thingy_url(obj)
 
         # Construct a link node
         el = markdown.etree.Element('a')
         el.set('href', url)
-        el.text = markdown.AtomicString(name)
+        el.text = markdown.AtomicString(manual_label or name)
         return el
 
 class PokedexMechanicsPattern(markdown.inlinepatterns.Pattern):
