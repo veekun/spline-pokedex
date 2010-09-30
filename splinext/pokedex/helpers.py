@@ -559,7 +559,7 @@ def apply_move_template(template, move):
         power=move.power,
         accuracy=move.accuracy,
 
-        priority=move.move_effect.priority,
+        priority=move.priority,
         effect_chance=move.effect_chance,
         effect=move.move_effect.short_effect,
     )

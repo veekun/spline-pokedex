@@ -1394,7 +1394,7 @@ class PokedexSearchController(BaseController):
             query = query.filter(c.form.effect_chance.data(me.effect_chance))
 
         if c.form.priority.data:
-            query = query.filter(c.form.priority.data(tables.MoveEffect.priority))
+            query = query.filter(c.form.priority.data(tables.Move.priority))
 
         # Pokémon -- they're ORed, so only one subquery is necessary
         #for pokemon in c.form.pokemon.data:
@@ -1490,7 +1490,7 @@ class PokedexSearchController(BaseController):
             sort_clauses.insert(0, me.accuracy.desc())
 
         elif c.form.sort.data == 'priority':
-            sort_clauses.insert(0, tables.MoveEffect.priority.desc())
+            sort_clauses.insert(0, tables.Move.priority.desc())
 
         elif c.form.sort.data == 'effect':
             sort_clauses.insert(0, tables.MoveEffect.effect.desc())
