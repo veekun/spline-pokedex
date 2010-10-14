@@ -383,7 +383,6 @@ def evolution_description(evolution):
         chunks.append(u"{0}s only".format(evolution.gender))
     if evolution.time_of_day:
         chunks.append(u"during the {0}".format(evolution.time_of_day))
-
     if evolution.minimum_level:
         chunks.append(u"starting at level {0}".format(evolution.minimum_level))
     if evolution.location_id:
@@ -400,7 +399,6 @@ def evolution_description(evolution):
     if evolution.minimum_beauty:
         chunks.append(u"with at least {0} beauty".format(
             evolution.minimum_beauty))
-
     if evolution.relative_physical_stats is not None:
         if evolution.relative_physical_stats < 0:
             op = u'<'
@@ -408,8 +406,10 @@ def evolution_description(evolution):
             op = u'>'
         else:
             op = u'='
-
         chunks.append(u"when Attack {0} Defense".format(op))
+    if evolution.party_pokemon_id:
+        chunks.append(u"with {0} in the party".format(
+            evolution.party_pokemon.name))
 
     return u', '.join(chunks)
 
