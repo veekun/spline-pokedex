@@ -184,7 +184,7 @@ class PokedexController(BaseController):
         tables.Location: 'location',
         tables.Move: 'move',
         tables.Nature: 'nature',
-        tables.Pokemon: 'Pokémon',
+        tables.Pokemon: u'Pokémon',
         tables.Type: 'type',
     }
 
