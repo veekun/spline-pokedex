@@ -261,9 +261,10 @@ class PokedexController(BaseController):
             abort(204)
 
         name = name.strip()
+        lookup = name.lower()
 
         ### Special stuff that bypasses lookup
-        if name.lower() == 'obdurate':
+        if lookup == 'obdurate':
             # Pokémon flavor text in the D/P font
             return self._egg_unlock_cheat('obdurate')
 
@@ -272,11 +273,11 @@ class PokedexController(BaseController):
         valid_types = []
         c.subpage = None
         # Subpage suffixes: 'flavor' and 'locations' for Pokémon bits
-        if name.lower().endswith(u' flavor'):
+        if lookup.endswith((u' flavor', u' flavour')):
             c.subpage = 'flavor'
             valid_types = [u'pokemon']
-            name = re.sub('(?i) flavor$', '', name)
-        elif name.lower().endswith(u' locations'):
+            name = re.sub('(?i) flavou?r$', '', name)
+        elif lookup.endswith(u' locations'):
             c.subpage = 'locations'
             valid_types = [u'pokemon']
             name = re.sub('(?i) locations$', '', name)
