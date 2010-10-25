@@ -193,7 +193,7 @@ def version_icons(*versions):
     return version_icons
 
 
-def pokemon_sprite(pokemon, prefix='heartgold-soulsilver', **attr):
+def pokemon_sprite(pokemon, prefix='black-white', **attr):
     """Returns an <img> tag for a Pokémon sprite."""
 
     # Kinda gross, but it's entirely valid to pass None as a form
