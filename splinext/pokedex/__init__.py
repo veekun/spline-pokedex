@@ -67,8 +67,8 @@ class PokedexLinkPattern(markdown.inlinepatterns.Pattern):
         self.thingy_table = table
         self.thingy_type = table.__name__
 
-        # Match [...]{tablename}
-        regex = ur'(?x) \[ ([^]]+) \] \s* \{' + table.__singlename__ + ur'(:[^}]+)?\}'
+        # Match [target]{tablename} and [label]{tablename:target}
+        regex = ur'(?x) \[ ([^]]+) \] \s* \{' + table.__singlename__ + ur'(?: :([^}]+) )? \}'
 
         # old-style classes augh!
         markdown.inlinepatterns.Pattern.__init__(self, regex)
@@ -99,7 +99,9 @@ class PokedexLinkPattern(markdown.inlinepatterns.Pattern):
         return el
 
 class PokedexMechanicsPattern(markdown.inlinepatterns.Pattern):
-    """Matches [...]{mechanic}.  For now, this doesn't actually do anything."""
+    """Matches [target]{mechanic} and [label]{mechanic:target}.  For now, this
+    doesn't actually do anything.
+    """
     def handleMatch(self, m):
         # Don't do anything for now
         el = markdown.etree.Element('span')
@@ -114,7 +116,7 @@ class PokedexExtension(markdown.Extension):
             key = "pokedex-link-{table.__tablename__}".format(table=table)
             md.inlinePatterns[key] = PokedexLinkPattern(table)
 
-        mechanics_regex = ur'(?x) \[ ([^]]+) \] \s* \{mechanic\}'
+        mechanics_regex = ur'(?x) \[ ([^]]+) \] \s* \{mechanic(?: :([^}]+) )?\}'
         md.inlinePatterns['pokedex-mechanics'] \
             = PokedexMechanicsPattern(mechanics_regex)
 
