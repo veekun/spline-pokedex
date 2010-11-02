@@ -41,19 +41,13 @@ def connect(config):
 def get_by_name_query(table, name):
     """Finds a single row in the given table by name, ignoring case.
 
-    Don't use this for Pokémon!  Use `pokemon()`, as it knows about forms.
+    Don't use this for Pokémon!  Use `pokemon_query()`, as it knows about
+    forms.
     """
     q = pokedex_session.query(table).filter(func.lower(table.name)
                                             == name.lower())
 
     return q
-
-def get_by_name(table, name):
-    """Same as above, except actally performs the query, which is lame.
-
-    Use the above if at all possible.
-    """
-    return get_by_name_query(table, name).one()
 
 def pokemon_query(name, form=None):
     """Returns a query that will look for the named Pokémon."""
@@ -74,12 +68,6 @@ def pokemon_query(name, form=None):
         q = q.filter_by(forme_base_pokemon_id=None)
 
     return q
-
-def pokemon(name, form=None):
-    # TODO: make this go away
-
-    # If this raises because the data is bogus, it's the caller's fault
-    return pokemon_query(name, form).one()
 
 def generation(id):
     return pokedex_session.query(tables.Generation).get(id)

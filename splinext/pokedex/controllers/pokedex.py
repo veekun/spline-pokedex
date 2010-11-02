@@ -1053,7 +1053,7 @@ class PokedexController(BaseController):
         Pokémon.
         """
         try:
-            c.pokemon = db.pokemon(name)
+            c.pokemon = db.pokemon_query(name).one()
         except NoResultFound:
             return self._not_found()
 
@@ -1425,7 +1425,7 @@ class PokedexController(BaseController):
 
     def types(self, name):
         try:
-            c.type = db.get_by_name(tables.Type, name)
+            c.type = db.get_by_name_query(tables.Type, name).one()
         except NoResultFound:
             return self._not_found()
 
@@ -1486,7 +1486,7 @@ class PokedexController(BaseController):
 
     def abilities(self, name):
         try:
-            c.ability = db.get_by_name(tables.Ability, name)
+            c.ability = db.get_by_name_query(tables.Ability, name).one()
         except NoResultFound:
             return self._not_found()
 
@@ -1546,7 +1546,7 @@ class PokedexController(BaseController):
         except NoResultFound:
             # It's possible this is an old item URL; redirect if so
             try:
-                item = db.get_by_name(tables.Item, pocket)
+                item = db.get_by_name_query(tables.Item, pocket).one()
                 return redirect(
                     url(controller='dex', action='items',
                         pocket=item.pocket.identifier, name=pocket),
@@ -1569,7 +1569,7 @@ class PokedexController(BaseController):
 
     def items(self, pocket, name):
         try:
-            c.item = db.get_by_name(tables.Item, name)
+            c.item = db.get_by_name_query(tables.Item, name).one()
         except NoResultFound:
             return self._not_found()
 
@@ -1749,7 +1749,7 @@ class PokedexController(BaseController):
 
     def natures(self, name):
         try:
-            c.nature = db.get_by_name(tables.Nature, name)
+            c.nature = db.get_by_name_query(tables.Nature, name).one()
         except NoResultFound:
             return self._not_found()
 
