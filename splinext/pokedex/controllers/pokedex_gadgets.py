@@ -166,9 +166,8 @@ def stat_graph_chunk_color(gene):
 class PokedexGadgetsController(BaseController):
 
     def capture_rate(self):
-        """Find a page in the Pokédex given a name.
-
-        Also performs fuzzy search.
+        """Calculate the successful capture rate of every Ball given a target
+        Pokémon and a set of battle conditions.
         """
 
         c.javascripts.append(('pokedex', 'pokedex-gadgets'))
