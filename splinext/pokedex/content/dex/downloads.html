@@ -34,12 +34,16 @@ ${h.h2(u'Main Pokémon sprites')}
         <a href="${h.static_uri('pokedex', 'downloads/generation-4.tar.gz')}">Generation IV (14MB)</a>
         &mdash; all sprites from Diamond, Pearl, Platinum, HeartGold, and SoulSilver
     </li>
+    <li>
+        <a href="${h.static_uri('pokedex', 'downloads/generation-5.tar.gz')}">Generation V (2.4MB)</a>
+        &mdash; all sprites from Black and White
+    </li>
 </ul>
 
 ${h.h2('Others')}
 <ul class="classic-list">
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/pokemon-icons.tar.gz')}">Pokémon icons (178KB)</a>
+        <a href="${h.static_uri('pokedex', 'downloads/pokemon-icons.tar.gz')}">Pokémon icons (242KB)</a>
         &mdash; sprites used in the Pokémon screen (no animations)
     </li>
     <li>
@@ -47,14 +51,14 @@ ${h.h2('Others')}
         &mdash; overworld Pokémon sprites from HeartGold/SoulSilver, plus a few overworld trainers
     </li>
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/pokemon-footprints.tar.gz')}">Footprints (43KB)</a>
+        <a href="${h.static_uri('pokedex', 'downloads/pokemon-footprints.tar.gz')}">Footprints (35KB)</a>
     </li>
     <li>
         <a href="${h.static_uri('pokedex', 'downloads/pokemon-trozei.tar.gz')}">Trozei sprites (249KB)</a>
         &mdash; sprite for each Pokémon from Pokémon Trozei
     </li>
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/items.tar.gz')}">Items (164KB)</a>
+        <a href="${h.static_uri('pokedex', 'downloads/items.tar.gz')}">Items (175KB)</a>
         &mdash; includes large sprites from Berry Tags and the Sinnoh Underground
     </li>
     <li>
@@ -215,6 +219,27 @@ ${h.h1('Main sprite montages')}
             ${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')} back (561KB)</a>
     </dd>
 </dl>
+<hr>
+<dl>
+    <dt>${h.pokedex.version_icons(u'Black', u'White')}</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/black-white.png')}">normal (749KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/black-white-shiny.png')}">shiny (750KB)</a>;
+    </dd>
+    <dt>${h.pokedex.version_icons(u'Black', u'White')} back</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/black-white-back.png')}">normal (652KB)</a>;
+        <a href="${h.static_uri('pokedex', 'downloads/black-white-back-shiny.png')}">shiny (653KB)</a>
+    </dd>
+    <dt>${h.pokedex.generation_icon(5)} ♂ vs ♀</dt>
+    <dd>
+        <a href="${h.static_uri('pokedex', 'downloads/black-white-female-diff.png')}">
+            ${h.pokedex.version_icons(u'Black', u'White')} front (869KB)</a>
+        <br>
+        <a href="${h.static_uri('pokedex', 'downloads/black-white-back-female-diff.png')}">
+            ${h.pokedex.version_icons(u'Black', u'White')} back (755KB)</a>
+    </dd>
+</dl>
 
 ${h.h1('Other montages')}
 <ul class="classic-list">
@@ -234,7 +259,7 @@ ${h.h1('Other montages')}
             shiny backwards (153KB)</a>
     </li>
     <li><a href="${h.static_uri('pokedex', 'downloads/footprints.png')}">Pokémon footprints (11KB)</a></li>
-    <li><a href="${h.static_uri('pokedex', 'downloads/sugimori.png')}">Pokémon sugimori art, shrunk down (10MB)</a></li>
+    <li><a href="${h.static_uri('pokedex', 'downloads/sugimori.png')}">Pokémon sugimori art, shrunk down (11MB)</a></li>
     <li><a href="${h.static_uri('pokedex', 'downloads/items.png')}">items (249KB)</a></li>
     <li><a href="${h.static_uri('pokedex', 'downloads/berries.png')}">berries (47KB)</a></li>
 </ul>
@@ -242,7 +267,7 @@ ${h.h1('Other montages')}
 ${h.h1('Other files')}
 <ul class="classic-list">
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/pokemon-cries.tar.gz')}">Pokémon cries (1.9MB)</a>
+        <a href="${h.static_uri('pokedex', 'downloads/pokemon-cries.tar.gz')}">Pokémon cries (3.1MB)</a>
         &mdash; encoded as Ogg Vorbis quality 3
     </li>
     <li>
@@ -250,7 +275,7 @@ ${h.h1('Other files')}
         &mdash; official art for every Pokémon
     </li>
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/veekun-pokedex.sqlite.gz')}">Full database as gzipped SQLite (4.8MB)</a>.
+        <a href="${h.static_uri('pokedex', 'downloads/veekun-pokedex.sqlite.gz')}">Full database as gzipped SQLite (7.0MB)</a>.
         But see <a href="http://bugs.veekun.com/projects/pokedex/wiki/GettingData">the documentation</a> for other databases or real instructions.
     </li>
     <li>

@@ -33,6 +33,7 @@ def create_downloads():
     make_tarball('generation-2.tar.gz', ['gold', 'silver', 'crystal'])
     make_tarball('generation-3.tar.gz', ['ruby-sapphire', 'emerald', 'firered-leafgreen'])
     make_tarball('generation-4.tar.gz', ['diamond-pearl', 'platinum', 'heartgold-soulsilver'])
+    make_tarball('generation-5.tar.gz', ['black-white'])
 
     # Other Pokémon stuff
     make_tarball('overworld.tar.gz', ['overworld'])
@@ -142,6 +143,15 @@ def create_downloads():
     make_montage('heartgold-soulsilver-back-shiny-frame2.png',
         'heartgold-soulsilver/back/shiny/frame2/{0}.png', 80, 493, transparent=True)
 
+    make_montage('black-white.png',
+        'black-white/{0}.png', 96, 649, transparent=True)
+    make_montage('black-white-shiny.png',
+        'black-white/shiny/{0}.png', 96, 649, transparent=True)
+    make_montage('black-white-back.png',
+        'black-white/back/{0}.png', 96, 649, transparent=True)
+    make_montage('black-white-back-shiny.png',
+        'black-white/back/shiny/{0}.png', 96, 649, transparent=True)
+
     # And female montages, which are a little different
     make_diff_montage(
         filename='diamond-pearl-female-diff.png',
@@ -168,6 +178,14 @@ def create_downloads():
         pokemon=493,
     )
     make_diff_montage(
+        filename='black-white-female-diff.png',
+        other_filename='black-white.png',
+        pattern='black-white/female/{0}.png',
+        fallback_pattern='black-white/{0}.png',
+        sprite_size=96,
+        pokemon=649,
+    )
+    make_diff_montage(
         filename='diamond-pearl-back-female-diff.png',
         other_filename='diamond-pearl-back.png',
         pattern='diamond-pearl/back/female/{0}.png',
@@ -191,6 +209,14 @@ def create_downloads():
         sprite_size=80,
         pokemon=493,
     )
+    make_diff_montage(
+        filename='black-white-back-female-diff.png',
+        other_filename='black-white-back.png',
+        pattern='black-white/back/female/{0}.png',
+        fallback_pattern='black-white/back/{0}.png',
+        sprite_size=96,
+        pokemon=649,
+    )
 
     # Overworld
     make_montage('overworld-right.png',
@@ -207,7 +233,7 @@ def create_downloads():
         'overworld/shiny/up/{0}.png', 32, 493, transparent=True)
 
     # Other miscellaneous
-    make_montage('footprints.png', 'footprints/{0}.png', 48, 493,
+    make_montage('footprints.png', 'footprints/{0}.png', 16, 649,
         subst_forms=False)
     make_montage('sugimori.png', 'sugimori/{0}.png', 96, 493,
         padding=2, subst_forms=False, filter='lanczos')
