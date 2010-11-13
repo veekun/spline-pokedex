@@ -334,8 +334,8 @@ pokedex.pokemon_moves = {
             .children('th[colspan]');
         var old_colspan = $colspanned.eq(0).attr('colspan');
         var new_colspan = old_colspan - hidden_cell_css.length;
-        $colspanned.data('pokemon_moves.original_colspan', old_colspan)
-            .attr('colspan', new_colspan);
+        $colspanned.data('pokemon_moves.original_colspan', old_colspan);
+        $colspanned.attr('colspan', new_colspan);
 
         // Hide any rows that only have empty cells remaining
         // i.e. hide any rows that AREN'T rows WITHOUT empty cells remaining.
