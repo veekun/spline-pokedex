@@ -99,6 +99,11 @@ pokedex.pokemon_moves = {
                     vg_width = 0;
                 });
             }
+            else if ($version_colgroups.length == 1) {
+                // In the case of a single version, there's nothing to filter,
+                // but there still needs to be an empty cell above it
+                $controls.append('<td class="js-not-a-button"></td>');
+            }
 
             // Create buttons for sorting by a column
             var $first_tds = $first_tr.find('td, th');
