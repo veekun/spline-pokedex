@@ -65,7 +65,7 @@ ${getattr(self, 'col_' + column)()}
 ## Plain bulleted list with a Template.
 <ul class="dex-pokemon-search-list classic-list">
     % for result in c.results:
-    <li><a href="${url(controller='dex', action='moves', name=result.name.lower())}">h.pokedex.apply_move_template(c.display_template, result)</a></li>
+    <li><a href="${url(controller='dex', action='moves', name=result.name.lower())}">${h.pokedex.apply_move_template(c.display_template, result)}</a></li>
     % endfor
 </ul>
 
@@ -74,7 +74,7 @@ ${getattr(self, 'col_' + column)()}
 ## friendly to clipboards.
 <div class="dex-pokemon-search-list">
 % for result in c.results:
-<a href="${url(controller='dex', action='moves', name=result.name.lower())}">h.pokedex.apply_move_template(c.display_template, result)</a><br>
+<a href="${url(controller='dex', action='moves', name=result.name.lower())}">${h.pokedex.apply_move_template(c.display_template, result)}</a><br>
 % endfor
 </div>
 

@@ -1003,7 +1003,12 @@ class PokedexSearchController(BaseController):
                 c.display_mode = 'custom-list-bullets'
                 list_format = list_format[1:]
 
-            c.display_template = Template( h.escape(list_format) )
+            # Need to escape funny characters in the actual format, but the
+            # h.literal() stuff in the helper functions infects the entire
+            # format and allows user HTML, and using h.escape() here likewise
+            # escapes even legitimate $icon's.  Solution is to use h.escape,
+            # then cast back to a string to remove infectious magic
+            c.display_template = Template( unicode(h.escape(list_format)) )
 
         else:
             # icons and sprites don't need any special behavior
@@ -1451,7 +1456,10 @@ class PokedexSearchController(BaseController):
                 c.display_mode = 'custom-list-bullets'
                 list_format = list_format[1:]
 
-            c.display_template = Template( h.escape(list_format) )
+            # See super-duper long comment for Pokémon search.  Doesn't matter
+            # so much for moves, which have no literal() template things, but
+            # avoids bugs in the future.
+            c.display_template = Template( unicode(h.escape(list_format)) )
 
         # "Name" is the field that actually links to the page.  If it's
         # missing, add a little link column
