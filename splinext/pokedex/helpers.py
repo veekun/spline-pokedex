@@ -507,6 +507,10 @@ def apply_pokemon_template(template, pokemon):
         d['ability'] = u'/'.join(_.name for _ in abilities)
         d['ability1'] = abilities[0].name
         d['ability2'] = abilities[1].name if len(abilities) > 1 else u''
+        if pokemon.dream_ability:
+            d['dream_ability'] = pokemon.dream_ability.name
+        else:
+            d['dream_ability'] = u''
 
     if 'color' in template.template:
         d['color'] = pokemon.color

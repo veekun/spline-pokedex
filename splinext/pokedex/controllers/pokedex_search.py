@@ -152,7 +152,8 @@ class PokemonSearchForm(BaseSearchForm):
     ability = PokedexLookupField('Ability', valid_type='ability', allow_blank=True)
     held_item = PokedexLookupField('Held item', valid_type='item', allow_blank=True)
     growth_rate = QuerySelectField('Growth rate',
-        query_factory=lambda: db.pokedex_session.query(tables.GrowthRate),
+        query_factory=lambda: db.pokedex_session.query(tables.GrowthRate) \
+            .options(eagerload('max_experience_obj')),
         get_pk=lambda _: _.max_experience,
         get_label=lambda _: """{0} ({1:n} EXP)""".format(_.name, _.max_experience),
         allow_blank=True,
@@ -377,6 +378,7 @@ class PokemonSearchForm(BaseSearchForm):
             ('type', 'Types'),
             ('growth_rate', 'EXP to level 100'),
             ('ability', 'Abilities'),
+            ('dream_ability', 'Dream ability'),
             ('gender', 'Gender rate'),
             ('egg_group', 'Egg groups'),
 
@@ -555,6 +557,7 @@ class PokedexSearchController(BaseController):
         # Rendering needs to know which version groups go with which
         # generations for the move-version-group list
         c.generations = db.pokedex_session.query(tables.Generation) \
+            .options(eagerload('version_groups')) \
             .order_by(tables.Generation.id.asc())
 
         # Rendering also needs an example Pokémon, to make the custom list docs
@@ -645,10 +648,11 @@ class PokedexSearchController(BaseController):
 
         # Ability
         if c.form.ability.data:
-            query = query.filter( me.abilities.any(
-                                    tables.Ability.id == c.form.ability.data.id
-                                  )
-                                )
+            query = query.filter(
+                me.all_abilities.any(
+                    tables.Ability.id == c.form.ability.data.id
+                )
+            )
 
         # Held item
         if c.form.held_item.data:
@@ -1211,6 +1215,9 @@ class PokedexSearchController(BaseController):
 
             if 'ability' in c.display_columns:
                 eagerloads.append('abilities')
+
+            if 'dream_ability' in c.display_columns:
+                eagerloads.append('dream_ability')
 
             if 'egg_group' in c.display_columns:
                 eagerloads.append('egg_groups')

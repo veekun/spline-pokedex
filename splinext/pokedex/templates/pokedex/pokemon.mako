@@ -38,12 +38,21 @@ ${h.h1('Essentials')}
 
 <div class="dex-page-beside-portrait">
 <h2>Abilities</h2>
-<dl class="pokemon-abilities">
-    % for ability in c.pokemon.abilities:
+<%def name="_render_ability(ability)">
     <dt><a href="${url(controller='dex', action='abilities', name=ability.name.lower())}">${ability.name}</a></dt>
     <dd class="markdown">${ability.short_effect.as_html | n}</dd>
+</%def>
+<dl class="pokemon-abilities">
+    % for ability in c.pokemon.abilities:
+    ${_render_ability(ability)}
     % endfor
 </dl>
+% if c.pokemon.dream_ability:
+<h3>Dream Ability</h3>
+<dl class="pokemon-abilities">
+    ${_render_ability(c.pokemon.dream_ability)}
+</dl>
+% endif
 
 <h2>Damage Taken</h2>
 ## Boo not using <dl>  :(  But I can't get them to align horizontally with CSS2
