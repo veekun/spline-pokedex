@@ -169,6 +169,27 @@ ${h.literal(c.move.effect.as_html)}
 </ul>
 
 
+% if c.move.changelog:
+${h.h1('History')}
+<dl>
+    % for change in c.move.changelog:
+    <dt>Before ${h.pokedex.version_icons(*change.changed_in.versions)}</dt>
+    <dd>
+        % if change.power is not None:
+        Power was ${change.power}.
+        % endif
+        % if change.accuracy is not None:
+        Accuracy was ${change.accuracy}%.
+        % endif
+        % if change.pp is not None:
+        PP was ${change.pp}.
+        % endif
+    </dd>
+    % endfor
+</dl>
+% endif
+
+
 ${h.h1('Flavor')}
 <div class="dex-column-container">
 <div class="dex-column-2x">
