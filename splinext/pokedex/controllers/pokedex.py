@@ -1331,7 +1331,7 @@ class PokedexController(BaseController):
 
         for method, method_list in c.pokemon:
             # Sort each method's rows by their Pokémon
-            method_list.sort(key=lambda row: helpers.pokemon_sort_key(row[0]))
+            method_list.sort(key=lambda row: pokedex_helpers.pokemon_sort_key(row[0]))
 
         # Finally, collapse identical columns within the same generation
         c.pokemon_columns \
@@ -1435,7 +1435,7 @@ class PokedexController(BaseController):
             ) \
             .one()
 
-        c.pokemon = sorted(c.type.pokemon, key=helpers.pokemon_sort_key)
+        c.pokemon = sorted(c.type.pokemon, key=pokedex_helpers.pokemon_sort_key)
         c.moves = sorted(c.type.moves, key=lambda move: move.name)
 
         return
@@ -1485,7 +1485,7 @@ class PokedexController(BaseController):
             ) \
             .one()
 
-        c.pokemon = sorted(c.ability.pokemon, key=helpers.pokemon_sort_key)
+        c.pokemon = sorted(c.ability.pokemon, key=pokedex_helpers.pokemon_sort_key)
 
         return
 
@@ -1811,6 +1811,6 @@ class PokedexController(BaseController):
                     minmax_stat_subquery.c.pokemon_id == tables.Pokemon.id))
 
         # Order by id as per usual
-        c.pokemon = sorted(c.pokemon, key=helpers.pokemon_sort_key)
+        c.pokemon = sorted(c.pokemon, key=pokedex_helpers.pokemon_sort_key)
 
         return render('/pokedex/nature.mako')

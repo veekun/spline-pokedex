@@ -190,7 +190,7 @@ ${h.h1(u'Held by wild Pokémon', id='pokemon')}
 ## Rows
 <tbody>
 % for pokemon, version_rarities in sorted(c.holding_pokemon.items(), \
-                                          key=lambda (k, v): k.id):
+                                          key=lambda (k, v): h.pokedex.pokemon_sort_key(k)):
     <tr>
         % for column in sum(c.held_version_columns, []):
             % if version_rarities[column[0]]:
