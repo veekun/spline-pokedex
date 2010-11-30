@@ -751,6 +751,28 @@ class PokedexController(BaseController):
             'border': bar_color(percentile, 0.8),
         }
 
+        ### Pokéathlon stats
+        # Unown collapses to letters and punctuation.  Shellos and Gastrodon
+        # can collapse entirely.  Nothing else collapses at all.  (Arceus
+        # /could/ have two sets of types collapse, but who cares.)
+        forms = [form for form in c.pokemon.normal_form.forms if
+                 form.pokeathlon_stats]
+
+        if not forms:
+            # No stats
+            c.pokeathlon_stats = None
+        elif len(forms) == 1 or c.pokemon.id in (422, 423):
+            # Only one set of stats, or Shellos/Gastrodon
+            c.pokeathlon_stats = [(None, forms[0].pokeathlon_stats)]
+        elif c.pokemon.id == 201:
+            # Use Unown A's stats for all the letters and !'s stats for ! and ?
+            c.pokeathlon_stats = [('A-Z', forms[0].pokeathlon_stats),
+                                  ('! and ?', forms[26].pokeathlon_stats)]
+        else:
+            # Different stats for every form
+            c.pokeathlon_stats = [(form.full_name or 'Normal',
+                                   form.pokeathlon_stats) for form in forms]
+
         ### Sizing
         c.trainer_height = pokedex_helpers.trainer_height
         c.trainer_weight = pokedex_helpers.trainer_weight

@@ -413,6 +413,36 @@ ${h.h1('Stats')}
 </tr>
 </table>
 
+% if c.pokeathlon_stats:
+${h.h2(h.pokedex.version_icons('HeartGold', 'SoulSilver') + u' Pokéathlon Performance', id='pokeathlon')}
+<%
+    star_buffed = h.pokedex.pokedex_img('chrome/pokeathlon-star-buffed.png', alt=u'★')
+    star_base = h.pokedex.pokedex_img('chrome/pokeathlon-star.png', alt=u'✯')
+    star_empty = h.pokedex.pokedex_img('chrome/pokeathlon-star-empty.png', alt=u'☆')
+%>
+
+<p>${star_buffed} Minimum; ${star_base} Base; ${star_empty} Maximum</p>
+
+% for stat_set in c.pokeathlon_stats:
+<div class="dex-pokeathlon-stats">
+    ## Label for this set of stats, if any
+    % if stat_set[0]:
+    <p>${stat_set[0]}</p>
+    % endif
+
+    <dl>
+        % for stat in stat_set[1]:
+        <dt>${stat.pokeathlon_stat.name}</dt>
+        <dd>${star_buffed * stat.minimum_stat}${star_base * (stat.base_stat - stat.minimum_stat)}${star_empty * (stat.maximum_stat - stat.base_stat)}</dd>
+        % endfor
+
+        <dt>Total</dt>
+        <dd>${sum(stat.minimum_stat for stat in stat_set[1])}/${sum(stat.base_stat for stat in stat_set[1])}/${sum(stat.maximum_stat for stat in stat_set[1])}</dd>
+    </dl>
+</div>
+% endfor
+% endif
+
 ${h.h1('Flavor')}
 <ul class="see-also">
 <li> <img src="${h.static_uri('spline', 'icons/arrow-000-medium.png')}" alt="See also:"> <a href="${url.current(action='pokemon_flavor')}">Detailed flavor page covering all versions</a> </li>

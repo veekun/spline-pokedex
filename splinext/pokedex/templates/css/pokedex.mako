@@ -225,6 +225,12 @@ dl.dex-simple-encounters ul li { display: inline; }
 dl.dex-simple-encounters ul li:after { content: '; '; }
 dl.dex-simple-encounters ul li:last-child:after { content: ''; }
 
+/* Pokémon page -- Pokéathlon performance */
+.dex-pokeathlon-stats { display: inline-block; }
+.dex-pokeathlon-stats p { text-align: center; }
+.dex-pokeathlon-stats dt { width: 7em; }
+.dex-pokeathlon-stats dd { padding-left: 7.5em; width: 80px; }
+
 /* Pokémon page -- cry */
 /* Mozilla's player changes its height proportionate to its width by default or something */
 audio.cry { width: 100%; height: 35px; }
