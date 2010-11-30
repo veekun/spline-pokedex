@@ -212,8 +212,8 @@ def pokemon_sprite(pokemon, prefix='black-white', **attr):
     """Returns an <img> tag for a Pokémon sprite."""
 
     if isinstance(pokemon, tables.PokemonForm):
-        alt_text = form.pokemon_name
         form = attr.pop('form', pokemon.name)
+        alt_text = pokemon.pokemon_name
         pokemon = pokemon.form_base_pokemon
     elif isinstance(pokemon, tables.Pokemon):
         form = attr.pop('form', pokemon.form_name)
