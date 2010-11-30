@@ -183,9 +183,9 @@ class PokedexGadgetsController(BaseController):
             c.pokemon = c.form.pokemon.data
             level = c.form.level.data
 
-            # Overrule a 'yes' for opposite genders if this Pokémon has no
-            # gender
-            if c.pokemon.gender_rate == -1:
+            # Overrule a 'yes' for opposite genders if this Pokémon is a
+            # genderless or single-gender species
+            if c.pokemon.gender_rate in (-1, 0, 8):
                 c.form.twitterpating.data = False
 
             percent_hp = c.form.current_hp.data / 100
