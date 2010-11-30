@@ -2,24 +2,14 @@
 <%namespace name="lib" file="lib.mako"/>
 <%! import re %>\
 
-<%def name="flavor_name()">\
-% if c.pokemon.name == 'Unown' and c.form:
-Unown ${c.form.capitalize()}\
-% elif c.form:
-${c.form.title()} ${c.pokemon.name}\
-% else:
-${c.pokemon.name}\
-% endif
-</%def>
-
-<%def name="title()">${flavor_name()} flavor - Pokémon #${c.pokemon.national_id}</%def>
+<%def name="title()">${c.form.pokemon_name} flavor - Pokémon #${c.form.form_base_pokemon_id}</%def>
 
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
     <li><a href="${url('/dex')}">Pokédex</a></li>
     <li><a href="${url(controller='dex', action='pokemon_list')}">Pokémon</a></li>
-    <li>${h.pokedex.pokemon_link(c.pokemon)}</li>
-    <li>${flavor_name()} flavor</li>
+    <li>${h.pokedex.pokemon_link(c.pokemon, content=c.pokemon.name, form=None)}</li>
+    <li>${c.form.pokemon_name} flavor</li>
 </ul>
 </%def>
 
@@ -51,10 +41,10 @@ ${h.h1('Essentials')}
         <dt>Cry</dt>
 <%
         # Shaymin (and nothing else) has different cries for its different forms
-        if c.pokemon.national_id == 492:
-            cry_path = 'cries/{0}-{1}.ogg'.format(c.pokemon.national_id, c.form)
+        if c.pokemon.normal_form.id == 492:
+            cry_path = 'cries/{0}-{1}.ogg'.format(c.pokemon.normal_form.id, c.form.name.lower())
         else:
-            cry_path = 'cries/{0}.ogg'.format(c.pokemon.national_id)
+            cry_path = 'cries/{0}.ogg'.format(c.pokemon.normal_form.id)
 
         cry_path = url(controller='dex', action='media', path=cry_path)
 %>\
@@ -78,7 +68,7 @@ ${h.h1('Essentials')}
         % endif
 
         <dt>Footprint</dt>
-        <dd>${h.pokedex.pokemon_sprite(c.pokemon, prefix='footprints', form=None)}</dd>
+        <dd>${h.pokedex.pokemon_sprite(c.form.form_base_pokemon, prefix='footprints', form=None)}</dd>
 
         % if c.pokemon.generation.id <= 4:
         <dt>Shape ${h.pokedex.generation_icon(4)}</dt>
@@ -104,11 +94,11 @@ ${h.h1('Essentials')}
             </p>
         </div>
         <div class="dex-size-pokemon">
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.heights['pokemon'] * 100), form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.heights['pokemon'] * 100), form=c.form.name)}
             <div class="js-dex-size-raw">${c.pokemon.height}</div>
             <p class="dex-size-value">
-                ${h.pokedex.format_height_imperial(c.pokemon_height)} <br/>
-                ${h.pokedex.format_height_metric(c.pokemon_height)}
+                ${h.pokedex.format_height_imperial(c.pokemon.height)} <br/>
+                ${h.pokedex.format_height_metric(c.pokemon.height)}
             </p>
         </div>
     </div>
@@ -124,11 +114,11 @@ ${h.h1('Essentials')}
             </p>
         </div>
         <div class="dex-size-pokemon">
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.weights['pokemon'] * 100), form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.weights['pokemon'] * 100), form=c.form.name)}
             <div class="js-dex-size-raw">${c.pokemon.weight}</div>
             <p class="dex-size-value">
-                ${h.pokedex.format_weight_imperial(c.pokemon_weight)} <br/>
-                ${h.pokedex.format_weight_metric(c.pokemon_weight)}
+                ${h.pokedex.format_weight_imperial(c.pokemon.weight)} <br/>
+                ${h.pokedex.format_weight_metric(c.pokemon.weight)}
             </p>
         </div>
     </div>
@@ -136,17 +126,17 @@ ${h.h1('Essentials')}
 </div>
 
 ${h.h1(u'Pokédex Description', id='pokedex')}
-${lib.flavor_text_list(c.pokemon.flavor_text, 'dex-pokemon-flavor-text')}
+${lib.flavor_text_list(c.form.form_base_pokemon.flavor_text, 'dex-pokemon-flavor-text')}
 
 ${h.h1('Main Game Portraits', id='main-sprites')}
-% if c.forms:
+% if c.form.form_base_pokemon.form_group:
 <h3>Forms</h3>
 <ul class="inline">
-% for form in c.forms:
+% for form in c.form.form_base_pokemon.forms:
     <li>${h.pokedex.pokemon_link(
-            c.pokemon,
-            h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white', form=form),
-            to_flavor=True, form=form,
+            c.form.form_base_pokemon,
+            h.pokedex.pokemon_sprite(form, prefix='black-white'),
+            to_flavor=True, form=form.name,
             class_='dex-icon-link' + (' selected' if form == c.form else ''),
     )}</li>
 % endfor
@@ -154,7 +144,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 <p> ${c.pokemon.normal_form.form_group.description.as_html | n} </p>
 % endif
 
-% if c.introduced_in.id <= 2:
+% if c.form.introduced_in_version_group_id <= 2:
 <h2 id="main-sprites:gen-i"><a href="#main-sprites:gen-i" class="subtle">${h.pokedex.generation_icon(1)} Red &amp; Green, Red &amp; Blue, Yellow</a></h2>
 <table class="dex-pokemon-flavor-sprites">
 <colgroup span="1"></colgroup> <!-- row headers -->
@@ -172,25 +162,25 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 <tbody>
     <tr>
         <th class="vertical-text">GB</th>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-green/gray', form=c.form)}</td>
-        <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-green/back/gray', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='red-green/gray')}</td>
+        <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.form, prefix='red-green/back/gray')}</td>
 
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-blue/gray', form=c.form)}</td>
-        <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-blue/back/gray', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='red-blue/gray')}</td>
+        <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.form, prefix='red-blue/back/gray')}</td>
 
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='yellow/gray', form=c.form)}</td>
-        <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.pokemon, prefix='yellow/back/gray', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='yellow/gray')}</td>
+        <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.form, prefix='yellow/back/gray')}</td>
     </tr>
     <tr>
         <th class="vertical-text">SGB</th>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-green', form=c.form)}</td>
-        <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-green/back', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='red-green')}</td>
+        <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.form, prefix='red-green/back')}</td>
 
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-blue', form=c.form)}</td>
-        <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.pokemon, prefix='red-blue/back', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='red-blue')}</td>
+        <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.form, prefix='red-blue/back')}</td>
 
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='yellow', form=c.form)}</td>
-        <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.pokemon, prefix='yellow/back', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='yellow')}</td>
+        <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.form, prefix='yellow/back')}</td>
     </tr>
     <tr>
         <th class="vertical-text">GBC</th>
@@ -198,14 +188,14 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 
         <td colspan="2" class="dex-pokemon-flavor-no-sprite">—</td>
 
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='yellow/gbc', form=c.form)}</td>
-        <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.pokemon, prefix='yellow/back/gbc', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='yellow/gbc')}</td>
+        <td class="dex-pokemon-flavor-rby-back">${h.pokedex.pokemon_sprite(c.form, prefix='yellow/back/gbc')}</td>
     </tr>
 </tbody>
 </table>
 % endif
 
-% if c.introduced_in.id <= 4:
+% if c.form.introduced_in_version_group_id <= 4:
 <h2 id="main-sprites:gen-ii"><a href="#main-sprites:gen-ii" class="subtle">${h.pokedex.generation_icon(2)} Gold &amp; Silver, Crystal</a></h2>
 <table class="dex-pokemon-flavor-sprites">
 <colgroup span="1"></colgroup> <!-- row headers -->
@@ -223,42 +213,42 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 <tbody>
     <tr>
         <th class="vertical-text">Normal</th>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='gold', form=c.form)}</td>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='gold/back', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='gold')}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='gold/back')}</td>
 
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='silver', form=c.form)}</td>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='silver/back', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='silver')}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='silver/back')}</td>
 
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='crystal', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='crystal/animated', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='crystal')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='crystal/animated')}
         </td>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='crystal/back', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='crystal/back')}</td>
     </tr>
     <tr>
         <th class="vertical-text">Shiny</th>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='gold/shiny', form=c.form)}</td>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='gold/back/shiny', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='gold/shiny')}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='gold/back/shiny')}</td>
 
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='silver/shiny', form=c.form)}</td>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='silver/back/shiny', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='silver/shiny')}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='silver/back/shiny')}</td>
 
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='crystal/shiny', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='crystal/animated/shiny', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='crystal/shiny')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='crystal/animated/shiny')}
         </td>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='crystal/back/shiny', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='crystal/back/shiny')}</td>
     </tr>
 </tbody>
 </table>
 % endif
 
-% if c.introduced_in.id <= 7:
-<% show_rusa = (c.pokemon.name != u'Deoxys' or c.form == u'normal') %>\
-<% show_emerald = (c.pokemon.name != u'Deoxys' or c.form in (u'speed', u'normal')) %>\
+% if c.form.introduced_in_version_group_id <= 7:
+<% show_rusa = c.form.introduced_in_version_group_id <= 5 %>\
+<% show_emerald = c.form.introduced_in_version_group_id <= 6 %>\
 <% show_frlg = (c.pokemon.generation_id == 1
                 or c.pokemon.name == u'Teddiursa'
-                or (c.pokemon.name == u'Deoxys' and c.form in (u'attack', u'defense', u'normal'))) %>\
+                or c.form.introduced_in_version_group_id == 7) %>\
 <h2 id="main-sprites:gen-iii"><a href="#main-sprites:gen-iii" class="subtle">${h.pokedex.generation_icon(3)} Ruby &amp; Sapphire, Emerald, FireRed &amp; LeafGreen</a></h2>
 ## Deoxys is a bit of a mess.
 ## Normal exists everywhere.  Speed only in Emerald; Attack only in LG; Defense only in FR.
@@ -291,46 +281,46 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
     <tr>
         <th class="vertical-text">Normal</th>
     % if show_rusa:
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='ruby-sapphire', form=c.form)}</td>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='ruby-sapphire/back', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='ruby-sapphire')}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='ruby-sapphire/back')}</td>
     % endif
 
     % if show_emerald:
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='emerald')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='emerald/frame2')}
             ## Emerald animations don't exist for forms that only exist after a battle starts
             % if c.appears_in_overworld:
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald/animated', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='emerald/animated')}
             % endif
         </td>
     % endif
 
     % if show_frlg:
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='firered-leafgreen', form=c.form)}</td>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='firered-leafgreen/back', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='firered-leafgreen')}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='firered-leafgreen/back')}</td>
     % endif
     </tr>
     <tr>
         <th class="vertical-text">Shiny</th>
     % if show_rusa:
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='ruby-sapphire/shiny', form=c.form)}</td>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='ruby-sapphire/back/shiny', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='ruby-sapphire/shiny')}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='ruby-sapphire/back/shiny')}</td>
     % endif
 
     % if show_emerald:
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald/shiny', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald/shiny/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='emerald/shiny')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='emerald/shiny/frame2')}
             % if c.appears_in_overworld:
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='emerald/shiny/animated', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='emerald/shiny/animated')}
             % endif
         </td>
     % endif
 
     % if show_frlg:
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='firered-leafgreen/shiny', form=c.form)}</td>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='firered-leafgreen/back/shiny', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='firered-leafgreen/shiny')}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='firered-leafgreen/back/shiny')}</td>
     % endif
     </tr>
 </tbody>
@@ -341,23 +331,23 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 <h2 id="main-sprites:gen-iv"><a href="#main-sprites:gen-iv" class="subtle">${h.pokedex.generation_icon(4)} Diamond &amp; Pearl, Platinum, HeartGold &amp; SoulSilver</a></h2>
 <table class="dex-pokemon-flavor-sprites">
 <colgroup span="1"></colgroup> <!-- row headers -->
-% if c.introduced_in.id <= 8:
+% if c.form.introduced_in_version_group_id <= 8:
 <colgroup span="2"></colgroup> <!-- Diamond/Pearl -->
 % endif
-% if c.introduced_in.id <= 9:
+% if c.form.introduced_in_version_group_id <= 9:
 <colgroup span="2"></colgroup> <!-- Platinum -->
 % endif
-% if c.introduced_in.id <= 10:
+% if c.form.introduced_in_version_group_id <= 10:
 <colgroup span="2"></colgroup> <!-- HeartGold/SoulSilver -->
 % endif
 <thead>
     <tr class="header-row">
         <th></th>
         ## Rotom forms only exist beyond Platinum
-        % if c.introduced_in.id <= 8:
+        % if c.form.introduced_in_version_group_id <= 8:
         <th colspan="2">${h.pokedex.version_icons(u'Diamond', u'Pearl')}</th>
         % endif
-        % if c.introduced_in.id <= 9:
+        % if c.form.introduced_in_version_group_id <= 9:
         <th colspan="2">${h.pokedex.version_icons(u'Platinum')}</th>
         % endif
         <th colspan="2">${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')}</th>
@@ -371,32 +361,32 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
             <br/> (male)
             % endif
         </th>
-        % if c.introduced_in.id <= 8:
+        % if c.form.introduced_in_version_group_id <= 8:
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/frame2')}
         </td>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/back', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/back')}</td>
         % endif
 
-        % if c.introduced_in.id <= 9:
+        % if c.form.introduced_in_version_group_id <= 9:
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/frame2')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/back')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/back/frame2')}
         </td>
         % endif
 
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/frame2')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/back')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/back/frame2')}
         </td>
     </tr>
     <tr>
@@ -406,32 +396,32 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
             <br/> (male)
             % endif
         </th>
-        % if c.introduced_in.id <= 8:
+        % if c.form.introduced_in_version_group_id <= 8:
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/shiny', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/shiny/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/shiny')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/shiny/frame2')}
         </td>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/back/shiny', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/back/shiny')}</td>
         % endif
 
-        % if c.introduced_in.id <= 9:
+        % if c.form.introduced_in_version_group_id <= 9:
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/shiny')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/shiny/frame2')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/shiny', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/shiny/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/back/shiny')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/back/shiny/frame2')}
         </td>
         % endif
 
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/shiny')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/shiny/frame2')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/shiny', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/shiny/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/back/shiny')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/back/shiny/frame2')}
         </td>
     </tr>
 </tbody>
@@ -439,27 +429,27 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 <tbody>
     <tr>
         <th class="vertical-text">Normal<br/>(female)</th>
-        % if c.introduced_in.id <= 8:
+        % if c.form.introduced_in_version_group_id <= 8:
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/female', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/female/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/female')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/female/frame2')}
         </td>
         % if c.pokemon.has_gen4_fem_back_sprite:
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/back/female', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/back/female')}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
         % endif
 
-        % if c.introduced_in.id <= 9:
+        % if c.form.introduced_in_version_group_id <= 9:
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/female', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/female/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/female')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/female/frame2')}
         </td>
         % if c.pokemon.has_gen4_fem_back_sprite:
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/female', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/female/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/back/female')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/back/female/frame2')}
         </td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
@@ -467,13 +457,13 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         % endif
 
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/female', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/female/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/female')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/female/frame2')}
         </td>
         % if c.pokemon.has_gen4_fem_back_sprite:
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/female', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/female/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/back/female')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/back/female/frame2')}
         </td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
@@ -481,27 +471,27 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
     </tr>
     <tr>
         <th class="vertical-text">Shiny<br/>(female)</th>
-        % if c.introduced_in.id <= 8:
+        % if c.form.introduced_in_version_group_id <= 8:
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/shiny/female', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/shiny/female/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/shiny/female')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/shiny/female/frame2')}
         </td>
         % if c.pokemon.has_gen4_fem_back_sprite:
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='diamond-pearl/back/shiny/female', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/back/shiny/female')}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
         % endif
 
-        % if c.introduced_in.id <= 9:
+        % if c.form.introduced_in_version_group_id <= 9:
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny/female', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/shiny/female/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/shiny/female')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/shiny/female/frame2')}
         </td>
         % if c.pokemon.has_gen4_fem_back_sprite:
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/shiny/female', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='platinum/back/shiny/female/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/back/shiny/female')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/back/shiny/female/frame2')}
         </td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
@@ -509,13 +499,13 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         % endif
 
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny/female', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/shiny/female/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/shiny/female')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/shiny/female/frame2')}
         </td>
         % if c.pokemon.has_gen4_fem_back_sprite:
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/shiny/female', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='heartgold-soulsilver/back/shiny/female/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/back/shiny/female')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/back/shiny/female/frame2')}
         </td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
@@ -530,7 +520,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 <h2 id="main-sprites:gen-v"><a href="#main-sprites:gen-v" class="subtle">${h.pokedex.generation_icon(5)} Black &amp; White</a></h2>
 <table class="dex-pokemon-flavor-sprites">
 <colgroup span="1"></colgroup> <!-- row headers -->
-% if c.introduced_in.id <= 11:
+% if c.form.introduced_in_version_group_id <= 11:
 <colgroup span="2"></colgroup> <!-- Black/White -->
 % endif
 <thead>
@@ -547,9 +537,9 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
             <br/> (male)
             % endif
         </th>
-        % if c.introduced_in.id <= 11:
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white', form=c.form)}</td>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/back', form=c.form)}</td>
+        % if c.form.introduced_in_version_group_id <= 11:
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='black-white')}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='black-white/back')}</td>
         % endif
     </tr>
     <tr>
@@ -559,9 +549,9 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
             <br/> (male)
             % endif
         </th>
-        % if c.introduced_in.id <= 11:
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/shiny', form=c.form)}</td>
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/back/shiny', form=c.form)}</td>
+        % if c.form.introduced_in_version_group_id <= 11:
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='black-white/shiny')}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='black-white/back/shiny')}</td>
         % endif
     </tr>
 </tbody>
@@ -569,10 +559,10 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 <tbody>
     <tr>
         <th class="vertical-text">Normal <br/> (female)</th>
-        % if c.introduced_in.id <= 11:
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/female', form=c.form)}</td>
+        % if c.form.introduced_in_version_group_id <= 11:
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='black-white/female')}</td>
         % if c.pokemon.has_gen4_fem_back_sprite:
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/back/female', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='black-white/back/female')}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
@@ -580,10 +570,10 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
     </tr>
     <tr>
         <th class="vertical-text">Shiny <br/> (female)</th>
-        % if c.introduced_in.id <= 11:
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/shiny/female', form=c.form)}</td>
+        % if c.form.introduced_in_version_group_id <= 11:
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='black-white/shiny/female')}</td>
         % if c.pokemon.has_gen4_fem_back_sprite:
-        <td>${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white/back/shiny/female', form=c.form)}</td>
+        <td>${h.pokedex.pokemon_sprite(c.form, prefix='black-white/back/shiny/female')}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
@@ -595,11 +585,9 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 % endif
 
 
-## Overworld sprites can't exist for alternate formes that are in-battle only
+## Overworld sprites can't exist for alternate forms that are in-battle only
 % if c.appears_in_overworld:
 ${h.h1('Miscellaneous Game Art', id='misc-sprites')}
-
-% if c.pokemon.generation_id <= 4:
 <h2> ${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')} HeartGold &amp; SoulSilver Overworld </h2>
 <table class="dex-pokemon-flavor-sprites">
 % if c.pokemon.has_gen4_fem_sprite:
@@ -626,38 +614,38 @@ ${h.h1('Miscellaneous Game Art', id='misc-sprites')}
         <th class="vertical-text" rowspan="2">Male</th>
         % endif
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/left', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/left/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/left')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/left/frame2')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/down/frame2', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/down', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/down/frame2')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/down')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/up', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/up/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/up')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/up/frame2')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/right', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/right/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/right')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/right/frame2')}
         </td>
     </tr>
     <tr>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/left', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/left/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/left')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/left/frame2')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/down/frame2', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/down', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/down/frame2')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/down')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/up', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/up/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/up')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/up/frame2')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/right', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/right/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/right')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/right/frame2')}
         </td>
     </tr>
 </tbody>
@@ -666,63 +654,59 @@ ${h.h1('Miscellaneous Game Art', id='misc-sprites')}
     <tr>
         <th class="vertical-text" rowspan="2">Female</th>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/left', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/left/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/female/left')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/female/left/frame2')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/down/frame2', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/down', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/female/down/frame2')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/female/down')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/up', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/up/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/female/up')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/female/up/frame2')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/right', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/female/right/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/female/right')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/female/right/frame2')}
         </td>
     </tr>
     <tr>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/left', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/left/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/female/left')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/female/left/frame2')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/down/frame2', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/down', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/female/down/frame2')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/female/down')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/up', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/up/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/female/up')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/female/up/frame2')}
         </td>
         <td>
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/right', form=c.form)}
-            ${h.pokedex.pokemon_sprite(c.pokemon, prefix='overworld/shiny/female/right/frame2', form=c.form)}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/female/right')}
+            ${h.pokedex.pokemon_sprite(c.form, prefix='overworld/shiny/female/right/frame2')}
         </td>
     </tr>
 </tbody>
 % endif
 </table>
-% endif
-
 % endif  ## appears_in_overworld
 
 
+<%
+    sugimori_path = None
+    if c.form.form_base_pokemon_id in (386, 412, 413, 421, 422, 423, 479, 487, 492) and c.form.name:
+        # We have separate Sugimori art for the forms of Deoxys, Burmy, Wormadam, Cherrim, Shellos, Gastrodon, Rotom, Giratina, and Shaymin
+        sugimori_path = 'sugimori/{0}-{1}.png'.format(c.form.form_base_pokemon_id, c.form.name.lower())
+    elif c.pokemon.generation_id <= 4:
+        sugimori_path = 'sugimori/{0}.png'.format(c.pokemon.id)
+%>
 
+% if sugimori_path is not None:
 ${h.h1('Other Images', id='other')}
-
 <h2>Official artwork by Ken Sugimori</h2>
-## Shenanigans!  Most forms have official art, but a couple do not.
-## To resolve this:
-## 1. "Default" forms are just (number).png and are guaranteed to exist.
-## 2. Other forms are filenamed as usual.
-## So, there is no 479-normal.png or 422-west.png.  Ick.
-## Conveniently, though, the forms with official art are all "physical" forms
-## -- except Shellos and Gastrodon, which have East art.
 <p class="dex-sugimori">
-    % if (c.pokemon.forme_name and c.pokemon.forme_name != c.form) or (c.pokemon.id in (422, 423)):
-    ${h.pokedex.pokedex_img("sugimori/{0}-{1}.png".format(c.pokemon.national_id, c.form))}
-    % else:
-    ${h.pokedex.pokedex_img("sugimori/{0}.png".format(c.pokemon.national_id))}
-    % endif
+    ${h.pokedex.pokedex_img(sugimori_path)}
 </p>
+% endif

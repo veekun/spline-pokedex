@@ -456,7 +456,7 @@ class PokedexGadgetsController(BaseController):
             redirect(url.current(**short_params))
 
         FoundPokemon = namedtuple('FoundPokemon',
-            ['pokemon', 'suggestions', 'input'])
+            ['pokemon', 'form', 'suggestions', 'input'])
 
         # The Pokémon themselves go into c.pokemon.  This list should always
         # have eight FoundPokemon elements
@@ -470,18 +470,24 @@ class PokedexGadgetsController(BaseController):
             if not raw_pokemon:
                 # Use a junk placeholder tuple
                 c.found_pokemon[i] = FoundPokemon(
-                    pokemon=None, suggestions=None, input=u'')
+                    pokemon=None, form=None, suggestions=None, input=u'')
                 continue
 
             results = db.pokedex_lookup.lookup(
-                raw_pokemon, valid_types=['pokemon'])
+                raw_pokemon, valid_types=['pokemon', 'pokemon_form'])
 
             # Two separate things to do here.
             # 1: Use the first result as the actual Pokémon
             pokemon = None
+            form = None
             if results:
                 pokemon = results[0].object
                 c.did_anything = True
+
+                # 1.5: Deal with form matches
+                if isinstance(pokemon, tables.PokemonForm):
+                    form = pokemon.name
+                    pokemon = pokemon.unique_pokemon or pokemon.form_base_pokemon
 
             # 2: Use the other results as suggestions.  Doing this informs the
             # template that this was a multi-match
@@ -499,7 +505,8 @@ class PokedexGadgetsController(BaseController):
                 ]
 
             # Construct a tuple and slap that bitch in there
-            c.found_pokemon[i] = FoundPokemon(pokemon, suggestions, raw_pokemon)
+            c.found_pokemon[i] = FoundPokemon(pokemon, form,
+                                              suggestions, raw_pokemon)
 
         # There are a lot of links to similar incarnations of this page.
         # Provide a closure for constructing the links easily

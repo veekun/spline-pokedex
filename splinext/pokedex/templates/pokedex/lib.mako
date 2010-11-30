@@ -1,8 +1,8 @@
 <%def name="pokemon_icon(pokemon)">\
-% if pokemon.forme_base_pokemon_id:
-${h.pokedex.pokemon_sprite(pokemon, prefix='icons')}\
+% if pokemon.is_base_form:
+<span class="sprite-icon sprite-icon-${pokemon.normal_form.id}"></span>\
 % else:
-<span class="sprite-icon sprite-icon-${pokemon.national_id}"></span>\
+${h.pokedex.pokemon_sprite(pokemon, prefix='icons')}\
 % endif
 </%def>
 
@@ -12,15 +12,15 @@ ${h.pokedex.pokemon_sprite(pokemon, prefix='icons')}\
     <a href="${url.current(name=c.prev_pokemon.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">
         <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
         ${pokemon_icon(c.prev_pokemon)}
-        ${c.prev_pokemon.national_id}: ${c.prev_pokemon.name}
+        ${c.prev_pokemon.normal_form.id}: ${c.prev_pokemon.name}
     </a>
     <a href="${url.current(name=c.next_pokemon.name.lower(), form=None)}" id="dex-header-next" class="dex-box-link">
-        ${c.next_pokemon.national_id}: ${c.next_pokemon.name}
+        ${c.next_pokemon.normal_form.id}: ${c.next_pokemon.name}
         ${pokemon_icon(c.next_pokemon)}
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
     ${h.pokedex.pokemon_sprite(prefix='icons', pokemon=c.pokemon)}
-    <br>${c.pokemon.national_id}: ${c.pokemon.name}
+    <br>${c.pokemon.normal_form.id}: ${c.pokemon.name}
     <ul class="inline-menu">
     % for action, label in (('pokemon', u'Pokédex'), \
                             ('pokemon_flavor', u'Flavor'), \

@@ -185,6 +185,7 @@ class PokedexController(BaseController):
         tables.Move: 'move',
         tables.Nature: 'nature',
         tables.Pokemon: u'Pokémon',
+        tables.PokemonForm: u'Pokémon form',
         tables.Type: 'type',
     }
 
@@ -275,7 +276,7 @@ class PokedexController(BaseController):
         # Subpage suffixes: 'flavor' and 'locations' for Pokémon bits
         if lookup.endswith((u' flavor', u' flavour')):
             c.subpage = 'flavor'
-            valid_types = [u'pokemon']
+            valid_types = [u'pokemon', u'pokemon_forms']
             name = re.sub('(?i) flavou?r$', '', name)
         elif lookup.endswith(u' locations'):
             c.subpage = 'locations'
@@ -355,10 +356,15 @@ class PokedexController(BaseController):
             # nothing; everything else gets the obvious corresponding icon
             image = None
             if isinstance(row, tables.Pokemon):
-                if row.forme_name:
-                    image = u"icons/{0}-{1}.png".format(row.national_id, row.forme_name)
+                if row.form_name:
+                    image = u"icons/{0}-{1}.png".format(row.normal_form.id, row.form_name.lower())
                 else:
-                    image = u"icons/{0}.png".format(row.national_id)
+                    image = u"icons/{0}.png".format(row.normal_form.id)
+            elif isinstance(row, tables.PokemonForm):
+                if row.name:
+                    image = u"icons/{0}-{1}.png".format(row.form_base_pokemon_id, row.name.lower())
+                else:
+                    image = u"icons/{0}.png".format(row.form_base_pokemon_id)
             elif isinstance(row, tables.Move):
                 image = u"chrome/types/{0}.png".format(row.type.name)
             elif isinstance(row, tables.Type):
@@ -418,12 +424,12 @@ class PokedexController(BaseController):
     def _prev_next_pokemon(self, pokemon):
         """Returns a 2-tuple of the previous and next Pokémon."""
         max_id = db.pokedex_session.query(tables.Pokemon) \
-                                .filter_by(forme_base_pokemon_id=None) \
+                                .filter(tables.Pokemon.forms.any()) \
                                 .count()
         prev_pokemon = db.pokedex_session.query(tables.Pokemon).get(
-            (c.pokemon.national_id - 1 - 1) % max_id + 1)
+            (c.pokemon.normal_form.id - 1 - 1) % max_id + 1)
         next_pokemon = db.pokedex_session.query(tables.Pokemon).get(
-            (c.pokemon.national_id - 1 + 1) % max_id + 1)
+            (c.pokemon.normal_form.id - 1 + 1) % max_id + 1)
         return prev_pokemon, next_pokemon
 
     @jsonify
@@ -466,10 +472,6 @@ class PokedexController(BaseController):
                 eagerload('shape'),
                 subqueryload_all('stats.stat'),
                 subqueryload_all('types.target_efficacies.damage_type'),
-
-                # XXX SQLAlchemy totally barfs if I try to eagerload things
-                # that are only on the normal_form.  No idea why.  This
-                # includes: dex_numbers, foreign_names, flavor_text
             )
 
             # Alright, execute
@@ -485,7 +487,7 @@ class PokedexController(BaseController):
 
         # Let's cache this bitch
         return self.cache_content(
-            key=u';'.join([c.pokemon.name, c.pokemon.forme_name or u'']),
+            key=u';'.join((c.pokemon.name, c.pokemon.form_name or u'')),
             template='/pokedex/pokemon.mako',
             do_work=self._do_pokemon,
         )
@@ -535,7 +537,7 @@ class PokedexController(BaseController):
                  .outerjoin((parent_a, tables.Pokemon.parent_pokemon)) \
                  .outerjoin((grandparent_a, parent_a.parent_pokemon)) \
                  .filter(tables.Pokemon.gender_rate != -1) \
-                 .filter(tables.Pokemon.forme_base_pokemon_id == None) \
+                 .filter(tables.Pokemon.forms.any()) \
                  .filter(
                     # This is a "base form" iff either:
                     or_(
@@ -611,10 +613,11 @@ class PokedexController(BaseController):
         # where the span is used as the HTML cell's rowspan -- e.g., Eevee has a
         # total of seven descendents, so it would need to span 7 rows.
         c.evolution_table = []
-        family = c.pokemon.evolution_chain.pokemon
         # Prefetch the evolution details
-        db.pokedex_session.query(tables.Pokemon) \
-            .filter(tables.Pokemon.id.in_(_.id for _ in family)) \
+        family = db.pokedex_session.query(tables.Pokemon) \
+            .filter(tables.Pokemon.evolution_chain_id ==
+                    c.pokemon.normal_form.evolution_chain_id) \
+            .filter(tables.Pokemon.forms.any()) \
             .options(
                 eagerload_all('parent_evolution.trigger'),
                 eagerload_all('parent_evolution.trigger_item'),
@@ -654,9 +657,7 @@ class PokedexController(BaseController):
             if len(unseen_leaves) == 0:
                 break
 
-            # Sort by id, then by forme if any.  This keeps evolutions in about
-            # the order people expect, while clustering formes together.
-            unseen_leaves.sort(key=lambda x: (x.national_id, x.forme_name))
+            unseen_leaves.sort(key=lambda x: x.id)
             leaf = unseen_leaves[0]
 
             # root, parent_n, ... parent2, parent1, leaf
@@ -959,64 +960,20 @@ class PokedexController(BaseController):
 
 
     def pokemon_flavor(self, name):
+        form = request.params.get('form', None)
+
         try:
-            c.pokemon = db.pokemon_query(name).one()
+            c.form = db.pokemon_form_query(name, form=form).one()
         except NoResultFound:
             return self._not_found()
 
-        # Deal with forms.  Remember, this could be either a physical form or
-        # an aesthetic form!
-        c.form = request.params.get('form', None)
-        form_sprites = c.pokemon.form_sprites
+        c.pokemon = c.form.unique_pokemon or c.form.form_base_pokemon
 
-        # If we don't have a form name, but this Pokémon has forms, we need to
-        # know the default
-        if not c.form and c.pokemon.forme_name:
-            # If there's a physical form name, just use that.  Don't redirect,
-            # as the physical form name is universally treated as the "default"
-            # and thus interchangeable with the plain Pokémon name -- that is,
-            # Normal Deoxys will always be /dex/pokemon/deoxys and vice versa
-            c.form = c.pokemon.forme_name
-
-        elif not c.form and \
-            form_sprites and \
-            not any(_.name == '' for _ in form_sprites) and \
-            c.pokemon.default_form_sprite.name:
-            # If there are aesthetic forms, but not one without a name, and we
-            # didn't GET a name, then redirect to the default.  In this case,
-            # you can't see flavor for "just Unown"; there's no such thing.
-            # You have to pick one, and if you don't, then I'll pick one for
-            # you
-            redirect(url.current(form=c.pokemon.default_form_sprite.name))
-
-        c.forms = [_.name for _ in c.pokemon.form_sprites]
-        c.forms.sort()
-
-
-        # Every form should have a recorded sprite; find it
-        if c.form:
-            try:
-                spr_form = db.pokedex_session \
-                    .query(tables.PokemonFormSprite) \
-                    .filter_by(pokemon_id=c.pokemon.id, name=c.form) \
-                    .one()
-            except NoResultFound:
-                # Not a valid form!
-                abort(404)
-
-            c.introduced_in = spr_form.introduced_in
-        else:
-            c.introduced_in = c.pokemon.generation.version_groups[0]
-
-        # Figure out if a sprite form appears in the overworld.  If this isn't
-        # a sprite form, the answer is obviously yes
-        c.appears_in_overworld = True
-        default_form_sprite = c.pokemon.default_form_sprite
-        if c.pokemon.form_group and c.pokemon.form_group.is_battle_only \
-            and default_form_sprite and c.form != default_form_sprite.name:
-            # That is, if this Pokémon's forms aren't battle-only, and it's not
-            # the default
-            c.appears_in_overworld = False
+        # Figure out if a sprite form appears in the overworld
+        c.appears_in_overworld = c.form.introduced_in_version_group_id <= 10 and (
+            c.form.is_default or
+            (c.pokemon.form_group and not c.pokemon.form_group.is_battle_only)
+        )
 
         ### Previous and next for the header
         c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
@@ -1024,25 +981,14 @@ class PokedexController(BaseController):
         ### Sizing
         c.trainer_height = pokedex_helpers.trainer_height
         c.trainer_weight = pokedex_helpers.trainer_weight
-        c.pokemon_height = c.pokemon.height
-        c.pokemon_weight = c.pokemon.weight
 
-        # Forms with separate Pokémon records sometimes differ
-        # XXX This kinda sucks, but it'll do until we fix Pokémon forms
-        if c.form:
-            for form in c.pokemon.formes:
-                if form.forme_name == c.form:
-                    c.pokemon_height = form.height
-                    c.pokemon_weight = form.weight
-                    break
-
-        heights = dict(pokemon=c.pokemon_height, trainer=c.trainer_height)
+        heights = {'pokemon': c.pokemon.height, 'trainer': c.trainer_height}
         c.heights = pokedex_helpers.scale_sizes(heights)
 
         # Strictly speaking, weight takes three dimensions.  But the real
         # measurement here is just "space taken up", and these are sprites, so
         # the space they actually take up is two-dimensional.
-        weights = dict(pokemon=c.pokemon_weight, trainer=c.trainer_weight)
+        weights = {'pokemon': c.pokemon.weight, 'trainer': c.trainer_weight}
         c.weights = pokedex_helpers.scale_sizes(weights, dimensions=2)
 
         return render('/pokedex/pokemon_flavor.mako')
@@ -1315,7 +1261,6 @@ class PokedexController(BaseController):
                 # Pokémon table stuff
                 subqueryload('pokemon.abilities'),
                 subqueryload('pokemon.egg_groups'),
-                subqueryload('pokemon.formes'),
                 subqueryload('pokemon.stats'),
                 subqueryload('pokemon.types'),
             ) \
@@ -1362,9 +1307,9 @@ class PokedexController(BaseController):
         c.pokemon = pokemon_methods.items()
         c.pokemon.sort(key=_pokemon_move_method_sort_key)
 
-        # Sort by Pokémon number
         for method, method_list in c.pokemon:
-            method_list.sort(key=lambda (pokemon, whatever): (pokemon.national_id, pokemon.forme_name))
+            # Sort each method's rows by their Pokémon
+            method_list.sort(key=lambda row: helpers.pokemon_sort_key(row[0]))
 
         # Finally, collapse identical columns within the same generation
         c.pokemon_columns \
@@ -1451,30 +1396,25 @@ class PokedexController(BaseController):
                 joinedload('damage_efficacies.target_type'),
                 subqueryload('target_efficacies'),
                 joinedload('target_efficacies.damage_type'),
+
+                # Move stuff
+                subqueryload('moves'),
+                joinedload('moves.damage_class'),
+                joinedload('moves.generation'),
+                joinedload('moves.move_effect'),
+                joinedload('moves.type'),
+
+                # Pokémon stuff
+                subqueryload('pokemon'),
+                joinedload('pokemon.abilities'),
+                joinedload('pokemon.egg_groups'),
+                joinedload('pokemon.types'),
+                joinedload('pokemon.stats'),
             ) \
             .one()
 
-        c.moves = db.pokedex_session.query(tables.Move) \
-            .filter_by(type_id=c.type.id) \
-            .order_by(tables.Move.name.asc()) \
-            .options(
-                joinedload('damage_class'),
-                joinedload('generation'),
-                joinedload('move_effect'),
-                joinedload('type'),
-            )
-
-        c.pokemon = db.pokedex_session.query(tables.Pokemon) \
-            .join(tables.PokemonType) \
-            .filter(tables.PokemonType.type_id == c.type.id) \
-            .options(
-                subqueryload('abilities'),
-                subqueryload('egg_groups'),
-                subqueryload('types'),
-                subqueryload_all('stats.stat'),
-            )
-
-        c.pokemon = sorted(c.pokemon, key=lambda (pokemon): (pokemon.national_id, pokemon.forme_name))
+        c.pokemon = sorted(c.type.pokemon, key=helpers.pokemon_sort_key)
+        c.moves = sorted(c.type.moves, key=lambda move: move.name)
 
         return
 
@@ -1513,20 +1453,17 @@ class PokedexController(BaseController):
                 subqueryload('flavor_text'),
                 joinedload('flavor_text.version_group'),
                 joinedload('flavor_text.version_group.versions'),
+
+                # Pokémon stuff
+                subqueryload('pokemon'),
+                subqueryload_all('pokemon.abilities'),
+                subqueryload_all('pokemon.egg_groups'),
+                subqueryload_all('pokemon.types'),
+                subqueryload_all('pokemon.stats.stat'),
             ) \
             .one()
 
-        c.pokemon = db.pokedex_session.query(tables.Pokemon) \
-            .join(tables.PokemonAbility) \
-            .filter(tables.PokemonAbility.ability_id == c.ability.id) \
-            .options(
-                subqueryload('abilities'),
-                subqueryload('egg_groups'),
-                subqueryload('types'),
-                subqueryload_all('stats.stat'),
-            )
-
-        c.pokemon = sorted(c.pokemon, key=lambda (pokemon): (pokemon.national_id, pokemon.forme_name))
+        c.pokemon = sorted(c.ability.pokemon, key=helpers.pokemon_sort_key)
 
         return
 
@@ -1852,6 +1789,6 @@ class PokedexController(BaseController):
                     minmax_stat_subquery.c.pokemon_id == tables.Pokemon.id))
 
         # Order by id as per usual
-        c.pokemon = c.pokemon.order_by(tables.Pokemon.id.asc())
+        c.pokemon = sorted(c.pokemon, key=helpers.pokemon_sort_key)
 
         return render('/pokedex/nature.mako')

@@ -70,7 +70,8 @@ ${getattr(self, 'col_' + column)()}
                 # Still in the same family.  Look for this Pokémon's immediate
                 # parent somewhere in the stack, in case this is a sibling.
                 # Yes, this will die if the parent hasn't been seen
-                while evolution_chain_stack[-1] != result.parent_pokemon:
+                while evolution_chain_stack[-1] != \
+                   result.normal_form.parent_pokemon:
                     evolution_chain_stack.pop()
 
             else:
@@ -364,7 +365,7 @@ ${h.end_form()}
 ### Display columns defs
 <%def name="col_id()"><col class="dex-col-id"></%def>
 <%def name="th_id()"><th>Num</th></%def>
-<%def name="td_id(pokemon)"><td>${pokemon.national_id}</td></%def>
+<%def name="td_id(pokemon)"><td>${pokemon.normal_form.id}</td></%def>
 
 <%def name="col_icon()"><col class="dex-col-icon"></%def>
 <%def name="th_icon()"><th></th></%def>

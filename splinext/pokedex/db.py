@@ -39,7 +39,8 @@ def connect(config):
 
 # Quick access to a few database objects
 def get_by_name_query(table, name):
-    """Finds a single row in the given table by name, ignoring case.
+    """Returns a query to find a single row in the given table by name,
+    ignoring case.
 
     Don't use this for Pokémon!  Use `pokemon_query()`, as it knows about
     forms.
@@ -56,16 +57,31 @@ def pokemon_query(name, form=None):
     q = pokedex_session.query(tables.Pokemon) \
                        .filter(func.lower(tables.Pokemon.name) == name.lower())
 
-    # Some Pokémon have a "default" form with no real name, like Deoxys.
-    # Some Pokémon have names for all their forms, e.g., Grass Wormadam.
-    # We have to accept wormadam/None and do the right thing.  So.
     if form:
-        # If there's a form, it must match exactly
-        q = q.filter_by(forme_name=form)
+        # If a form has been specified, it must match
+        q = q.join('unique_form')
+        q = q.filter(func.lower(tables.PokemonForm.name) == form.lower())
     else:
-        # If there's NOT a form, just make sure we get a normal-form
-        # Pokémon, whether or not it has a name
-        q = q.filter_by(forme_base_pokemon_id=None)
+        # If there's NOT a form, just make sure we get a form base Pokémon
+        q = q.filter(tables.Pokemon.forms.any())
+
+    return q
+
+def pokemon_form_query(name, form=None):
+    """Returns a query that will look for the specified Pokémon form, or the
+    default form of the named Pokémon.
+    """
+
+    q = pokedex_session.query(tables.PokemonForm) \
+                       .join('form_base_pokemon') \
+                       .filter(func.lower(tables.Pokemon.name) == name.lower())
+
+    if form:
+        # If a form has been specified, it must match
+        q = q.filter(func.lower(tables.PokemonForm.name) == form.lower())
+    else:
+        # If there's NOT a form, just get the default form
+        q = q.filter(tables.PokemonForm.is_default == True)
 
     return q
 

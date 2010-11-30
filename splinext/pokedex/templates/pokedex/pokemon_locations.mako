@@ -2,14 +2,14 @@
 <%namespace name="lib" file="/lib.mako"/>
 <%namespace name="dexlib" file="lib.mako"/>
 
-<%def name="title()">${c.pokemon.full_name} locations - Pokémon #${c.pokemon.national_id}</%def>
+<%def name="title()">${c.pokemon.name} locations - Pokémon #${c.pokemon.normal_form.id}</%def>
 
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
     <li><a href="${url('/dex')}">Pokédex</a></li>
     <li><a href="${url(controller='dex', action='pokemon_list')}">Pokémon</a></li>
-    <li>${h.pokedex.pokemon_link(c.pokemon, content=c.pokemon.full_name)}</li>
-    <li>${c.pokemon.full_name} locations</li>
+    <li>${h.pokedex.pokemon_link(c.pokemon, content=c.pokemon.name)}</li>
+    <li>${c.pokemon.name} locations</li>
 </ul>
 </%def>
 

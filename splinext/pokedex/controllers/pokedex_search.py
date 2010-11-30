@@ -618,9 +618,10 @@ class PokedexSearchController(BaseController):
                 or_(
                     and_(
                         c.form.id.data(me.id),
-                        me.forme_base_pokemon_id == None,
+                        me.forms.any(),
                     ),
-                    c.form.id.data(me.forme_base_pokemon_id),
+                    me.unique_form.has(c.form.id.data(
+                      tables.PokemonForm.form_base_pokemon_id)),
                 )
             )
 
@@ -635,7 +636,8 @@ class PokedexSearchController(BaseController):
                     or_(
                         # Either it was a form name...
                         and_(
-                            ilike( me.forme_name, form_name ),
+                            me.unique_form.has(ilike(tables.PokemonForm.name,
+                                form_name)),
                             ilike( me.name, name_sans_form ),
                         ),
                         # ...or not.
@@ -752,8 +754,16 @@ class PokedexSearchController(BaseController):
             grandparent_pokemon = aliased(tables.Pokemon)
 
             query = query.outerjoin(
-                (parent_pokemon, me.parent_pokemon),
-                (grandparent_pokemon, parent_pokemon.parent_pokemon),
+                # If we're a specific form, check the base form, too
+                (tables.PokemonEvolution, or_(
+                    tables.PokemonEvolution.to_pokemon_id == me.id,
+                    me.unique_form.has(tables.PokemonEvolution.to_pokemon_id ==
+                                       tables.PokemonForm.form_base_pokemon_id)
+                )),
+                (parent_pokemon, tables.PokemonEvolution.from_pokemon),
+
+                # No Pokémon ever evolve, gain forms, then evolve again
+                (grandparent_pokemon, parent_pokemon.parent_pokemon)
             )
 
         # ...whereas position and special tend to need children
@@ -894,8 +904,12 @@ class PokedexSearchController(BaseController):
                 .subquery()
 
             query = query.join((
-                pokedex_subquery,
-                me.id == pokedex_subquery.c.pokemon_id,
+                # Work for alternate forms, too
+                pokedex_subquery, or_(
+                    me.id == pokedex_subquery.c.pokemon_id,
+                    me.unique_form.has(pokedex_subquery.c.pokemon_id ==
+                                       tables.PokemonForm.form_base_pokemon_id)
+                )
             ))
 
         # Moves

@@ -4,7 +4,7 @@
 <%! from splinext.pokedex import db %>\
 <%! import re %>\
 
-<%def name="title()">${c.pokemon.full_name} - Pokémon #${c.pokemon.national_id}</%def>
+<%def name="title()">${c.pokemon.full_name} - Pokémon #${c.pokemon.normal_form.id}</%def>
 
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
@@ -23,8 +23,8 @@ ${h.h1('Essentials')}
 ## Portrait block
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.pokemon.name}</p>
-    % if c.pokemon.forme_name:
-    <p id="dex-pokemon-forme">${c.pokemon.forme_name.capitalize()} Forme</p>
+    % if c.pokemon.form_name:
+    <p id="dex-pokemon-forme">${c.pokemon.unique_form.full_name}</p>
     % endif
     <div id="dex-pokemon-portrait-sprite">
         ${h.pokedex.pokemon_sprite(c.pokemon, prefix='black-white')}
@@ -163,8 +163,9 @@ ${h.h1('Essentials')}
         <li>${h.pokedex.pokemon_link(
             pokemon,
             h.literal(capture(dexlib.pokemon_icon, pokemon)),
+            form=None,
             class_='dex-icon-link',
-            title=pokemon.full_name,
+            title=pokemon.name,
         )}</li>
         % endfor
     </ul>
@@ -264,7 +265,10 @@ ${h.h1('Evolution')}
 <li>
     <img src="${h.static_uri('spline', 'icons/chart--arrow.png')}" alt="See also:">
     <a href="${url(controller='dex_gadgets', action='compare_pokemon', \
-        pokemon=[pokemon.full_name for pokemon in c.pokemon.evolution_chain.pokemon])}">Compare these Pokémon</a>
+        pokemon=[pokemon.full_name for pokemon in sorted(
+            c.pokemon.evolution_chain.pokemon,
+            key=lambda pokemon: (not pokemon.is_baby,) + h.pokedex.pokemon_sort_key(pokemon)
+        )])}">Compare this family</a>
 </li>
 </ul>
 
@@ -286,20 +290,20 @@ ${h.h1('Evolution')}
     <td></td>
     % elif col != None:
     <td rowspan="${col['span']}"\
-        % if col['pokemon'] == c.pokemon:
+        % if col['pokemon'] == c.pokemon.normal_form:
         ${h.literal(' class="selected"')}\
         % endif
     >
         % if col['pokemon'] == c.pokemon:
         <span class="dex-evolution-chain-pokemon">
             ${dexlib.pokemon_icon(col['pokemon'])}
-            ${col['pokemon'].full_name}
+            ${col['pokemon'].name}
         </span>
         % else:
         ${h.pokedex.pokemon_link(
             pokemon=col['pokemon'],
             content=h.literal(capture(dexlib.pokemon_icon, col['pokemon']))
-                   + col['pokemon'].full_name,
+                   + col['pokemon'].name,
             class_='dex-evolution-chain-pokemon',
         )}
         % endif
@@ -322,13 +326,13 @@ ${h.h1('Evolution')}
 % if c.pokemon.normal_form.form_group:
 <h2 id="forms"> <a href="#forms" class="subtle">${c.pokemon.name} Forms</a> </h2>
 <ul class="inline">
-    % for form in [_.name for _ in c.pokemon.normal_form.form_sprites]:
+    % for form in c.pokemon.normal_form.forms:
 <%
     link_class = 'dex-box-link'
-    if form == c.pokemon.forme_name:
+    if form == c.pokemon.unique_form:
         link_class = link_class + ' selected'
 %>\
-    <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_sprite(c.pokemon, 'black-white', form=form), form=form, class_=link_class)}</li>
+    <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_sprite(form, 'black-white'), form=form.name, class_=link_class)}</li>
     % endfor
 </ul>
 <p> ${c.pokemon.normal_form.form_group.description.as_html | n} </p>
@@ -466,10 +470,10 @@ ${h.h1('Flavor')}
         <dt>Cry</dt>
 <%
         # Shaymin (and nothing else) has different cries for its different forms
-        if c.pokemon.national_id == 492:
-            cry_path = 'cries/{0}-{1}.ogg'.format(c.pokemon.national_id, c.pokemon.forme_name)
+        if c.pokemon.normal_form.id == 492:
+            cry_path = 'cries/{0}-{1}.ogg'.format(c.pokemon.normal_form.id, c.pokemon.unique_form.name.lower())
         else:
-            cry_path = 'cries/{0}.ogg'.format(c.pokemon.national_id)
+            cry_path = 'cries/{0}.ogg'.format(c.pokemon.normal_form.id)
 
         cry_path = url(controller='dex', action='media', path=cry_path)
 %>\
@@ -658,27 +662,27 @@ ${h.h1('External Links', id='links')}
         ghpd_name = re.sub('[^\w-]', '', ghpd_name)
         smogon_name = ghpd_name
 
-    if c.pokemon.forme_base_pokemon:
-        if c.pokemon.forme_name == 'sandy':
+    if not c.pokemon.is_base_form:
+        if c.pokemon.form_name == 'Sandy':
             smogon_name += '-g'
-        elif c.pokemon.forme_name == 'mow':
+        elif c.pokemon.form_name == 'Mow':
             smogon_name += '-c'
-        elif c.pokemon.forme_name in ('fan', 'trash'):
+        elif c.pokemon.form_name in ('Fan', 'Trash'):
             smogon_name += '-s'
         else:
-            smogon_name += '-' + c.pokemon.forme_name[0].lower()
+            smogon_name += '-' + c.pokemon.form_name[0].lower()
 %>
 <ul class="classic-list">
 % if c.pokemon.generation.id <= 1:
-<li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/species/${"%03d" % c.pokemon.national_id}.htm">Azure Heights</a></li>
+<li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/species/${"%03d" % c.pokemon.normal_form.id}.htm">Azure Heights</a></li>
 % endif
 <li><a href="http://bulbapedia.bulbagarden.net/wiki/${re.sub(' ', '_', c.pokemon.name)}_%28Pok%C3%A9mon%29">Bulbapedia</a></li>
 % if c.pokemon.generation.id <= 2:
 <li>${h.pokedex.generation_icon(2)} <a href="http://www.pokemondungeon.com/pokedex/${ghpd_name}.shtml">Gengar and Haunter's Pokémon Dungeon</a></li>
 % endif
 <li><a href="http://www.legendarypokemon.net/pokedex/${lp_name}">Legendary Pokémon</a></li>
-<li><a href="http://www.psypokes.com/dex/psydex/${"%03d" % c.pokemon.national_id}">PsyPoke</a></li>
-<li><a href="http://www.serebii.net/pokedex-bw/${"%03d" % c.pokemon.national_id}.shtml">Serebii.net</a></li>
+<li><a href="http://www.psypokes.com/dex/psydex/${"%03d" % c.pokemon.normal_form.id}">PsyPoke</a></li>
+<li><a href="http://www.serebii.net/pokedex-bw/${"%03d" % c.pokemon.normal_form.id}.shtml">Serebii.net</a></li>
 <li><a href="http://www.smogon.com/dp/pokemon/${smogon_name}">Smogon</a></li>
 </ul>
 </%lib:cache_content>
