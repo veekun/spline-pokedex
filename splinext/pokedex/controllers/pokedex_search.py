@@ -1040,12 +1040,18 @@ class PokedexSearchController(BaseController):
         ### Sorting
         # nb: the below sort ascending for words (a->z) and descending for
         # numbers (9->1), because that's how it should be, okay
-        # Default fallback sort is by name, then by id (in case of form)
-        sort_clauses = [ me.name.asc(), me.id.asc() ]
+        # Default fallback sort is by name, then by form
+        query = query.outerjoin(me.unique_form)
+        sort_clauses = [me.name.asc(), tables.PokemonForm.order.asc(),
+                        tables.PokemonForm.name.asc()]
+
+        # When sorting by ID, use the form base ID if there is one
+        base_id = func.coalesce(tables.PokemonForm.form_base_pokemon_id, me.id)
+
         if c.form.sort.data == 'id':
-            sort_clauses.insert(0,
-                func.coalesce(me.forme_base_pokemon_id, me.id).asc()
-            )
+            # Sorting by both name and national ID is redundant, since both are
+            # the same for two Pokémon iff they're the same base species.
+            sort_clauses[0] = base_id.asc()
 
         elif c.form.sort.data == 'evolution-chain':
             # This one is very special!  It affects sorting, but if the display
@@ -1077,6 +1083,9 @@ class PokedexSearchController(BaseController):
                 query = db.pokedex_session.query(me) \
                     .filter(me.id.in_(pokemon_ids.keys()))
 
+            # Outer join the new query to forms again; needed for sorting
+            query = query.outerjoin(me.unique_form)
+
             # Let the template know which Pokémon are actually in the original
             # result set
             c.original_results = pokemon_ids
@@ -1085,11 +1094,17 @@ class PokedexSearchController(BaseController):
             # their chain to actually appear in the results.  This is wonky,
             # but makes sure that fake results don't affect sorting
             chain_sorting_alias = aliased(tables.Pokemon)
+            chain_sorting_forms = aliased(tables.PokemonForm)
+            chain_sorting_base_id = func.coalesce(
+                chain_sorting_forms.form_base_pokemon_id,
+                chain_sorting_alias.id
+            )
             chain_sorting_subquery = db.pokedex_session.query(
                     chain_sorting_alias.evolution_chain_id,
-                    func.min(chain_sorting_alias.id).label('chain_position')
+                    func.min(chain_sorting_base_id).label('chain_position')
                 ) \
                 .filter(chain_sorting_alias.id.in_(pokemon_ids)) \
+                .outerjoin(chain_sorting_alias.unique_form) \
                 .group_by(chain_sorting_alias.evolution_chain_id) \
                 .subquery()
 
@@ -1099,11 +1114,13 @@ class PokedexSearchController(BaseController):
                     == me.evolution_chain_id
             ))
 
+            # Sort by ID instead of name within families
+            sort_clauses[0] = base_id.asc()
+
             sort_clauses = [
-                    chain_sorting_subquery.c.chain_position,
-                    me.is_baby.desc(),
-                    me.id.asc(),
-                ] + sort_clauses
+                chain_sorting_subquery.c.chain_position,
+                me.is_baby.desc()
+            ] + sort_clauses
 
         elif c.form.sort.data == 'name':
             # Name is fallback, so don't do anything
