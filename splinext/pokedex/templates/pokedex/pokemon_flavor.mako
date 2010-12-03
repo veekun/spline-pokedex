@@ -699,7 +699,7 @@ ${h.h1('Miscellaneous Game Art', id='misc-sprites')}
     if c.form.form_base_pokemon_id in (386, 412, 413, 421, 422, 423, 479, 487, 492) and c.form.name:
         # We have separate Sugimori art for the forms of Deoxys, Burmy, Wormadam, Cherrim, Shellos, Gastrodon, Rotom, Giratina, and Shaymin
         sugimori_path = 'sugimori/{0}-{1}.png'.format(c.form.form_base_pokemon_id, c.form.name.lower())
-    elif c.pokemon.generation_id <= 4:
+    elif c.pokemon.generation_id <= 5:
         sugimori_path = 'sugimori/{0}.png'.format(c.pokemon.id)
 %>
 
