@@ -145,6 +145,11 @@ def expected_attempts_oh_no(partitions):
 CaptureChance = namedtuple('CaptureChance', ['condition', 'is_active', 'chances'])
 
 
+class ChainBreedingForm(Form):
+    pokemon = PokedexLookupField(u'Target Pokémon', valid_type='pokemon')
+    moves = PokedexLookupField(u'Desired move', valid_type='moves')
+
+
 class StatCalculatorForm(Form):
     pokemon = PokedexLookupField(u'Pokémon', valid_type='pokemon')
     level = fields.IntegerField(u'Level', [wtforms.validators.NumberRange(min=1, max=100)],
@@ -407,6 +412,110 @@ class PokedexGadgetsController(BaseController):
             c.results = None
 
         return render('/pokedex/gadgets/capture_rate.mako')
+
+    def chain_breeding(self):
+        u"""Given a Pokémon and an egg move it can learn, figure out the
+        fastest way to get it that move.
+        """
+
+        # XXX validate that the move matches the pokemon, in the form
+        # TODO correctly handle e.g. munchlax-vs-snorlax
+        # TODO write tests for this man
+        c.form = ChainBreedingForm(request.GET)
+        if not request.GET or not c.form.validate():
+            c.did_anything = False
+            return render('/pokedex/gadgets/chain_breeding.mako')
+
+        # The result will be an entire hierarchy of Pokémon, like this:
+        # TARGET
+        #  |--- something compatible
+        #  | '--- something compatible here too
+        #  '--- something else compatible
+        # ... with Pokémon as high in the tree as possible.
+
+        # TODO make this a control yo
+        version_group = db.pokedex_session.query(tables.VersionGroup).get(11)  # b/w
+
+        target = c.form.pokemon.data
+
+        # First, find every potential Pokémon in the tree: that is, every
+        # Pokémon that can learn this move at all.
+        # It's useful to know which methods go with which Pokémon, so let's
+        # store the pokemon_moves rows per Pokémon.
+        # XXX this should exclude Ditto and unbreedables
+        candidates = {}
+        pokemon_moves = db.pokedex_session.query(tables.PokemonMove) \
+            .filter_by(
+                move_id=c.form.moves.data.id,
+                version_group_id=version_group.id,
+            )
+        pokemon_by_egg_group = defaultdict(set)
+        for pokemon_move in pokemon_moves:
+            candidates \
+                .setdefault(pokemon_move.pokemon, []) \
+                .append(pokemon_move)
+            for egg_group in pokemon_move.pokemon.egg_groups:
+                pokemon_by_egg_group[egg_group].add(pokemon_move.pokemon)
+
+        # Breeding only really cares about egg group combinations, not the
+        # individual Pokémon; for all intents and purposes, any (5, 9) Pokémon
+        # can be replaced by any other.  So build the tree out of those, first.
+        egg_group_candidates = set(
+            tuple(pokemon.egg_groups) for pokemon in candidates.keys()
+        )
+
+        # The above are actually edges in a graph; (5, 9) indicates that
+        # there's a viable connection between all Pokémon in egg groups 5 and
+        # 9.  The target Pokémon is sort of an anonymous node that has edges to
+        # its two breeding groups.  So build a graph!
+        egg_graph = dict()
+        # Create an isolated node for every group
+        all_egg_groups = set(egg_group for pair in egg_group_candidates
+                                       for egg_group in pair)
+        all_egg_groups.add('me')  # special sentinel value for the target
+        for egg_group in all_egg_groups:
+            egg_graph[egg_group] = dict(
+                node=egg_group,
+                adjacent=[],
+            )
+        # Fill in the adjacent edges
+        for egg_group in target.egg_groups:
+            egg_graph['me']['adjacent'].append(egg_graph[egg_group])
+            egg_graph[egg_group]['adjacent'].append(egg_graph['me'])
+        for egg_groups in egg_group_candidates:
+            if len(egg_groups) == 1:
+                # Pokémon in only one egg group aren't useful here
+                continue
+            a, b = egg_groups
+            egg_graph[a]['adjacent'].append(egg_graph[b])
+            egg_graph[b]['adjacent'].append(egg_graph[a])
+
+        # And now trim that down to just a tree, where nodes are placed as
+        # close to the root as possible.
+        # Start from the root ('me'), expand outwards, and remove edges that
+        # lead to nodes on a higher level.  Duplicates within a level are OK.
+        egg_tree = egg_graph['me']
+        seen = set(['me'])
+        current_level = [egg_tree]
+        current_seen = True
+        while current_seen:
+            next_level = []
+            current_seen = set()
+
+            for node in current_level:
+                node['adjacent'] = [_ for _ in node['adjacent'] if _['node'] not in seen]
+                node['adjacent'].sort(key=lambda _: _['node'].id)
+                current_seen.update(_['node'] for _ in node['adjacent'])
+                next_level.extend(node['adjacent'])
+
+            current_level = next_level
+            seen.update(current_seen)
+
+        c.pokemon = c.form.pokemon.data
+        c.pokemon_by_egg_group = pokemon_by_egg_group
+        c.egg_group_tree = egg_tree
+        c.did_anything = True
+        return render('/pokedex/gadgets/chain_breeding.mako')
 
     NUM_COMPARED_POKEMON = 8
     def _shorten_compare_pokemon(self, pokemon):
