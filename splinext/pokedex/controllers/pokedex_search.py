@@ -751,11 +751,8 @@ class PokedexSearchController(BaseController):
 
             query = query.outerjoin(
                 # If we're a specific form, check the base form, too
-                (tables.PokemonEvolution, or_(
-                    tables.PokemonEvolution.to_pokemon_id == me.id,
-                    me.unique_form.has(tables.PokemonEvolution.to_pokemon_id ==
-                                       tables.PokemonForm.form_base_pokemon_id)
-                )),
+                (tables.PokemonEvolution,
+                    tables.PokemonEvolution.to_pokemon_id == base_form_id),
                 (parent_pokemon, tables.PokemonEvolution.from_pokemon),
 
                 # No Pokémon ever evolve, gain forms, then evolve again
@@ -772,10 +769,8 @@ class PokedexSearchController(BaseController):
                 .group_by(child_evolution.from_pokemon_id) \
                 .subquery()
 
-            query = query.outerjoin((
-                child_subquery,
-                me.id == child_subquery.c.parent_id
-            ))
+            query = query.outerjoin((child_subquery,
+                base_form_id == child_subquery.c.parent_id))
 
         if c.form.evolution_stage.data:
             # Collect clauses for the requested stages and add to the query
@@ -886,6 +881,7 @@ class PokedexSearchController(BaseController):
                 me.generation_id.in_(_.id for _ in c.form.introduced_in.data)
             )
 
+        # Regional dex inclusion
         if c.form.in_pokedex.data:
             pokedex_query = db.pokedex_session.query(
                     tables.PokemonDexNumber.pokemon_id) \
