@@ -87,13 +87,14 @@ class TestMoveSearchController(TestController):
         self.check_search(
             dict(name=u'thunder'),
             [ u'Thunder', u'Thunderbolt', u'Thunder Wave',
-              u'ThunderShock', u'ThunderPunch', u'Thunder Fang'],
+              u'ThunderShock', u'ThunderPunch', u'Thunder Fang',
+              u'cross thunder' ],
             'no wildcards is treated as substring',
             exact=True,
         )
         self.check_search(
             dict(name=u'*under'),
-            [u'Thunder'],  # not ThunderShock, etc.!
+            [u'Thunder', u'cross thunder'],  # not ThunderShock, etc.!
             'splat wildcard works and is not used as substring',
             exact=True,
         )
@@ -107,8 +108,12 @@ class TestMoveSearchController(TestController):
     def test_type(self):
         u"""Checks type searching."""
         self.check_search(
-            dict(type=u'???'),
-            [u'Curse'],
+            dict(type=u'dragon'),
+            [ u'double chop', u'Draco Meteor', u'DragonBreath', u'Dragon Claw',
+              u'Dragon Dance', u'Dragon Pulse', u'Dragon Rage', u'Dragon Rush',
+              u'dragon tail', u'Outrage', u'Roar of Time', u'Spacial Rend',
+              u'Twister',
+            ],
             'searching by type',
             exact=True,
         )
@@ -150,7 +155,8 @@ class TestMoveSearchController(TestController):
         self.check_search(
             dict(similar_to=u'icy wind'),
             [ u'Bubble', u'BubbleBeam', u'Constrict',
-              u'Icy Wind', u'Mud Shot', u'Rock Tomb' ],
+              u'Icy Wind', u'Mud Shot', u'Rock Tomb',
+              u'level field' ],
             'searching by effect',
             exact=True,
         )
@@ -190,13 +196,13 @@ class TestMoveSearchController(TestController):
         """
         self.check_search(
             dict(accuracy=u'55'),
-            [u'Sing', u'Poison Gas', u'GrassWhistle', u'Supersonic'],
+            [u'Sing', u'GrassWhistle', u'Supersonic'],
             'searching by accuracy',
             exact=True,
         )
         self.check_search(
             dict(accuracy=u'53-56'),
-            [u'Sing', u'Poison Gas', u'GrassWhistle', u'Supersonic'],
+            [u'Sing', u'GrassWhistle', u'Supersonic'],
             'searching by accuracy range',
             exact=True,
         )
@@ -210,14 +216,14 @@ class TestMoveSearchController(TestController):
 
         self.check_search(
             dict(priority=u'-7'),  # XXX oh no what?  this looks like "<7"
-            [u'Trick Room'],
+            [u'magic room', u'Trick Room', u'wonder room'],
             'searching by priority',
             exact=True,
         )
 
         self.check_search(
             dict(power=u'130'),
-            [u'Last Resort'],
+            [u'blue flame', u'Hi Jump Kick', u'lightning strike'],
             'searching by power',
             exact=True,
         )

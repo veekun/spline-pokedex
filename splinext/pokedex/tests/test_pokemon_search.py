@@ -13,7 +13,7 @@ class TestPokemonSearchController(TestController):
 
     def check_search(self, criteria, expected, message, exact=False):
         """Checks whether the given expected results (a list of names or (name,
-        forme_name) tuples) are included in the response from a search.
+        form_name) tuples) are included in the response from a search.
 
         If exact is set to True, the search must contain exactly the given
         results.  Otherwise, the search can produce other results.
@@ -35,7 +35,7 @@ class TestPokemonSearchController(TestController):
         leftover_results = []
         leftover_expected = []
 
-        # Normalize expecteds to (name, forme_name)
+        # Normalize expecteds to (name, form_name)
         for name in expected:
             if isinstance(name, tuple):
                 leftover_expected.append(name)
@@ -45,7 +45,7 @@ class TestPokemonSearchController(TestController):
         # Remove expected results from the 'leftover' list, and add unexpected
         # results to the other leftover list
         for result in results:
-            result_name = result.name, result.forme_name
+            result_name = result.name, result.form_name
 
             if result_name in leftover_expected:
                 leftover_expected.remove(result_name)
@@ -59,6 +59,8 @@ class TestPokemonSearchController(TestController):
         )
 
         if exact:
+            if leftover_results:
+                print leftover_results
             self.assertEquals(
                 leftover_results, [],
                 u"no extra Pokémon found: {0}".format(message)
@@ -80,8 +82,8 @@ class TestPokemonSearchController(TestController):
 
         self.check_search(
             dict(name=u'speed deoxys'),
-            [(u'Deoxys', u'speed')],
-            'searching by forme name',
+            [(u'Deoxys', u'Speed')],
+            'searching by form name',
             exact=True,
         )
 
@@ -207,7 +209,7 @@ class TestPokemonSearchController(TestController):
         # Actual stages
         self.check_search(
             dict(evolution_stage=u'baby'),
-            [ u'Magby', u'Munchlax', u'Phione', u'Pichu', u'Riolu', u'Smoochum' ],
+            [ u'Magby', u'Munchlax', u'Pichu', u'Riolu', u'Smoochum' ],
             u'baby Pokémon',
         )
         self.check_search(
@@ -264,11 +266,6 @@ class TestPokemonSearchController(TestController):
         )
 
         # Some combinations of options
-        self.check_search(
-            dict(evolution_position=[u'first', u'last']),
-            [ u'Jirachi', u'Kecleon', u'Latias', u'Mew', u'Shuckle' ],
-            u'only evolution',
-        )
         self.check_search(
             dict(evolution_position=u'last', evolution_special=u'branching'),
             [],
@@ -343,8 +340,9 @@ class TestPokemonSearchController(TestController):
         # 6 + 11 == Fairy + Indeterminate
         self.check_search(
             dict(egg_group_operator=u'all', egg_group=[u'6', u'11']),
-            [ u'Castform' ],
-            'fairy + indeterm; only one result',
+            [  u'Castform',            (u'Castform', u'Sunny'),
+              (u'Castform', u'Rainy'), (u'Castform', u'Snowy') ],
+            'fairy + indeterm; only one result, kinda...',
             exact=True,
         )
         # Water 1; Water 3
@@ -385,7 +383,7 @@ class TestPokemonSearchController(TestController):
         )
         self.check_search(
             dict(in_pokedex=u'6'),
-            [ u'Eevee', u'Staraptor', (u'Giratina', u'altered') ],
+            [ u'Eevee', u'Staraptor', (u'Giratina', u'Altered') ],
             u'in Sinnoh Pokedex',
         )
 
@@ -544,20 +542,20 @@ class TestPokemonSearchController(TestController):
         )
 
         self.check_search(
-            dict(id=u'492+'),
-            [ (u'Shaymin', u'land'), (u'Shaymin', u'sky'), u'Arceus' ],
+            dict(id=u'648+'),
+            [ (u'meroetta', u'step'), (u'meroetta', u'voice'), u'genosekuto' ],
             'range: n+',
             exact=True,
         )
         self.check_search(
-            dict(id=u'492-'),
-            [ (u'Shaymin', u'land'), (u'Shaymin', u'sky'), u'Arceus' ],
+            dict(id=u'648-'),
+            [ (u'meroetta', u'step'), (u'meroetta', u'voice'), u'genosekuto' ],
             'range: n-',
             exact=True,
         )
         self.check_search(
-            dict(id=u'>=492'),
-            [ (u'Shaymin', u'land'), (u'Shaymin', u'sky'), u'Arceus' ],
+            dict(id=u'>=648'),
+            [ (u'meroetta', u'step'), (u'meroetta', u'voice'), u'genosekuto' ],
             'range: >=n',
             exact=True,
         )
@@ -610,7 +608,7 @@ class TestPokemonSearchController(TestController):
         )
         self.check_search(
             dict(stat_special_attack=u'130-131'),
-            [ u'Espeon', u'Gengar', u'Glaceon', u'Heatran', u'Latios', u'Magnezone' ],
+            [ u'Espeon', u'Gengar', u'Glaceon', u'Heatran', u'Latios', u'Magnezone', u'kyuremu' ],
             'special attack of 130',
             exact=True,
         )
