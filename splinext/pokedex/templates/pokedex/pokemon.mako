@@ -120,7 +120,7 @@ ${h.h1('Essentials')}
                 % endfor
             </ul>
             % if len(c.pokemon.egg_groups) > 1:
-            <a href="${url(controller='dex_search', action='pokemon_search', egg_group=[_.id for _ in c.pokemon.egg_groups])}"
+            <a href="${url(controller='dex_search', action='pokemon_search', egg_group=[group.id for group in c.pokemon.egg_groups])}"
                 class="dex-subtle-search-link">
                 <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="">
             </a>
@@ -585,7 +585,7 @@ ${h.h1('Locations')}
                 ## Sort locations by name
                 % for location_area, (conditions, combined_encounter) \
                     in h.keysort(area_condition_encounters, lambda k: (k.location.name, k.name)):
-                <li title="${combined_encounter.level} ${combined_encounter.rarity}% ${';'.join(_.name for _ in conditions)}">
+                <li title="${combined_encounter.level} ${combined_encounter.rarity}% ${';'.join(condition.name for condition in conditions)}">
                     <a href="${url(controller="dex", action="locations", name=location_area.location.name.lower())}${'#area:' + location_area.name if location_area.name else ''}">
                         ${location_area.location.name}${', ' + location_area.name if location_area.name else ''}
                     </a>
