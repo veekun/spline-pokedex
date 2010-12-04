@@ -13,7 +13,7 @@ from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from sqlalchemy.orm import aliased, eagerload, eagerload_all
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql import func, and_, not_, or_
+from sqlalchemy.sql import exists, func, and_, not_, or_
 from sqlalchemy.sql.operators import asc_op
 
 from spline.lib import helpers as h
@@ -887,22 +887,12 @@ class PokedexSearchController(BaseController):
             )
 
         if c.form.in_pokedex.data:
-            # Need a subquery that finds all the Pokémon in all the selected
-            # Pokédexes
-            pokedex_numbers = aliased(tables.PokemonDexNumber)
-            pokedex_subquery = db.pokedex_session.query(
-                pokedex_numbers.pokemon_id,
-            ) \
-                .filter(pokedex_numbers.pokedex_id.in_(
-                    _.id for _ in c.form.in_pokedex.data
-                )) \
-                .group_by(pokedex_numbers.pokemon_id) \
-                .subquery()
+            pokedex_query = db.pokedex_session.query(
+                    tables.PokemonDexNumber.pokemon_id) \
+                .filter(tables.PokemonDexNumber.pokedex_id.in_(
+                    _.id for _ in c.form.in_pokedex.data))
 
-            query = query.join((
-                # Work for alternate forms, too
-                pokedex_subquery, pokedex_subquery.c.pokemon_id == base_form_id
-            ))
+            query = query.filter(base_form_id.in_(pokedex_query.subquery()))
 
         # Moves
         # To avoid stupid group-by-having-count tricks, each move needs to
