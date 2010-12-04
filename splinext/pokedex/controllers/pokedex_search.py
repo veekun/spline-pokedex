@@ -579,6 +579,11 @@ class PokedexSearchController(BaseController):
         me = tables.Pokemon
         query = db.pokedex_session.query(me)
 
+        # Several joins need to know the base form
+        base_form = tables.PokemonForm
+        query = query.outerjoin((base_form, me.unique_form))
+        base_form_id = func.coalesce(base_form.form_base_pokemon_id, me.id)
+
         # Sorting and filtering by stat both need to join to the stat table for
         # the specific stat in question.  Keep track of these joins to avoid
         # doing them multiple times
@@ -614,16 +619,7 @@ class PokedexSearchController(BaseController):
         # ID
         if c.form.id.data:
             # Have to handle forms and not-forms differently
-            query = query.filter(
-                or_(
-                    and_(
-                        c.form.id.data(me.id),
-                        me.forms.any(),
-                    ),
-                    me.unique_form.has(c.form.id.data(
-                      tables.PokemonForm.form_base_pokemon_id)),
-                )
-            )
+            query = query.filter(c.form.id.data(base_form_id))
 
         # Name
         if c.form.name.data:
@@ -905,11 +901,7 @@ class PokedexSearchController(BaseController):
 
             query = query.join((
                 # Work for alternate forms, too
-                pokedex_subquery, or_(
-                    me.id == pokedex_subquery.c.pokemon_id,
-                    me.unique_form.has(pokedex_subquery.c.pokemon_id ==
-                                       tables.PokemonForm.form_base_pokemon_id)
-                )
+                pokedex_subquery, pokedex_subquery.c.pokemon_id == base_form_id
             ))
 
         # Moves
@@ -1041,17 +1033,13 @@ class PokedexSearchController(BaseController):
         # nb: the below sort ascending for words (a->z) and descending for
         # numbers (9->1), because that's how it should be, okay
         # Default fallback sort is by name, then by form
-        query = query.outerjoin(me.unique_form)
-        sort_clauses = [me.name.asc(), tables.PokemonForm.order.asc(),
-                        tables.PokemonForm.name.asc()]
-
-        # When sorting by ID, use the form base ID if there is one
-        base_id = func.coalesce(tables.PokemonForm.form_base_pokemon_id, me.id)
+        sort_clauses = [me.name.asc(), base_form.order.asc(),
+                        base_form.name.asc()]
 
         if c.form.sort.data == 'id':
             # Sorting by both name and national ID is redundant, since both are
             # the same for two Pokémon iff they're the same base species.
-            sort_clauses[0] = base_id.asc()
+            sort_clauses[0] = base_form_id.asc()
 
         elif c.form.sort.data == 'evolution-chain':
             # This one is very special!  It affects sorting, but if the display
@@ -1084,7 +1072,7 @@ class PokedexSearchController(BaseController):
                     .filter(me.id.in_(pokemon_ids.keys()))
 
             # Outer join the new query to forms again; needed for sorting
-            query = query.outerjoin(me.unique_form)
+            query = query.outerjoin((base_form, me.unique_form))
 
             # Let the template know which Pokémon are actually in the original
             # result set
@@ -1115,7 +1103,7 @@ class PokedexSearchController(BaseController):
             ))
 
             # Sort by ID instead of name within families
-            sort_clauses[0] = base_id.asc()
+            sort_clauses[0] = base_form_id.asc()
 
             sort_clauses = [
                 chain_sorting_subquery.c.chain_position,
