@@ -5,3 +5,4 @@
 /*.db
 /data
 /migration.py
+/splinext/pokedex/i18n/*/LC_MESSAGES/spline-pokedex.mo
