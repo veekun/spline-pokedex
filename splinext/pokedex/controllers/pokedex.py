@@ -754,9 +754,11 @@ class PokedexController(BaseController):
         ### Pokéathlon stats
         # Unown collapses to letters and punctuation.  Shellos and Gastrodon
         # can collapse entirely.  Nothing else collapses at all.  (Arceus
-        # /could/ have two sets of types collapse, but who cares.)
-        forms = [form for form in c.pokemon.normal_form.forms if
-                 form.pokeathlon_stats]
+        # /could/ have two pairs of types collapse, but who cares.)
+
+        # Show all forms' stats for the base form, or else just this form's
+        forms = [form for form in c.pokemon.forms or [c.pokemon.unique_form]
+                 if form.pokeathlon_stats]
 
         if not forms:
             # No stats
