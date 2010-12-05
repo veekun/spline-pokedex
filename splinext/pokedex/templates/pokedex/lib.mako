@@ -22,13 +22,14 @@ ${h.pokedex.pokemon_sprite(pokemon, prefix='icons')}\
     ${h.pokedex.pokemon_sprite(prefix='icons', pokemon=c.pokemon)}
     <br>${c.pokemon.normal_form.id}: ${c.pokemon.name}
     <ul class="inline-menu">
+    <% form = c.pokemon.form_name.lower() if not c.pokemon.is_base_form else None %>\
     % for action, label in (('pokemon', u'Pokédex'), \
                             ('pokemon_flavor', u'Flavor'), \
                             ('pokemon_locations', u'Locations')):
         % if action == request.environ['pylons.routes_dict']['action']:
         <li>${label}</li>
         % else:
-        <li><a href="${url.current(action=action)}">${label}</a></li>
+        <li><a href="${url.current(action=action, form=form if action != 'pokemon_locations' else None)}">${label}</a></li>
         % endif
     % endfor
     </ul>
