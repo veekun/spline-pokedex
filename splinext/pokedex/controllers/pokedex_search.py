@@ -1078,7 +1078,7 @@ class PokedexSearchController(BaseController):
                     func.min(chain_sorting_base_id).label('chain_position')
                 ) \
                 .filter(chain_sorting_alias.id.in_(pokemon_ids)) \
-                .outerjoin(chain_sorting_alias.unique_form) \
+                .outerjoin((chain_sorting_forms, 'unique_form')) \
                 .group_by(chain_sorting_alias.evolution_chain_id) \
                 .subquery()
 
