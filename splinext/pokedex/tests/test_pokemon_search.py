@@ -236,7 +236,7 @@ class TestPokemonSearchController(TestController):
         )
         self.check_search(
             dict(evolution_position=u'last'),
-            [ u'Charizard', u'Farfetch\'d', u'Jolteon', u'Scizor', u'Togekiss' ],
+            [ u'Charizard', u'Jolteon', u'Lucario', u'Scizor', u'Togekiss' ],
             u'final evolution',
         )
         self.check_search(

@@ -822,8 +822,13 @@ class PokedexSearchController(BaseController):
             clauses = []
 
             if u'first' in c.form.evolution_position.data:
-                # No parent
-                clauses.append( parent_pokemon.id == None )
+                # No parent; at least one child
+                clauses.append(
+                    and_(
+                        parent_pokemon.id == None,
+                        child_subquery.c.child_count != None,
+                    )
+                )
 
             if u'middle' in c.form.evolution_position.data:
                 # Has a parent AND a child
@@ -835,11 +840,16 @@ class PokedexSearchController(BaseController):
                 )
 
             if u'last' in c.form.evolution_position.data:
-                # No children
-                clauses.append( child_subquery.c.child_count == None )
+                # Has a parent but no children
+                clauses.append(
+                    and_(
+                        parent_pokemon.id != None,
+                        child_subquery.c.child_count == None
+                    )
+                )
 
             if u'only' in c.form.evolution_position.data:
-                # No parent; children
+                # No parent or children
                 clauses.append(
                     and_(
                         parent_pokemon.id == None,
