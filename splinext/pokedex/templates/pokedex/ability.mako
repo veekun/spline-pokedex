@@ -46,6 +46,17 @@ ${h.h1('Effect')}
 </div>
 
 
+% if c.ability.changelog:
+${h.h1('History')}
+<dl>
+    % for change in c.ability.changelog:
+    <dt>Before ${h.pokedex.version_icons(*change.changed_in.versions)}</dt>
+    <dd>${change.effect.as_html | n}</dd>
+    % endfor
+</dl>
+% endif
+
+
 ${h.h1('Flavor')}
 <div class="dex-column-container">
 <div class="dex-column-2x">
