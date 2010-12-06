@@ -366,9 +366,9 @@ class PokedexController(BaseController):
                 else:
                     image = u"icons/{0}.png".format(row.form_base_pokemon_id)
             elif isinstance(row, tables.Move):
-                image = u"chrome/types/{0}.png".format(row.type.name)
+                image = u"chrome/types/{0}.png".format(row.type.name.lower())
             elif isinstance(row, tables.Type):
-                image = u"chrome/types/{0}.png".format(row.name)
+                image = u"chrome/types/{0}.png".format(row.name.lower())
             elif isinstance(row, tables.Item):
                 image = u"items/{0}.png".format(
                     pokedex_helpers.filename_from_name(row.name))
