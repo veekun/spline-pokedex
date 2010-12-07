@@ -60,7 +60,7 @@ ${h.h1('Essentials')}
     <h2>Stats</h2>
     <dl>
         <dt>Power</dt>
-        % if c.move.damage_class.name == 'None':
+        % if c.move.damage_class.name == 'non-damaging':
         <dd>n/a</dd>
         % else:
         <dd>
@@ -77,7 +77,7 @@ ${h.h1('Essentials')}
             —  (cannot miss)
             % else:
             ${c.move.accuracy}%
-            % if c.move.accuracy != 100 and c.move.damage_class.name != 'None':
+            % if c.move.accuracy != 100 and c.move.damage_class.name != 'non-damaging':
             ≈ ${"%.1f" % (c.move.power * c.move.accuracy / 100.0)} power
             % endif
             % endif
@@ -326,9 +326,9 @@ ${h.h1(u'Similar moves')}
 % endif
 
 ${h.h1(u'Pokémon', id='pokemon')}
-% if c.move.damage_class.name != u'None':
-<p>${c.move.type.name.capitalize()} Pokémon get STAB, and have their types highlighted in green.</p>
-<p>Pokémon with higher ${u'Special Attack' if c.move.damage_class.name == u'Special' else u'Attack'} are more suited to ${c.move.name}'s ${c.move.damage_class.name} damage, and have the stat highlighted in green.</p>
+% if c.move.damage_class.name != u'non-damaging':
+<p>${c.move.type.name} Pokémon get STAB, and have their types highlighted in green.</p>
+<p>Pokémon with higher ${u'Special Attack' if c.move.damage_class.name == u'special' else u'Attack'} are more suited to ${c.move.name}'s ${c.move.damage_class.name} damage, and have the stat highlighted in green.</p>
 % endif
 <% columns = sum(c.pokemon_columns, []) %>
 <table class="dex-pokemon-moves striped-rows">
@@ -365,7 +365,7 @@ ${h.h1(u'Pokémon', id='pokemon')}
 <tbody>
 % for pokemon, version_group_data in method_list:
     <tr class="\
-        % if c.move.damage_class.name != u'None' and c.move.type in pokemon.types:
+        % if c.move.damage_class.name != u'non-damaging' and c.move.type in pokemon.types:
         better-move-type\
         % endif
         % if c.move.damage_class == c.better_damage_classes[pokemon]:
