@@ -417,8 +417,8 @@ class MoveSearchForm(BaseSearchForm):
     damage_class = QueryCheckboxSelectMultipleField(
         'Damage class',
         query_factory=lambda: db.pokedex_session.query(tables.MoveDamageClass),
-        get_label=lambda _: _.name,
-        get_pk=lambda table: table.name.lower(),
+        get_label=lambda _: _.name.capitalize(),
+        get_pk=lambda table: table.name,
         allow_blank=True,
     )
     introduced_in = QueryCheckboxSelectMultipleField(

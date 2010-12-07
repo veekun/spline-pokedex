@@ -8,7 +8,7 @@
 <ul id="breadcrumbs">
     <li><a href="${url('/dex')}">Pokédex</a></li>
     <li><a href="${url(controller='dex', action='types_list')}">Types</a></li>
-    <li>${c.type.name.title()}</li>
+    <li>${c.type.name}</li>
 </ul>
 </%def>
 
@@ -117,8 +117,8 @@ ${h.h1('External Links', id='links')}
     <li><a href="http://bulbapedia.bulbagarden.net/wiki/%3F%3F%3F_(type)">Bulbapedia</a></li>
     <li><a href="http://www.smogon.com/dp/types/questionquestionquestion">Smogon</a></li>
     % else:
-    <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.type.name.title()}_(type)">Bulbapedia</a></li>
-    <li><a href="http://www.smogon.com/dp/types/${c.type.name}">Smogon</a></li>
+    <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.type.name}_(type)">Bulbapedia</a></li>
+    <li><a href="http://www.smogon.com/dp/types/${c.type.name.lower()}">Smogon</a></li>
     % endif
 </ul>
 </%lib:cache_content>

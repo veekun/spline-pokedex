@@ -288,17 +288,16 @@ def pokemon_link(pokemon, content=None, to_flavor=False, **attr):
 
 def damage_class_icon(damage_class):
     return pokedex_img(
-        "chrome/damage-classes/%s.png" % damage_class.name.lower(),
+        "chrome/damage-classes/%s.png" % damage_class.name,
         alt=damage_class.name,
-        title="%s: %s" % (damage_class.name, damage_class.description),
+        title="%s: %s" % (damage_class.name.capitalize(), damage_class.description),
     )
 
 
 def type_icon(type):
     if not isinstance(type, basestring):
         type = type.name
-    type = type.lower()
-    return pokedex_img('chrome/types/%s.png' % type, alt=type, title=type)
+    return pokedex_img('chrome/types/%s.png' % type.lower(), alt=type, title=type)
 
 def type_link(type):
     return h.HTML.a(
