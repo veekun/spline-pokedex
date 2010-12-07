@@ -76,6 +76,7 @@ def _collapse_pokemon_move_columns(table, thing):
     # Only even consider versions in which this thing actually exists
     q = db.pokedex_session.query(tables.Generation) \
                        .filter(tables.Generation.id >= thing.generation_id) \
+                       .options(joinedload('version_groups')) \
                        .order_by(tables.Generation.id.asc())
     for generation in q:
         move_columns.append( [] ) # A new column group for this generation
@@ -552,6 +553,7 @@ class PokedexController(BaseController):
                     )
                  ) \
                  .filter(tables.PokemonEggGroup.egg_group_id.in_(egg_group_ids)) \
+                 .options(joinedload('unique_form')) \
                  .order_by(tables.Pokemon.id)
             c.compatible_families = q.all()
 
@@ -625,6 +627,8 @@ class PokedexController(BaseController):
                 eagerload_all('parent_evolution.location'),
                 eagerload_all('parent_evolution.known_move'),
                 eagerload_all('parent_evolution.party_pokemon'),
+                eagerload_all('parent_pokemon'),
+                eagerload_all('unique_form'),
             ) \
             .all()
         # Strategy: build this table going backwards.
@@ -860,6 +864,7 @@ class PokedexController(BaseController):
             .outerjoin((tables.Machine, tables.PokemonMove.machine)) \
             .options(
                  contains_eager(tables.PokemonMove.machine),
+                 eagerload_all('method'),
                  eagerload_all('move.damage_class'),
                  eagerload_all('move.move_effect'),
                  eagerload_all('move.type'),
