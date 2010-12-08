@@ -1149,11 +1149,29 @@ class PokedexController(BaseController):
             return self._not_found()
 
         ### Prev/next for header
-        max_id = db.pokedex_session.query(tables.Move).count()
-        c.prev_move = db.pokedex_session.query(tables.Move).get(
-            (c.move.id - 1 - 1) % max_id + 1)
-        c.next_move = db.pokedex_session.query(tables.Move).get(
-            (c.move.id - 1 + 1) % max_id + 1)
+        # Find the next move alphabetically
+        c.prev_move = db.pokedex_session.query(tables.Move) \
+            .filter(tables.Move.name < c.move.name) \
+            .order_by(tables.Move.name.desc()) \
+            .first()
+
+        if c.prev_move is None:
+            # No move comes before this one alphabetically; wrap to the last
+            c.prev_move = db.pokedex_session.query(tables.Move) \
+                .order_by(tables.Move.name.desc()) \
+                .first()
+
+        # Find the next move alphabetically
+        c.next_move = db.pokedex_session.query(tables.Move) \
+            .filter(tables.Move.name > c.move.name) \
+            .order_by(tables.Move.name.asc()) \
+            .first()
+
+        if c.next_move is None:
+            # There is no next move; wrap to the first
+            c.next_move = db.pokedex_session.query(tables.Move) \
+                .order_by(tables.Move.name.asc()) \
+                .first()
 
         return self.cache_content(
             key=c.move.name,
@@ -1399,11 +1417,29 @@ class PokedexController(BaseController):
             return self._not_found()
 
         ### Prev/next for header
-        max_id = db.pokedex_session.query(tables.Type).count()
-        c.prev_type = db.pokedex_session.query(tables.Type).get(
-            (c.type.id - 1 - 1) % max_id + 1)
-        c.next_type = db.pokedex_session.query(tables.Type).get(
-            (c.type.id - 1 + 1) % max_id + 1)
+        # Find the next type alphabetically
+        c.prev_type = db.pokedex_session.query(tables.Type) \
+            .filter(tables.Type.name < c.type.name) \
+            .order_by(tables.Type.name.desc()) \
+            .first()
+
+        if c.prev_type is None:
+            # No type comes before this one alphabetically; wrap to the last
+            c.prev_type = db.pokedex_session.query(tables.Type) \
+                .order_by(tables.Type.name.desc()) \
+                .first()
+
+        # Find the next type alphabetically
+        c.next_type = db.pokedex_session.query(tables.Type) \
+            .filter(tables.Type.name > c.type.name) \
+            .order_by(tables.Type.name.asc()) \
+            .first()
+
+        if c.next_type is None:
+            # There is no next type; wrap to the first
+            c.next_type = db.pokedex_session.query(tables.Type) \
+                .order_by(tables.Type.name.asc()) \
+                .first()
 
         return self.cache_content(
             key=c.type.name,
@@ -1455,11 +1491,29 @@ class PokedexController(BaseController):
             return self._not_found()
 
         ### Prev/next for header
-        max_id = db.pokedex_session.query(tables.Ability).count()
-        c.prev_ability = db.pokedex_session.query(tables.Ability).get(
-            (c.ability.id - 1 - 1) % max_id + 1)
-        c.next_ability = db.pokedex_session.query(tables.Ability).get(
-            (c.ability.id - 1 + 1) % max_id + 1)
+        # Find the ability that comes right before this one alphabetically
+        c.prev_ability = db.pokedex_session.query(tables.Ability) \
+            .filter(tables.Ability.name < c.ability.name) \
+            .order_by(tables.Ability.name.desc()) \
+            .first()
+
+        if c.prev_ability is None:
+            # No ability comes before this one alphabetically; wrap to the last
+            c.prev_ability = db.pokedex_session.query(tables.Ability) \
+                .order_by(tables.Ability.name.desc()) \
+                .first()
+
+        # Find the next ability alphabetically
+        c.next_ability = db.pokedex_session.query(tables.Ability) \
+            .filter(tables.Ability.name > c.ability.name) \
+            .order_by(tables.Ability.name.asc()) \
+            .first()
+
+        if c.next_ability is None:
+            # There is no next ability; wrap to the first
+            c.next_ability = db.pokedex_session.query(tables.Ability) \
+                .order_by(tables.Ability.name.asc()) \
+                .first()
 
         return self.cache_content(
             key=c.ability.name,

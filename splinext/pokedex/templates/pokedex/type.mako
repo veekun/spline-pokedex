@@ -15,13 +15,13 @@
 <div id="dex-header">
     <a href="${url.current(name=c.prev_type.name)}" id="dex-header-prev" class="dex-box-link">
         <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
-        ${c.prev_type.id}: ${h.pokedex.type_icon(c.prev_type)}
+        ${h.pokedex.type_icon(c.prev_type)}
     </a>
     <a href="${url.current(name=c.next_type.name)}" id="dex-header-next" class="dex-box-link">
-        ${c.next_type.id}: ${h.pokedex.type_icon(c.next_type)}
+        ${h.pokedex.type_icon(c.next_type)}
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
-    ${c.type.id}: ${h.pokedex.type_icon(c.type)}
+    ${h.pokedex.type_icon(c.type)}
 </div>
 
 <%lib:cache_content>
