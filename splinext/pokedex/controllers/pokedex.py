@@ -1149,7 +1149,7 @@ class PokedexController(BaseController):
             return self._not_found()
 
         ### Prev/next for header
-        # Find the next move alphabetically
+        # Find the move that comes right before this one alphabetically
         c.prev_move = db.pokedex_session.query(tables.Move) \
             .filter(tables.Move.name < c.move.name) \
             .order_by(tables.Move.name.desc()) \
@@ -1417,7 +1417,7 @@ class PokedexController(BaseController):
             return self._not_found()
 
         ### Prev/next for header
-        # Find the next type alphabetically
+        # Find the type that comes right before this one alphabetically
         c.prev_type = db.pokedex_session.query(tables.Type) \
             .filter(tables.Type.name < c.type.name) \
             .order_by(tables.Type.name.desc()) \
@@ -1480,7 +1480,7 @@ class PokedexController(BaseController):
 
     def abilities_list(sef):
         c.abilities = db.pokedex_session.query(tables.Ability) \
-            .order_by(tables.Ability.id) \
+            .order_by(tables.Ability.generation_id, tables.Ability.name) \
             .all()
         return render('/pokedex/ability_list.mako')
 

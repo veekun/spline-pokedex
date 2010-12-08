@@ -12,12 +12,12 @@
 ${h.h1('Ability list')}
 
 <table class="striped-rows dex-ability-list">
-<colgroup span="2"></colgroup> <!-- #, gen -->
+<colgroup span="2"></colgroup> <!-- ID, gen -->
 <colgroup span="1"></colgroup> <!-- name -->
 <colgroup span="1"></colgroup> <!-- summary -->
 <thead>
     <tr class="header-row">
-        <th>#</th>
+        <th>ID</th>
         <th>Gen</th>
         <th>Name</th>
         <th>Summary</th>
