@@ -87,7 +87,7 @@ class PokedexLinkPattern(markdown.inlinepatterns.Pattern):
         # Find the thingy and figure out its URL
         if self.thingy_type.lower() == u'pokemon':
             obj = splinext.pokedex.db.pokemon_query(target).one()
-            name = obj.full_name
+            name = obj.name
         else:
             obj = splinext.pokedex.db.get_by_name_query(self.thingy_table, target).one()
             name = obj.name
