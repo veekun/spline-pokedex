@@ -157,6 +157,10 @@ ${h.pokedex.pokemon_sprite(pokemon, prefix='icons')}\
 <th>Total</th>
 </%def>
 
+<%def name="_pokemon_ability_link(ability)">
+<a href="${url(controller='dex', action='abilities', name=ability.name.lower())}">${ability.name}</a>
+</%def>
+
 <%def name="pokemon_table_row(pokemon)">
 <td class="icon">${pokemon_icon(pokemon)}</td>
 <td>${h.pokedex.pokemon_link(pokemon)}</td>
@@ -168,10 +172,14 @@ ${h.pokedex.pokemon_sprite(pokemon, prefix='icons')}\
 <td class="ability">
   % for i, ability in enumerate(pokemon.abilities):
     % if i > 0:
-    <br>
+    <br />
     % endif
-    <a href="${url(controller='dex', action='abilities', name=ability.name.lower())}">${ability.name}</a>
+    ${_pokemon_ability_link(ability)}
   % endfor
+  % if pokemon.dream_ability and pokemon.dream_ability not in pokemon.abilities:
+    <br />
+    <em>${_pokemon_ability_link(pokemon.dream_ability)}</em>
+  % endif
 </td>
 <td>${h.pokedex.pokedex_img('gender-rates/%d.png' % pokemon.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.gender_rate])}</td>
 <td class="egg-group">
