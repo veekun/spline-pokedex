@@ -1534,14 +1534,31 @@ class PokedexController(BaseController):
 
                 # Pokémon stuff
                 subqueryload('pokemon'),
-                subqueryload_all('pokemon.abilities'),
-                subqueryload_all('pokemon.egg_groups'),
-                subqueryload_all('pokemon.types'),
-                subqueryload_all('pokemon.stats.stat'),
+                subqueryload('dream_pokemon'),
+                subqueryload_all('all_pokemon.abilities'),
+                subqueryload_all('all_pokemon.egg_groups'),
+                subqueryload_all('all_pokemon.types'),
+                subqueryload_all('all_pokemon.stats.stat'),
             ) \
             .one()
 
-        c.pokemon = sorted(c.ability.pokemon, key=pokedex_helpers.pokemon_sort_key)
+        c.method_labels = {
+            'Normal': u'May be found normally on Pokémon.',
+            'Dream': u'Found on Dream World Pokémon and a few Pokémon from '
+                     u'specific in-game encounters.',
+        }
+
+        regular_pokemon = sorted(c.ability.pokemon,
+                                 key=pokedex_helpers.pokemon_sort_key)
+        dream_pokemon = sorted((pokemon for pokemon in c.ability.dream_pokemon
+                               if pokemon not in regular_pokemon),
+                               key=pokedex_helpers.pokemon_sort_key)
+
+        c.pokemon = []
+        if regular_pokemon:
+            c.pokemon.append(('Normal', regular_pokemon))
+        if dream_pokemon:
+            c.pokemon.append(('Dream', dream_pokemon))
 
         return
 

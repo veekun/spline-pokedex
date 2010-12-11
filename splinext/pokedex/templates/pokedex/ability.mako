@@ -84,18 +84,23 @@ ${h.h1('Flavor')}
 ${h.h1(u'Pokémon', id='pokemon')}
 <table class="dex-pokemon-moves striped-rows">
     ${dexlib.pokemon_table_columns()}
-    <thead>
-        <tr class="header-row">
+    % for method, pokemon_list in c.pokemon:
+    <tbody>
+        <tr class="header-row" id="pokemon:${method.lower()}">
             ${dexlib.pokemon_table_header()}
         </tr>
-    </thead>
-    <tbody>
-        % for pokemon in c.pokemon:
+        <tr class="subheader-row">
+            <th colspan="13">
+                <a href="#pokemon:${method.lower()}" class="subtle"><strong>${method}</strong></a>: ${c.method_labels[method]}
+            </th>
+        </tr>
+        % for pokemon in pokemon_list:
         <tr>
             ${dexlib.pokemon_table_row(pokemon)}
         </tr>
         % endfor
     </tbody>
+    % endfor
 </table>
 
 
