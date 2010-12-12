@@ -10,7 +10,7 @@
 </ul>
 </%def>
 
-<h1>Compare Pokémon</h1>
+${h.h1(u'Compare Pokémon', 'compare')}
 <p>Select up to eight Pokémon to compare their stats, moves, etc.</p>
 
 ${h.form(url.current(), method='GET')}
@@ -101,27 +101,21 @@ ${h.end_form()}
     ${row(u'Type', type_cell, class_='dex-compare-list')}
     ${row(u'Abilities', abilities_cell, class_='dex-compare-list')}
 
-    <tr class="subheader-row">
-        <th colspan="${len(c.found_pokemon) + 1}">Breeding + Training</th>
-    </tr>
+    ${subheader_row('Breeding + Training', 'breeding-training')}
     ${row(u'Egg groups', egg_groups_cell, class_='dex-compare-list')}
     ${row(u'Gender', gender_cell, class_='dex-compare-flavor-text')}
     ${relative_row(u'Base EXP')}
     ${relative_row(u'Base happiness')}
     ${relative_row(u'Capture rate')}
 
-    <tr class="subheader-row">
-        <th colspan="${len(c.found_pokemon) + 1}">Stats</th>
-    </tr>
+    ${subheader_row('Stats', 'stats')}
     % for stat in c.stats:
     ${relative_row(stat.name)}
     % endfor
     ${relative_row(u'Base stat total')}
     ${row(u'Effort', effort_cell)}
 
-    <tr class="subheader-row">
-        <th colspan="${len(c.found_pokemon) + 1}">Flavor</th>
-    </tr>
+    ${subheader_row('Flavor', 'flavor')}
 
     <tr class="size">
         <th>${h.pokedex.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.heights['trainer'] * 100))}</th>
@@ -155,7 +149,7 @@ ${h.end_form()}
 </tbody>
 </table>
 
-<h1>Level-up moves</h1>
+${h.h1('Level-up moves')}
 <table class="striped-rows dex-compare-pokemon dex-compare-pokemon-moves">
 <col class="labels">
 ${move_table_header()}
@@ -175,15 +169,13 @@ ${move_table_header()}
 </tbody>
 </table>
 
-<h1>Moves</h1>
+${h.h1('Moves')}
 <table class="striped-rows dex-compare-pokemon dex-compare-pokemon-moves">
 <col class="labels">
 ${move_table_header()}
 <tbody>
     % for method, move_pokemons in sorted(c.moves.items(), key=lambda (k, v): k.id):
-    <tr class="subheader-row">
-        <th colspan="${len(c.found_pokemon) + 1}">${method.name}</th>
-    </tr>
+    ${subheader_row(method.name, 'moves:' + h.pokedex.filename_from_name(method.name))}
     % for move, pokemons in sorted(move_pokemons.items(), key=lambda (k, v): k.name):
     <tr>
         <th><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></th>
@@ -219,6 +211,13 @@ ${move_table_header()}
         % endfor
     </tr>
 </thead>
+</%def>
+
+## An anchored table subheader row
+<%def name="subheader_row(label, id)">
+<tr class="subheader-row" id="${id}">
+    <th colspan="${len(c.found_pokemon) + 1}"><a href="#${id}" class="subtle">${label}</a></th>
+</tr>
 </%def>
 
 ## Print a row of 8
