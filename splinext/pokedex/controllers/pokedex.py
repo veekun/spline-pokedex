@@ -1371,12 +1371,14 @@ class PokedexController(BaseController):
     def types_list(self):
         c.types = db.pokedex_session.query(tables.Type) \
             .order_by(tables.Type.name) \
+            .filter(tables.Type.damage_efficacies.any()) \
             .options(eagerload('damage_efficacies')) \
             .all()
 
         try:
             c.secondary_type = db.pokedex_session.query(tables.Type) \
-                .filter(tables.Type.name == request.params['secondary']) \
+                .filter(func.lower(tables.Type.name) ==
+                        request.params['secondary'].lower()) \
                 .one()
 
             c.secondary_efficacy = dict(

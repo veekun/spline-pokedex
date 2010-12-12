@@ -21,7 +21,7 @@
 % endif
 % for type in c.types:
     % if type != c.secondary_type:
-    <li><a href="${url.current(secondary=type.name)}">${h.pokedex.type_icon(type)}</a></li>
+    <li><a href="${url.current(secondary=type.name.lower())}">${h.pokedex.type_icon(type)}</a></li>
     % endif
 % endfor
 </ul>
