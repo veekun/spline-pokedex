@@ -166,6 +166,8 @@ ${h.form(url.current(), method='GET')}
 <p class="error">${error}</p>
 % endfor
 
+${c.form.shadow_moves()} ${c.form.shadow_moves.label()}
+
 <h2>Numbers</h2>
 <dl class="standard-form">
     ${lib.field('accuracy')}

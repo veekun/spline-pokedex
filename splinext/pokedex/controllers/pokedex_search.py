@@ -432,11 +432,14 @@ class MoveSearchForm(BaseSearchForm):
 
     type = QueryCheckboxSelectMultipleField(
         'Type',
-        query_factory=lambda: db.pokedex_session.query(tables.Type),
+        query_factory=lambda: db.pokedex_session.query(tables.Type)
+                              .filter(tables.Type.id != 10002),  # Shadow
         get_label=lambda _: _.name,
         get_pk=lambda table: table.name,
         allow_blank=True,
     )
+
+    shadow_moves = fields.BooleanField('Include Colosseum/XD Shadow moves')
 
     # Category operator; the actual categories are dynamic, below
     category_operator = fields.SelectField('',
@@ -1354,6 +1357,9 @@ class PokedexSearchController(BaseController):
         if c.form.type.data:
             type_ids = [_.id for _ in c.form.type.data]
             query = query.filter( me.type_id.in_(type_ids) )
+
+        if not c.form.shadow_moves.data:
+            query = query.filter(me.type_id != 10002)
 
         # Flags
         for field, flag_id in c.flag_fields:
