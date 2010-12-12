@@ -1154,8 +1154,15 @@ class PokedexController(BaseController):
             return self._not_found()
 
         ### Prev/next for header
+        # Shadow moves have the prev/next Shadow move; other moves skip them
+        if c.move.type_id == 10002:
+            shadowness = tables.Move.type_id == 10002
+        else:
+            shadowness = tables.Move.type_id != 10002
+
         # Find the move that comes right before this one alphabetically
         c.prev_move = db.pokedex_session.query(tables.Move) \
+            .filter(shadowness) \
             .filter(tables.Move.name < c.move.name) \
             .order_by(tables.Move.name.desc()) \
             .first()
@@ -1163,11 +1170,13 @@ class PokedexController(BaseController):
         if c.prev_move is None:
             # No move comes before this one alphabetically; wrap to the last
             c.prev_move = db.pokedex_session.query(tables.Move) \
+                .filter(shadowness) \
                 .order_by(tables.Move.name.desc()) \
                 .first()
 
         # Find the next move alphabetically
         c.next_move = db.pokedex_session.query(tables.Move) \
+            .filter(shadowness) \
             .filter(tables.Move.name > c.move.name) \
             .order_by(tables.Move.name.asc()) \
             .first()
@@ -1175,6 +1184,7 @@ class PokedexController(BaseController):
         if c.next_move is None:
             # There is no next move; wrap to the first
             c.next_move = db.pokedex_session.query(tables.Move) \
+                .filter(shadowness) \
                 .order_by(tables.Move.name.asc()) \
                 .first()
 
