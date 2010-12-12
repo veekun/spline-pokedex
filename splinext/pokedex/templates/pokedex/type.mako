@@ -64,13 +64,14 @@ ${h.h1(u'Pokémon', id='pokemon')}
 <%! from pokedex.db import markdown %>
 <div class="markdown">
 ${markdown.MarkdownString(u"""
-In Generation IV, pure [flying]{type}-types become ???-type during [Roost]{move}. This can be accomplished with
-[Conversion]{move}, [Conversion 2]{move}, or the ability [Color Change]{ability}. A Pokémon can legitimately have both
+In Generation IV, pure [flying]{type}-types become ???-type during [Roost]{move}.  This can be accomplished with
+[Conversion]{move}, [Conversion 2]{move}, or the ability [Color Change]{ability}.  A Pokémon can legitimately have both
 Roost and one of these only through the use of [Mimic]{move}, [Sketch]{move}, [Role Play]{move}, or [Skill Swap]{move}.
 (No Pokémon that has [Trace]{ability} or [Multitype]{ability} learns Roost, and Multitype cannot be copied.)
 
-There are [sprites for a ???-type Arceus](%s), even though Arceus cannot become ???-type through regular play. Eggs
-are purely ???-type before hatching, and are displayed as such in the Generation III status screen.
+Generation IV has [sprites for a ???-type Arceus](%s), even though Arceus cannot become ???-type through regular play.
+Eggs are purely ???-type before hatching before Generation V, and are displayed as such in the Generation III status
+screen.  In Generation V, the ??? type no longer exists.
 """ % url(controller='dex', action='pokemon_flavor', name='arceus', form='???')).as_html | n}
 </div>
 % elif c.type.name == 'Shadow':
