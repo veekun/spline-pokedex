@@ -112,8 +112,8 @@ class PokedexMechanicsPattern(markdown.inlinepatterns.Pattern):
 class PokedexExtension(markdown.Extension):
     """Plugs the [foo]{bar} syntax into the markdown parser."""
     def extendMarkdown(self, md, md_globals):
-        for table in (tables.Ability, tables.Item, tables.Move, tables.Pokemon,
-                      tables.Type):
+        for table in (tables.Ability, tables.Item, tables.Location,
+                      tables.Move, tables.Pokemon, tables.Type):
             key = "pokedex-link-{table.__tablename__}".format(table=table)
             md.inlinePatterns[key] = PokedexLinkPattern(table)
 
