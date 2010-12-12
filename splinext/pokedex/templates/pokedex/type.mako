@@ -73,6 +73,11 @@ There are [sprites for a ???-type Arceus](%s), even though Arceus cannot become 
 are purely ???-type before hatching, and are displayed as such in the Generation III status screen.
 """ % url(controller='dex', action='pokemon_flavor', name='arceus', form='???')).as_html | n}
 </div>
+% elif c.type.name == 'Shadow':
+Shadow Pokémon are Pokémon whose hearts have been closed in Pokémon Colosseum and Pokémon XD: Gale of Darkness.  The
+Shadow type, Shadow Pokémon, and Shadow moves are unique to those games.
+
+A list of obtainable Shadow Pokémon is pending.
 % else:
 <table class="dex-pokemon-moves striped-rows">
     ${dexlib.pokemon_table_columns()}
