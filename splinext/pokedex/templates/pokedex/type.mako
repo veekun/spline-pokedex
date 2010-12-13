@@ -39,24 +39,32 @@ ${h.h1('Essentials')}
 </div>
 
 <div class="dex-page-beside-portrait">
+% if c.type.name == '???':
+    <h2>Damage Dealt/Taken</h2>
+    <p>??? theoretically took and dealt 1× damage with every type, but there were no ??? Pokémon or damaging moves.</p>
+% elif c.type.name == 'Shadow':
+    <h2>Damage Dealt/Taken</h2>
+    <p>In XD, Shadow moves are super-effective against non-Shadow Pokémon and not very effective against Shadow
+    Pokémon.  In Colosseum, Shadow Rush is regularly effective against everything.</p>
+% else:
     <h2>Damage Dealt</h2>
     <ul class="dex-type-list">
-        ## always sort ??? last
-        % for type in sorted(c.type.damage_efficacies, key=lambda type: (type.target_type.id == 18, type.target_type.name)):
-        <li class="dex-damage-dealt-${type.damage_factor}">
-             ${h.pokedex.type_link(type.target_type)} ${h.pokedex.type_efficacy_label[type.damage_factor]}
+        % for type_efficacy in sorted(c.type.damage_efficacies, key=lambda efficacy: efficacy.target_type.name):
+        <li class="dex-damage-dealt-${type_efficacy.damage_factor}">
+             ${h.pokedex.type_link(type_efficacy.target_type)} ${h.pokedex.type_efficacy_label[type_efficacy.damage_factor]}
         </li>
         % endfor
     </ul>
 
     <h2>Damage Taken</h2>
     <ul class="dex-type-list">
-        % for type in sorted(c.type.target_efficacies, key=lambda type: (type.damage_type.id == 18, type.damage_type.name)):
-        <li class="dex-damage-taken-${type.damage_factor}">
-             ${h.pokedex.type_link(type.damage_type)} ${h.pokedex.type_efficacy_label[type.damage_factor]}
+        % for type_efficacy in sorted(c.type.target_efficacies, key=lambda efficacy: efficacy.damage_type.name):
+        <li class="dex-damage-taken-${type_efficacy.damage_factor}">
+             ${h.pokedex.type_link(type_efficacy.damage_type)} ${h.pokedex.type_efficacy_label[type_efficacy.damage_factor]}
         </li>
         % endfor
     </ul>
+% endif
 </div>
 
 ${h.h1(u'Pokémon', id='pokemon')}
@@ -75,10 +83,10 @@ screen.  In Generation V, the ??? type no longer exists.
 """ % url(controller='dex', action='pokemon_flavor', name='arceus', form='???')).as_html | n}
 </div>
 % elif c.type.name == 'Shadow':
-Shadow Pokémon are Pokémon whose hearts have been closed in Pokémon Colosseum and Pokémon XD: Gale of Darkness.  The
-Shadow type, Shadow Pokémon, and Shadow moves are unique to those games.
+<p>Shadow Pokémon are Pokémon whose hearts have been closed in Pokémon Colosseum and Pokémon XD: Gale of Darkness.  The
+Shadow type, Shadow Pokémon, and Shadow moves are unique to those games.</p>
 
-A list of obtainable Shadow Pokémon is pending.
+<p>A list of obtainable Shadow Pokémon is pending.</p>
 % else:
 <table class="dex-pokemon-moves striped-rows">
     ${dexlib.pokemon_table_columns()}

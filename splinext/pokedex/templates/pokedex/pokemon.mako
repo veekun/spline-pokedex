@@ -58,9 +58,7 @@ ${h.h1('Essentials')}
 ## Boo not using <dl>  :(  But I can't get them to align horizontally with CSS2
 ## if the icon and value have no common element..
 <ul class="dex-type-list">
-    ## always sort ??? last
-    % for type, damage_factor in sorted(c.type_efficacies.items(), \
-                                        key=lambda x: (x[0].id == 18, x[0].name)):
+    % for type, damage_factor in sorted(c.type_efficacies.items(), key=lambda x: x[0].name):
     <li class="dex-damage-taken-${damage_factor}">
         ${h.pokedex.type_link(type)} ${h.pokedex.type_efficacy_label[damage_factor]}
     </li>

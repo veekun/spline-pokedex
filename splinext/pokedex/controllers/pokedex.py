@@ -1223,12 +1223,6 @@ class PokedexController(BaseController):
         c.pp_up = db.pokedex_session.query(tables.Item) \
             .filter_by(name=u'PP Up').one()
 
-        ### Type efficacy
-        c.type_efficacies = {}
-        for type_efficacy in c.move.type.damage_efficacies:
-            c.type_efficacies[type_efficacy.target_type] = \
-                type_efficacy.damage_factor
-
         ### Power percentile
         if c.move.power in (0, 1):
             c.power_percentile = None
