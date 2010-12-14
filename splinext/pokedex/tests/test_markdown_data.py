@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from nose.tools import ok_
+import pylons.test
 
 from spline.tests import *
 
@@ -18,12 +19,14 @@ class TestMarkdownData(SplineTest):
             for column in table.c:
                 if not isinstance(column.type, markdown.MarkdownColumn):
                     continue
-                
+
                 yield self.check_markdown_column, column
 
     def check_markdown_column(self, column):
         """Implementation for the above"""
-        session = connect()
+        # Well this is a bit roundabout
+        session = connect(
+            pylons.test.pylonsapp.config['spline-pokedex.database_url'])
 
         table = column.table
         columns = (column,) + tuple(table.primary_key.columns)
