@@ -173,14 +173,24 @@ ${h.h1('History')}
     % for change in c.move.changelog:
     <dt>Before ${h.pokedex.version_icons(*change.changed_in.versions)}</dt>
     <dd>
+        % if change.type_id is not None:
+        Type is ${h.pokedex.type_link(change.type)}.
+        % endif
         % if change.power is not None:
-        Power was ${change.power}.
+        Has ${change.power} power.
         % endif
         % if change.accuracy is not None:
-        Accuracy was ${change.accuracy}%.
+        Has ${change.accuracy}% accuracy.
         % endif
         % if change.pp is not None:
-        PP was ${change.pp}.
+        Has ${change.pp} PP.
+        % endif
+        % if change.effect_id is not None:
+        ## XXX as_html is more appropriate but adds <p> tags
+        Effect is: ${change.short_effect.as_text}
+        % elif change.effect_chance is not None:
+        ## If we're showing the entire effect, it'll include the effect chance
+        Effect chance is ${change.effect_chance}.
         % endif
     </dd>
     % endfor
