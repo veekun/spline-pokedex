@@ -13,11 +13,11 @@
 </%def>
 
 <div id="dex-header">
-    <a href="${url.current(name=c.prev_type.name)}" id="dex-header-prev" class="dex-box-link">
+    <a href="${url.current(name=c.prev_type.name.lower())}" id="dex-header-prev" class="dex-box-link">
         <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
         ${h.pokedex.type_icon(c.prev_type)}
     </a>
-    <a href="${url.current(name=c.next_type.name)}" id="dex-header-next" class="dex-box-link">
+    <a href="${url.current(name=c.next_type.name.lower())}" id="dex-header-next" class="dex-box-link">
         ${h.pokedex.type_icon(c.next_type)}
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
