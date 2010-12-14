@@ -39,8 +39,7 @@
     ## Draw a divider to separate terrain, in id order.  Why not?
     ## Include the versions header, too.
     % for terrain, pokemon_version_condition_encounters \
-       in sorted(c.grouped_encounters.get(location_area, {}).items(), \
-                 key=lambda (k, v): k.id):
+       in h.keysort(c.grouped_encounters.get(location_area, {}), lambda k: k.id):
 
     <tr class="header-row">
         <th></th>
@@ -57,8 +56,7 @@
 
     ## One row per Pokémon, sorted by name
     % for pokemon, version_condition_encounters \
-       in sorted(pokemon_version_condition_encounters.items(), \
-                 key=lambda (k, v): k.name):
+       in h.keysort(pokemon_version_condition_encounters, lambda k: k.name):
     <tr>
         <th class="location">
             ${h.pokedex.pokemon_link(
@@ -78,17 +76,15 @@
             ## Conditions are only grouped in the first place so we can stick
             ## them in this div wrapper, which draws a divider line between
             ## them.
-            % for conditions, condition_value_encounters \
-               in sorted(condition_encounters.items(), \
-                         key=lambda (k, v): [len(k)] + [cond.id for cond in k] ):
+            % for conditions, condition_value_encounters in h.keysort( \
+                condition_encounters, lambda k: [len(k)] + [cond.id for cond in k]):
             <div class="dex-encounter-condition-group">
 
             ## Sort in order of condition value id, too.  Pretty arbitrary, but
             ## the condition values are entirely under my control, and the
             ## order in the db is intuitive to me.
-            % for condition_values, encounters \
-               in sorted(condition_value_encounters.items(), \
-                         key=lambda (k, v): [cv.id for cv in k] ):
+            % for condition_values, encounters in h.keysort( \
+                condition_value_encounters, lambda k: [cv.id for cv in k]):
             <div class="dex-encounter-conditions">
                 % for condition_value in condition_values:
                 <div class="dex-encounter-icon">

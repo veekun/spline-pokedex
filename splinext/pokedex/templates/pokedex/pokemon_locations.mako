@@ -18,7 +18,7 @@ ${dexlib.pokemon_page_header()}
 <%lib:cache_content>
 ## Sort regions by the generation that introduced them
 % for region, terrain_area_version_condition_encounters \
-   in sorted( c.grouped_encounters.items(), key=lambda (k, v): k.generation.id):
+   in h.keysort(c.grouped_encounters, lambda k: k.generation.id):
 ${h.h1(region.name)}
 
 <table class="dex-encounters striped-rows">
@@ -40,8 +40,7 @@ ${h.h1(region.name)}
     ## Draw a divider to separate terrain, in id order.  Why not?
     ## Include the versions header, too.
     % for terrain, area_version_condition_encounters \
-       in sorted(terrain_area_version_condition_encounters.items(), \
-                 key=lambda (k, v): k.id):
+       in h.keysort(terrain_area_version_condition_encounters, lambda k: k.id):
 
     <tr class="header-row">
         <th></th>
@@ -58,8 +57,7 @@ ${h.h1(region.name)}
 
     ## One row per location-area, sorted by name
     % for location_area, version_condition_encounters \
-       in sorted(area_version_condition_encounters.items(), \
-                 key=lambda (k, v): (k.location.name, k.name)):
+       in h.keysort(area_version_condition_encounters, lambda k: (k.location.name, k.name)):
     <tr>
         <th class="location">
             <a href="${url(controller="dex", action="locations", name=location_area.location.name.lower())}${'#area:' + location_area.name if location_area.name else ''}">
@@ -77,17 +75,15 @@ ${h.h1(region.name)}
             ## Conditions are only grouped in the first place so we can stick
             ## them in this div wrapper, which draws a divider line between
             ## them.
-            % for conditions, condition_value_encounters \
-               in sorted(condition_encounters.items(), \
-                         key=lambda (k, v): [len(k)] + [cond.id for cond in k] ):
+            % for conditions, condition_value_encounters in h.keysort( \
+                condition_encounters, lambda k: [len(k)] + [cond.id for cond in k]):
             <div class="dex-encounter-condition-group">
 
             ## Sort in order of condition value id, too.  Pretty arbitrary, but
             ## the condition values are entirely under my control, and the
             ## order in the db is intuitive to me.
-            % for condition_values, encounters \
-               in sorted(condition_value_encounters.items(), \
-                         key=lambda (k, v): [cv.id for cv in k] ):
+            % for condition_values, encounters in h.keysort( \
+                condition_value_encounters, lambda k: [cv.id for cv in k]):
             <div class="dex-encounter-conditions">
                 % for condition_value in condition_values:
                 <div class="dex-encounter-icon">

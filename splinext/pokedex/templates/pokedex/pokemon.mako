@@ -58,7 +58,7 @@ ${h.h1('Essentials')}
 ## Boo not using <dl>  :(  But I can't get them to align horizontally with CSS2
 ## if the icon and value have no common element..
 <ul class="dex-type-list">
-    % for type, damage_factor in sorted(c.type_efficacies.items(), key=lambda x: x[0].name):
+    % for type, damage_factor in h.keysort(c.type_efficacies, lambda k: k.name):
     <li class="dex-damage-taken-${damage_factor}">
         ${h.pokedex.type_link(type)} ${h.pokedex.type_efficacy_label[damage_factor]}
     </li>
@@ -221,11 +221,9 @@ ${h.h1('Essentials')}
 
     <h2>Wild held items</h2>
     <table class="dex-pokemon-held-items striped-row-groups">
-    % for generation, version_dict in sorted(c.held_items.items(), \
-                                             key=lambda (k, v): k.id):
+    % for generation, version_dict in h.keysort(c.held_items, lambda k: k.id):
     <tbody>
-    % for versions, item_records in sorted(version_dict.items(), \
-                                          key=lambda (k, v): k[0].id):
+    % for versions, item_records in h.keysort(version_dict, lambda k: k[0].id):
     <tr class="new-version">
       % for i in range(len(item_records) or 1):
         % if i == 0:
@@ -585,21 +583,18 @@ ${h.h1('Locations')}
 
 <dl class="dex-simple-encounters">
     ## Sort versions by order, which happens to be id
-    % for version, terrain_etc in sorted(c.locations.items(), \
-                                         key=lambda (k, v): k.id):
+    % for version, terrain_etc in h.keysort(c.locations, lambda k: k.id):
     <dt>${version.name} ${h.pokedex.version_icons(version)}</dt>
     <dd>
         ## Sort terrain by name
-        % for terrain, area_condition_encounters in sorted(terrain_etc.items(), \
-                                                           key=lambda (k, v): k.id):
+        % for terrain, area_condition_encounters in h.keysort(terrain_etc, lambda k: k.id):
         <div class="dex-simple-encounters-terrain">
             ${h.pokedex.pokedex_img('encounters/' + c.encounter_terrain_icons.get(terrain.name, 'unknown.png'), \
                                     alt=terrain.name)}
             <ul>
                 ## Sort locations by name
                 % for location_area, (conditions, combined_encounter) \
-                    in sorted(area_condition_encounters.items(), \
-                              key=lambda (k, v): (k.location.name, k.name)):
+                    in h.keysort(area_condition_encounters, lambda k: (k.location.name, k.name)):
                 <li title="${combined_encounter.level} ${combined_encounter.rarity}% ${';'.join(_.name for _ in conditions)}">
                     <a href="${url(controller="dex", action="locations", name=location_area.location.name.lower())}${'#area:' + location_area.name if location_area.name else ''}">
                         ${location_area.location.name}${', ' + location_area.name if location_area.name else ''}

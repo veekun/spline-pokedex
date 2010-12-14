@@ -124,8 +124,7 @@ ${h.h1('Essentials')}
 <div class="dex-column">
     <h2>Machines</h2>
     <dl>
-    % for generation, version_numbers in sorted(c.machines.items(), \
-                                                key=lambda (k, v): k.id):
+    % for generation, version_numbers in h.keysort(c.machines, lambda k: k.id):
         <dt>${h.pokedex.generation_icon(generation)}</dt>
         <dd>
           % for version_group, machine_number in version_numbers:
