@@ -30,6 +30,7 @@
     <th>Num</th>
     % endif
     <th>Item</th>
+    <th>Effect</th>
 </tr>
 % for category in c.item_pocket.categories:
 % if category.name:
@@ -43,6 +44,7 @@
     <td>${item.berry.id}</td>
     % endif
     <td>${h.pokedex.item_link(item)}</td>
+    <td>${item.short_effect}</td>
 </tr>
 % endfor
 % endfor
