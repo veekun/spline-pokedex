@@ -51,14 +51,7 @@ def make_thingy_url(thingy, subpage=None):
                action=action,
                **args)
 
-def pokemon_sort_key(pokemon):
-    """A key to sort by base Pokémon id, then by form."""
-    if pokemon.unique_form:
-        # Forms with the same order number should fall back on sorting by name
-        return (pokemon.normal_form.id, pokemon.unique_form.order,
-                                        pokemon.unique_form.name)
-    else:
-        return (pokemon.normal_form.id,)
+pokemon_sort_key = attrgetter('order')
 
 def render_flavor_text(flavor_text, literal=False):
     """Makes flavor text suitable for HTML presentation.

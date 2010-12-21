@@ -262,11 +262,9 @@ ${h.h1('Evolution')}
 <ul class="see-also">
 <li>
     <img src="${h.static_uri('spline', 'icons/chart--arrow.png')}" alt="See also:">
-    <a href="${url(controller='dex_gadgets', action='compare_pokemon', \
-        pokemon=[pokemon.full_name for pokemon in sorted(
-            c.pokemon.evolution_chain.pokemon,
-            key=lambda pokemon: (not pokemon.is_baby,) + h.pokedex.pokemon_sort_key(pokemon)
-        )])}">Compare this family</a>
+    <a href="${url(controller='dex_gadgets', action='compare_pokemon',
+        pokemon=[pokemon.full_name for pokemon in c.pokemon.evolution_chain.pokemon]
+        )}">Compare this family</a>
 </li>
 </ul>
 

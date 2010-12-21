@@ -554,7 +554,7 @@ class PokedexController(BaseController):
                  ) \
                  .filter(tables.PokemonEggGroup.egg_group_id.in_(egg_group_ids)) \
                  .options(joinedload('unique_form')) \
-                 .order_by(tables.Pokemon.id)
+                 .order_by(tables.Pokemon.order)
             c.compatible_families = q.all()
 
         ### Wild held items
@@ -1484,7 +1484,7 @@ class PokedexController(BaseController):
             ) \
             .one()
 
-        c.pokemon = sorted(c.type.pokemon, key=pokedex_helpers.pokemon_sort_key)
+        c.pokemon = c.type.pokemon
         c.moves = sorted(c.type.moves, key=lambda move: move.name)
 
         return
@@ -1839,9 +1839,10 @@ class PokedexController(BaseController):
                 ) \
                 .subquery()
 
-            c.pokemon = db.pokedex_session.query(tables.Pokemon) \
+            query = db.pokedex_session.query(tables.Pokemon) \
                 .join((stat_subquery,
-                    stat_subquery.c.pokemon_id == tables.Pokemon.id))
+                    stat_subquery.c.pokemon_id == tables.Pokemon.id)) \
+                .order_by(tables.Pokemon.order)
 
         else:
             # More interesting.
@@ -1890,11 +1891,11 @@ class PokedexController(BaseController):
 
             # Finally, just join that mess to pokemon; INNER-ness will do all
             # the filtering
-            c.pokemon = db.pokedex_session.query(tables.Pokemon) \
+            query = db.pokedex_session.query(tables.Pokemon) \
                 .join((minmax_stat_subquery,
-                    minmax_stat_subquery.c.pokemon_id == tables.Pokemon.id))
+                    minmax_stat_subquery.c.pokemon_id == tables.Pokemon.id)) \
+                .order_by(tables.Pokemon.order)
 
-        # Order by id as per usual
-        c.pokemon = sorted(c.pokemon, key=pokedex_helpers.pokemon_sort_key)
+        c.pokemon = query.all()
 
         return render('/pokedex/nature.mako')
