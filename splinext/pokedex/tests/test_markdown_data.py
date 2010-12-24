@@ -7,7 +7,7 @@ import pylons.test
 from spline.tests import *
 
 from pokedex.db import connect, markdown
-from pokedex.db.tables import metadata
+from pokedex.db.tables import metadata, MoveEffect
 
 class TestMarkdownData(SplineTest):
 
@@ -22,6 +22,11 @@ class TestMarkdownData(SplineTest):
 
                 yield self.check_markdown_column, column
 
+        # Move effects have their own special wrappers, so they aren't actually
+        # marked as MarkdownColumns.  Explicitly test them separately
+        yield self.check_markdown_column, MoveEffect.__table__.c.short_effect
+        yield self.check_markdown_column, MoveEffect.__table__.c.effect
+
     def check_markdown_column(self, column):
         """Implementation for the above"""
         # Well this is a bit roundabout
@@ -32,6 +37,10 @@ class TestMarkdownData(SplineTest):
         columns = (column,) + tuple(table.primary_key.columns)
         for data in session.query(*columns).all():
             mdtext = data[0]
+            if not isinstance(column.type, markdown.MarkdownColumn):
+                # For move effect columns
+                mdtext = markdown.MarkdownString(mdtext)
+
             key = "{0} / {1}".format(table.name, data[1:])
 
             # Test 1: HTML conversion shouldn't crash!
