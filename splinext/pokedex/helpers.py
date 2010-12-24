@@ -412,6 +412,9 @@ def evolution_description(evolution):
     if evolution.party_pokemon_id:
         chunks.append(u"with {0} in the party".format(
             evolution.party_pokemon.name))
+    if evolution.trade_pokemon_id:
+        chunks.append(u"in exchange for {0}"
+            .format(evolution.trade_pokemon.name))
 
     return u', '.join(chunks)
 
