@@ -1,7 +1,6 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="/lib.mako"/>
 <%namespace name="dexlib" file="lib.mako"/>
-<%! import re %>\
 
 <%def name="title()">${c.move.name} - Moves</%def>
 
@@ -356,7 +355,7 @@ ${h.h1(u'Pokémon', id='pokemon')}
 ## HEADERS
 <tbody>
 <%
-    method_id = "pokemon:" + re.sub("\W+", "-", method.name.lower())
+    method_id = "pokemon:" + h.sanitize_id(method.name)
 %>\
     <tr class="header-row" id="${method_id}">
         % for column in columns:

@@ -175,7 +175,7 @@ ${h.h1('Moves')}
 ${move_table_header()}
 <tbody>
     % for method, move_pokemons in h.keysort(c.moves, lambda k: k.id):
-    ${subheader_row(method.name, 'moves:' + h.pokedex.filename_from_name(method.name))}
+    ${subheader_row(method.name, 'moves:' + h.sanitize_id(method.name))}
     % for move, pokemons in h.keysort(move_pokemons, lambda k: k.name):
     <tr>
         <th><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></th>

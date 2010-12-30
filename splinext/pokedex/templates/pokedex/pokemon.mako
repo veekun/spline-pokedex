@@ -632,7 +632,7 @@ ${h.h1('Moves')}
 ## HEADERS
 <tbody>
 <%
-    method_id = "moves:" + re.sub('\W+', '-', method.name.lower())
+    method_id = "moves:" + h.sanitize_id(method.name)
 %>\
     <tr class="header-row" id="${method_id}">
         % for column in columns:
