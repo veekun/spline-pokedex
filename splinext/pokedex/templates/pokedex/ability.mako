@@ -51,7 +51,7 @@ ${h.h1('History')}
 <dl>
     % for change in c.ability.changelog:
     <dt>Before ${h.pokedex.version_icons(*change.changed_in.versions)}</dt>
-    <dd>${change.effect.as_html | n}</dd>
+    <dd class="markdown">${change.effect.as_html | n}</dd>
     % endfor
 </dl>
 % endif
