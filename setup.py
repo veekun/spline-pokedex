@@ -22,5 +22,5 @@ setup(
     message_extractors = {'splinext': [
         ('**.py', 'spline-python', None),
         ('*/templates/**.mako', 'spline-mako', {'input_encoding': 'utf-8'}),
-        ('*/public/**', 'ignore', None)]},
+        ('*/content/**.html', 'spline-mako', {'input_encoding': 'utf-8'})]},
 )

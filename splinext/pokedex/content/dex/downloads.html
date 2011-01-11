@@ -1,243 +1,273 @@
 <%inherit file="/base.mako" />
+<%! from splinext.pokedex import i18n %>\
 
-<%def name="title()">Downloads - Pokédex</%def>
+<%def name="title()">${_(u"Downloads - Pokédex")}</%def>
 
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
-    <li><a href="${url('/dex')}">Pokédex</a></li>
+    <li><a href="${url('/' + _('dex'))}">${_(u"Pokédex")}</a></li>
     <li>Downloads</li>
 </ul>
 </%def>
 
+<%def name="dl_link(path, text=None)">
+<a href="${h.static_uri('pokedex', path)}">
+%if text:
+${text}
+%else:
+${caller.body()}
+%endif
+(${h.pokedex.download_filesize(path)})\
+</a>\
+</%def>
 
-<p>You can use anything on this page however you want.  Nintendo made these, not me, so I don't claim to own them in any way.  If you want to credit me for collecting or ripping them, that's cool; if not, that's cool too.  Enjoy.</p>
+
+<p>${_(u"""You can use anything on this page however you want.
+Nintendo made these, not me, so I don't claim to own them in any way.
+If you want to credit me for collecting or ripping them, that's cool;
+if not, that's cool too.  Enjoy.""")}</p>
 
 ## TODO: It would be a good idea to stick these sizes in dynamically.
-${h.h1('Sprite packs')}
-<p>These are tarballs of all the sprites from each generation.  If your zip program can't open them, try <a href="http://www.7-zip.org/">7-zip</a>.</p>
+${h.h1(_('Sprite packs'))}
+<p>${_(u"""These are tarballs of all the sprites from each generation.
+If your zip program can't open them, try
+<a href="http://www.7-zip.org/">7-zip</a>.""") | n}</p>
 
-${h.h2(u'Main Pokémon sprites')}
+${h.h2(_(u'Main Pokémon sprites'))}
 <ul class="classic-list">
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/generation-1.tar.gz')}">Generation I (700KB)</a>
-        &mdash; all sprites from Green, Red, Blue, and Yellow
+        ${dl_link('downloads/generation-1.tar.gz', _(u"Generation I"))}
+        ${_(u"— all sprites from Green, Red, Blue, and Yellow")}
     </li>
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/generation-2.tar.gz')}">Generation II (2.3MB)</a>
-        &mdash; all sprites from Gold, Silver, and Crystal (including animations)
+        ${dl_link('downloads/generation-2.tar.gz', _(u"Generation II"))}
+        ${_(u"— all sprites from Gold, Silver, and Crystal (including animations)")}
     </li>
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/generation-3.tar.gz')}">Generation III (9.4MB)</a>
-        &mdash; all sprites from Ruby, Sapphire, Emerald (including animations), FireRed, and LeafGreen
+        ${dl_link('downloads/generation-3.tar.gz', _(u"Generation III"))}
+        ${_(u"— all sprites from Ruby, Sapphire, Emerald (including animations), FireRed, and LeafGreen")}
     </li>
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/generation-4.tar.gz')}">Generation IV (14MB)</a>
-        &mdash; all sprites from Diamond, Pearl, Platinum, HeartGold, and SoulSilver
+        ${dl_link('downloads/generation-4.tar.gz', _(u"Generation IV"))}
+        ${_(u"— all sprites from Diamond, Pearl, Platinum, HeartGold, and SoulSilver")}
     </li>
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/generation-5.tar.gz')}">Generation V (2.4MB)</a>
-        &mdash; all sprites from Black and White
+        ${dl_link('downloads/generation-5.tar.gz', _(u"Generation V"))}
+        ${_(u"— all sprites from Black and White")}
     </li>
 </ul>
 
-${h.h2('Others')}
+${h.h2(_('Others'))}
 <ul class="classic-list">
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/pokemon-icons.tar.gz')}">Pokémon icons (242KB)</a>
-        &mdash; sprites used in the Pokémon screen (no animations)
+        ${dl_link('downloads/pokemon-icons.tar.gz', _(u"Pokémon icons"))}
+        ${_(u"— sprites used in the Pokémon screen (no animations)")}
     </li>
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/overworld.tar.gz')}">Overworld (3.7MB)</a>
-        &mdash; overworld Pokémon sprites from HeartGold/SoulSilver, plus a few overworld trainers
+        ${dl_link('downloads/overworld.tar.gz', _(u"Overworld"))}
+        ${_(u"— overworld Pokémon sprites from HeartGold/SoulSilver, plus a few overworld trainers")}
     </li>
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/pokemon-footprints.tar.gz')}">Footprints (35KB)</a>
+        ${dl_link('downloads/pokemon-footprints.tar.gz', _(u"Footprints"))}
     </li>
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/pokemon-trozei.tar.gz')}">Trozei sprites (249KB)</a>
-        &mdash; sprite for each Pokémon from Pokémon Trozei
+        ${dl_link('downloads/pokemon-trozei.tar.gz', _(u"Trozei sprites"))}
+        ${_(u"— sprite for each Pokémon from Pokémon Trozei")}
     </li>
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/items.tar.gz')}">Items (175KB)</a>
-        &mdash; includes large sprites from Berry Tags and the Sinnoh Underground
+        ${dl_link('downloads/items.tar.gz', _(u"Items"))}
+        ${_(u"— includes large sprites from Berry Tags and the Sinnoh Underground")}
     </li>
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/chrome.tar.gz')}">Chrome (39KB)</a>
-        &mdash; sprites for types, contest types, habitats, shiny leaves, ribbons, et al.
+        ${dl_link('downloads/chrome.tar.gz', _(u"Chrome"))}
+        ${_(u"— sprites for types, contest types, habitats, shiny leaves, ribbons, et al.")}
     </li>
 </ul>
 
-${h.h1('Main sprite montages')}
-<p>Every Pokémon combined into a single large image by the <a href="http://www.imagemagick.org/script/montage.php"><code>montage</code></a> program.</p>
+${h.h1(_('Main sprite montages'))}
+<p>${_(u'Every Pokémon combined into a single large image by the <a href="http://www.imagemagick.org/script/montage.php"><code>montage</code></a> program.') | n}</p>
 <dl>
     <dt>${h.pokedex.version_icons(u'赤い', u'緑')}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/red-green.png')}">Game Boy (60KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/red-green-sgb.png')}">Super Game Boy (79KB)</a>
+        ${dl_link('downloads/red-green.png', _(u"Game Boy"))};
+        ${dl_link('downloads/red-green-sgb.png', _(u"Super Game Boy"))}
     </dd>
     <dt>${h.pokedex.version_icons(u'Red', u'Blue')}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/red-blue.png')}">Game Boy (58KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/red-blue-sgb.png')}">Super Game Boy (77KB)</a>
+        ${dl_link('downloads/red-blue.png', _(u"Game Boy"))};
+        ${dl_link('downloads/red-blue-sgb.png', _(u"Game Boy"))}
     </li>
     <dt>${h.pokedex.version_icons(u'Yellow')}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/yellow.png')}">Game Boy (57KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/yellow-sgb.png')}">Super Game Boy (76KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/yellow-gbc.png')}">Game Boy Color (76KB)</a>
+        ${dl_link('downloads/yellow.png', _(u"Game Boy"))};
+        ${dl_link('downloads/yellow-sgb.png', _(u"Super Game Boy"))};
+        ${dl_link('downloads/yellow-gbc.png', _(u"Game Boy Color"))}
     </dd>
     <dt>${h.pokedex.generation_icon(1)} back</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/generation-1-back.png')}">Game Boy (19KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/red-green-blue-back-sgb.png')}">
+        ${dl_link('downloads/generation-1-back.png', _(u"Game Boy"))};
+        <%self:dl_link path="downloads/red-green-blue-back-sgb.png">
             ${h.pokedex.version_icons(u'赤い', u'緑', u'Red', u'Blue')}
-            Super Game Boy (26KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/yellow-back-sgb.png')}">
+            ${_(u"Super Game Boy")}
+        </%self:dl_link>;
+        <%self:dl_link path="downloads/yellow-back-sgb.png">
             ${h.pokedex.version_icons(u'Yellow')}
-            Super Game Boy (26KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/yellow-back-gbc.png')}">
+            ${_(u"Super Game Boy")}
+        </%self:dl_link>;
+        <%self:dl_link path="downloads/yellow-back-gbc.png">
             ${h.pokedex.version_icons(u'Yellow')}
-            Game Boy Color (26KB)</a>
+            ${_(u"Game Boy Color")}
+        </%self:dl_link>
     </dd>
 </dl>
 <hr>
 <dl>
     <dt>${h.pokedex.version_icons(u'Gold')}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/gold.png')}">normal (154KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/gold-shiny.png')}">shiny (155KB)</a>
+        ${dl_link('downloads/gold.png', _(u"normal"))};
+        ${dl_link('downloads/gold-shiny.png', _(u"shiny"))}
     </dd>
     <dt>${h.pokedex.version_icons(u'Silver')}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/silver.png')}">normal (155KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/silver-shiny.png')}">shiny (156KB)</a>
+        ${dl_link('downloads/silver.png', _(u"normal"))};
+        ${dl_link('downloads/silver-shiny.png', _(u"shiny"))}
     </dd>
     <dt>${h.pokedex.version_icons(u'Crystal')}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/crystal.png')}">normal (155KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/crystal-shiny.png')}">shiny (156KB)</a>
+        ${dl_link('downloads/crystal.png', _(u"normal"))};
+        ${dl_link('downloads/crystal-shiny.png', _(u"shiny"))}
     </dd>
-    <dt>${h.pokedex.version_icons(u'Gold', u'Silver')} back</dt>
+    <dt>${_("%s back") % h.pokedex.version_icons(u'Gold', u'Silver') | n}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/gold-silver-back.png')}">normal (116KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/gold-silver-back-shiny.png')}">shiny (117KB)</a>
+        ${dl_link('downloads/gold-silver-back.png', _(u"normal"))};
+        ${dl_link('downloads/gold-silver-back-shiny.png', _(u"shiny"))}
     </dd>
-    <dt>${h.pokedex.version_icons(u'Crystal')} back</dt>
+    <dt>${_("%s back") % h.pokedex.version_icons(u'Crystal') | n}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/crystal-back.png')}">normal (116KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/crystal-back-shiny.png')}">shiny (117KB)</a>
+        ${dl_link('downloads/crystal-back.png', _(u"normal"))};
+        ${dl_link('downloads/crystal-back-shiny.png', _(u"shiny"))}
     </dd>
 </dl>
 <hr>
 <dl>
     <dt>${h.pokedex.generation_icon(3)}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/generation-3.png')}">normal (363KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/generation-3-shiny.png')}">shiny (366KB)</a>
+        ${dl_link('downloads/generation-3.png', _(u"normal"))};
+        ${dl_link('downloads/generation-3-shiny.png', _(u"shiny"))}
     </dd>
     <dt>${h.pokedex.version_icons(u'Emerald')}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/emerald-frame2.png')}">frame 2 (356KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/emerald-frame2-shiny.png')}">frame 2 shiny (358KB)</a>
+        ${dl_link('downloads/emerald-frame2.png', _(u"frame 2"))};
+        ${dl_link('downloads/emerald-frame2-shiny.png', _(u"frame 2 shiny"))}
     </dd>
     <dt>${h.pokedex.version_icons(u'FireRed', u'LeafGreen')}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/firered-leafgreen.png')}">
-            ${h.pokedex.generation_icon(1)} normal (144KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/firered-leafgreen-shiny.png')}">
-            ${h.pokedex.generation_icon(1)} shiny (143KB)</a>
+        <%self:dl_link path="downloads/firered-leafgreen.png">
+            ${h.pokedex.generation_icon(1)} normal
+        </%self:dl_link>;
+        <%self:dl_link path="downloads/firered-leafgreen-shiny.png">
+            ${h.pokedex.generation_icon(1)} shiny
+        </%self:dl_link>
     </dd>
-    <dt>${h.pokedex.generation_icon(3)} back</dt>
+    <dt>${_("%s back") % h.pokedex.generation_icon(3) | n}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/generation-3-back.png')}">normal (297KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/generation-3-back-shiny.png')}">shiny (299KB)</a>
+        ${dl_link('downloads/generation-3-back.png', _(u"normal"))};
+        ${dl_link('downloads/generation-3-back-shiny.png', _(u"shiny"))}
     </dd>
-    <dt>${h.pokedex.version_icons(u'FireRed', u'LeafGreen')} back</dt>
+    <dt>${_("%s back") % h.pokedex.version_icons(u'FireRed', u'LeafGreen') | n}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/firered-leafgreen-back.png')}">
-            ${h.pokedex.generation_icon(1)} normal (118KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/firered-leafgreen-back-shiny.png')}">
-            ${h.pokedex.generation_icon(1)} shiny (118KB)</a>
+        <%self:dl_link path="downloads/firered-leafgreen-back.png">
+            ${h.pokedex.generation_icon(1)} normal
+        </%self:dl_link>;
+        <%self:dl_link path="downloads/firered-leafgreen-back-shiny.png">
+            ${h.pokedex.generation_icon(1)} shiny
+        </%self:dl_link>
     </dd>
 </dl>
 <hr>
 <dl>
     <dt>${h.pokedex.version_icons(u'Diamond', u'Pearl')}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl.png')}">normal (537KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl-shiny.png')}">shiny (537KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl-frame2.png')}">frame 2 (524KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl-shiny-frame2.png')}">shiny frame 2 (524KB)</a>
+        ${dl_link('downloads/diamond-pearl.png', _(u"normal"))};
+        ${dl_link('downloads/diamond-pearl-shiny.png', _(u"shiny"))};
+        ${dl_link('downloads/diamond-pearl-frame2.png', _(u"frame 2"))};
+        ${dl_link('downloads/diamond-pearl-shiny-frame2.png', _(u"shiny frame 2"))}
     </dd>
     <dt>${h.pokedex.version_icons(u'Platinum')}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/platinum.png')}">normal (535KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/platinum-shiny.png')}">shiny (535KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/platinum-frame2.png')}">frame 2 (523KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/platinum-shiny-frame2.png')}">shiny frame 2 (524KB)</a>
+        ${dl_link('downloads/platinum.png', _(u"normal"))};
+        ${dl_link('downloads/platinum-shiny.png', _(u"shiny"))};
+        ${dl_link('downloads/platinum-frame2.png', _(u"frame 2"))};
+        ${dl_link('downloads/platinum-shiny-frame2.png', _(u"shiny frame 2"))}
     </dd>
     <dt>${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver.png')}">normal (531KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-shiny.png')}">shiny (531KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-frame2.png')}">frame 2 (518KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-shiny-frame2.png')}">shiny frame 2 (518KB)</a>
+        ${dl_link('downloads/heartgold-soulsilver.png', _(u"normal"))};
+        ${dl_link('downloads/heartgold-soulsilver-shiny.png', _(u"shiny"))};
+        ${dl_link('downloads/heartgold-soulsilver-frame2.png', _(u"frame 2"))};
+        ${dl_link('downloads/heartgold-soulsilver-shiny-frame2.png', _(u"shiny frame 2"))}
     </dd>
-    <dt>${h.pokedex.version_icons(u'Diamond', u'Pearl')} back</dt>
+    <dt>${_("%s back") % h.pokedex.version_icons(u'Diamond', u'Pearl') | n}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl-back.png')}">normal (495KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl-back-shiny.png')}">shiny (496KB)</a>
+        ${dl_link('downloads/diamond-pearl-back.png', _(u"normal"))};
+        ${dl_link('downloads/diamond-pearl-back-shiny.png', _(u"shiny"))}
     </dd>
-    <dt>${h.pokedex.version_icons(u'Platinum')} back</dt>
+    <dt>${_("%s back") % h.pokedex.version_icons(u'Platinum') | n}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/platinum-back.png')}">normal (495KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/platinum-back-shiny.png')}">shiny (496KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/platinum-back-frame2.png')}">frame 2 (496KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/platinum-back-shiny-frame2.png')}">shiny frame 2 (497KB)</a>
+        ${dl_link('downloads/platinum-back.png', _(u"normal"))};
+        ${dl_link('downloads/platinum-back-shiny.png', _(u"shiny"))};
+        ${dl_link('downloads/platinum-back-frame2.png', _(u"frame 2"))};
+        ${dl_link('downloads/platinum-back-shiny-frame2.png', _(u"shiny frame 2"))}
     </dd>
-    <dt>${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')} back</dt>
+    <dt>${_("%s back") % h.pokedex.version_icons(u'HeartGold', u'SoulSilver') | n}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-back.png')}">normal (496KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-back-shiny.png')}">shiny (496KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-back-frame2.png')}">frame 2 (500KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-back-shiny-frame2.png')}">shiny frame 2 (500KB)</a>
+        ${dl_link('downloads/heartgold-soulsilver-back.png', _(u"normal"))};
+        ${dl_link('downloads/heartgold-soulsilver-back-shiny.png', _(u"shiny"))};
+        ${dl_link('downloads/heartgold-soulsilver-back-frame2.png', _(u"frame 2"))};
+        ${dl_link('downloads/heartgold-soulsilver-back-shiny-frame2.png', _(u"shiny frame 2"))}
     </dd>
-    <dt>${h.pokedex.generation_icon(4)} ♂ vs ♀</dt>
+    <dt>${_(u"%s ♂ vs ♀") % h.pokedex.generation_icon(4) | n}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl-female-diff.png')}">
-            ${h.pokedex.version_icons(u'Diamond', u'Pearl')} front (606KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/platinum-female-diff.png')}">
-            ${h.pokedex.version_icons(u'Platinum')} front (602KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-female-diff.png')}">
-            ${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')} front (597KB)</a>
-        <br>
-        <a href="${h.static_uri('pokedex', 'downloads/diamond-pearl-back-female-diff.png')}">
-            ${h.pokedex.version_icons(u'Diamond', u'Pearl')} back (565KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/platinum-back-female-diff.png')}">
-            ${h.pokedex.version_icons(u'Platinum')} back (561KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/heartgold-soulsilver-back-female-diff.png')}">
-            ${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')} back (561KB)</a>
+        <%self:dl_link path="downloads/diamond-pearl-female-diff.png">
+            ${_("%s front") % h.pokedex.version_icons(u'Diamond', u'Pearl') | n}
+        </%self:dl_link>;
+        <%self:dl_link path="downloads/platinum-female-diff.png">
+            ${_("%s front") % h.pokedex.version_icons(u'Platinum') | n}
+        </%self:dl_link>;
+        <%self:dl_link path="downloads/heartgold-soulsilver-female-diff.png">
+            ${_("%s front") % h.pokedex.version_icons(u'HeartGold', u'SoulSilver') | n}
+        </%self:dl_link>;
+        <%self:dl_link path="downloads/diamond-pearl-back-female-diff.png">
+            ${_("%s back") % h.pokedex.version_icons(u'Diamond', u'Pearl') | n}
+        </%self:dl_link>;
+        <%self:dl_link path="downloads/platinum-back-female-diff.png">
+            ${_("%s back") % h.pokedex.version_icons(u'Platinum') | n}
+        </%self:dl_link>;
+        <%self:dl_link path="downloads/heartgold-soulsilver-back-female-diff.png">
+            ${_("%s back") % h.pokedex.version_icons(u'HeartGold', u'SoulSilver') | n}
+        </%self:dl_link>
     </dd>
 </dl>
 <hr>
 <dl>
     <dt>${h.pokedex.version_icons(u'Black', u'White')}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/black-white.png')}">normal (749KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/black-white-shiny.png')}">shiny (750KB)</a>;
+        ${dl_link('downloads/black-white.png', _(u"normal"))};
+        ${dl_link('downloads/black-white-shiny.png', _(u"shiny"))};
     </dd>
-    <dt>${h.pokedex.version_icons(u'Black', u'White')} back</dt>
+    <dt>${_("%s back") % h.pokedex.version_icons(u'Black', u'White') | n}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/black-white-back.png')}">normal (652KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/black-white-back-shiny.png')}">shiny (653KB)</a>
+        ${dl_link('downloads/black-white-back.png', _(u"normal"))};
+        ${dl_link('downloads/black-white-back-shiny.png', _(u"shiny"))};
     </dd>
-    <dt>${h.pokedex.generation_icon(5)} ♂ vs ♀</dt>
+    <dt>${_(u"%s ♂ vs ♀") % h.pokedex.generation_icon(5) | n}</dt>
     <dd>
-        <a href="${h.static_uri('pokedex', 'downloads/black-white-female-diff.png')}">
-            ${h.pokedex.version_icons(u'Black', u'White')} front (869KB)</a>
-        <br>
-        <a href="${h.static_uri('pokedex', 'downloads/black-white-back-female-diff.png')}">
-            ${h.pokedex.version_icons(u'Black', u'White')} back (755KB)</a>
+        <%self:dl_link path="downloads/black-white-female-diff.png">
+            ${_("%s front") % h.pokedex.version_icons(u'Black', u'White') | n}
+        </%self:dl_link>;
+        <%self:dl_link path="downloads/black-white-back-female-diff.png">
+            ${_("%s back") % h.pokedex.version_icons(u'Black', u'White') | n}
+        </%self:dl_link>
     </dd>
 </dl>
 
@@ -245,41 +275,35 @@ ${h.h1('Other montages')}
 <ul class="classic-list">
     <li>
         ${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')} overworld:
-        <a href="${h.static_uri('pokedex', 'downloads/overworld-down.png')}">
-            facing forwards (169KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/overworld-right.png')}">
-            facing right (156KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/overworld-up.png')}">
-            facing backwards (152KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/overworld-down-shiny.png')}">
-            shiny forwards (170KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/overworld-right-shiny.png')}">
-            shiny right (157KB)</a>;
-        <a href="${h.static_uri('pokedex', 'downloads/overworld-up-shiny.png')}">
-            shiny backwards (153KB)</a>
+        ${dl_link('downloads/overworld-down.png', _(u"facing forwards"))};
+        ${dl_link('downloads/overworld-right.png', _(u"facing right"))};
+        ${dl_link('downloads/overworld-up.png', _(u"facing backwards"))};
+        ${dl_link('downloads/overworld-down-shiny.png', _(u"shiny forwards"))};
+        ${dl_link('downloads/overworld-right-shiny.png', _(u"shiny right"))};
+        ${dl_link('downloads/overworld-up-shiny.png', _(u"shiny backwards"))}
     </li>
-    <li><a href="${h.static_uri('pokedex', 'downloads/footprints.png')}">Pokémon footprints (11KB)</a></li>
-    <li><a href="${h.static_uri('pokedex', 'downloads/sugimori.png')}">Pokémon sugimori art, shrunk down (11MB)</a></li>
-    <li><a href="${h.static_uri('pokedex', 'downloads/items.png')}">items (249KB)</a></li>
-    <li><a href="${h.static_uri('pokedex', 'downloads/berries.png')}">berries (47KB)</a></li>
+    <li>${dl_link('downloads/footprints.png', _(u"Pokémon footprints"))}</li>
+    <li>${dl_link('downloads/sugimori.png', _(u"Pokémon sugimori art, shrunk down"))}</li>
+    <li>${dl_link('downloads/items.png', _(u"Items"))}</li>
+    <li>${dl_link('downloads/berries.png', _(u"Berries"))}</li>
 </ul>
 
 ${h.h1('Other files')}
 <ul class="classic-list">
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/pokemon-cries.tar.gz')}">Pokémon cries (3.1MB)</a>
-        &mdash; encoded as Ogg Vorbis quality 3
+        ${dl_link('downloads/pokemon-cries.tar.gz', _(u"Pokémon cries"))}
+        ${_(u"— encoded as Ogg Vorbis quality 3")}
     </li>
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/pokemon-sugimori.tar.gz')}">Sugimori art (25MB)</a>
-        &mdash; official art for every Pokémon
+        ${dl_link('downloads/pokemon-sugimori.tar.gz', _(u"Sugimori art"))}
+        ${_(u"— official art for every Pokémon")}
     </li>
     <li>
-        <a href="${h.static_uri('pokedex', 'downloads/veekun-pokedex.sqlite.gz')}">Full database as gzipped SQLite (7.0MB)</a>.
-        But see <a href="http://bugs.veekun.com/projects/pokedex/wiki/GettingData">the documentation</a> for other databases or real instructions.
+        ${dl_link('downloads/veekun-pokedex.sqlite.gz', _(u"Full database as gzipped SQLite"))}
+        ${_(u'But see <a href="http://bugs.veekun.com/projects/pokedex/wiki/GettingData">the documentation</a> for other databases or real instructions.') | n}
     </li>
     <li>
-        <a href="http://git.veekun.com/">Source code for everything</a>;
-        use "snapshot" links or <a href="http://bugs.veekun.com/projects/veekun/wiki/Documentation">the real way</a>
+        <a href="http://git.veekun.com/">${_(u"Source code for everything")}</a>;
+        ${_(u'use "snapshot" links or <a href="http://bugs.veekun.com/projects/veekun/wiki/Documentation">the real way</a>') | n}
     </li>
 </ul>

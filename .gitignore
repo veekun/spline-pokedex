@@ -6,3 +6,4 @@
 /data
 /migration.py
 /splinext/pokedex/i18n/*/LC_MESSAGES/spline-pokedex.mo
+splinext/pokedex/public/downloads/*
