@@ -109,7 +109,7 @@ class TestMoveSearchController(TestController):
         u"""Checks type searching."""
         self.check_search(
             dict(type=u'Dragon'),
-            [ u'double chop', u'Draco Meteor', u'DragonBreath', u'Dragon Claw',
+            [ u'Dual Chop', u'Draco Meteor', u'DragonBreath', u'Dragon Claw',
               u'Dragon Dance', u'Dragon Pulse', u'Dragon Rage', u'Dragon Rush',
               u'dragon tail', u'Outrage', u'Roar of Time', u'Spacial Rend',
               u'Twister',
