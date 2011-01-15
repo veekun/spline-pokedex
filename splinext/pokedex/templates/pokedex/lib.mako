@@ -296,3 +296,11 @@ cry_url = url(controller='dex', action='media', path=h.pokedex.pokemon_media_pat
     <a href="${cry_url}">Download</a>
 </audio>
 </%def>
+
+<%def name="subtle_search(**kwargs)">
+    <% _ = kwargs.pop('_', unicode) %>
+    <a href="${url(controller='dex_search', **kwargs)}"
+        class="dex-subtle-search-link">
+        <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="${_('Search: ')}" title="${_('Search')}">
+    </a>
+</%def>
