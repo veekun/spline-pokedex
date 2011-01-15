@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 
 import os.path
+import re
 
 import pokedex.db
 from pokedex.db import tables
@@ -46,8 +47,14 @@ def get_by_name_query(table, name):
     Don't use this for Pokémon!  Use `pokemon_query()`, as it knows about
     forms.
     """
-    q = pokedex_session.query(table).filter(func.lower(table.name)
-                                            == name.lower())
+    # XXX: Use the name, not identifier
+
+    name = name.lower()
+    name = re.sub(u'[ _]+', u'-', name)
+    name = re.sub(u'[\'.]', u'', name)
+
+    q = pokedex_session.query(table).filter(func.lower(table.identifier)
+                                            == name)
 
     return q
 
@@ -55,8 +62,9 @@ def pokemon_query(name, form=None):
     """Returns a query that will look for the named Pokémon."""
 
     # Force case-insensitive matching the heavy-handed way
+    # XXX: Use the name, not identifier
     q = pokedex_session.query(tables.Pokemon) \
-                       .filter(func.lower(tables.Pokemon.name) == name.lower())
+                       .filter(func.lower(tables.Pokemon.identifier) == name.lower())
 
     if form:
         # If a form has been specified, it must match

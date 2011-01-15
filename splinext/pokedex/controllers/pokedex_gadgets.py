@@ -156,7 +156,8 @@ class ChainBreedingForm(Form):
 class StatCalculatorForm(Form):
     pokemon = PokedexLookupField(u'Pokémon', valid_type='pokemon')
     nature = QuerySelectField('Nature',
-        query_factory=lambda: db.pokedex_session.query(tables.Nature).order_by(tables.Nature.name),
+        # XXX: Use name, not identifier
+        query_factory=lambda: db.pokedex_session.query(tables.Nature).order_by(tables.Nature.identifier),
         get_pk=lambda _: _.name.lower(),
         get_label=lambda _: _.name,
         allow_blank=True,

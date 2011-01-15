@@ -1239,32 +1239,34 @@ class PokedexController(BaseController):
         else:
             shadowness = tables.Move.type_id != 10002
 
+        # XXX: Use name, not identifier
+
         # Find the move that comes right before this one alphabetically
         c.prev_move = db.pokedex_session.query(tables.Move) \
             .filter(shadowness) \
-            .filter(tables.Move.name < c.move.name) \
-            .order_by(tables.Move.name.desc()) \
+            .filter(tables.Move.identifier < c.move.identifier) \
+            .order_by(tables.Move.identifier.desc()) \
             .first()
 
         if c.prev_move is None:
             # No move comes before this one alphabetically; wrap to the last
             c.prev_move = db.pokedex_session.query(tables.Move) \
                 .filter(shadowness) \
-                .order_by(tables.Move.name.desc()) \
+                .order_by(tables.Move.identifier.desc()) \
                 .first()
 
         # Find the next move alphabetically
         c.next_move = db.pokedex_session.query(tables.Move) \
             .filter(shadowness) \
-            .filter(tables.Move.name > c.move.name) \
-            .order_by(tables.Move.name.asc()) \
+            .filter(tables.Move.identifier > c.move.identifier) \
+            .order_by(tables.Move.identifier.asc()) \
             .first()
 
         if c.next_move is None:
             # There is no next move; wrap to the first
             c.next_move = db.pokedex_session.query(tables.Move) \
                 .filter(shadowness) \
-                .order_by(tables.Move.name.asc()) \
+                .order_by(tables.Move.identifier.asc()) \
                 .first()
 
         return self.cache_content(
@@ -1300,7 +1302,7 @@ class PokedexController(BaseController):
 
         # Used for item linkage
         c.pp_up = db.pokedex_session.query(tables.Item) \
-            .filter_by(name=u'PP Up').one()
+            .filter_by(identifier=u'pp-up').one()
 
         ### Power percentile
         if c.move.power in (0, 1):
@@ -1454,8 +1456,9 @@ class PokedexController(BaseController):
 
 
     def types_list(self):
+        # XXX: Use the name, not identifier
         c.types = db.pokedex_session.query(tables.Type) \
-            .order_by(tables.Type.name) \
+            .order_by(tables.Type.identifier) \
             .filter(tables.Type.damage_efficacies.any()) \
             .options(eagerload('damage_efficacies')) \
             .all()
@@ -1516,27 +1519,28 @@ class PokedexController(BaseController):
 
         ### Prev/next for header
         # Find the type that comes right before this one alphabetically
+        # XXX: Use the name, not identifier
         c.prev_type = db.pokedex_session.query(tables.Type) \
-            .filter(tables.Type.name < c.type.name) \
-            .order_by(tables.Type.name.desc()) \
+            .filter(tables.Type.identifier < c.type.identifier) \
+            .order_by(tables.Type.identifier.desc()) \
             .first()
 
         if c.prev_type is None:
             # No type comes before this one alphabetically; wrap to the last
             c.prev_type = db.pokedex_session.query(tables.Type) \
-                .order_by(tables.Type.name.desc()) \
+                .order_by(tables.Type.identifier.desc()) \
                 .first()
 
         # Find the next type alphabetically
         c.next_type = db.pokedex_session.query(tables.Type) \
-            .filter(tables.Type.name > c.type.name) \
-            .order_by(tables.Type.name.asc()) \
+            .filter(tables.Type.identifier > c.type.identifier) \
+            .order_by(tables.Type.identifier.asc()) \
             .first()
 
         if c.next_type is None:
             # There is no next type; wrap to the first
             c.next_type = db.pokedex_session.query(tables.Type) \
-                .order_by(tables.Type.name.asc()) \
+                .order_by(tables.Type.identifier.asc()) \
                 .first()
 
         return self.cache_content(
@@ -1574,8 +1578,9 @@ class PokedexController(BaseController):
         return
 
     def abilities_list(sef):
+        # XXX: Use name, not identifier
         c.abilities = db.pokedex_session.query(tables.Ability) \
-            .order_by(tables.Ability.generation_id, tables.Ability.name) \
+            .order_by(tables.Ability.generation_id, tables.Ability.identifier) \
             .all()
         return render('/pokedex/ability_list.mako')
 
@@ -1588,26 +1593,26 @@ class PokedexController(BaseController):
         ### Prev/next for header
         # Find the ability that comes right before this one alphabetically
         c.prev_ability = db.pokedex_session.query(tables.Ability) \
-            .filter(tables.Ability.name < c.ability.name) \
-            .order_by(tables.Ability.name.desc()) \
+            .filter(tables.Ability.identifier < c.ability.identifier) \
+            .order_by(tables.Ability.identifier.desc()) \
             .first()
 
         if c.prev_ability is None:
             # No ability comes before this one alphabetically; wrap to the last
             c.prev_ability = db.pokedex_session.query(tables.Ability) \
-                .order_by(tables.Ability.name.desc()) \
+                .order_by(tables.Ability.identifier.desc()) \
                 .first()
 
         # Find the next ability alphabetically
         c.next_ability = db.pokedex_session.query(tables.Ability) \
-            .filter(tables.Ability.name > c.ability.name) \
-            .order_by(tables.Ability.name.asc()) \
+            .filter(tables.Ability.identifier > c.ability.identifier) \
+            .order_by(tables.Ability.identifier.asc()) \
             .first()
 
         if c.next_ability is None:
             # There is no next ability; wrap to the first
             c.next_ability = db.pokedex_session.query(tables.Ability) \
-                .order_by(tables.Ability.name.asc()) \
+                .order_by(tables.Ability.identifier.asc()) \
                 .first()
 
         return self.cache_content(
@@ -1717,9 +1722,9 @@ class PokedexController(BaseController):
 
         # These are used for their item linkage
         c.growth_mulch = db.pokedex_session.query(tables.Item) \
-            .filter_by(name=u'Growth Mulch').one()
+            .filter_by(identifier=u'growth-mulch').one()
         c.damp_mulch = db.pokedex_session.query(tables.Item) \
-            .filter_by(name=u'Damp Mulch').one()
+            .filter_by(identifier=u'damp-mulch').one()
 
         # Pokémon that can hold this item are per version; break this up into a
         # two-dimensional structure of pokemon => version => rarity
@@ -1885,7 +1890,8 @@ class PokedexController(BaseController):
                 tables.Nature.decreased_stat_id.asc(),
             )
         else:
-            c.natures = c.natures.order_by(tables.Nature.name.asc())
+            # XXX: Use name, not identifier
+            c.natures = c.natures.order_by(tables.Nature.identifier.asc())
 
         return render('/pokedex/nature_list.mako')
 
@@ -1922,7 +1928,7 @@ class PokedexController(BaseController):
         # The useful thing here is that this cannot be done in the Pokémon
         # search, as it requires comparing a Pokémon's stats to themselves.
         # Also, HP doesn't count.  Durp.
-        hp = db.pokedex_session.query(tables.Stat).filter_by(name=u'HP').one()
+        hp = db.pokedex_session.query(tables.Stat).filter_by(identifier=u'hp').one()
         if c.nature.increased_stat == c.nature.decreased_stat:
             # Neutral.  Boring!
             # Create a subquery of neutral-ish Pokémon

@@ -292,7 +292,7 @@ ${h.h1(_('Contests'))}
     <h2>${_("%s Contest") % h.pokedex.generation_icon(3) | n}</h2>
     <dl>
         <dt>${_("Type")}</dt>
-        <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type.name, alt=c.move.contest_type.name)}</dd>
+        <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type.identifier, alt=c.move.contest_type.name)}</dd>
         <dt>${_("Appeal")}</dt>
         <dd title="${c.move.contest_effect.appeal}">${u'♡' * c.move.contest_effect.appeal}</dd>
         <dt>${_("Jam")}</dt>
@@ -333,7 +333,7 @@ ${h.h1(_('Contests'))}
     <h2>${h.pokedex.generation_icon(4)} Super Contest</h2>
     <dl>
         <dt>${_("Type")}</dt>
-        <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type.name, alt=c.move.contest_type.name)}</dd>
+        <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type.identifier, alt=c.move.contest_type.name)}</dd>
         <dt>${_("Appeal")}</dt>
         <dd title="${c.move.super_contest_effect.appeal}">${u'♡' * c.move.super_contest_effect.appeal}</dd>
         <dt>${_("Flavor text")}</dt>
