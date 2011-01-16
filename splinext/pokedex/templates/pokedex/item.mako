@@ -86,17 +86,7 @@ ${h.h1(_('Flavor'))}
 
 <div class="dex-column">
     <h2>${_("Foreign names")}</h2>
-    <dl>
-        % for foreign_name in c.item.foreign_names:
-        <dt>${foreign_name.language.name}
-        <img src="${h.static_uri('spline', "flags/{0}.png".format(foreign_name.language.iso3166))}" alt=""></dt>
-        % if foreign_name.language.name == 'Japanese':
-        <dd>${foreign_name.name} (${h.pokedex.romanize(foreign_name.name)})</dd>
-        % else:
-        <dd>${foreign_name.name}</dd>
-        % endif
-        % endfor
-    </dl>
+    <%dexlib:foreign_names object="${c.item}"/>
 </div>
 </div>
 
