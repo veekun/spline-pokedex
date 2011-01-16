@@ -1,22 +1,23 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="/lib.mako"/>
+<%! from splinext.pokedex import i18n %>\
 
-<%def name="title()">Natures</%def>
+<%def name="title()">${_("Natures")}</%def>
 
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
-    <li><a href="${url('/dex')}">Pokédex</a></li>
-    <li>Natures</li>
+    <li><a href="${url('/dex')}">${_(u"Pokédex")}</a></li>
+    <li>${_("Natures")}</li>
 </ul>
 </%def>
 
-${h.h1('Nature list')}
+${h.h1(_('Nature list'))}
 
 <p>
     % if c.sort_order == u'stat':
-    <a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/sort-alphabet.png')}"> Sort by name</a>
+    <a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/sort-alphabet.png')}"> ${_("Sort by name")}</a>
     % else:
-    <a href="${url.current(sort=u'stat')}"><img src="${h.static_uri('spline', 'icons/sort-rating.png')}"> Sort by stat</a>
+    <a href="${url.current(sort=u'stat')}"><img src="${h.static_uri('spline', 'icons/sort-rating.png')}"> ${_("Sort by stat")}</a>
     % endif
 </p>
 
@@ -26,11 +27,11 @@ ${h.h1('Nature list')}
 <colgroup span="2"></colgroup> <!-- flavors -->
 <thead>
     <tr class="header-row">
-        <th>Name</th>
-        <th>+10%</th>
-        <th>-10%</th>
-        <th>Likes flavor</th>
-        <th>Hates flavor</th>
+        <th>${_("Name")}</th>
+        <th>${_("+10%")}</th>
+        <th>${_("-10%")}</th>
+        <th>${_("Likes flavor")}</th>
+        <th>${_("Hates flavor")}</th>
     </tr>
 </thead>
 <tbody>
@@ -39,16 +40,16 @@ ${h.h1('Nature list')}
         <td><a href="${url(controller='dex', action='natures', name=nature.name.lower())}">${nature.name}</a></td>
 
         % if nature.increased_stat == nature.decreased_stat:
-        <td>—</td>
-        <td>—</td>
+        <td>${_(u"—")}</td>
+        <td>${_(u"—")}</td>
         % else:
         <td>${nature.increased_stat.name}</td>
         <td>${nature.decreased_stat.name}</td>
         % endif
 
         % if nature.likes_flavor == nature.hates_flavor:
-        <td class="flavor">—</td>
-        <td class="flavor">—</td>
+        <td class="flavor">${_(u"—")}</td>
+        <td class="flavor">${_(u"—")}</td>
         % else:
         <td class="flavor">
             ${nature.likes_flavor.flavor}:

@@ -1,13 +1,16 @@
 <%inherit file="/base.mako"/>
 <%namespace name="dexlib" file="lib.mako"/>
+<%! from splinext.pokedex import i18n %>\
 
-<%def name="title()">${c.item_pocket.name} pocket - Items</%def>
+<%def name="title()">
+${_("%s pocket - Items") % (c.item_pocket.name)}
+</%def>
 
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
-    <li><a href="${url('/dex')}">Pokédex</a></li>
-    <li><a href="${url(controller='dex', action='items_list')}">Items</a></li>
-    <li>${c.item_pocket.name} pocket</li>
+    <li><a href="${url('/dex')}">${_(u"Pokédex")}</a></li>
+    <li><a href="${url(controller='dex', action='items_list')}">${_("Items")}</a></li>
+    <li>${_("%s pocket") % (c.item_pocket.name)}</li>
 </ul>
 </%def>
 
@@ -22,14 +25,14 @@
     % endfor
 </ul>
 
-<h1>${c.item_pocket.name}</h1>
+<h1>${(c.item_pocket.name)}</h1>
 
 <table class="striped-rows">
 <tr class="header-row">
     % if c.item_pocket.identifier == u'berries':
-    <th>Num</th>
+    <th>${_("Num")}</th>
     % endif
-    <th>Item</th>
+    <th>${_("Item")}</th>
     <th>Effect</th>
 </tr>
 % for category in c.item_pocket.categories:

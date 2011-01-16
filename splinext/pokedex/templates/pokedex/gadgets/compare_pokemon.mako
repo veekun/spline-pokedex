@@ -1,22 +1,23 @@
 <%inherit file="/base.mako" />
+<%! from splinext.pokedex import i18n %>\
 
-<%def name="title()">Compare Pokémon</%def>
+<%def name="title()">${_(u"Compare Pokémon")}</%def>
 
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
-    <li><a href="${url('/dex')}">Pokédex</a></li>
-    <li>Gadgets</li>
-    <li>Compare Pokémon</li>
+    <li><a href="${url('/dex')}">${_(u"Pokédex")}</a></li>
+    <li>${_(u"Gadgets")}</li>
+    <li>${_(u"Compare Pokémon")}</li>
 </ul>
 </%def>
 
-${h.h1(u'Compare Pokémon', 'compare')}
-<p>Select up to eight Pokémon to compare their stats, moves, etc.</p>
+<h1>${_(u"Compare Pokémon"), _('compare')}</h1>
+<p>${_(u"Select up to eight Pokémon to compare their stats, moves, etc.")}</p>
 
 ${h.form(url.current(), method='GET')}
 <input type="hidden" name="shorten" value="1">
 <div>
-    Version to use for moves:
+    ${_(u"Version to use for moves:")}
     <ul class="dex-compare-pokemon-version-list">
         % for version_group in c.version_groups:
         <li> <label>
@@ -41,7 +42,7 @@ ${h.form(url.current(), method='GET')}
             % if found_pokemon.suggestions is None:
             <% pass %>\
             % elif found_pokemon.pokemon is None:
-            no matches
+            ${_(u"no matches")}
             % else:
             <ul>
                 % for suggestion, iso3166 in found_pokemon.suggestions:
@@ -59,7 +60,7 @@ ${h.form(url.current(), method='GET')}
     </tr>
     % endif
     <tr class="header-row">
-        <th><button type="submit">Compare:</button></th>
+        <th><button type="submit">${_(u"Compare:")}</button></th>
         % for found_pokemon in c.found_pokemon:
         <th>
             % if found_pokemon.pokemon:
@@ -78,13 +79,13 @@ ${h.form(url.current(), method='GET')}
         % for found_pokemon in c.found_pokemon:
         <th>
             <a href="${c.create_comparison_link(target=found_pokemon, move=-1)}">
-                <img src="${h.static_uri('spline', 'icons/arrow-180-small.png')}" alt="←" title="Move left">
+                <img src="${h.static_uri('spline', 'icons/arrow-180-small.png')}" alt="←" title="${_(u"Move left")}">
             </a>
             <a href="${c.create_comparison_link(target=found_pokemon, replace_with=u'')}">
-                <img src="${h.static_uri('spline', 'icons/cross-small.png')}" alt="remove" title="Remove">
+                <img src="${h.static_uri('spline', 'icons/cross-small.png')}" alt="${_(u"remove")}" title="${_(u"Remove")}">
             </a>
             <a href="${c.create_comparison_link(target=found_pokemon, move=+1)}">
-                <img src="${h.static_uri('spline', 'icons/arrow-000-small.png')}" alt="→" title="Move right">
+                <img src="${h.static_uri('spline', 'icons/arrow-000-small.png')}" alt="→" title="${_(u"Move right")}">
             </a>
         </th>
         % endfor
@@ -98,27 +99,27 @@ ${h.end_form()}
 <table class="striped-rows dex-compare-pokemon">
 <col class="labels">
 <tbody>
-    ${row(u'Type', type_cell, class_='dex-compare-list')}
-    ${row(u'Abilities', abilities_cell, class_='dex-compare-list')}
+    ${row(_(u'Type'), type_cell, class_='dex-compare-list')}
+    ${row(_(u'Abilities'), abilities_cell, class_='dex-compare-list')}
 
-    ${subheader_row('Breeding + Training', 'breeding-training')}
-    ${row(u'Egg groups', egg_groups_cell, class_='dex-compare-list')}
-    ${row(u'Gender', gender_cell, class_='dex-compare-flavor-text')}
-    ${relative_row(u'Base EXP')}
-    ${relative_row(u'Base happiness')}
-    ${relative_row(u'Capture rate')}
+    ${subheader_row(_(u'Breeding + Training'), 'breeding-training')}
+    ${row(_(u'Egg groups'), egg_groups_cell, class_='dex-compare-list')}
+    ${row(_(u'Gender'), gender_cell, class_='dex-compare-flavor-text')}
+    ${relative_row(_(u'Base EXP'), 'Base EXP')}
+    ${relative_row(_(u'Base happiness'), 'Base happiness')}
+    ${relative_row(_(u'Capture rate'), 'Capture rate')}
 
-    ${subheader_row('Stats', 'stats')}
+    ${subheader_row(_('Stats'), 'stats')}
     % for stat in c.stats:
-    ${relative_row(stat.name)}
+    ${relative_row(stat.name, stat.name)}
     % endfor
-    ${relative_row(u'Base stat total')}
-    ${row(u'Effort', effort_cell)}
+    ${relative_row(_(u'Base stat total'), 'Base stat total')}
+    ${row(_(u'Effort'), effort_cell)}
 
-    ${subheader_row('Flavor', 'flavor')}
+    ${subheader_row(_('Flavor'), 'flavor')}
 
     <tr class="size">
-        <th>${h.pokedex.pokedex_img('chrome/trainer-male.png', alt='Trainer dude', style="height: %.2f%%" % (c.heights['trainer'] * 100))}</th>
+        <th>${h.pokedex.pokedex_img('chrome/trainer-male.png', alt='${_(u"Trainer dude")}', style="height: %.2f%%" % (c.heights['trainer'] * 100))}</th>
         % for i, found_pokemon in enumerate(c.found_pokemon):
         <td>
             % if found_pokemon.pokemon:
@@ -127,10 +128,10 @@ ${h.end_form()}
         </td>
         % endfor
     </tr>
-    ${row(u'Height', height_cell, class_='dex-compare-flavor-text')}
+    ${row(_(u'Height'), height_cell, class_='dex-compare-flavor-text')}
 
     <tr class="size">
-        <th>${h.pokedex.pokedex_img('chrome/trainer-female.png', alt='Trainer dudette', style="height: %.2f%%" % (c.weights['trainer'] * 100))}</th>
+        <th>${h.pokedex.pokedex_img('chrome/trainer-female.png', alt='${_(u"Trainer dudette")}', style="height: %.2f%%" % (c.weights['trainer'] * 100))}</th>
         % for i, found_pokemon in enumerate(c.found_pokemon):
         <td>
             % if found_pokemon.pokemon:
@@ -139,13 +140,13 @@ ${h.end_form()}
         </td>
         % endfor
     </tr>
-    ${row(u'Weight', weight_cell, class_='dex-compare-flavor-text')}
+    ${row(_(u'Weight'), weight_cell, class_='dex-compare-flavor-text')}
 
-    ${row(u'Species',   species_cell,   class_='dex-compare-flavor-text')}
-    ${row(u'Color',     color_cell,     class_='dex-compare-flavor-text')}
-    ${row(u'Habitat',   habitat_cell,   class_='dex-compare-flavor-text')}
-    ${row(u'Footprint', footprint_cell, class_='dex-compare-flavor-text')}
-    ${row(u'Shape',     shape_cell,     class_='dex-compare-flavor-text')}
+    ${row(_(u'Species'),   species_cell,   class_='dex-compare-flavor-text')}
+    ${row(_(u'Color'),     color_cell,     class_='dex-compare-flavor-text')}
+    ${row(_(u'Habitat'),   habitat_cell,   class_='dex-compare-flavor-text')}
+    ${row(_(u'Footprint'), footprint_cell, class_='dex-compare-flavor-text')}
+    ${row(_(u'Shape'),     shape_cell,     class_='dex-compare-flavor-text')}
 </tbody>
 </table>
 
@@ -235,9 +236,9 @@ ${move_table_header()}
 </%def>
 
 ## Print a row of 8 relatively-colored numbers
-<%def name="relative_row(label)">
+<%def name="relative_row(label_text, label)">
     <tr class="dex-compare-relative">
-        <th>${label}</th>
+        <th>${label_text}</th>
         % for found_pokemon in c.found_pokemon:
         % if found_pokemon.pokemon:
         <% value, pct = c.relatives[label][found_pokemon.pokemon] %>\

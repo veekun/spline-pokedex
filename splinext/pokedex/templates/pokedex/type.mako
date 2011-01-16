@@ -1,13 +1,14 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="/lib.mako"/>
 <%namespace name="dexlib" file="lib.mako"/>
+<%! from splinext.pokedex import i18n %>\
 
-<%def name="title()">${c.type.name.title()} - Types</%def>
+<%def name="title()">${_(u"%s - Types") % c.type.name.title()}</%def>
 
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
-    <li><a href="${url('/dex')}">Pokédex</a></li>
-    <li><a href="${url(controller='dex', action='types_list')}">Types</a></li>
+    <li><a href="${url('/dex')}">${_(u"Pokédex")}</a></li>
+    <li><a href="${url(controller='dex', action='types_list')}">${_(u"Types")}</a></li>
     <li>${c.type.name}</li>
 </ul>
 </%def>
@@ -25,7 +26,7 @@
 </div>
 
 <%lib:cache_content>
-${h.h1('Essentials')}
+${h.h1(_('Essentials'))}
 
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.type.name.title()}</p>
@@ -40,14 +41,14 @@ ${h.h1('Essentials')}
 
 <div class="dex-page-beside-portrait">
 % if c.type.name == '???':
-    <h2>Damage Dealt/Taken</h2>
+    <h2>${_('Damage Dealt/Taken')}</h2>
     <p>??? theoretically took and dealt 1× damage with every type, but there were no ??? Pokémon or damaging moves.</p>
 % elif c.type.name == 'Shadow':
-    <h2>Damage Dealt/Taken</h2>
+    <h2>${_('Damage Dealt/Taken')}</h2>
     <p>In XD, Shadow moves are super-effective against non-Shadow Pokémon and not very effective against Shadow
     Pokémon.  In Colosseum, Shadow Rush is regularly effective against everything.</p>
 % else:
-    <h2>Damage Dealt</h2>
+    <h2>${_('Damage Dealt')}</h2>
     <ul class="dex-type-list">
         % for type_efficacy in sorted(c.type.damage_efficacies, key=lambda efficacy: efficacy.target_type.name):
         <li class="dex-damage-dealt-${type_efficacy.damage_factor}">
@@ -56,7 +57,7 @@ ${h.h1('Essentials')}
         % endfor
     </ul>
 
-    <h2>Damage Taken</h2>
+    <h2>${_(u"Damage Taken")}</h2>
     <ul class="dex-type-list">
         % for type_efficacy in sorted(c.type.target_efficacies, key=lambda efficacy: efficacy.damage_type.name):
         <li class="dex-damage-taken-${type_efficacy.damage_factor}">
@@ -67,11 +68,11 @@ ${h.h1('Essentials')}
 % endif
 </div>
 
-${h.h1(u'Pokémon', id='pokemon')}
+${h.h1(_(u'Pokémon'), id='pokemon')}
 % if c.type.name == '???':
 <%! from pokedex.db import markdown %>
 <div class="markdown">
-${markdown.MarkdownString(u"""
+${markdown.MarkdownString(_(u"""
 In Generation IV, pure [flying]{type}-types become ???-type during [Roost]{move}.  This can be accomplished with
 [Conversion]{move}, [Conversion 2]{move}, or the ability [Color Change]{ability}.  A Pokémon can legitimately have both
 Roost and one of these only through the use of [Mimic]{move}, [Sketch]{move}, [Role Play]{move}, or [Skill Swap]{move}.
@@ -80,7 +81,7 @@ Roost and one of these only through the use of [Mimic]{move}, [Sketch]{move}, [R
 Generation IV has [sprites for a ???-type Arceus](%s), even though Arceus cannot become ???-type through regular play.
 Eggs are purely ???-type before hatching before Generation V, and are displayed as such in the Generation III status
 screen.  In Generation V, the ??? type no longer exists.
-""" % url(controller='dex', action='pokemon_flavor', name='arceus', form='???')).as_html | n}
+""") % url(controller='dex', action='pokemon_flavor', name='arceus', form='???')).as_html | n}
 </div>
 % elif c.type.name == 'Shadow':
 <p>Shadow Pokémon are Pokémon whose hearts have been closed in Pokémon Colosseum and Pokémon XD: Gale of Darkness.  The
@@ -105,7 +106,7 @@ Shadow type, Shadow Pokémon, and Shadow moves are unique to those games.</p>
 </table>
 % endif
 
-${h.h1('Moves')}
+${h.h1(_('Moves'))}
 <table class="dex-pokemon-moves striped-rows">
     ${dexlib.move_table_columns()}
     <thead>
@@ -122,17 +123,17 @@ ${h.h1('Moves')}
     </tbody>
 </table>
 
-${h.h1('External Links', id='links')}
+${h.h1(_('External Links'), id='links')}
 <ul class="classic-list">
     % if c.type.generation.id <= 1:
-    <li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/comp/${c.type.name}.htm">Azure Heights</a></li>
+    <li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/comp/${c.type.name}.htm">${_("Azure Heights")}</a></li>
     % endif
     % if c.type.name == '???':
-    <li><a href="http://bulbapedia.bulbagarden.net/wiki/%3F%3F%3F_(type)">Bulbapedia</a></li>
-    <li><a href="http://www.smogon.com/dp/types/questionquestionquestion">Smogon</a></li>
+    <li><a href="http://bulbapedia.bulbagarden.net/wiki/%3F%3F%3F_(type)">${_("Bulbapedia")}</a></li>
+    <li><a href="http://www.smogon.com/dp/types/questionquestionquestion">${_("Smogon")}</a></li>
     % else:
-    <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.type.name}_(type)">Bulbapedia</a></li>
-    <li><a href="http://www.smogon.com/dp/types/${c.type.name.lower()}">Smogon</a></li>
+    <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.type.name}_(type)">${_("Bulbapedia")}</a></li>
+    <li><a href="http://www.smogon.com/dp/types/${c.type.name.lower()}">${_("Smogon")}</a></li>
     % endif
 </ul>
 </%lib:cache_content>

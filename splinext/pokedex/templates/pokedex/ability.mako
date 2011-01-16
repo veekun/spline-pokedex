@@ -1,13 +1,14 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="/lib.mako"/>
 <%namespace name='dexlib' file='lib.mako'/>
+<%! from splinext.pokedex import i18n %>\
 
-<%def name="title()">${c.ability.name} - Abilities</%def>
+<%def name="title()">${_("%s - Abilities") % c.ability.name}</%def>
 
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
-    <li><a href="${url('/dex')}">Pokédex</a></li>
-    <li><a href="${url(controller='dex', action='abilities_list')}">Abilities</a></li>
+    <li><a href="${url('/dex')}">${_(u"Pokédex")}</a></li>
+    <li><a href="${url(controller='dex', action='abilities_list')}">${_("Abilities")}</a></li>
     <li>${c.ability.name}</li>
 </ul>
 </%def>
@@ -26,46 +27,45 @@
 
 
 <%lib:cache_content>
-${h.h1('Essentials')}
+${h.h1(_('Essentials'))}
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.ability.name}</p>
     <p>${h.pokedex.generation_icon(c.ability.generation)}</p>
 </div>
 
 <div class="dex-page-beside-portrait">
-    <h2>Summary</h2>
+    <h2>${_("Summary")}</h2>
     <div class="markdown">
         ${c.ability.short_effect.as_html | n}
     </div>
 </div>
 
 
-${h.h1('Effect')}
+${h.h1(_('Effect'))}
 <div class="markdown">
     ${c.ability.effect.as_html | n}
 </div>
 
-
 % if c.ability.changelog:
-${h.h1('History')}
+${h.h1(_('History'))}
 <dl>
     % for change in c.ability.changelog:
-    <dt>Before ${h.pokedex.version_icons(*change.changed_in.versions)}</dt>
+    <dt>${_('Before %s') % h.pokedex.version_icons(*change.changed_in.versions)}</dt>
     <dd class="markdown">${change.effect.as_html | n}</dd>
     % endfor
 </dl>
 % endif
 
 
-${h.h1('Flavor')}
+${h.h1(_('Flavor'))}
 <div class="dex-column-container">
 <div class="dex-column-2x">
-    <h2>Flavor Text</h2>
+    <h2>${_("Flavor Text")}</h2>
     ${dexlib.flavor_text_list(c.ability.flavor_text)}
 </div>
 
 <div class="dex-column">
-    <h2>Foreign Names</h2>
+    <h2>${_("Foreign Names")}</h2>
     <dl>
         % for foreign_name in c.ability.foreign_names:
         <dt>${foreign_name.language.name}
@@ -81,7 +81,7 @@ ${h.h1('Flavor')}
 </div>
 
 
-${h.h1(u'Pokémon', id='pokemon')}
+${h.h1(_(u'Pokémon', context='plural'))}
 <table class="dex-pokemon-moves striped-rows">
     ${dexlib.pokemon_table_columns()}
     % for method, pokemon_list in c.pokemon:
@@ -104,11 +104,11 @@ ${h.h1(u'Pokémon', id='pokemon')}
 </table>
 
 
-${h.h1('External Links', id='links')}
+${h.h1(_('External Links'), id='links')}
 <ul class="classic-list">
-    <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.ability.name.replace(' ', '_')}_%28ability%29">Bulbapedia</a></li>
-    <li><a href="http://legendarypokemon.net/dp/abilities#${c.ability.name.lower().replace(' ', '+')}">Legendary Pokémon</a></li>
-    <li><a href="http://serebii.net/abilitydex/${c.ability.name.lower().replace(' ', '')}.shtml">Serebii.net</a></li>
-    <li><a href="http://smogon.com/dp/abilities/${c.ability.name.lower().replace(' ', '_')}">Smogon</a></li>
+    <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.ability.name.replace(' ', '_')}_%28ability%29">${_("Bulbapedia")}</a></li>
+    <li><a href="http://legendarypokemon.net/dp/abilities#${c.ability.name.lower().replace(' ', '+')}">${_(u"Legendary Pokémon")}</a></li>
+    <li><a href="http://serebii.net/abilitydex/${c.ability.name.lower().replace(' ', '')}.shtml">${_("Serebii.net")}</a></li>
+    <li><a href="http://smogon.com/dp/abilities/${c.ability.name.lower().replace(' ', '_')}">${_("Smogon")}</a></li>
 </ul>
 </%lib:cache_content>
