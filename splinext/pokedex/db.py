@@ -69,7 +69,7 @@ def pokemon_query(name, form=None):
     if form:
         # If a form has been specified, it must match
         q = q.join('unique_form')
-        q = q.filter(func.lower(tables.PokemonForm.name) == form.lower())
+        q = q.filter(func.lower(tables.PokemonForm.identifier) == form.lower())
     else:
         # If there's NOT a form, just make sure we get a form base Pokémon
         q = q.filter(tables.Pokemon.forms.any())
@@ -83,11 +83,11 @@ def pokemon_form_query(name, form=None):
 
     q = pokedex_session.query(tables.PokemonForm) \
                        .join('form_base_pokemon') \
-                       .filter(func.lower(tables.Pokemon.name) == name.lower())
+                       .filter(func.lower(tables.Pokemon.identifier) == name.lower())
 
     if form:
         # If a form has been specified, it must match
-        q = q.filter(func.lower(tables.PokemonForm.name) == form.lower())
+        q = q.filter(func.lower(tables.PokemonForm.identifier) == form.lower())
     else:
         # If there's NOT a form, just get the default form
         q = q.filter(tables.PokemonForm.is_default == True)

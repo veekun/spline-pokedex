@@ -529,7 +529,7 @@ class PokedexController(BaseController):
         if c.pokemon.gender_rate == -1:
             # Genderless; Ditto only
             ditto = db.pokedex_session.query(tables.Pokemon) \
-                .filter_by(name=u'Ditto').one()
+                .filter_by(identifier='ditto').one()
             c.compatible_families = [ditto]
         elif c.pokemon.egg_groups[0].id == 15:
             # No Eggs group
@@ -1290,7 +1290,7 @@ class PokedexController(BaseController):
                 eagerload('super_contest_effect'),
                 subqueryload_all('move_flags.flag'),
                 subqueryload_all('type.damage_efficacies.target_type'),
-                subqueryload_all('foreign_names.language'),
+                subqueryload_all('texts'),
                 subqueryload_all('flavor_text.version_group.generation'),
                 subqueryload_all('flavor_text.version_group.versions'),
                 subqueryload_all('contest_combo_first.second'),
@@ -1467,7 +1467,7 @@ class PokedexController(BaseController):
             try:
                 c.secondary_type = db.pokedex_session.query(tables.Type) \
                     .filter(tables.Type.damage_efficacies.any()) \
-                    .filter(func.lower(tables.Type.name) ==
+                    .filter(func.lower(tables.Type.identifier) ==
                             request.params['secondary']) \
                     .options(eagerload('target_efficacies')) \
                     .one()
@@ -1626,8 +1626,8 @@ class PokedexController(BaseController):
         db.pokedex_session.query(tables.Ability) \
             .filter_by(id=c.ability.id) \
             .options(
-                subqueryload('foreign_names'),
-                joinedload('foreign_names.language'),
+                subqueryload('texts'),
+                joinedload('texts.language'),
                 subqueryload('flavor_text'),
                 joinedload('flavor_text.version_group'),
                 joinedload('flavor_text.version_group.versions'),
@@ -1764,7 +1764,7 @@ class PokedexController(BaseController):
         # the same name.  To avoid complications, the name is stored in
         # c.location_name, and after that we only deal with areas.
         c.locations = db.pokedex_session.query(tables.Location) \
-            .filter(func.lower(tables.Location.name) == name) \
+            .filter(func.lower(tables.Location.identifier) == name) \
             .all()
 
         if not c.locations:
@@ -1909,7 +1909,7 @@ class PokedexController(BaseController):
                 .filter(tables.Nature.increased_stat_id
                      == tables.Nature.decreased_stat_id) \
                 .filter(tables.Nature.id != c.nature.id) \
-                .order_by(tables.Nature.name)
+                .order_by(tables.Nature.identifier)
         else:
             c.inverse_nature = db.pokedex_session.query(tables.Nature) \
                 .filter_by(
