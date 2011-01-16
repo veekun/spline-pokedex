@@ -1487,8 +1487,7 @@ class PokedexController(BaseController):
 
     def types_list(self):
         # XXX: Use the name, not identifier
-        c.types = db.pokedex_session.query(tables.Type) \
-            .order_by(tables.Type.identifier) \
+        c.types = db.alphabetize_table(tables.Type) \
             .filter(tables.Type.damage_efficacies.any()) \
             .options(eagerload('damage_efficacies')) \
             .all()
@@ -1587,9 +1586,8 @@ class PokedexController(BaseController):
         return
 
     def abilities_list(sef):
-        # XXX: Use name, not identifier
-        c.abilities = db.pokedex_session.query(tables.Ability) \
-            .order_by(tables.Ability.generation_id, tables.Ability.identifier) \
+        c.abilities = db.alphabetize(db.pokedex_session.query(tables.Ability)
+            .order_by(tables.Ability.generation_id), tables.AbilityText) \
             .all()
         return render('/pokedex/ability_list.mako')
 
@@ -1879,7 +1877,7 @@ class PokedexController(BaseController):
             )
         else:
             # XXX: Use name, not identifier
-            c.natures = c.natures.order_by(tables.Nature.identifier.asc())
+            c.natures = db.alphabetize(c.natures, tables.NatureText)
 
         return render('/pokedex/nature_list.mako')
 
@@ -1893,11 +1891,10 @@ class PokedexController(BaseController):
         # Other neutral natures if this one is neutral; otherwise, the inverse
         # of this one
         if c.nature.increased_stat == c.nature.decreased_stat:
-            c.neutral_natures = db.pokedex_session.query(tables.Nature) \
+            c.neutral_natures = db.alphabetize_table(tables.Nature) \
                 .filter(tables.Nature.increased_stat_id
                      == tables.Nature.decreased_stat_id) \
-                .filter(tables.Nature.id != c.nature.id) \
-                .order_by(tables.Nature.identifier)
+                .filter(tables.Nature.id != c.nature.id)
         else:
             c.inverse_nature = db.pokedex_session.query(tables.Nature) \
                 .filter_by(

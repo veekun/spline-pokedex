@@ -153,3 +153,11 @@ def alphabetize(query, name_table, language=None, reverse=False):
         return query.order_by(name_table.name.desc(), name_table.object_table.identifier.desc())
     else:
         return query.order_by(name_table.name.asc(), name_table.object_table.identifier.asc())
+
+def alphabetize_table(table, language=None, reverse=False):
+    return alphabetize(
+            pokedex_session.query(table),
+            table.name_table,
+            language=language,
+            reverse=reverse,
+        )
