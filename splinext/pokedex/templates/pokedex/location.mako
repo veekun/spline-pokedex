@@ -62,7 +62,7 @@
             ${h.pokedex.pokemon_link(
                 pokemon,
                 h.literal(u"""{0} {1}""".format(
-                    h.pokedex.pokemon_sprite(pokemon, prefix='icons'),
+                    lib.pokemon_icon(pokemon),
                     pokemon.name,
                 )),
                 class_='dex-icon-link',

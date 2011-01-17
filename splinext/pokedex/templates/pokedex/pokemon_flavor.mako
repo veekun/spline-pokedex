@@ -1,6 +1,5 @@
 <%inherit file="/base.mako"/>
 <%namespace name="lib" file="lib.mako"/>
-<%! import re %>\
 
 <%def name="title()">${c.form.pokemon_name} flavor - Pokémon #${c.form.form_base_pokemon_id}</%def>
 
@@ -68,7 +67,7 @@ ${h.h1('Essentials')}
         % endif
 
         <dt>Footprint</dt>
-        <dd>${h.pokedex.pokemon_sprite(c.form.form_base_pokemon, prefix='footprints', form=None)}</dd>
+        <dd>${h.pokedex.pokemon_sprite(c.form, prefix='footprints', no_form=True)}</dd>
 
         % if c.pokemon.generation.id <= 4:
         <dt>Shape ${h.pokedex.generation_icon(4)}</dt>
@@ -357,7 +356,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
     <tr>
         <th class="vertical-text">
             Normal
-            % if c.pokemon.has_gen4_fem_sprite:
+            % if c.pokemon.has_gender_differences:
             <br/> (male)
             % endif
         </th>
@@ -392,7 +391,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
     <tr>
         <th class="vertical-text">
             Shiny
-            % if c.pokemon.has_gen4_fem_sprite:
+            % if c.pokemon.has_gender_differences:
             <br/> (male)
             % endif
         </th>
@@ -425,16 +424,22 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         </td>
     </tr>
 </tbody>
-% if c.pokemon.has_gen4_fem_sprite:
+## Chimecho's female back frame 2 sprite has one hand in a slightly different pose
+% if c.pokemon.has_gender_differences or c.pokemon.id == 358:
 <tbody>
     <tr>
         <th class="vertical-text">Normal<br/>(female)</th>
         % if c.form.introduced_in_version_group_id <= 8:
+        % if h.pokedex.pokemon_has_sprite(c.form, 'diamond-pearl/female'):
         <td>
             ${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/female')}
             ${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/female/frame2')}
         </td>
-        % if c.pokemon.has_gen4_fem_back_sprite:
+        % else:
+        <td class="dex-pokemon-flavor-no-sprite">—</td>
+        % endif
+
+        % if h.pokedex.pokemon_has_sprite(c.form, 'diamond-pearl/back/female'):
         <td>${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/back/female')}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
@@ -442,11 +447,16 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         % endif
 
         % if c.form.introduced_in_version_group_id <= 9:
+        % if h.pokedex.pokemon_has_sprite(c.form, 'platinum/female'):
         <td>
             ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/female')}
             ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/female/frame2')}
         </td>
-        % if c.pokemon.has_gen4_fem_back_sprite:
+        % else:
+        <td class="dex-pokemon-flavor-no-sprite">—</td>
+        % endif
+
+        % if h.pokedex.pokemon_has_sprite(c.form, 'platinum/back/female'):
         <td>
             ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/back/female')}
             ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/back/female/frame2')}
@@ -456,11 +466,16 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         % endif
         % endif
 
+        % if h.pokedex.pokemon_has_sprite(c.form, 'heartgold-soulsilver/female'):
         <td>
             ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/female')}
             ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/female/frame2')}
         </td>
-        % if c.pokemon.has_gen4_fem_back_sprite:
+        % else:
+        <td class="dex-pokemon-flavor-no-sprite">—</td>
+        % endif
+
+        % if h.pokedex.pokemon_has_sprite(c.form, 'heartgold-soulsilver/back/female'):
         <td>
             ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/back/female')}
             ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/back/female/frame2')}
@@ -472,11 +487,16 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
     <tr>
         <th class="vertical-text">Shiny<br/>(female)</th>
         % if c.form.introduced_in_version_group_id <= 8:
+        % if h.pokedex.pokemon_has_sprite(c.form, 'diamond-pearl/female'):
         <td>
             ${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/shiny/female')}
             ${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/shiny/female/frame2')}
         </td>
-        % if c.pokemon.has_gen4_fem_back_sprite:
+        % else:
+        <td class="dex-pokemon-flavor-no-sprite">—</td>
+        % endif
+
+        % if h.pokedex.pokemon_has_sprite(c.form, 'diamond-pearl/back/female'):
         <td>${h.pokedex.pokemon_sprite(c.form, prefix='diamond-pearl/back/shiny/female')}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
@@ -484,11 +504,16 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         % endif
 
         % if c.form.introduced_in_version_group_id <= 9:
+        % if h.pokedex.pokemon_has_sprite(c.form, 'platinum/female'):
         <td>
             ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/shiny/female')}
             ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/shiny/female/frame2')}
         </td>
-        % if c.pokemon.has_gen4_fem_back_sprite:
+        % else:
+        <td class="dex-pokemon-flavor-no-sprite">—</td>
+        % endif
+
+        % if h.pokedex.pokemon_has_sprite(c.form, 'platinum/back/female'):
         <td>
             ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/back/shiny/female')}
             ${h.pokedex.pokemon_sprite(c.form, prefix='platinum/back/shiny/female/frame2')}
@@ -498,11 +523,16 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         % endif
         % endif
 
+        % if h.pokedex.pokemon_has_sprite(c.form, 'heartgold-soulsilver/female'):
         <td>
             ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/shiny/female')}
             ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/shiny/female/frame2')}
         </td>
-        % if c.pokemon.has_gen4_fem_back_sprite:
+        % else:
+        <td class="dex-pokemon-flavor-no-sprite">—</td>
+        % endif
+
+        % if h.pokedex.pokemon_has_sprite(c.form, 'heartgold-soulsilver/back/female'):
         <td>
             ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/back/shiny/female')}
             ${h.pokedex.pokemon_sprite(c.form, prefix='heartgold-soulsilver/back/shiny/female/frame2')}
@@ -533,7 +563,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
     <tr>
         <th class="vertical-text">
             Normal
-            % if c.pokemon.has_gen4_fem_sprite:
+            % if c.pokemon.has_gender_differences:
             <br/> (male)
             % endif
         </th>
@@ -545,7 +575,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
     <tr>
         <th class="vertical-text">
             Shiny
-            % if c.pokemon.has_gen4_fem_sprite:
+            % if c.pokemon.has_gender_differences:
             <br/> (male)
             % endif
         </th>
@@ -555,13 +585,18 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         % endif
     </tr>
 </tbody>
-% if c.pokemon.has_gen4_fem_sprite:
+% if c.pokemon.has_gender_differences:
 <tbody>
     <tr>
         <th class="vertical-text">Normal <br/> (female)</th>
         % if c.form.introduced_in_version_group_id <= 11:
+        % if h.pokedex.pokemon_has_sprite(c.form, 'black-white/female'):
         <td>${h.pokedex.pokemon_sprite(c.form, prefix='black-white/female')}</td>
-        % if c.pokemon.has_gen4_fem_back_sprite:
+        % else:
+        <td class="dex-pokemon-flavor-no-sprite">—</td>
+        % endif
+
+        % if h.pokedex.pokemon_has_sprite(c.form, 'black-white/back/female'):
         <td>${h.pokedex.pokemon_sprite(c.form, prefix='black-white/back/female')}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
@@ -571,8 +606,13 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
     <tr>
         <th class="vertical-text">Shiny <br/> (female)</th>
         % if c.form.introduced_in_version_group_id <= 11:
+        % if h.pokedex.pokemon_has_sprite(c.form, 'black-white/female'):
         <td>${h.pokedex.pokemon_sprite(c.form, prefix='black-white/shiny/female')}</td>
-        % if c.pokemon.has_gen4_fem_back_sprite:
+        % else:
+        <td class="dex-pokemon-flavor-no-sprite">—</td>
+        % endif
+
+        % if h.pokedex.pokemon_has_sprite(c.form, prefix='black-white/back/female'):
         <td>${h.pokedex.pokemon_sprite(c.form, prefix='black-white/back/shiny/female')}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
@@ -587,10 +627,11 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 
 ## Overworld sprites can't exist for alternate forms that are in-battle only
 % if c.appears_in_overworld:
+<% overworld_gender_differences = c.pokemon.has_gender_differences and h.pokedex.pokemon_has_sprite(c.form, 'overworld/female') %>
 ${h.h1('Miscellaneous Game Art', id='misc-sprites')}
 <h2> ${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')} HeartGold &amp; SoulSilver Overworld </h2>
 <table class="dex-pokemon-flavor-sprites">
-% if c.pokemon.has_gen4_fem_sprite:
+% if overworld_gender_differences:
 <colgroup span="1"></colgroup> <!-- row headers -->
 % endif
 <colgroup span="1"></colgroup> <!-- left -->
@@ -599,7 +640,7 @@ ${h.h1('Miscellaneous Game Art', id='misc-sprites')}
 <colgroup span="1"></colgroup> <!-- right -->
 <thead>
     <tr class="header-row">
-        % if c.pokemon.has_gen4_fem_sprite:
+        % if overworld_gender_differences:
         <th></th>
         % endif
         <th>Left</th>
@@ -610,7 +651,7 @@ ${h.h1('Miscellaneous Game Art', id='misc-sprites')}
 </thead>
 <tbody>
     <tr>
-        % if c.pokemon.has_gen4_fem_sprite:
+        % if overworld_gender_differences:
         <th class="vertical-text" rowspan="2">Male</th>
         % endif
         <td>
@@ -649,7 +690,7 @@ ${h.h1('Miscellaneous Game Art', id='misc-sprites')}
         </td>
     </tr>
 </tbody>
-% if c.pokemon.has_gen4_fem_sprite:
+% if overworld_gender_differences:
 <tbody>
     <tr>
         <th class="vertical-text" rowspan="2">Female</th>

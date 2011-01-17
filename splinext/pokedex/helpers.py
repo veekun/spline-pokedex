@@ -11,6 +11,7 @@ import re
 from itertools import groupby, chain, repeat
 from operator import attrgetter
 
+from pkg_resources import resource_exists
 from pylons import url
 
 import pokedex.db.tables as tables
@@ -200,36 +201,55 @@ def version_icons(*versions):
 
     return version_icons
 
+def pokemon_has_sprite(pokemon_form, prefix='black-white'):
+    """A wrapper around resource_exists to determine whether a sprite exists
+    in the specified directory for the specified Pokémon form.
+    """
 
-def pokemon_sprite(pokemon, prefix='black-white', **attr):
-    """Returns an <img> tag for a Pokémon sprite."""
+    return resource_exists('pokedex', 'data/media/{0}'.format(
+        pokemon_sprite_path(pokemon_form, prefix)))
 
-    if isinstance(pokemon, tables.PokemonForm):
-        form = attr.pop('form', pokemon.name)
-        alt_text = pokemon.pokemon_name
-        pokemon = pokemon.form_base_pokemon
-    elif isinstance(pokemon, tables.Pokemon):
-        form = attr.pop('form', pokemon.form_name)
-        alt_text = pokemon.full_name
+def pokemon_sprite_path(pokemon_form, prefix='black-white', no_form=False):
+    """Returns a path to a Pokémon sprite.
+
+    no_form should be True if the form is to be ignored, e.g. for footprints.
+    """
 
     if 'animated' in prefix:
         ext = 'gif'
     else:
         ext = 'png'
 
-    if form:
+    # Leave it as None if it's null; pass it by filename_from_name otherwise
+    # XXX Temporary solution until we can use identifiers
+    form_name = pokemon_form.name and filename_from_name(pokemon_form.name)
+
+    if form_name and not no_form:
         filename = '{id}-{form}.{ext}'
     else:
         filename = '{id}.{ext}'
 
-    attr.setdefault('alt', alt_text)
-    attr.setdefault('title', alt_text)
+    filename = filename.format(
+        id=pokemon_form.form_base_pokemon_id,
+        form=form_name,
+        ext=ext
+    )
 
-    filename = filename.format(id=pokemon.normal_form.id,
-                               form=filename_from_name(form),
-                               ext=ext)
+    return '/'.join((prefix, filename))
 
-    return pokedex_img('/'.join((prefix, filename)), **attr)
+def pokemon_sprite(pokemon_form, prefix='black-white', no_form=False, **attr):
+    """Returns an <img> tag for a Pokémon sprite."""
+
+    # If we're being form-generic, use the Pokémon's name alone
+    if no_form:
+        default_text = pokemon_form.form_base_pokemon.name
+    else:
+        default_text = pokemon_form.pokemon_name
+    
+    attr.setdefault('alt', default_text)
+    attr.setdefault('title', default_text)
+
+    return pokedex_img(pokemon_sprite_path(pokemon_form, prefix, no_form), **attr)
 
 def pokemon_link(pokemon, content=None, to_flavor=False, **attr):
     """Returns a link to a Pokémon page.
@@ -473,7 +493,7 @@ def apply_pokemon_template(template, pokemon):
     """
 
     d = dict(
-        icon=pokemon_sprite(pokemon, prefix=u'icons'),
+        icon=pokemon_sprite(pokemon.form, prefix=u'icons'),
         id=pokemon.normal_form.id,
         name=pokemon.full_name,
 

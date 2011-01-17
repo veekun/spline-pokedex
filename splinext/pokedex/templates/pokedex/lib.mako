@@ -2,7 +2,7 @@
 % if pokemon.is_base_form:
 <span class="sprite-icon sprite-icon-${pokemon.normal_form.id}"></span>\
 % else:
-${h.pokedex.pokemon_sprite(pokemon, prefix='icons')}\
+${h.pokedex.pokemon_sprite(pokemon.form, prefix='icons')}\
 % endif
 </%def>
 
@@ -19,7 +19,7 @@ ${h.pokedex.pokemon_sprite(pokemon, prefix='icons')}\
         ${pokemon_icon(c.next_pokemon)}
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
-    ${h.pokedex.pokemon_sprite(prefix='icons', pokemon=c.pokemon)}
+    ${h.pokedex.pokemon_sprite(c.pokemon.form, prefix='icons')}
     <br>${c.pokemon.normal_form.id}: ${c.pokemon.name}
     <ul class="inline-menu">
     <% form = c.pokemon.form_name.lower() if not c.pokemon.is_base_form else None %>\

@@ -595,8 +595,10 @@ class PokedexGadgetsController(BaseController):
 
                 # 1.5: Deal with form matches
                 if isinstance(pokemon, tables.PokemonForm):
-                    form = pokemon.name
-                    pokemon = pokemon.unique_pokemon or pokemon.form_base_pokemon
+                    form = pokemon
+                    pokemon = pokemon.pokemon
+                else:
+                    form = pokemon.form
 
             # 2: Use the other results as suggestions.  Doing this informs the
             # template that this was a multi-match
