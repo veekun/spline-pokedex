@@ -724,18 +724,21 @@ ${h.h1('Miscellaneous Game Art', id='misc-sprites')}
 
 
 <%
-    sugimori_path = None
-    if c.form.form_base_pokemon_id in (386, 412, 413, 421, 422, 423, 479, 487, 492) and c.form.name:
-        # We have separate Sugimori art for the forms of Deoxys, Burmy, Wormadam, Cherrim, Shellos, Gastrodon, Rotom, Giratina, and Shaymin
-        sugimori_path = 'sugimori/{0}-{1}.png'.format(c.form.form_base_pokemon_id, c.form.name.lower())
-    elif c.pokemon.generation_id <= 5:
-        sugimori_path = 'sugimori/{0}.png'.format(c.pokemon.id)
-%>
+sugimori_art = None
 
-% if sugimori_path is not None:
+if h.pokedex.pokemon_has_media(c.form, 'sugimori', 'png'):
+    # We only have separate art per form for some Pokémon
+    sugimori_art = h.pokedex.pokemon_image(c.form, 'sugimori')
+elif (c.form.is_default and
+      h.pokedex.pokemon_has_media(c.form, 'sugimori', 'png', use_form=False)):
+    # We don't want to show default-form art if we're not the default form, and
+    # we also just plain don't have art of a few Pokémon
+    sugimori_art = h.pokedex.pokemon_image(c.form, 'sugimori', use_form=False)
+%>\
+% if sugimori_art:
 ${h.h1('Other Images', id='other')}
 <h2>Official artwork by Ken Sugimori</h2>
 <p class="dex-sugimori">
-    ${h.pokedex.pokedex_img(sugimori_path)}
+    ${sugimori_art}
 </p>
 % endif
