@@ -263,6 +263,8 @@ ${h.pokedex.pokemon_image(pokemon.form, prefix='icons')}\
 <td colspan="7"></td>
 </%def>
 
+###### Miscellaneous flavour presentation
+
 <%def name="flavor_text_list(flavor_text, classes='')">
 <%
 obdurate = session.get('cheat_obdurate', False)
@@ -281,4 +283,16 @@ collapse_key = h.pokedex.collapse_flavor_text_key(literal=obdurate)
 </dd>
 % endfor
 </dl>
+</%def>
+
+<%def name="pokemon_cry(pokemon_form)">
+<%
+# Shaymin (and nothing else) has different cries for its different forms
+cry_url = url(controller='dex', action='media', path=h.pokedex.pokemon_media_path(
+    pokemon_form, 'cries', 'ogg', pokemon_form.form_base_pokemon_id == 492))
+%>
+<audio src="${cry_url}" controls preload="auto" class="cry">
+    <!-- Totally the best fallback -->
+    <a href="${cry_url}">Download</a>
+</audio>
 </%def>

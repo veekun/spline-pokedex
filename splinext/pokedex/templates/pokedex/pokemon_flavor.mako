@@ -38,20 +38,8 @@ ${h.h1('Essentials')}
         </dd>
 
         <dt>Cry</dt>
-<%
-        # Shaymin (and nothing else) has different cries for its different forms
-        if c.pokemon.normal_form.id == 492:
-            cry_path = 'cries/{0}-{1}.ogg'.format(c.pokemon.normal_form.id, c.form.name.lower())
-        else:
-            cry_path = 'cries/{0}.ogg'.format(c.pokemon.normal_form.id)
-
-        cry_path = url(controller='dex', action='media', path=cry_path)
-%>\
         <dd>
-            <audio src="${cry_path}" controls preload="auto" class="cry">
-                <!-- Totally the best fallback -->
-                <a href="${cry_path}">Download</a>
-            </audio>
+            ${lib.pokemon_cry(c.form)}
         </dd>
 
         % if c.pokemon.generation.id <= 3:
