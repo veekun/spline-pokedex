@@ -25,9 +25,9 @@
     The ${c.table_labels[object.__class__]}
     <a href="${h.pokedex.make_thingy_url(object, subpage=c.subpage)}">
     % if object.__tablename__ == 'pokemon':
-    ${h.pokedex.pokemon_sprite(object.form, prefix='icons')}
+    ${h.pokedex.pokemon_image(object.form, prefix='icons')}
     % elif object.__tablename__ == 'pokemon_forms':
-    ${h.pokedex.pokemon_sprite(object, prefix='icons')}
+    ${h.pokedex.pokemon_image(object, prefix='icons')}
     % elif object.__tablename__ == 'items':
     ${h.pokedex.pokedex_img("items/%s.png" % h.pokedex.filename_from_name(object.name))}
     % elif object.__tablename__ == 'types':

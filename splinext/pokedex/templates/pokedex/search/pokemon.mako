@@ -129,7 +129,7 @@ ${h.pokedex.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_temp
 ## Grid of icons
 <ul class="inline">
     % for result in c.results:
-    <li>${h.pokedex.pokemon_link(result, h.pokedex.pokemon_sprite(result.form, prefix=u'icons'), class_='dex-icon-link')}</li>
+    <li>${h.pokedex.pokemon_link(result, h.pokedex.pokemon_image(result.form, prefix=u'icons'), class_='dex-icon-link')}</li>
     % endfor
 </ul>
 
@@ -137,7 +137,7 @@ ${h.pokedex.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_temp
 ## Grid of most recent sprites
 <ul class="inline">
     % for result in c.results:
-    <li>${h.pokedex.pokemon_link(result, h.pokedex.pokemon_sprite(result.form), class_='dex-icon-link')}</li>
+    <li>${h.pokedex.pokemon_link(result, h.pokedex.pokemon_image(result.form), class_='dex-icon-link')}</li>
     % endfor
 </ul>
 

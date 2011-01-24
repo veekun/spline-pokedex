@@ -64,7 +64,7 @@ ${h.form(url.current(), method='GET')}
         <th>
             % if found_pokemon.pokemon:
             ${h.pokedex.pokemon_link(found_pokemon.pokemon,
-                h.pokedex.pokemon_sprite(found_pokemon.form, prefix=u'icons')
+                h.pokedex.pokemon_image(found_pokemon.form, prefix=u'icons')
                     + h.literal(u'<br>') + found_pokemon.pokemon.full_name,
             )}<br>
             % endif
@@ -122,7 +122,7 @@ ${h.end_form()}
         % for i, found_pokemon in enumerate(c.found_pokemon):
         <td>
             % if found_pokemon.pokemon:
-            ${h.pokedex.pokemon_sprite(found_pokemon.form, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.heights[i] * 100))}
+            ${h.pokedex.pokemon_image(found_pokemon.form, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.heights[i] * 100))}
             % endif
         </td>
         % endfor
@@ -134,7 +134,7 @@ ${h.end_form()}
         % for i, found_pokemon in enumerate(c.found_pokemon):
         <td>
             % if found_pokemon.pokemon:
-            ${h.pokedex.pokemon_sprite(found_pokemon.form, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.weights[i] * 100))}
+            ${h.pokedex.pokemon_image(found_pokemon.form, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.weights[i] * 100))}
             % endif
         </td>
         % endfor
@@ -203,7 +203,7 @@ ${move_table_header()}
         <th>
             % if found_pokemon.pokemon:
             ${h.pokedex.pokemon_link(found_pokemon.pokemon,
-                h.pokedex.pokemon_sprite(found_pokemon.form, prefix=u'icons')
+                h.pokedex.pokemon_image(found_pokemon.form, prefix=u'icons')
                 + h.literal('<br>')
                 + found_pokemon.pokemon.full_name)}
             % endif
@@ -324,7 +324,7 @@ n/a
 % endif
 </%def>
 
-<%def name="footprint_cell(pokemon)">${h.pokedex.pokemon_sprite(pokemon.form, prefix='footprints', no_form=True)}</%def>
+<%def name="footprint_cell(pokemon)">${h.pokedex.pokemon_image(pokemon.form, prefix='footprints', use_form=False)}</%def>
 
 <%def name="shape_cell(pokemon)">
 % if pokemon.shape:

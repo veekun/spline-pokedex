@@ -27,7 +27,7 @@ ${h.h1('Essentials')}
     <p id="dex-pokemon-forme">${c.pokemon.unique_form.full_name}</p>
     % endif
     <div id="dex-pokemon-portrait-sprite">
-        ${h.pokedex.pokemon_sprite(c.pokemon.form, prefix='black-white')}
+        ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white')}
     </div>
     <p id="dex-page-types">
         % for type in c.pokemon.types:
@@ -326,7 +326,7 @@ ${h.h1('Evolution')}
     if form == c.pokemon.unique_form:
         link_class = link_class + ' selected'
 %>\
-    <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_sprite(form, 'black-white'), form=form.name, class_=link_class)}</li>
+    <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_image(form, 'black-white'), form=form.name, class_=link_class)}</li>
     % endfor
 </ul>
 <p> ${c.pokemon.normal_form.form_group.description.as_html | n} </p>
@@ -452,19 +452,19 @@ ${h.h1('Flavor')}
 </div>
 <div class="dex-column">
     <h2>Sprites</h2>
-    ${h.pokedex.pokemon_sprite(c.pokemon.form, prefix='black-white')}
-    ${h.pokedex.pokemon_sprite(c.pokemon.form, prefix='black-white/shiny')}
-    ${h.pokedex.pokemon_sprite(c.pokemon.form, prefix='black-white/back')}
-    ${h.pokedex.pokemon_sprite(c.pokemon.form, prefix='black-white/back/shiny')}
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white')}
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white/shiny')}
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white/back')}
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white/back/shiny')}
     % if c.pokemon.has_gender_differences:
     <br/>
-    % if h.pokedex.pokemon_has_sprite(c.pokemon.form, prefix='black-white/female'):
-    ${h.pokedex.pokemon_sprite(c.pokemon.form, prefix='black-white/female')}
-    ${h.pokedex.pokemon_sprite(c.pokemon.form, prefix='black-white/shiny/female')}
+    % if h.pokedex.pokemon_has_media(c.pokemon.form, 'black-white/female', 'png'):
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white/female')}
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white/shiny/female')}
     % endif
-    % if h.pokedex.pokemon_has_sprite(c.pokemon.form, prefix='black-white/back/female'):
-    ${h.pokedex.pokemon_sprite(c.pokemon.form, prefix='black-white/back/female')}
-    ${h.pokedex.pokemon_sprite(c.pokemon.form, prefix='black-white/back/shiny/female')}
+    % if h.pokedex.pokemon_has_media(c.pokemon.form, 'black-white/back/female', 'png'):
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white/back/female')}
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white/back/shiny/female')}
     % endif
     % endif
 </div>
@@ -523,7 +523,7 @@ ${h.h1('Flavor')}
         % endif
 
         <dt>Footprint</dt>
-        <dd>${h.pokedex.pokemon_sprite(c.pokemon.form, prefix='footprints', no_form=True)}</dd>
+        <dd>${h.pokedex.pokemon_image(c.pokemon.form, prefix='footprints', use_form=False)}</dd>
 
         % if c.pokemon.generation.id <= 4:
         <dt>Shape ${h.pokedex.generation_icon(4)}</dt>
@@ -548,7 +548,7 @@ ${h.h1('Flavor')}
             </p>
         </div>
         <div class="dex-size-pokemon">
-            ${h.pokedex.pokemon_sprite(c.pokemon.form, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
+            ${h.pokedex.pokemon_image(c.pokemon.form, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
             <div class="js-dex-size-raw">${c.pokemon.height}</div>
             <p class="dex-size-value">
                 ${h.pokedex.format_height_imperial(c.pokemon.height)} <br/>
@@ -567,7 +567,7 @@ ${h.h1('Flavor')}
             </p>
         </div>
         <div class="dex-size-pokemon">
-            ${h.pokedex.pokemon_sprite(c.pokemon.form, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
+            ${h.pokedex.pokemon_image(c.pokemon.form, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
             <div class="js-dex-size-raw">${c.pokemon.weight}</div>
             <p class="dex-size-value">
                 ${h.pokedex.format_weight_imperial(c.pokemon.weight)} <br/>
