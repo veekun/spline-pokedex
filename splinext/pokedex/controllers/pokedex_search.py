@@ -253,7 +253,6 @@ class PokemonSearchForm(BaseSearchForm):
         u'In regional Pokédex',
         query_factory=lambda: db.pokedex_session.query(tables.Pokedex) \
                                   .filter(tables.Pokedex.region_id != None) \
-                                  .filter(tables.Pokedex.name != u'Internal ID') \
                                   .options(eagerload_all('region.generation')),
         get_label=in_pokedex_label,
         get_pk=lambda table: table.id,

@@ -446,9 +446,9 @@ ${h.h1('Flavor')}
 <div class="dex-column-container">
 <div class="dex-column-2x">
     <h2>Flavor Text</h2>
-	<% flavor_text = filter(lambda text: text.version.generation.id == 4,
-	                        c.pokemon.normal_form.flavor_text) %>
-	${dexlib.flavor_text_list(flavor_text, 'dex-pokemon-flavor-text')}
+    <% flavor_text = filter(lambda text: text.version.generation.id == 4,
+                            c.pokemon.normal_form.flavor_text) %>
+    ${dexlib.flavor_text_list(flavor_text, 'dex-pokemon-flavor-text')}
 </div>
 <div class="dex-column">
     <h2>Sprites</h2>
