@@ -996,9 +996,20 @@ class PokedexController(BaseController):
         except NoResultFound:
             return self._not_found()
 
-        c.pokemon = c.form.unique_pokemon or c.form.form_base_pokemon
+        c.pokemon = c.form.pokemon
 
+        ### Previous and next for the header
+        c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
+
+        return self.cache_content(
+            key=u';'.join((c.pokemon.name, c.form.name or u'')),
+            template='/pokedex/pokemon_flavor.mako',
+            do_work=self._do_pokemon_flavor,
+        )
+
+    def _do_pokemon_flavor(self, name_plus_form):
         c.sprites = {}
+
         def sprite_exists(directory):
             """Return whether or not a sprite exists for this Pokémon in the
             specified directory, checking if need be.
@@ -1025,9 +1036,6 @@ class PokedexController(BaseController):
         c.sprites['emerald/animated'] = (c.appears_in_overworld and
             c.form.introduced_in_version_group_id <= 6)
 
-        ### Previous and next for the header
-        c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
-
         ### Sizing
         c.trainer_height = pokedex_helpers.trainer_height
         c.trainer_weight = pokedex_helpers.trainer_weight
@@ -1040,8 +1048,6 @@ class PokedexController(BaseController):
         # the space they actually take up is two-dimensional.
         weights = {'pokemon': c.pokemon.weight, 'trainer': c.trainer_weight}
         c.weights = pokedex_helpers.scale_sizes(weights, dimensions=2)
-
-        return render('/pokedex/pokemon_flavor.mako')
 
 
     def pokemon_locations(self, name):

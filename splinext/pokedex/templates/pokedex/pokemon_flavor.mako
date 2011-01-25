@@ -1,5 +1,6 @@
 <%inherit file="/base.mako"/>
-<%namespace name="lib" file="lib.mako"/>
+<%namespace name="lib" file="/lib.mako"/>
+<%namespace name="dexlib" file="lib.mako"/>
 
 <%def name="title()">${c.form.pokemon_name} flavor - Pokémon #${c.form.form_base_pokemon_id}</%def>
 
@@ -12,7 +13,10 @@
 </ul>
 </%def>
 
-${lib.pokemon_page_header()}
+${dexlib.pokemon_page_header()}
+
+
+<%lib:cache_content>
 ${h.h1('Essentials')}
 <div class="dex-column-container">
 <div class="dex-column">
@@ -39,7 +43,7 @@ ${h.h1('Essentials')}
 
         <dt>Cry</dt>
         <dd>
-            ${lib.pokemon_cry(c.form)}
+            ${dexlib.pokemon_cry(c.form)}
         </dd>
 
         % if c.pokemon.generation.id <= 3:
@@ -113,7 +117,7 @@ ${h.h1('Essentials')}
 </div>
 
 ${h.h1(u'Pokédex Description', id='pokedex')}
-${lib.flavor_text_list(c.form.form_base_pokemon.flavor_text, 'dex-pokemon-flavor-text')}
+${dexlib.flavor_text_list(c.form.form_base_pokemon.flavor_text, 'dex-pokemon-flavor-text')}
 
 ${h.h1('Main Game Portraits', id='main-sprites')}
 % if c.form.form_base_pokemon.form_group:
@@ -741,3 +745,4 @@ ${h.h1('Other Images', id='other')}
     ${sugimori_art}
 </p>
 % endif
+</%lib:cache_content>
