@@ -13,7 +13,7 @@
 </ul>
 </%def>
 
-${dexlib.pokemon_page_header()}
+${dexlib.pokemon_page_header(icon_form=c.form)}
 
 
 <%lib:cache_content>

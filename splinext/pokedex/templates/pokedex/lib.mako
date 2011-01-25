@@ -7,7 +7,7 @@ ${h.pokedex.pokemon_image(pokemon.form, prefix='icons')}\
 </%def>
 
 
-<%def name="pokemon_page_header()">
+<%def name="pokemon_page_header(icon_form=None)">
 <div id="dex-header">
     <a href="${url.current(name=c.prev_pokemon.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">
         <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
@@ -19,7 +19,7 @@ ${h.pokedex.pokemon_image(pokemon.form, prefix='icons')}\
         ${pokemon_icon(c.next_pokemon)}
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='icons')}
+    ${h.pokedex.pokemon_image(icon_form or c.pokemon.form, prefix='icons')}
     <br>${c.pokemon.normal_form.id}: ${c.pokemon.name}
     <ul class="inline-menu">
     <% form = c.pokemon.form_name.lower() if not c.pokemon.is_base_form else None %>\
