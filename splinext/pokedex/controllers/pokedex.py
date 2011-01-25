@@ -998,11 +998,32 @@ class PokedexController(BaseController):
 
         c.pokemon = c.form.unique_pokemon or c.form.form_base_pokemon
 
+        c.sprites = {}
+        def sprite_exists(directory):
+            """Return whether or not a sprite exists for this Pokémon in the
+            specified directory, checking if need be.
+
+            Avoids calling resource_exists() multiple times per sprite.
+            """
+
+            # n.b. calling dict.setdefault always evaluates the default
+            if directory not in c.sprites:
+                c.sprites[directory] = pokedex_helpers.pokemon_has_media(
+                    c.form, directory, 'png')
+            return c.sprites[directory]
+        c.sprite_exists = sprite_exists
+
         # Figure out if a sprite form appears in the overworld
-        c.appears_in_overworld = c.form.introduced_in_version_group_id <= 10 and (
-            c.form.is_default or
-            (c.pokemon.form_group and not c.pokemon.form_group.is_battle_only)
+        c.appears_in_overworld = c.form.is_default or (
+            c.form.form_base_pokemon.form_group and not
+            c.form.form_base_pokemon.form_group.is_battle_only
         )
+
+        # Some sprite-existence shortcuts based on this information
+        c.sprites['overworld'] = (c.appears_in_overworld and
+            c.form.introduced_in_version_group_id <= 10)
+        c.sprites['emerald/animated'] = (c.appears_in_overworld and
+            c.form.introduced_in_version_group_id <= 6)
 
         ### Previous and next for the header
         c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)

@@ -277,7 +277,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
             ${h.pokedex.pokemon_image(c.form, prefix='emerald')}
             ${h.pokedex.pokemon_image(c.form, prefix='emerald/frame2')}
             ## Emerald animations don't exist for forms that only exist after a battle starts
-            % if c.appears_in_overworld:
+            % if c.sprite_exists('emerald/animated'):
             ${h.pokedex.pokemon_image(c.form, prefix='emerald/animated')}
             % endif
         </td>
@@ -299,7 +299,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         <td>
             ${h.pokedex.pokemon_image(c.form, prefix='emerald/shiny')}
             ${h.pokedex.pokemon_image(c.form, prefix='emerald/shiny/frame2')}
-            % if c.appears_in_overworld:
+            % if c.sprite_exists('emerald/animated'):
             ${h.pokedex.pokemon_image(c.form, prefix='emerald/shiny/animated')}
             % endif
         </td>
@@ -418,7 +418,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
     <tr>
         <th class="vertical-text">Normal<br/>(female)</th>
         % if c.form.introduced_in_version_group_id <= 8:
-        % if h.pokedex.pokemon_has_media(c.form, 'diamond-pearl/female', 'png'):
+        % if c.sprite_exists('diamond-pearl/female'):
         <td>
             ${h.pokedex.pokemon_image(c.form, prefix='diamond-pearl/female')}
             ${h.pokedex.pokemon_image(c.form, prefix='diamond-pearl/female/frame2')}
@@ -427,7 +427,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
 
-        % if h.pokedex.pokemon_has_media(c.form, 'diamond-pearl/back/female', 'png'):
+        % if c.sprite_exists('diamond-pearl/back/female'):
         <td>${h.pokedex.pokemon_image(c.form, prefix='diamond-pearl/back/female')}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
@@ -435,7 +435,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         % endif
 
         % if c.form.introduced_in_version_group_id <= 9:
-        % if h.pokedex.pokemon_has_media(c.form, 'platinum/female', 'png'):
+        % if c.sprite_exists('platinum/female'):
         <td>
             ${h.pokedex.pokemon_image(c.form, prefix='platinum/female')}
             ${h.pokedex.pokemon_image(c.form, prefix='platinum/female/frame2')}
@@ -444,7 +444,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
 
-        % if h.pokedex.pokemon_has_media(c.form, 'platinum/back/female', 'png'):
+        % if c.sprite_exists('platinum/back/female'):
         <td>
             ${h.pokedex.pokemon_image(c.form, prefix='platinum/back/female')}
             ${h.pokedex.pokemon_image(c.form, prefix='platinum/back/female/frame2')}
@@ -454,7 +454,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         % endif
         % endif
 
-        % if h.pokedex.pokemon_has_media(c.form, 'heartgold-soulsilver/female', 'png'):
+        % if c.sprite_exists('heartgold-soulsilver/female'):
         <td>
             ${h.pokedex.pokemon_image(c.form, prefix='heartgold-soulsilver/female')}
             ${h.pokedex.pokemon_image(c.form, prefix='heartgold-soulsilver/female/frame2')}
@@ -463,7 +463,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
 
-        % if h.pokedex.pokemon_has_media(c.form, 'heartgold-soulsilver/back/female', 'png'):
+        % if c.sprite_exists('heartgold-soulsilver/back/female'):
         <td>
             ${h.pokedex.pokemon_image(c.form, prefix='heartgold-soulsilver/back/female')}
             ${h.pokedex.pokemon_image(c.form, prefix='heartgold-soulsilver/back/female/frame2')}
@@ -475,7 +475,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
     <tr>
         <th class="vertical-text">Shiny<br/>(female)</th>
         % if c.form.introduced_in_version_group_id <= 8:
-        % if h.pokedex.pokemon_has_media(c.form, 'diamond-pearl/female', 'png'):
+        % if c.sprite_exists('diamond-pearl/female'):
         <td>
             ${h.pokedex.pokemon_image(c.form, prefix='diamond-pearl/shiny/female')}
             ${h.pokedex.pokemon_image(c.form, prefix='diamond-pearl/shiny/female/frame2')}
@@ -484,7 +484,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
 
-        % if h.pokedex.pokemon_has_media(c.form, 'diamond-pearl/back/female', 'png'):
+        % if c.sprite_exists('diamond-pearl/back/female'):
         <td>${h.pokedex.pokemon_image(c.form, prefix='diamond-pearl/back/shiny/female')}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
@@ -492,7 +492,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         % endif
 
         % if c.form.introduced_in_version_group_id <= 9:
-        % if h.pokedex.pokemon_has_media(c.form, 'platinum/female', 'png'):
+        % if c.sprite_exists('platinum/female'):
         <td>
             ${h.pokedex.pokemon_image(c.form, prefix='platinum/shiny/female')}
             ${h.pokedex.pokemon_image(c.form, prefix='platinum/shiny/female/frame2')}
@@ -501,7 +501,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
 
-        % if h.pokedex.pokemon_has_media(c.form, 'platinum/back/female', 'png'):
+        % if c.sprite_exists('platinum/back/female'):
         <td>
             ${h.pokedex.pokemon_image(c.form, prefix='platinum/back/shiny/female')}
             ${h.pokedex.pokemon_image(c.form, prefix='platinum/back/shiny/female/frame2')}
@@ -511,7 +511,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         % endif
         % endif
 
-        % if h.pokedex.pokemon_has_media(c.form, 'heartgold-soulsilver/female', 'png'):
+        % if c.sprite_exists('heartgold-soulsilver/female'):
         <td>
             ${h.pokedex.pokemon_image(c.form, prefix='heartgold-soulsilver/shiny/female')}
             ${h.pokedex.pokemon_image(c.form, prefix='heartgold-soulsilver/shiny/female/frame2')}
@@ -520,7 +520,7 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
 
-        % if h.pokedex.pokemon_has_media(c.form, 'heartgold-soulsilver/back/female', 'png'):
+        % if c.sprite_exists('heartgold-soulsilver/back/female'):
         <td>
             ${h.pokedex.pokemon_image(c.form, prefix='heartgold-soulsilver/back/shiny/female')}
             ${h.pokedex.pokemon_image(c.form, prefix='heartgold-soulsilver/back/shiny/female/frame2')}
@@ -578,13 +578,13 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
     <tr>
         <th class="vertical-text">Normal <br/> (female)</th>
         % if c.form.introduced_in_version_group_id <= 11:
-        % if h.pokedex.pokemon_has_media(c.form, 'black-white/female', 'png'):
+        % if c.sprite_exists('black-white/female'):
         <td>${h.pokedex.pokemon_image(c.form, prefix='black-white/female')}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
 
-        % if h.pokedex.pokemon_has_media(c.form, 'black-white/back/female', 'png'):
+        % if c.sprite_exists('black-white/back/female'):
         <td>${h.pokedex.pokemon_image(c.form, prefix='black-white/back/female')}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
@@ -594,13 +594,13 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
     <tr>
         <th class="vertical-text">Shiny <br/> (female)</th>
         % if c.form.introduced_in_version_group_id <= 11:
-        % if h.pokedex.pokemon_has_media(c.form, 'black-white/female', 'png'):
+        % if c.sprite_exists('black-white/female'):
         <td>${h.pokedex.pokemon_image(c.form, prefix='black-white/shiny/female')}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
 
-        % if h.pokedex.pokemon_has_media(c.form, 'black-white/back/female', 'png'):
+        % if c.sprite_exists('black-white/back/female'):
         <td>${h.pokedex.pokemon_image(c.form, prefix='black-white/back/shiny/female')}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
@@ -613,9 +613,8 @@ ${h.h1('Main Game Portraits', id='main-sprites')}
 % endif
 
 
-## Overworld sprites can't exist for alternate forms that are in-battle only
-% if c.appears_in_overworld:
-<% overworld_gender_differences = c.pokemon.has_gender_differences and h.pokedex.pokemon_has_sprite(c.form, 'overworld/female') %>
+% if c.sprite_exists('overworld'):
+<% overworld_gender_differences = c.pokemon.has_gender_differences and c.sprite_exists('overworld/female') %>
 ${h.h1('Miscellaneous Game Art', id='misc-sprites')}
 <h2> ${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')} HeartGold &amp; SoulSilver Overworld </h2>
 <table class="dex-pokemon-flavor-sprites">
