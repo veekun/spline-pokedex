@@ -1,23 +1,25 @@
 <%inherit file="/base.mako"/>
+<%! from splinext.pokedex import i18n %>\
 <%!
+    _ = unicode
     import random
     random_title = random.choice([
-        'idspispopd',
-        'iddqd',
-        'cass',
-        'uuddlrlrba',
-        'hold down+b',
-        'talk to oak 250 times',
-        'its a secret to everyone',
+        _('idspispopd'),
+        _('iddqd'),
+        _('cass'),
+        _('uuddlrlrba'),
+        _('hold down+b'),
+        _('talk to oak 250 times'),
+        _('its a secret to everyone'),
     ])
 %>
-<%def name="title()">${random_title}</%def>
+<%def name="title()">${_(random_title)}</%def>
 
 <div id="dex-cheat-unlocked">
-    <img src="${h.static_uri('pokedex', 'images/cheat-unlocked.gif')}" alt="YEAH" class="dex-cheat-unlocked-left">
-    <img src="${h.static_uri('pokedex', 'images/cheat-unlocked.gif')}" alt="YEAH" class="dex-cheat-unlocked-right">
-    <div class="dex-cheat-unlocked-line1">Success</div>
-    <div class="dex-cheat-unlocked-line2">Cheat Unlocked</div>
+    <img src="${h.static_uri('pokedex', 'images/cheat-unlocked.gif')}" alt="${_("YEAH")}" class="dex-cheat-unlocked-left">
+    <img src="${h.static_uri('pokedex', 'images/cheat-unlocked.gif')}" alt="${_("YEAH")}" class="dex-cheat-unlocked-right">
+    <div class="dex-cheat-unlocked-line1">${_("Success")}</div>
+    <div class="dex-cheat-unlocked-line2">${_("Cheat Unlocked")}</div>
 </div>
 
 <ul id="dex-cheat-list">

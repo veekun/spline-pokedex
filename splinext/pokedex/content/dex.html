@@ -2,6 +2,8 @@
 <%def name="title()">Pokédex</%def>
 <%def name="title_in_page()">Pokédex Introduction</%def>
 
+<%! from splinext.pokedex import i18n %>\
+
 <form id="big-pokedex-lookup" method="GET" action="${url(controller='dex', action='lookup')}">
 <p>
     <input type="text" name="lookup" class="dex-lookup js-dex-suggest"/>
@@ -10,38 +12,88 @@
 </form>
 
 ${h.h1('Introduction')}
-<p>Pretty much anything that exists in the Pokémon world can be found in the Pokédex.  Just type in a name and try it out.</p>
+<p>${_(u"""Pretty much anything that exists in the Pokémon world can be found
+in the Pokédex.  Just type in a name and try it out.""")}</p>
 
-<p>Or you can browse by category:</p>
+<p>${_(u"Or you can browse by category:")}</p>
 
 <ul class="classic-list">
-    <li><a href="${url(controller='dex', action='pokemon_list')}">Pokémon</a></li>
-    <li><a href="${url(controller='dex', action='moves_list')}">Moves</a></li>
-    <li><a href="${url(controller='dex', action='types_list')}">Types</a></li>
-    <li><a href="${url(controller='dex', action='abilities_list')}">Abilities</a></li>
-    <li><a href="${url(controller='dex', action='items_list')}">Items</a></li>
-    <li><a href="${url(controller='dex', action='natures_list')}">Natures</a></li>
+    <li><a href="${url(controller='dex', action='pokemon_list')}">${_(u"Pokémon", context="plural")}</a></li>
+    <li><a href="${url(controller='dex', action='moves_list')}">${_(u"Moves")}</a></li>
+    <li><a href="${url(controller='dex', action='types_list')}">${_(u"Types")}</a></li>
+    <li><a href="${url(controller='dex', action='abilities_list')}">${_(u"Abilities")}</a></li>
+    <li><a href="${url(controller='dex', action='items_list')}">${_(u"Items")}</a></li>
+    <li><a href="${url(controller='dex', action='natures_list')}">${_(u"Natures")}</a></li>
 </ul>
 
-<p>The <a href="http://old.veekun.com/dex">old Pokédex</a> is, for now, still available.</p>
+<p>${_(u"""The <a href="http://old.veekun.com/dex">old Pokédex</a> is, for now,
+still available.""") | n}</p>
 
 
-${h.h1('Finding stuff')}
+${h.h1(_('Finding stuff'))}
 
-<p>Lookup works the same way anywhere you can type a name.  ("Lookup" refers to entering a name to find something(s) specific.  "Searching" is <a href="${url(controller='dex_search', action='pokemon_search')}">a bit more complicated</a>.)</p>
+<p>${_(u'''Lookup works the same way anywhere you can type a name.
+("Lookup" refers to entering a name to find something(s) specific.
+"Searching" is <a href="%s">a bit more complicated</a>.)'''
+) % url(controller='dex_search', action='pokemon_search') | n}</p>
 
-<p>Case (${lookup_examples(u'kecleon')} vs ${lookup_examples(u'KECLEON')}) and extra spaces are ignored.</p>
+<p>${_(u"Case ({kecleon} vs {KECLEON}) and extra spaces are ignored.").format(
+    kecleon=lookup_examples(_(u'kecleon')),
+    KECLEON=lookup_examples(_(u'KECLEON'))
+) | n}</p>
 
-<p>If you enter something that's misspelled or could be one of several pages, you'll get a list of up to 10 guesses or matches to choose from.</p>
+<p>${_(u"""If you enter something that's misspelled or could be one of several
+pages, you'll get a list of up to 10 guesses or matches to choose from.""")}</p>
 
-<p>You can specify what sort of thing you're looking for by putting one or more before a colon, e.g. ${lookup_examples(u'pokemon:Kangaskhan')} or ${lookup_examples(u'item,move:metronome')}.  This is mostly useful when looking things up by national id (${lookup_examples(u'pokemon:151')}), because moves and types have ids, too.  It's also helpful when looking up something ambiguous (${lookup_examples(u'move:Psychic')} vs ${lookup_examples(u'type:psychic')}) if you want to skip the disambiguation page.</p>
+<p>${_(u"""You can specify what sort of thing you're looking for by putting one
+or more before a colon, e.g. {pokemon_Kangaskhan} or {item_move_Metronome}.
+This is mostly useful when looking things up by national id ({pokemon_151}),
+because moves and types have ids, too.  It's also helpful when looking up
+something ambiguous ({move_Psychic} vs {type_psychic}) if you want to skip the
+disambiguation page.""",
+comment="Feel free to leave out the Psychic example if your language has unambiguous names."
+).format(
+    pokemon_Kangaskhan=lookup_examples(_(u'pokemon:Kangaskhan')),
+    item_move_Metronome=lookup_examples(_(u'item,move:metronome')),
+    pokemon_151=lookup_examples(_(u'pokemon:151')),
+    move_Psychic=lookup_examples(_(u'move:Psychic')),
+    type_psychic=lookup_examples(_(u'type:psychic')),
+) | n}</p>
 
-<p>Similarly, you can restrict lookup by language.  ${lookup_examples(u'charge')} will offer both <a href="${url(controller='dex', action='moves', name=u'tackle')}">Tackle</a> and <a href="${url(controller='dex', action='moves', name=u'charge')}">Charge</a>, because Tackle's French name is "Charge".  If you wanted one or the other, you could enter ${lookup_examples(u'@fr:charge')} or ${lookup_examples(u'@en:charge')}.  These also combine with the prefixes above, as in ${lookup_examples(u'@fr,move:charge')}.</p>
+<p>${_(u"""Similarly, you can restrict lookup by language.
+{charge} will offer both {link_tackle} and
+{link_charge}, because Tackle's French name is "Charge".
+If you wanted one or the other, you could enter {fr_charge} or {en_charge}.
+These also combine with the prefixes above, as in {fr_move_charge}.""",
+comment="""This is a tough one, don't get confused.
+{charge} will become a link to a search for "charge".
+{link_tackle} will become a link to the move that's called Tackle in English.
+{link_charge} will become a link to the move that's called Charge in English.
+{fr_charge} will become a link to the "@fr:charge" search.
+{en_charge} will become a link to the "@en:charge" search.
+{fr_move_charge} will become a link to the "@fr,move:charge" search.
+"""
+).format(
+    link_tackle='<a href="{url}">{name}</a>'.format(
+            url=url(controller='dex', action='moves', name=_(u'tackle', context='move name')),
+            name=_('Tackle', context='move'),
+        ),
+    link_charge='<a href="{url}">{name}</a>'.format(
+            url=url(controller='dex', action='moves', name=_(u'charge', context='move name')),
+            name=_('Charge', context='move'),
+        ),
+    charge=lookup_examples(u'charge'),
+    charge_url=url(controller='dex', action='moves', name=_(u'charge', context='move name')),
+    fr_charge=lookup_examples(u'@fr:charge'),
+    en_charge=lookup_examples(u'@en:charge'),
+    fr_move_charge=lookup_examples(u'@fr,move:charge'),
+) | n}</p>
 
 
-<p>Lookup understands the following:</p>
 
-<%def name="lookup_examples(*examples)">\
+<p>${_(u"Lookup understands the following:")}</p>
+
+<%def name="lookup_examples(*examples)" buffered="True">\
 % for i, example in enumerate(examples):
 % if i > 0:
 ;
@@ -51,22 +103,22 @@ ${h.h1('Finding stuff')}
 </%def>
 
 <dl>
-    <dt>National IDs</dt>
-    <dd>${lookup_examples(u'pokemon:352', u'move:1')}</dd>
-    <dt>Names</dt>
-    <dd>${lookup_examples(u'Eevee', u'Rough Skin', u'Super Rod', u'Route 202')}</dd>
-    <dt>Pokémon forms</dt>
-    <dd>${lookup_examples(u'Speed Deoxys', u'Wash Rotom')}</dd>
-    <dt>Jump to subpages</dt>
-    <dd>${lookup_examples(u'eevee flavor', u'eevee locations')}</dd>
-    <dt>Foreign names</dt>
-    <dd>${lookup_examples(u'イーブイ', u'Iibui', u'Eivui', u'Évoli', u'이브이')}</dd>
-    <dt>Misspelled names</dt>
-    <dd>${lookup_examples(u'Dragontie', u'Synthesys', u'psychich', u'Thunder Shock')}</dd>
-    <dt>Wildcards</dt>
-    <dd>${lookup_examples(u'pokemon:????', u'move:thunder*', u'item:* ball')}</dd>
-    <dt>"Random"</dt>
-    <dd>${lookup_examples(u'pokemon:random', u'move:random', u'random')}</dd>
-    <dt>Magic words</dt>
-    <dd>???<!-- obdurate --></dd>
+    <dt>${_(u"National IDs")}</dt>
+    <dd>${lookup_examples(_(u'pokemon:352'), _(u'move:1')) | n}</dd>
+    <dt>${_(u"Names")}</dt>
+    <dd>${lookup_examples(_(u'Eevee'), _(u'Rough Skin'), _(u'Super Rod'), _(u'Route 202')) | n}</dd>
+    <dt>${_(u"Pokémon forms")}</dt>
+    <dd>${lookup_examples(_(u'Speed Deoxys'), _(u'Wash Rotom')) | n}</dd>
+    <dt>${_(u"Jump to subpages")}</dt>
+    <dd>${lookup_examples(_(u'eevee flavor'), _(u'eevee locations')) | n}</dd>
+    <dt>${_(u"Foreign names")}</dt>
+    <dd>${lookup_examples(u'イーブイ', u'Iibui', u'Eivui', u'Évoli', u'이브이') | n}</dd>
+    <dt>${_(u"Misspelled names")}</dt>
+    <dd>${lookup_examples(_(u'Dragontie'), _(u'Synthesys'), _(u'psychich'), _(u'Thunder Shock')) | n}</dd>
+    <dt>${_(u"Wildcards")}</dt>
+    <dd>${lookup_examples(_(u'pokemon:????'), _(u'move:thunder*'), _(u'item:* ball')) | n}</dd>
+    <dt>${_(u'"Random"')}</dt>
+    <dd>${lookup_examples(_(u'pokemon:random'), _(u'move:random'), _(u'random')) | n}</dd>
+    <dt>${_(u"Magic words")}</dt>
+    <dd>${_(u"???") | n}<!-- ${_(u"obdurate")} --></dd>
 </dl>

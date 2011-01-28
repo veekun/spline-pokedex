@@ -1,19 +1,20 @@
 <%inherit file="/base.mako" />
 <%namespace name="lib" file="/lib.mako"/>
 <%namespace name="dexlib" file="/pokedex/lib.mako"/>
+<%! from splinext.pokedex import i18n %>\
 
-<%def name="title()">Stat calculator</%def>
+<%def name="title()">${_(u"Stat calculator")}</%def>
 
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
-    <li><a href="${url('/dex')}">Pokédex</a></li>
-    <li>Gadgets</li>
-    <li>Stat calculator</li>
+    <li><a href="${url('/dex')}">${_(u"Pokédex")}</a></li>
+    <li>${_(u"Gadgets")}</li>
+    <li>${_(u"Stat calculator")}</li>
 </ul>
 </%def>
 
-<p>WHIRLWIND EXPLANATION: Pokémon have a fixed, permanent score from 0 to 31 for each stat that affects how good that stat can ever get.</p>
-<p>This calculator will figure out that score (called a "gene" or, more obtusely, an "IV") for you, so you can discard the <em>unworthy</em>.  It's more accurate for higher-level Pokémon, so it's helpful to go into a level 100 wifi battle with someone and check your Pokémon's stats from there.</p>
+<p>${_(u"WHIRLWIND EXPLANATION: Pokémon have a fixed, permanent score from 0 to 31 for each stat that affects how good that stat can ever get.")}</p>
+<p>${_(u"This calculator will figure out that score (called a \"gene\" or, more obtusely, an \"IV\") for you, so you can discard the <em>unworthy</em>.  It's more accurate for higher-level Pokémon, so it's helpful to go into a level 100 wifi battle with someone and check your Pokémon's stats from there.") | n}</p>
 
 <h1>Stat calculator</h1>
 
@@ -37,9 +38,9 @@ ${h.form(url.current(), method=u'GET')}
         <th></th>
         % for stat in c.stats:
         % if c.form.nature.data.increased_stat == stat:
-        <th class="dex-nature-buff">+10%</th>
+        <th class="dex-nature-buff">${_(u"+10%")}</th>
         % elif c.form.nature.data.decreased_stat == stat:
-        <th class="dex-nature-nerf">&minus;10%</th>
+        <th class="dex-nature-nerf">${_(u"−10%")}</th>
         % else:
         <th></th>
         % endif
@@ -58,12 +59,12 @@ ${h.form(url.current(), method=u'GET')}
     <tr>
         <th></th>
         <td colspan="${len(c.stats)}" class="protip">
-            Your Pokémon's actual stats, from the Summary screen in-game.
+            ${_(u"Your Pokémon's actual stats, from the Summary screen in-game.")}
         </td>
     </tr>
     % endif
     <tr>
-        <th>Stats</th>
+        <th>${_(u"Stats")}</th>
         % for field_name in c.stat_fields:
         <td>${lib.bare_field(field_name, size=3)}</td>
         % endfor
@@ -71,7 +72,7 @@ ${h.form(url.current(), method=u'GET')}
 
     % if c.results:
     <tr>
-        <th>Possible range</th>
+        <th>${_(u"Possible range")}</th>
         % for stat in c.stats:
         <td
             % if not c.form.nature.data or c.form.nature.data.is_neutral:
@@ -97,13 +98,13 @@ ${h.form(url.current(), method=u'GET')}
     <tr>
         <th></th>
         <td colspan="${len(c.stats)}" class="protip">
-            Accumulated as your Pokémon battles. <br>
-            If you don't know what this is, and your Pokémon has EVER battled or eaten a vitamin, this calculator CANNOT work.  Using Rare Candy is okay, though.
+            ${_(u"Accumulated as your Pokémon battles.")} <br>
+            ${_(u"If you don't know what this is, and your Pokémon has EVER battled or eaten a vitamin, this calculator CANNOT work.  Using Rare Candy is okay, though.")}
         </td>
     </tr>
     % endif
     <tr>
-        <th>Effort</th>
+        <th>${_(u"Effort")}</th>
         % for field_name in c.effort_fields:
         <td>${lib.bare_field(field_name, size=3)}</td>
         % endfor
@@ -120,7 +121,7 @@ ${h.form(url.current(), method=u'GET')}
     </tr>
     % endif
     <tr>
-        <th>Genes (IVs)</th>
+        <th>${_(u"Genes (IVs)")}</th>
         % for stat in c.stats:
         <td>
             % if c.results[stat]:
@@ -153,17 +154,17 @@ ${h.form(url.current(), method=u'GET')}
     <tr>
         <td colspan="${len(c.stats) + 1}">
             % if all(c.results.values()):
-            <p>And for your copy/pasting pleasure:</p>
+            <p>${_(u"And for your copy/pasting pleasure:")}</p>
             <p class="clipboard">
-                ${c.results[c.stats[0]]} HP;
-                ${c.results[c.stats[1]]}/${c.results[c.stats[2]]} Physical;
-                ${c.results[c.stats[3]]}/${c.results[c.stats[4]]} Special;
-                ${c.results[c.stats[5]]} Speed
+                ${c.results[c.stats[0]]} ${_(u"HP")};
+                ${c.results[c.stats[1]]}/${c.results[c.stats[2]]} ${_(u"Physical")};
+                ${c.results[c.stats[3]]}/${c.results[c.stats[4]]} ${_(u"Special")};
+                ${c.results[c.stats[5]]} ${_(u"Speed")}
             </p>
             % else:
-            <p>Uh-oh.  The set of stats you gave is totally impossible. Better double-check against your game.</p>
-            <p>The most common problem is effort; if a Pokémon has been trained at all, it'll have some effort accumulated.  This affects its stats, and there's no way to know how much effort it has unless you've been keeping track.  Sorry.</p>
-            <p>If you're desperate, you could try the effort-lowering berries (Pomeg et al.), which will reduce effort in a given stat by 10 at a time.  Drop every stat's effort until it won't drop any further, then try again.</p>
+            <p>${_(u"Uh-oh.  The set of stats you gave is totally impossible. Better double-check against your game.")}</p>
+            <p>${_(u"The most common problem is effort; if a Pokémon has been trained at all, it'll have some effort accumulated.  This affects its stats, and there's no way to know how much effort it has unless you've been keeping track.  Sorry.")}</p>
+            <p>${_(u"If you're desperate, you could try the effort-lowering berries (Pomeg et al.), which will reduce effort in a given stat by 10 at a time.  Drop every stat's effort until it won't drop any further, then try again.")}</p>
             % endif
         </td>
     </tr>
@@ -171,9 +172,9 @@ ${h.form(url.current(), method=u'GET')}
 % endif
 </table>
 
-<p><button type="submit">Let's do this!</button></p>
+<p><button type="submit">${_(u"Let's do this!")}</button></p>
 <p>
-    <button type="reset">Reset</button> or
-    <a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/eraser.png')}" alt=""> start over</a>
+    <button type="reset">${_(u"Reset")}</button> ${_(u"or")}
+    <a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/eraser.png')}" alt=""> ${_(u"start over")}</a>
 </p>
 ${h.end_form()}

@@ -1,3 +1,5 @@
+<%! from splinext.pokedex import i18n %>\
+
 <%def name="pokemon_icon(pokemon)">\
 % if pokemon.is_base_form:
 <span class="sprite-icon sprite-icon-${pokemon.normal_form.id}"></span>\
@@ -293,6 +295,14 @@ cry_url = url(controller='dex', action='media', path=h.pokedex.pokemon_media_pat
 %>
 <audio src="${cry_url}" controls preload="auto" class="cry">
     <!-- Totally the best fallback -->
-    <a href="${cry_url}">Download</a>
+    <a href="${cry_url}">${_('Download')}</a>
 </audio>
+</%def>
+
+<%def name="subtle_search(**kwargs)">
+    <% _ = kwargs.pop('_', unicode) %>
+    <a href="${url(controller='dex_search', **kwargs)}"
+        class="dex-subtle-search-link">
+        <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="${_('Search: ')}" title="${_('Search')}">
+    </a>
 </%def>

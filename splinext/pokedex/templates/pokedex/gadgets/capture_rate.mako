@@ -1,20 +1,21 @@
 <%inherit file="/base.mako" />
 <%namespace name="lib" file="/lib.mako"/>
 <%namespace name="dexlib" file="/pokedex/lib.mako"/>
+<%! from splinext.pokedex import i18n %>\
 
-<%def name="title()">Pokéball performance</%def>
+<%def name="title()">${_(u"Pokéball performance")}</%def>
 
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
-    <li><a href="${url('/dex')}">Pokédex</a></li>
-    <li>Gadgets</li>
-    <li>Pokéball performance</li>
+    <li><a href="${url('/dex')}">${_(u"Pokédex")}</a></li>
+    <li>${_("Gadgets")}</li>
+    <li>${_(u"Pokéball performance")}</li>
 </ul>
 </%def>
 
-<p>Have you spent the past six hours trying to catch Giratina in Ultra Balls?  Me, too!  What a jerk.  This gadget will tell you which ball is the best choice against your target, and about how long it'll take to catch.</p>
+<p>${_(u"Have you spent the past six hours trying to catch Giratina in Ultra Balls?  Me, too!  What a jerk.  This gadget will tell you which ball is the best choice against your target, and about how long it'll take to catch.")}</p>
 
-<h1>Target Pokémon</h1>
+<h1>${_(u"Target Pokémon")}</h1>
 
 ${h.form(url.current(), method='GET')}
 <dl class="standard-form">
@@ -23,8 +24,8 @@ ${h.form(url.current(), method='GET')}
     ${lib.field('status_ailment')}
 </dl>
 
-<h2>Specialty ball stuff</h2>
-<p>These affect the functionality of some specialty balls, but aren't part of the regular capture rate calculations.  You can skip them if you want.</p>
+<h2>${_(u"Specialty ball stuff")}</h2>
+<p>${_(u"These affect the functionality of some specialty balls, but aren't part of the regular capture rate calculations.  You can skip them if you want.")}</p>
 
 <%def name="long_checkbox_field(name)">
     <dd>${c.form[name]() | n} ${c.form[name].label() | n}</dd>
@@ -40,7 +41,7 @@ ${h.form(url.current(), method='GET')}
     ${long_checkbox_field('is_pokemon_master')}
 </dl>
 
-<p><input type="submit" value="Pokéball, go!"></p>
+<p><input type="submit" value="${_(u"Pokéball, go!")}"></p>
 ${h.end_form()}
 
 
@@ -70,7 +71,7 @@ ${h.end_form()}
     % else:  ## up+b
     <td class="chance">
         <div class="dex-capture-rate-graph"
-             title="Capture: ${ "{0:.1f}%".format(chances[0] * 100) }">
+             title="${_(u"Capture:")} ${ "{0:.1f}%".format(chances[0] * 100) }">
             ## Only actually draw bars for the wobbles.  Capture is the
             ## default background color.
             ## catch 3 2 1 0 => 3 2 1 0 => 0 1 2 3
@@ -128,43 +129,41 @@ ${h.end_form()}
 </%def>
 
 % if c.results:
-<h1>Ball Success Rates</h1>
+<h1>${_(u"Ball Success Rates")}</h1>
 <p>
-    ${h.pokedex.pokemon_link(c.pokemon)}'s capture rate:
-    ${c.pokemon.capture_rate}/255
-    or about ${ "{0:.01f}%".format( 1.0 * c.pokemon.capture_rate / 255 * 100 ) }.
+    ${_(u"{pokemon}'s capture rate: {rate}/255 or about {precent:.01f}%.").format(pokemon=h.pokedex.pokemon_link(c.pokemon), rate=c.pokemon.capture_rate, precent=1.0 * c.pokemon.capture_rate / 255 * 100) | n}.
 </p>
 
-<p>Disclaimer: This is all approximate!  The game might still hate you more than these numbers indicate.</p>
+<p>${_(u"Disclaimer: This is all approximate!  The game might still hate you more than these numbers indicate.")}</p>
 
 % if c.form.is_pokemon_master.data:
-<p>And no, Up+B doesn't actually do anything.</p>
+<p>${_(u"And no, Up+B doesn't actually do anything.")}</p>
 % endif
 
 <p class="dex-capture-rate-legend">
-    Legend: Ball wobbles
-    <span class="wobble0">zero</span>,
-    <span class="wobble1">one</span>,
-    <span class="wobble2">two</span>,
-    <span class="wobble3">three</span> times.
-    <span class="wobble4">Capture!</span>
-    Mouseover for specifics.
+    ${_(u"Legend: Ball wobbles")}
+    <span class="wobble0">${_(u"zero")}</span>,
+    <span class="wobble1">${_(u"one")}</span>,
+    <span class="wobble2">${_(u"two")}</span>,
+    <span class="wobble3">${_(u"three")}</span> ${_(u"times.")}
+    <span class="wobble4">${_(u"Capture!")}</span>
+    ${_(u"Mouseover for specifics.")}
 </p>
 
 
 <table class="dex-capture-rates striped-row-groups">
 <thead>
 <tr class="header-row">
-    <th>Ball</th>
-    <th colspan="2">Chance to catch</th>
-    <th>Avg. tries</th>
-    <th>Requirement</th>
+    <th>${_(u"Ball")}</th>
+    <th colspan="2">${_(u"Chance to catch")}</th>
+    <th>${_(u"Avg. tries")}</th>
+    <th>${_(u"Requirement")}</th>
 </tr>
 </thead>
 
 <thead>
 <tr class="subheader-row">
-    <th colspan="5">Generation I</th>
+    <th colspan="5">${_(u"Generation I")}</th>
 </tr>
 </thead>
 ${ball_rows(u'Poké Ball')}
@@ -175,7 +174,7 @@ ${ball_rows(u'Safari Ball')}
 
 <thead>
 <tr class="subheader-row">
-    <th colspan="5">Generation II</th>
+    <th colspan="5">${_(u"Generation II")}</th>
 </tr>
 </thead>
 ${ball_rows(u'Fast Ball')}
@@ -189,7 +188,7 @@ ${ball_rows(u'Sport Ball')}
 
 <thead>
 <tr class="subheader-row">
-    <th colspan="5">Generation III</th>
+    <th colspan="5">${_(u"Generation III")}</th>
 </tr>
 </thead>
 ${ball_rows(u'Premier Ball')}
@@ -202,7 +201,7 @@ ${ball_rows(u'Timer Ball')}
 
 <thead>
 <tr class="subheader-row">
-    <th colspan="5">Generation IV</th>
+    <th colspan="5">${_(u"Generation IV")}</th>
 </tr>
 </thead>
 ${ball_rows(u'Cherish Ball')}

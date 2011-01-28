@@ -1,19 +1,20 @@
 <%inherit file="/base.mako"/>
+<%! from splinext.pokedex import i18n %>\
 
-<%def name="title()">Disambiguation</%def>
+<%def name="title()">${_("Disambiguation")}</%def>
 
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
-    <li><a href="${url('/dex')}">Pokédex</a></li>
-    <li>Disambiguation</li>
+    <li><a href="${url('/dex')}">${_(u"Pokédex")}</a></li>
+    <li>${_("Disambiguation")}</li>
 </ul>
 </%def>
 
 <h1>${c.input}</h1>
 % if c.exact:
-<p>Hmmm, there are several things with that name.  Did you mean:</p>
+<p>${_("Hmmm, there are several things with that name.  Did you mean:")}</p>
 % else:
-<p>It seems you don't know how to spell.  Did you mean one of these?</p>
+<p>${_("It seems you don't know how to spell.  Did you mean one of these?")}</p>
 % endif
 
 <ul class="classic-list">
@@ -22,7 +23,7 @@
     object = result.object
 %>\
 <li>
-    The ${c.table_labels[object.__class__]}
+    ${_(u"The %s") % c.table_labels[object.__class__]}
     <a href="${h.pokedex.make_thingy_url(object, subpage=c.subpage)}">
     % if object.__tablename__ == 'pokemon':
     ${h.pokedex.pokemon_image(object.form, prefix='icons')}
@@ -51,7 +52,7 @@
 </ul>
 
 % if c.exact and len(c.results) >= 20:
-<p>Boy, this is a lot of matches!  Maybe you want to use the full-blown <a href="${url(controller='dex_search', action='pokemon_search')}">Pokémon search</a> or <a href="${url(controller='dex_search', action='move_search')}">move search</a>, or check the various <a href="${url('/dex')}">lists of everything and lookup help</a>.</p>
+<p>${_(u'Boy, this is a lot of matches!  Maybe you want to use the full-blown <a href="{pokesearch}">Pokémon search</a> or <a href="{movesearch}">move search</a>, or check the various <a href="{dexurl}">lists of everything and lookup help</a>').format(pokesearch=url(controller='dex_search', action='pokemon_search'), movesearch=url(controller='dex_search', action='move_search'), dexurl=url('/dex')) | n}.</p>
 % else:
-<p><a href="${url('/dex')}">Need help?</a></p>
+<p><a href="${url('/dex')}">${_("Need help?")}</a></p>
 % endif

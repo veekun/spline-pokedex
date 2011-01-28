@@ -12,7 +12,10 @@ import subprocess
 from subprocess import PIPE
 import sys
 import tarfile
+import gzip
 
+from pokedex.db import connect
+from pokedex.db.load import load
 
 phi = (1 + 5 ** 0.5) / 2
 
@@ -27,6 +30,17 @@ media_dir = pkg_resources.resource_filename('pokedex', 'data/media')
 def create_downloads():
     # Gotta chdir to get the gzip header right; see Python bug 4750
     os.chdir(downloads_dir)
+
+    # The database
+    db_filename = os.path.join(downloads_dir, 'veekun-pokedex.sqlite')
+    session = connect('sqlite:///' + db_filename)
+    load(session, drop_tables=True, verbose=True, safe=False)
+    session.close()
+    db_gz = gzip.open(db_filename + '.gz', 'wb')
+    with open(db_filename, 'rb') as source:
+        db_gz.write(source.read())
+    db_gz.close()  # XXX: 'with' context manager support is in Python 2.7
+    os.unlink(db_filename)
 
     # Per-generation Pokémon tarballs
     make_tarball('generation-1.tar.gz', ['red-green', 'red-blue', 'yellow'])

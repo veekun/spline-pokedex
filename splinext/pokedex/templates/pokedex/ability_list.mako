@@ -1,15 +1,16 @@
 <%inherit file="/base.mako"/>
+<%! from splinext.pokedex import i18n %>\
 
 <%def name="title()">Abilities</%def>
 
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
-    <li><a href="${url('/dex')}">Pokédex</a></li>
-    <li>Abilities</li>
+    <li><a href="${url('/dex')}">${_(u"Pokédex")}</a></li>
+    <li>${_(u"Abilities")}</li>
 </ul>
 </%def>
 
-${h.h1('Ability list')}
+${h.h1(_('Ability list'))}
 
 <table class="striped-rows dex-ability-list">
 <colgroup span="2"></colgroup> <!-- ID, gen -->
@@ -17,10 +18,10 @@ ${h.h1('Ability list')}
 <colgroup span="1"></colgroup> <!-- summary -->
 <thead>
     <tr class="header-row">
-        <th>ID</th>
-        <th>Gen</th>
-        <th>Name</th>
-        <th>Summary</th>
+        <th>${_(u"ID")}</th>
+        <th>${_(u"Gen")}</th>
+        <th>${_(u"Name")}</th>
+        <th>${_(u"Summary")}</th>
     </tr>
 </thead>
 <tbody>
