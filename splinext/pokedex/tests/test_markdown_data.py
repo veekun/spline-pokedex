@@ -44,16 +44,7 @@ class TestMarkdownData(SplineTest):
             key = "{0} / {1}".format(table.name, data[1:])
 
             # Test 1: HTML conversion shouldn't crash!
-            exc = None
-            try:
-                html = mdtext.as_html
-            except Exception as exc:
-                # Catch it so we can wrap it in a useful message
-                pass
-
-            ok_(exc is None,
-                """Markdown in ({0}) crashes while translating with {1}:\n{2}"""
-                .format(key, exc, mdtext.source_text))
+            html = mdtext.as_html
 
             # Test 2: It almost certainly shouldn't have brackets or braces;
             # those are going to be junk left over from mistyped markup
