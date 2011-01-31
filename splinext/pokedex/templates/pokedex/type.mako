@@ -115,7 +115,7 @@ ${h.h1(_('Moves'))}
         </tr>
     </thead>
     <tbody>
-        % for move in c.moves:
+        % for move in c.type.moves:
         <tr>
             ${dexlib.move_table_row(move, gen_instead_of_type=True)}
         </tr>

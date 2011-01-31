@@ -1512,7 +1512,6 @@ class PokedexController(BaseController):
             .one()
 
         c.pokemon = c.type.pokemon
-        c.moves = sorted(c.type.moves, key=lambda move: move.name)
 
         return
 
