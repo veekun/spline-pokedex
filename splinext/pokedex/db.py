@@ -20,9 +20,10 @@ def connect(config):
     # This uses the same timer proxy as the main engine, so Pokédex queries are
     # counted towards the db time in the footer
     global pokedex_session
+    prefix = 'spline-pokedex.sqlalchemy.'
+    config[prefix + 'proxy'] = config['spline._sqlalchemy_proxy']
     pokedex_session = pokedex.db.connect(
-        config['spline-pokedex.database_url'],
-        engine_args={'proxy': config['spline._sqlalchemy_proxy']},
+        engine_args=config, engine_prefix=prefix,
     )
 
     # Lookup object

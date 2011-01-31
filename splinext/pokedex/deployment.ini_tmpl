@@ -1,4 +1,4 @@
 ## encoding: utf8
 #-- Pokédex plugin
 # SQLAlchemy URL to the Pokédex database
-spline-pokedex.database_url = sqlite:///%(here)s/data/pokedex.db
+spline-pokedex.sqlalchemy.url = sqlite:///%(here)s/data/pokedex.db
