@@ -97,7 +97,7 @@ Shadow type, Shadow Pokémon, and Shadow moves are unique to those games.</p>
         </tr>
     </thead>
     <tbody>
-        % for pokemon in c.pokemon:
+        % for pokemon in c.type.pokemon:
         <tr>
             ${dexlib.pokemon_table_row(pokemon)}
         </tr>

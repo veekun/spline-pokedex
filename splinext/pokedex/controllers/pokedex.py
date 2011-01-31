@@ -1387,7 +1387,7 @@ class PokedexController(BaseController):
 
         for method, method_list in c.pokemon:
             # Sort each method's rows by their Pokémon
-            method_list.sort(key=lambda row: pokedex_helpers.pokemon_sort_key(row[0]))
+            method_list.sort(key=lambda row: row[0].order)
 
         # Finally, collapse identical columns within the same generation
         c.pokemon_columns \
@@ -1511,8 +1511,6 @@ class PokedexController(BaseController):
             ) \
             .one()
 
-        c.pokemon = c.type.pokemon
-
         return
 
     def abilities_list(sef):
@@ -1585,15 +1583,12 @@ class PokedexController(BaseController):
                      u'specific in-game encounters.',
         }
 
-        regular_pokemon = sorted(c.ability.pokemon,
-                                 key=pokedex_helpers.pokemon_sort_key)
-        dream_pokemon = sorted((pokemon for pokemon in c.ability.dream_pokemon
-                               if pokemon not in regular_pokemon),
-                               key=pokedex_helpers.pokemon_sort_key)
+        dream_pokemon = [pokemon for pokemon in c.ability.dream_pokemon if
+                         pokemon not in c.ability.pokemon]
 
         c.pokemon = []
-        if regular_pokemon:
-            c.pokemon.append(('Normal', regular_pokemon))
+        if c.ability.pokemon:
+            c.pokemon.append(('Normal', c.ability.pokemon))
         if dream_pokemon:
             c.pokemon.append(('Dream', dream_pokemon))
 

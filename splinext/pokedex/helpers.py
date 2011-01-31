@@ -61,8 +61,6 @@ def make_thingy_url(thingy, subpage=None):
                action=action,
                **args)
 
-pokemon_sort_key = attrgetter('order')
-
 def render_flavor_text(flavor_text, literal=False):
     """Makes flavor text suitable for HTML presentation.
 
