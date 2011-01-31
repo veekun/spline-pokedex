@@ -1597,6 +1597,24 @@ class PokedexController(BaseController):
         if dream_pokemon:
             c.pokemon.append(('Dream', dream_pokemon))
 
+        move_flag = None
+        if c.ability.name == 'Soundproof':
+            move_flag = 'sound'
+        elif c.ability.name == 'Iron Fist':
+            move_flag = 'punch'
+
+        c.moves = None
+        if move_flag:
+            c.moves = db.pokedex_session.query(tables.Move) \
+                .join(tables.MoveFlag, tables.MoveFlagType) \
+                .filter(tables.MoveFlagType.identifier == move_flag) \
+                .order_by(tables.Move.name) \
+                .options(
+                    subqueryload('move_effect'),
+                    subqueryload('type'),
+                    subqueryload('damage_class')
+                )
+
         return
 
 

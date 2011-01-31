@@ -46,6 +46,26 @@ ${h.h1(_('Effect'))}
     ${c.ability.effect.as_html | n}
 </div>
 
+% if c.moves:
+${h.h2(_('Moves affected'), id=_('moves', context='anchor'))}
+<table class="dex-pokemon-moves striped-rows">
+    ${dexlib.move_table_columns()}
+    <thead>
+        <tr class="header-row">
+            ${dexlib.move_table_header()}
+        </tr>
+    </thead>
+    <tbody>
+        % for move in c.moves:
+        <tr>
+            ${dexlib.move_table_row(move)}
+        </tr>
+        % endfor
+    </tbody>
+</table>
+% endif
+
+
 % if c.ability.changelog:
 ${h.h1(_('History'))}
 <dl>
