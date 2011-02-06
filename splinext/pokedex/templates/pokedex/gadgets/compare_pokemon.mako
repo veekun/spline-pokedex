@@ -11,7 +11,7 @@
 </ul>
 </%def>
 
-<h1>${_(u"Compare Pokémon"), _('compare')}</h1>
+${h.h1(_(u"Compare Pokémon"), _('compare'))}
 <p>${_(u"Select up to eight Pokémon to compare their stats, moves, etc.")}</p>
 
 ${h.form(url.current(), method='GET')}
