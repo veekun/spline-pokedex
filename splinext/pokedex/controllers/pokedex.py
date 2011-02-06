@@ -1335,9 +1335,11 @@ class PokedexController(BaseController):
                 eagerload('pokemon.form_group'),
                 eagerload('pokemon.stats.stat'),
                 eagerload('pokemon.stats.stat.damage_class'),
+                eagerload('pokemon.unique_form'),
 
                 # Pokémon table stuff
                 subqueryload('pokemon.abilities'),
+                subqueryload('pokemon.dream_ability'),
                 subqueryload('pokemon.egg_groups'),
                 subqueryload('pokemon.stats'),
                 subqueryload('pokemon.types'),
