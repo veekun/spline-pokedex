@@ -32,11 +32,15 @@ ${h.h1(_('Essentials'))}
     <p id="dex-page-name">${c.type.name.title()}</p>
     <p id="dex-page-types">
         ${h.pokedex.type_icon(c.type)}
+        % if c.type.damage_class is not None:
         ${h.pokedex.damage_class_icon(c.type.damage_class)}<span style="position: absolute" class="faded">*</span>
+        % endif
     </p>
     <p>${h.pokedex.generation_icon(c.type.generation)}</p>
+    % if c.type.damage_class is not None:
     <br/>
     <p class="faded">*before ${h.pokedex.generation_icon(4)}</p>
+    % endif
 </div>
 
 <div class="dex-page-beside-portrait">
