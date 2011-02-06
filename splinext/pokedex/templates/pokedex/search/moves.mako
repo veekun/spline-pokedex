@@ -282,7 +282,13 @@ ${h.end_form()}
 
 <%def name="col_accuracy()"><col class="dex-col-stat"></%def>
 <%def name="th_accuracy()"><th>${_("Acc")}</th></%def>
-<%def name="td_accuracy(move)"><td>${move.accuracy}%</td></%def>
+<%def name="td_accuracy(move)">\
+% if move.accuracy:
+<td>${move.accuracy}%</td>\
+% else:
+<td>—</td>\
+% endif
+</%def>
 
 <%def name="col_priority()"><col class="dex-col-stat"></%def>
 <%def name="th_priority()"><th>${_("Pri")}</th></%def>
