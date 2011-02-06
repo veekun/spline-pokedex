@@ -70,7 +70,7 @@ ${h.h2(_('Moves affected'), id=_('moves', context='anchor'))}
 ${h.h1(_('History'))}
 <dl>
     % for change in c.ability.changelog:
-    <dt>${_('Before %s') % h.pokedex.version_icons(*change.changed_in.versions)}</dt>
+    <dt>${_('Before %s') % h.pokedex.version_icons(*change.changed_in.versions) | n}</dt>
     <dd class="markdown">${change.effect.as_html | n}</dd>
     % endfor
 </dl>
