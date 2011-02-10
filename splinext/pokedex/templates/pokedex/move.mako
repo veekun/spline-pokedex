@@ -166,12 +166,20 @@ ${h.literal(c.move.effect.as_html)}
 </ul>
 
 
-% if c.move.changelog:
+% if c.move.changelog or c.move.move_effect.changelog:
 ${h.h1(_('History'))}
 <dl>
-    % for change in c.move.changelog:
+    <%! import pokedex.db.tables %>\
+    <%
+        all_changelog = (
+            list(c.move.changelog) + list(c.move.move_effect.changelog))
+        all_changelog.sort(key=lambda change: change.changed_in.id, reverse=True)
+    %>\
+
+    % for change in all_changelog:
     <dt>Before ${h.pokedex.version_icons(*change.changed_in.versions)}</dt>
     <dd>
+      % if isinstance(change, pokedex.db.tables.MoveChangelog):
         % if change.type_id is not None:
         Type is ${h.pokedex.type_link(change.type)}.
         % endif
@@ -191,6 +199,9 @@ ${h.h1(_('History'))}
         ## If we're showing the entire effect, it'll include the effect chance
         Effect chance is ${change.effect_chance}.
         % endif
+      % else:
+        ${change.effect}
+      % endif
     </dd>
     % endfor
 </dl>
