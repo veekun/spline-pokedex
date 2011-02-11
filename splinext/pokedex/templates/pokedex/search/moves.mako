@@ -274,7 +274,7 @@ ${h.end_form()}
 
 <%def name="col_pp()"><col class="dex-col-stat"></%def>
 <%def name="th_pp()"><th>${_("PP")}</th></%def>
-<%def name="td_pp(move)"><td>${move.pp}</td></%def>
+<%def name="td_pp(move)"><td>${move.pp or u'—'}</td></%def>
 
 <%def name="col_power()"><col class="dex-col-stat"></%def>
 <%def name="th_power()"><th>${_("Power")}</th></%def>

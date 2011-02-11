@@ -209,8 +209,9 @@ class TestMoveSearchController(TestController):
 
         self.check_search(
             dict(pp=u'1'),
-            [u'Sketch', u'Struggle'],
+            [u'Sketch'],
             'searching by PP',
+            exact=True,
         )
 
         self.check_search(

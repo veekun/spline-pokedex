@@ -81,7 +81,11 @@ ${h.h1(_('Essentials'))}
             % endif
         </dd>
         <dt>${_(u"PP")}</dt>
+        % if c.move.pp is not None:
         <dd>${"{base}, up to {max} with {ppup}".format(base=c.move.pp, max=c.move.pp * 8/5, ppup=h.pokedex.item_link(c.pp_up)) | n}</dd>
+        % else:
+        <dd>${_('n/a')}</dd>
+        % endif
         <dt>${_(u"Target")}</dt>
         <dd><abbr title="${c.move.target.description}">${c.move.target.name}</abbr></dd>
         <dt>Effect chance</dt>

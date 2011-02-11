@@ -238,7 +238,7 @@ ${h.pokedex.pokemon_image(pokemon.form, prefix='icons')}\
     % if pp_override and pp_override != move.pp:
     <s>${move.pp}</s> <br> ${pp_override}
     % else:
-    ${move.pp}
+    ${move.pp or u'—'}
     % endif
 </td>
 <td>${move.power}</td>
