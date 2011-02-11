@@ -54,7 +54,7 @@ class OptionalLevelField(fields.IntegerField):
             return unicode(self.data or u'')
 
 class CaptureRateForm(Form):
-    pokemon = PokedexLookupField(u'Wild Pokémon', valid_type='pokemon')
+    pokemon = PokedexLookupField(u'Wild Pokémon', [wtforms.validators.Required()], valid_type='pokemon')
     current_hp = fields.IntegerField(u'% HP left', [wtforms.validators.NumberRange(min=1, max=100)],
                                      default=100)
     status_ailment = fields.SelectField('Status ailment',
