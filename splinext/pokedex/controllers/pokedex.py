@@ -1408,16 +1408,22 @@ class PokedexController(BaseController):
             .options(eagerload('damage_efficacies')) \
             .all()
 
-        try:
-            c.secondary_type = db.pokedex_session.query(tables.Type) \
-                .filter(func.lower(tables.Type.name) ==
-                        request.params['secondary'].lower()) \
-                .one()
+        if 'secondary' in request.params:
+            try:
+                c.secondary_type = db.pokedex_session.query(tables.Type) \
+                    .filter(tables.Type.damage_efficacies.any()) \
+                    .filter(func.lower(tables.Type.name) ==
+                            request.params['secondary']) \
+                    .options(eagerload('target_efficacies')) \
+                    .one()
+            except NoResultFound:
+                abort(404)
 
             c.secondary_efficacy = dict(
-                [(efficacy.damage_type, efficacy.damage_factor) for efficacy in c.secondary_type.target_efficacies]
+                (efficacy.damage_type, efficacy.damage_factor)
+                for efficacy in c.secondary_type.target_efficacies
             )
-        except (KeyError, NoResultFound):
+        else:
             c.secondary_type = None
             c.secondary_efficacy = defaultdict(lambda: 100)
 
