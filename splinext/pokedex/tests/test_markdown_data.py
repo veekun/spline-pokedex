@@ -31,7 +31,7 @@ class TestMarkdownData(SplineTest):
         """Implementation for the above"""
         # Well this is a bit roundabout
         session = connect(
-            pylons.test.pylonsapp.config['spline-pokedex.database_url'])
+            pylons.test.pylonsapp.config['spline-pokedex.sqlalchemy.url'])
 
         table = column.table
         columns = (column,) + tuple(table.primary_key.columns)
