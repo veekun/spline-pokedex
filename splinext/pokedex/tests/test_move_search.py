@@ -111,7 +111,7 @@ class TestMoveSearchController(TestController):
             dict(type=u'Dragon'),
             [ u'Dual Chop', u'Draco Meteor', u'DragonBreath', u'Dragon Claw',
               u'Dragon Dance', u'Dragon Pulse', u'Dragon Rage', u'Dragon Rush',
-              u'dragon tail', u'Outrage', u'Roar of Time', u'Spacial Rend',
+              u'Dragon Tail', u'Outrage', u'Roar of Time', u'Spacial Rend',
               u'Twister',
             ],
             'searching by type',
