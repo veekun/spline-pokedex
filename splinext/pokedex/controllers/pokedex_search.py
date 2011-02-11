@@ -1227,6 +1227,9 @@ class PokedexSearchController(BaseController):
         if c.results and c.display_mode == 'custom-table':
             eagerloads = []
 
+            if 'icon' in c.display_columns:
+                eagerloads.append('unique_form')
+
             if 'type' in c.display_columns:
                 eagerloads.append('types')
 
