@@ -194,39 +194,34 @@ class PokedexController(PokedexBaseController):
         tables.Type: 'type',
     }
 
-    # Dict of method name => icon path
+    # Dict of terrain identifier => icon path
     encounter_method_icons = {
-        'Surfing':                          'surfing.png',
-        'Fishing with an Old Rod':          'old-rod.png',
-        'Fishing with a Good Rod':          'good-rod.png',
-        'Fishing with a Super Rod':         'super-rod.png',
-        'Walking in tall grass or a cave':  'grass.png',
-        'Smashing rocks':                   'rock-smash.png',
+        'surf': 'surfing.png',
+        'old-rod': 'old-rod.png',
+        'good-rod': 'good-rod.png',
+        'super-rod': 'super-rod.png',
+        'walk': 'grass.png',
+        'rock-smash': 'rock-smash.png',
     }
 
-    # Maps condition value names to representative icons
+    # Maps condition value identifiers to representative icons
     encounter_condition_value_icons = {
-        # Conditions
-        'Not during a swarm':   'swarm-no.png',
-        'During a swarm':       'swarm-yes.png',
-        'No fishing swarm':     'swarm-no.png',
-        'Fishing swarm':        'swarm-yes.png',
-        'No surfing swarm':     'swarm-no.png',
-        'Surfing swarm':        'swarm-yes.png',
-        'In the morning':       'time-morning.png',
-        'During the day':       'time-daytime.png',
-        'At night':             'time-night.png',
-        u'Not using PokéRadar': 'pokéradar-off.png',
-        u'Using PokéRadar':     'pokéradar-on.png',
-        'No game in slot 2':    'slot2-none.png',
-        'Ruby in slot 2':       'slot2-ruby.png',
-        'Sapphire in slot 2':   'slot2-sapphire.png',
-        'Emerald in slot 2':    'slot2-emerald.png',
-        'FireRed in slot 2':    'slot2-firered.png',
-        'LeafGreen in slot 2':  'slot2-leafgreen.png',
-        'Radio off':            'radio-off.png',
-        'Hoenn radio':          'radio-hoenn.png',
-        'Sinnoh radio':         'radio-sinnoh.png',
+        'swarm-no': 'swarm-no.png',
+        'swarm-yes': 'swarm-yes.png',
+        'time-morning': 'time-morning.png',
+        'time-day': 'time-daytime.png',
+        'time-night': 'time-night.png',
+        'radar-off': 'pokéradar-off.png',
+        'radar-on': 'pokéradar-on.png',
+        'slot2-none': 'slot2-none.png',
+        'slot2-ruby': 'slot2-ruby.png',
+        'slot2-sapphire': 'slot2-sapphire.png',
+        'slot2-emerald': 'slot2-emerald.png',
+        'slot2-firered': 'slot2-firered.png',
+        'slot2-leafgreen': 'slot2-leafgreen.png',
+        'radio-off': 'radio-off.png',
+        'radio-hoenn': 'radio-hoenn.png',
+        'radio-sinnoh': 'radio-sinnoh.png',
     }
 
     def __before__(self, action, **params):
