@@ -111,6 +111,7 @@ Shadow type, Shadow Pokémon, and Shadow moves are unique to those games.</p>
 % endif
 
 ${h.h1(_('Moves'))}
+% if c.type.moves:
 <table class="dex-pokemon-moves striped-rows">
     ${dexlib.move_table_columns()}
     <thead>
@@ -126,6 +127,29 @@ ${h.h1(_('Moves'))}
         % endfor
     </tbody>
 </table>
+% endif
+
+% if c.type.move_changelog:
+${h.h2(_('Formerly {0}-type moves').format(c.type.name), _('moves:former'))}
+<table class="dex-pokemon-moves striped-rows">
+    <col>
+    ${dexlib.move_table_columns()}
+    <thead>
+        <tr class="header-row">
+            <th>${_('Before')}</th>
+            ${dexlib.move_table_header()}
+        </tr>
+    </thead>
+    <tbody>
+        % for move_change in sorted(c.type.move_changelog, key=lambda c: c.move.name):
+        <tr>
+            <td>${h.pokedex.version_icons(*move_change.changed_in.versions)}</td>
+            ${dexlib.move_table_row(move_change.move)}
+        % endfor
+    </tbody>
+</table>
+% endif
+
 
 ${h.h1(_('External Links'), id='links')}
 <ul class="classic-list">
