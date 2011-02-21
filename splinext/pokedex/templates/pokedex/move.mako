@@ -58,8 +58,10 @@ ${h.h1(_('Essentials'))}
     <h2>${_(u"Stats")}</h2>
     <dl>
         <dt>${_(u"Power")}</dt>
-        % if c.move.damage_class.name == 'non-damaging':
-        <dd>${_(u"n/a")}</dd>
+        % if c.move.power == 0:
+        <dd>${_(u"—  (no damage)")}</dd>
+        % elif c.move.power == 1:
+        <dd>${_(u'*  (no fixed power)')}</dd>
         % else:
         <dd>
             % if c.power_percentile is None:

@@ -241,7 +241,15 @@ ${h.pokedex.pokemon_image(pokemon.form, prefix='icons')}\
     ${move.pp or u'—'}
     % endif
 </td>
-<td>${move.power}</td>
+<td>
+    % if move.power == 0:
+    —
+    % elif move.power == 1:
+    *
+    % else:
+    ${move.power}
+    % endif
+</td>
 <td>
     % if move.accuracy is None:
     —
