@@ -4,8 +4,8 @@
 <%! import re %>\
 <%! from splinext.pokedex import i18n %>\
 
-<%def name="flavor_name()">\
-${_(u"{name} flavor - Pokémon #{number}").format(name=c.form.pokemon_name, number=c.form.form_base_pokemon_id)}\
+<%def name="title()">\
+${_(u"{name} flavor – Pokémon #{number}").format(name=c.form.pokemon_name, number=c.form.form_base_pokemon_id)}\
 </%def>
 
 <%def name="title_in_page()">
