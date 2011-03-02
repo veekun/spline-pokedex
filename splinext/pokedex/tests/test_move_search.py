@@ -87,14 +87,13 @@ class TestMoveSearchController(TestController):
         self.check_search(
             dict(name=u'thunder'),
             [ u'Thunder', u'Thunderbolt', u'Thunder Wave',
-              u'ThunderShock', u'ThunderPunch', u'Thunder Fang',
-              u'cross thunder' ],
+              u'ThunderShock', u'ThunderPunch', u'Thunder Fang' ],
             'no wildcards is treated as substring',
             exact=True,
         )
         self.check_search(
             dict(name=u'*under'),
-            [u'Thunder', u'cross thunder'],  # not ThunderShock, etc.!
+            [u'Thunder'],  # not ThunderShock, etc.!
             'splat wildcard works and is not used as substring',
             exact=True,
         )
@@ -154,9 +153,8 @@ class TestMoveSearchController(TestController):
         """
         self.check_search(
             dict(similar_to=u'icy wind'),
-            [ u'Bubble', u'BubbleBeam', u'Constrict',
-              u'Icy Wind', u'Mud Shot', u'Rock Tomb',
-              u'level field' ],
+            [ u'Bubble', u'BubbleBeam', u'Bulldoze', u'Constrict',
+              u'Icy Wind', u'Mud Shot', u'Rock Tomb' ],
             'searching by effect',
             exact=True,
         )
@@ -216,14 +214,14 @@ class TestMoveSearchController(TestController):
 
         self.check_search(
             dict(priority=u'-7'),  # XXX oh no what?  this looks like "<7"
-            [u'magic room', u'Trick Room', u'wonder room'],
+            [u'Magic Room', u'Trick Room', u'Wonder Room'],
             'searching by priority',
             exact=True,
         )
 
         self.check_search(
             dict(power=u'130'),
-            [u'blue flame', u'Hi Jump Kick', u'lightning strike'],
+            [u'Blue Flare', u'Bolt Strike', u'Hi Jump Kick'],
             'searching by power',
             exact=True,
         )

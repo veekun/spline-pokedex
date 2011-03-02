@@ -543,19 +543,19 @@ class TestPokemonSearchController(TestController):
 
         self.check_search(
             dict(id=u'648+'),
-            [ (u'meroetta', u'step'), (u'meroetta', u'voice'), u'genosekuto' ],
+            [ (u'Meloetta', u'Pirouette'), (u'Meloetta', u'Aria'), u'Genesect' ],
             'range: n+',
             exact=True,
         )
         self.check_search(
             dict(id=u'648-'),
-            [ (u'meroetta', u'step'), (u'meroetta', u'voice'), u'genosekuto' ],
+            [ (u'Meloetta', u'Pirouette'), (u'Meloetta', u'Aria'), u'Genesect' ],
             'range: n-',
             exact=True,
         )
         self.check_search(
             dict(id=u'>=648'),
-            [ (u'meroetta', u'step'), (u'meroetta', u'voice'), u'genosekuto' ],
+            [ (u'Meloetta', u'Pirouette'), (u'Meloetta', u'Aria'), u'Genesect' ],
             'range: >=n',
             exact=True,
         )
@@ -608,7 +608,7 @@ class TestPokemonSearchController(TestController):
         )
         self.check_search(
             dict(stat_special_attack=u'130-131'),
-            [ u'Espeon', u'Gengar', u'Glaceon', u'Heatran', u'Latios', u'Magnezone', u'kyuremu' ],
+            [ u'Espeon', u'Gengar', u'Glaceon', u'Heatran', u'Latios', u'Magnezone', u'Kyurem' ],
             'special attack of 130',
             exact=True,
         )
