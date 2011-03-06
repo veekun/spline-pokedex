@@ -4,6 +4,7 @@ from __future__ import absolute_import, division
 from collections import defaultdict, namedtuple
 import colorsys
 import logging
+import math
 
 import wtforms.validators
 from wtforms import Form, ValidationError, fields
@@ -164,6 +165,12 @@ class StatCalculatorForm(Form):
         query_factory=lambda: db.pokedex_session.query(tables.StatHint).order_by(tables.StatHint.text),
         get_pk=lambda _: _.id,
         get_label=lambda _: _.text,
+        allow_blank=True,
+    )
+    hp_type = QuerySelectField('Hidden Power type',
+        query_factory=lambda: db.pokedex_session.query(tables.Type).filter(tables.Type.id < 10000).order_by(tables.Type.name),
+        get_pk=lambda _: _.id,
+        get_label=lambda _: _.name,
         allow_blank=True,
     )
 
@@ -759,7 +766,6 @@ class PokedexGadgetsController(BaseController):
         # XXX features this needs:
         # - short URLs
         # - more better error checking
-        # - accept and print out hidden power
         # - accept..  anything else hint at IVs?
         # - back-compat URL
         # - also calculate stats or effort
@@ -795,6 +801,12 @@ class PokedexGadgetsController(BaseController):
         c.results = None  # XXX shim
         if not request.GET or not c.form.validate():
             return render('/pokedex/gadgets/stat_calculator.mako')
+
+        def filter_genes(genes, f):
+            """Teeny helper function to only keep possible genes that fit the
+            given lambda.
+            """
+            genes &= set(gene for gene in genes if f(gene))
 
         # Okay, do some work!
         # Dumb method for now -- XXX change this to do a binary search.
@@ -841,33 +853,65 @@ class PokedexGadgetsController(BaseController):
             # Quick simple check: if the input is totally outside the valid
             # range, no need to calculate anything
             if not min_stat <= stat_in <= max_stat:
-                valid_genes[stat] = {}
+                valid_genes[stat] = set()
                 continue
 
             # Start out with everything being considered valid
-            valid_genes[stat] = dict((key, None) for key in range(32))
+            valid_genes[stat] = set(range(32))
 
             # Run through and maybe invalidate each gene
-            for gene in valid_genes[stat].keys():
-                if calculate_stat(gene) != stat_in:
-                    del valid_genes[stat][gene]
+            filter_genes(valid_genes[stat],
+                lambda gene: calculate_stat(gene) == stat_in)
 
-        # Characteristic
+        # Hidden Power type
+        if c.form.hp_type.data:
+            # Shift the type id to make Fighting (id=2) #0
+            hp_type = c.form.hp_type.data.id - 2
+
+            # See below for how this is calculated.
+            # We know x * 15 // 63 == hp_type, and want a range for x.
+            # hp_type * 63 / 15 is the LOWER bound, though you need to ceil()
+            # it to find the lower integral bound.
+            # The same thing for (hp_type + 1) is the lower bound for the next
+            # type, which is one more than our upper bound.  Cool.
+            min_x = int(math.ceil(hp_type * 63 / 15))
+            max_x = int(math.ceil((hp_type + 1) * 63 / 15) - 1)
+
+            # Now we need to find how many bits from the left will stay the
+            # same throughout this x-range, so we know that those bits must
+            # belong to the corresponding stats.  Easy if you note that, if
+            # min_x and max_x have the same leftmost n bits, so will every
+            # integer between them.
+            first_good_bit = None
+            for n in range(6):
+                # Convert "3" to 0b111000
+                # 3 -> 0b1000 -> 0b111 -> 0b111000
+                mask = 63 ^ ((1 << n) - 1)
+                if min_x & mask == max_x & mask:
+                    first_good_bit = n
+                    break
+            if first_good_bit is not None:
+                # OK, cool!  Now we know some number of stats are either
+                # definitely odd or definitely even.
+                for stat_id in range(first_good_bit, 6):
+                    bit = (min_x >> stat_id) & 1
+                    stat = c.stats[stat_id]
+                    filter_genes(valid_genes[stat],
+                        lambda gene: gene & 1 == bit)
+
+        # Characteristic; needs to be last since it imposes a maximum
         hint = c.form.hint.data
         if hint:
             # Knock out everything that doesn't match its mod-5
-            for gene in valid_genes[hint.stat].keys():
-                if gene % 5 != hint.gene_mod_5:
-                    del valid_genes[hint.stat][gene]
+            filter_genes(valid_genes[hint.stat],
+                lambda gene: gene % 5 == hint.gene_mod_5)
 
             # Also, the characteristic is only shown for the highest gene.  So,
             # no other stat can be higher than the new maximum for the hinted
             # stat
-            max_gene = max(valid_genes[hint.stat].keys())
+            max_gene = max(valid_genes[hint.stat])
             for genes in valid_genes.values():
-                for gene in genes.keys():
-                    if gene > max_gene:
-                        del genes[gene]
+                filter_genes(genes, lambda gene: gene <= max_gene)
 
         # Possibly calculate Hidden Power's type and power, if the results are
         # exact
@@ -880,7 +924,7 @@ class PokedexGadgetsController(BaseController):
             type_det = 0
             power_det = 0
             for i, stat in enumerate(c.stats):
-                stat_value, = valid_genes[stat].iterkeys()
+                stat_value, = valid_genes[stat]
                 type_det += (stat_value & 0x01) << i
                 power_det += (stat_value & 0x02) << i
 
@@ -901,8 +945,7 @@ class PokedexGadgetsController(BaseController):
             # the last range to the parts list
             left_endpoint = None
             parts = []
-            elements = valid_genes[stat].keys()
-            elements.sort()
+            elements = sorted(valid_genes[stat])
 
             for last_n, n in zip([None] + elements, elements + [None]):
                 if (n is None and left_endpoint is not None) or \

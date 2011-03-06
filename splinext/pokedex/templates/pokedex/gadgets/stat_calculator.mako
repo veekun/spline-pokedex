@@ -24,6 +24,7 @@ ${h.form(url.current(), method=u'GET')}
     ${lib.field(u'level', size=3)}
     ${lib.field(u'nature')}
     ${lib.field(u'hint')}
+    ${lib.field(u'hp_type')}
 </dl>
 
 <table class="dex-stat-calculator striped-row-groups">
