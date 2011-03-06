@@ -171,6 +171,50 @@ ${h.literal(c.move.effect.as_html)}
     % endfor
 </ul>
 
+<h2>Meta</h2>
+<% meta = c.move.meta %>
+<ul class="classic-list">
+    <li>Category: ${meta.category.description}</li>
+    % if meta.meta_ailment_id:
+    <li>
+        % if meta.ailment_chance:
+        ${meta.ailment_chance}% chance to inflict ${meta.ailment.name}
+        % else:
+        Inflicts ${meta.ailment.name}
+        % endif
+    </li>
+    % endif
+    % if meta.flinch_chance:
+    <li>${meta.flinch_chance}% chance to make the target flinch</li>
+    % endif
+    % if c.move.meta_stat_changes:
+    <li>
+        % if meta.stat_chance:
+        ${meta.stat_chance}% chance to
+        % endif
+        % for stat_change in c.move.meta_stat_changes:
+        ${stat_change.change} ${stat_change.stat.name}
+        % endfor
+    </li>
+    % endif
+
+    % if meta.crit_rate:
+    <li>Critical hit rate is increased by ${meta.crit_rate}</li>
+    % endif
+    % if meta.min_hits:
+    <li>Hits ${meta.min_hits} to ${meta.max_hits} times</li>
+    % endif
+    % if meta.min_turns:
+    <li>Effect lasts for ${meta.min_turns} to ${meta.max_turns} turns</li>
+    % endif
+    % if meta.recoil:
+    <li>User absorbs ${meta.recoil}% of damage inflicted</li>
+    % endif
+    % if meta.healing:
+    <li>User absorbs ${meta.healing}% of its max HP</li>
+    % endif
+</ul>
+
 
 % if c.move.changelog or c.move.move_effect.changelog:
 ${h.h1(_('History'))}
