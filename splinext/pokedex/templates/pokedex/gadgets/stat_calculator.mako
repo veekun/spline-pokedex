@@ -151,6 +151,15 @@ ${h.form(url.current(), method=u'GET')}
         </td>
         % endfor
     </tr>
+    % if c.exact:
+    <tr>
+        <th>${_(u"Hidden Power")}</th>
+        <td colspan="${len(c.stats)}"> <p>
+            ${h.pokedex.type_link(c.hidden_power_type)} damage,
+            with ${c.hidden_power_power} power.
+        </p> </td>
+    </tr>
+    % endif
     <tr>
         <td colspan="${len(c.stats) + 1}">
             % if all(c.results.values()):

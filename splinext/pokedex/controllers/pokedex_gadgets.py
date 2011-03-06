@@ -768,7 +768,9 @@ class PokedexGadgetsController(BaseController):
         # Add stat-based fields dynamically
         c.stat_fields = []  # just field names
         c.effort_fields = []
+        # XXX get rid of this stupid filter
         c.stats = db.pokedex_session.query(tables.Stat) \
+            .filter(tables.Stat.id <= 6) \
             .order_by(tables.Stat.id).all()
         for stat in c.stats:
             field_name = stat.name.lower().replace(u' ', u'_')
@@ -845,6 +847,27 @@ class PokedexGadgetsController(BaseController):
                 if calculate_stat(gene) != stat_in:
                     del valid_genes[stat][gene]
 
+        # Possibly calculate Hidden Power's type and power, if the results are
+        # exact
+        c.exact = all(len(genes) == 1 for genes in valid_genes.values())
+        if c.exact:
+            # HP uses bit 0 of each gene for the type, and bit 1 for the power.
+            # These bits are used to make new six-bit numbers, where HP goes to
+            # bit 0, Attack to bit 1, etc.  Our stats are, conveniently,
+            # already in the right order
+            type_det = 0
+            power_det = 0
+            for i, stat in enumerate(c.stats):
+                stat_value, = valid_genes[stat].iterkeys()
+                type_det += (stat_value & 0x01) << i
+                power_det += (stat_value & 0x02) << i
+
+            # Our types are also in the correct order, except that we start
+            # from 1 rather than 0, and HP skips Normal
+            c.hidden_power_type = db.pokedex_session.query(tables.Type) \
+                .get(type_det * 15 // 63)
+            c.hidden_power_power = power_det * 40 // 63 + 30
+
         # Turn those results into something more readable.
         # Template still needs valid_genes for drawing the graph
         c.results = {}
@@ -864,7 +887,10 @@ class PokedexGadgetsController(BaseController):
                     (last_n is not None and last_n + 1 < n):
 
                     # End of a subrange; break off what we have
-                    parts.append(u"{0}–{1}".format(left_endpoint, last_n))
+                    if left_endpoint == last_n:
+                        parts.append(u"{0}".format(last_n))
+                    else:
+                        parts.append(u"{0}–{1}".format(left_endpoint, last_n))
 
                 if left_endpoint is None or last_n + 1 < n:
                     # Starting a new subrange; remember the new left end
