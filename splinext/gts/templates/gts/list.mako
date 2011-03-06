@@ -8,8 +8,7 @@
     % if savefile.structure.ivs.is_egg:
     ${h.pokedex.pokedex_img("heartgold-soulsilver/egg.png", class_='icon')}
     % else:
-    ${h.pokedex.pokemon_sprite(savefile.species,
-        form=savefile.structure.alternate_form,
+    ${h.pokedex.pokemon_image(savefile.species_form,
         prefix='heartgold-soulsilver/' + ('shiny/' if savefile.is_shiny else ''),
         class_='icon')}
     % endif
