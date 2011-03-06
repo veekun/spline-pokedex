@@ -23,6 +23,7 @@ ${h.form(url.current(), method=u'GET')}
     ${lib.field(u'pokemon')}
     ${lib.field(u'level', size=3)}
     ${lib.field(u'nature')}
+    ${lib.field(u'hint')}
 </dl>
 
 <table class="dex-stat-calculator striped-row-groups">

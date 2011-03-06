@@ -160,6 +160,12 @@ class StatCalculatorForm(Form):
         get_label=lambda _: _.name,
         allow_blank=True,
     )
+    hint = QuerySelectField('Characteristic',
+        query_factory=lambda: db.pokedex_session.query(tables.StatHint).order_by(tables.StatHint.text),
+        get_pk=lambda _: _.id,
+        get_label=lambda _: _.text,
+        allow_blank=True,
+    )
 
 def stat_graph_chunk_color(gene):
     """Returns a #rrggbb color, given a gene.  Used for the pretty graph."""
@@ -753,7 +759,6 @@ class PokedexGadgetsController(BaseController):
         # XXX features this needs:
         # - short URLs
         # - more better error checking
-        # - accept "characteristics"
         # - accept and print out hidden power
         # - accept..  anything else hint at IVs?
         # - back-compat URL
@@ -846,6 +851,23 @@ class PokedexGadgetsController(BaseController):
             for gene in valid_genes[stat].keys():
                 if calculate_stat(gene) != stat_in:
                     del valid_genes[stat][gene]
+
+        # Characteristic
+        hint = c.form.hint.data
+        if hint:
+            # Knock out everything that doesn't match its mod-5
+            for gene in valid_genes[hint.stat].keys():
+                if gene % 5 != hint.gene_mod_5:
+                    del valid_genes[hint.stat][gene]
+
+            # Also, the characteristic is only shown for the highest gene.  So,
+            # no other stat can be higher than the new maximum for the hinted
+            # stat
+            max_gene = max(valid_genes[hint.stat].keys())
+            for genes in valid_genes.values():
+                for gene in genes.keys():
+                    if gene > max_gene:
+                        del genes[gene]
 
         # Possibly calculate Hidden Power's type and power, if the results are
         # exact
