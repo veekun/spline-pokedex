@@ -50,7 +50,13 @@ ${h.form(url.current(), method=u'GET')}
     </tr>
     % endif
     <tr class="header-row">
-        <th></th>
+        <th>
+            % if c.results:
+            ${h.pokedex.pokemon_link(c.pokemon, content=h.literal(u"{0}<br>{1}").format( \
+                h.pokedex.pokemon_image(c.pokemon.form, prefix=u'icons'), \
+                c.pokemon.full_name))}
+            % endif
+        </th>
         % for stat in c.stats:
         <th>${stat.name}</th>
         % endfor
@@ -113,6 +119,14 @@ ${h.form(url.current(), method=u'GET')}
     </tr>
 </tbody>
 % if c.results:
+<tbody>
+    <tr>
+        <th>${_(u"Base stats")}</th>
+        % for stat in c.stats:
+        <td>${c.form.pokemon.data.stat(stat).base_stat}</td>
+        % endfor
+    </tr>
+</tbody>
 <tbody>
     % if 0:
     <tr>

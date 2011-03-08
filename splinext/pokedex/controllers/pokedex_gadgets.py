@@ -857,12 +857,14 @@ class PokedexGadgetsController(BaseController):
     def stat_calculator(self):
         """Calculates, well, stats."""
         # XXX features this needs:
+        # - show the pokemon!!
         # - more better error checking
         # - back-compat URL
         # - also calculate stats or effort
         # - multiple levels
         # - track effort gained on the fly (as well as exp for auto level up?)
         #   - UI would need to be different and everything, ugh
+        #   - would also need to track evolutions oh no!
         # - graphs of potential stats?
         #   - given a pokemon and its genes and effort, graph all stats by level
         #   - given a pokemon and its gene results, graph approximate stats by level...?
@@ -899,7 +901,7 @@ class PokedexGadgetsController(BaseController):
         # Dumb method for now -- XXX change this to do a binary search.
         # Run through every possible value for each stat, see if it matches
         # input, and give the green light if so.
-        pokemon = c.form.pokemon.data
+        pokemon = c.pokemon = c.form.pokemon.data
         nature = c.form.nature.data
         if nature and nature.is_neutral:
             # Neutral nature is equivalent to none at all
