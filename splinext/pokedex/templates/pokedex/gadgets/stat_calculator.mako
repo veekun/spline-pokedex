@@ -67,8 +67,8 @@ ${h.form(url.current(), method=u'GET')}
     % endif
     <tr>
         <th>${_(u"Stats")}</th>
-        % for field_name in c.stat_fields:
-        <td>${lib.bare_field(field_name, size=3)}</td>
+        % for field in c.form.stat:
+        <td>${lib.literal_field(field, size=3)}</td>
         % endfor
     </tr>
 
@@ -107,8 +107,8 @@ ${h.form(url.current(), method=u'GET')}
     % endif
     <tr>
         <th>${_(u"Effort")}</th>
-        % for field_name in c.effort_fields:
-        <td>${lib.bare_field(field_name, size=3)}</td>
+        % for field in c.form.effort:
+        <td>${lib.literal_field(field, size=3)}</td>
         % endfor
     </tr>
 </tbody>
@@ -183,7 +183,10 @@ ${h.form(url.current(), method=u'GET')}
 % endif
 </table>
 
-<p><button type="submit">${_(u"Let's do this!")}</button></p>
+<p>
+    <input type="hidden" name="shorten" value="1">
+    <button type="submit">${_(u"Let's do this!")}</button>
+</p>
 <p>
     <button type="reset">${_(u"Reset")}</button> ${_(u"or")}
     <a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/eraser.png')}" alt=""> ${_(u"start over")}</a>

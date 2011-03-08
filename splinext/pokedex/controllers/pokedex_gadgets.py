@@ -3,6 +3,7 @@ from __future__ import absolute_import, division
 
 from collections import defaultdict, namedtuple
 import colorsys
+import itertools
 import logging
 import math
 
@@ -173,6 +174,98 @@ class StatCalculatorForm(Form):
         get_label=lambda _: _.name,
         allow_blank=True,
     )
+
+    shorten = fields.HiddenField(default=u'')
+    def __init__(self, formdata=None, obj=None, prefix='', **kwargs):
+        super(StatCalculatorForm, self).__init__(formdata, obj, prefix, **kwargs)
+
+        self.needs_shortening = bool(formdata.get('shorten', False))
+
+        if self.needs_shortening:
+            # Strip out form data that doesn't need to exist
+            sfd = self.short_formdata = formdata.copy()
+            del sfd['shorten']
+
+            # Shorten the stat fields down to pipe-delimited
+            for stat_field_name in ('stat', 'effort'):
+                stat_field = self[stat_field_name]
+                for field in stat_field:
+                    del sfd[field.short_name]
+                sfd[stat_field_name] = stat_field.short_data
+
+            # Outright delete stuff that's left blank
+            for field in ('nature', 'hint', 'hp_type'):
+                if not self[field].data:
+                    del sfd[field]
+
+        else:
+            # Done AFTER the parsing: compact the stat fields into single
+            # pipe-delimited parameters
+            pass
+
+class StatField(fields.Field):
+    """Compound field that contains one subfield for each of the six main
+    statistics, which need to be passed in on creation since they're db
+    objects.
+
+    Can be iterated to get the individual fields in stat id order, or used as a
+    dictionary.
+    """
+    def __init__(self, stats, label=u'', validators=None, **kwargs):
+        super(StatField, self).__init__(label, validators, **kwargs)
+
+        self._stats = stats
+        self._unbound_field = fields.IntegerField(label, validators)
+
+    def process(self, formdata, data=None):
+        self.process_errors = []
+        self._fields = {}
+
+        short_data = {}
+        if self.short_name in formdata:
+            # Must be a shortened field; unshorten it and clobber the actual
+            # formdata
+            values = formdata.getlist(self.short_name)[0].split(u'|')
+            try:
+                int_values = [int(value) for value in values]
+                short_data = dict(zip(self._stats, int_values))
+            except ValueError:
+                # Something isn't an integer.  Shortening fucked up.  ABORT
+                pass
+
+        for stat in self._stats:
+            name = '_'.join((self.short_name, stat.name.lower().replace(' ', '_')))
+            field = self._fields[stat] = self._unbound_field.bind(form=None, name=name)
+            if stat in short_data:
+                field.process({}, short_data[stat])
+            else:
+                field.process(formdata)
+
+    def validate(self, form, extra_validators=()):
+        self.errors = []
+        success = True
+        for field in self:
+            if not field.validate(form):
+                success = False
+                self.errors.append(field.errors)
+        return success
+
+    def populate_obj(self, obj, name): raise NotImplementedError
+
+    def __iter__(self):
+        return (self._fields[stat] for stat in self._stats)
+
+    def __getitem__(self, stat):
+        return self._fields[stat]
+
+    @property
+    def data(self):
+        return dict((stat, self._fields[stat].data) for stat in self._stats)
+
+    @property
+    def short_data(self):
+        return u'|'.join(str(field.data) for field in self)
+
 
 def stat_graph_chunk_color(gene):
     """Returns a #rrggbb color, given a gene.  Used for the pretty graph."""
@@ -764,43 +857,37 @@ class PokedexGadgetsController(BaseController):
     def stat_calculator(self):
         """Calculates, well, stats."""
         # XXX features this needs:
-        # - short URLs
         # - more better error checking
-        # - accept..  anything else hint at IVs?
         # - back-compat URL
         # - also calculate stats or effort
         # - multiple levels
         # - track effort gained on the fly (as well as exp for auto level up?)
         #   - UI would need to be different and everything, ugh
+        # - graphs of potential stats?
+        #   - given a pokemon and its genes and effort, graph all stats by level
+        #   - given a pokemon and its gene results, graph approximate stats by level...?
+        #   - given a pokemon, graph its min and max possible calc'd stats...
 
-        class F(StatCalculatorForm):
-            pass
-
-        # Add stat-based fields dynamically
-        c.stat_fields = []  # just field names
-        c.effort_fields = []
+        # Add the stat-based fields
         # XXX get rid of this stupid filter
         c.stats = db.pokedex_session.query(tables.Stat) \
             .filter(tables.Stat.id <= 6) \
-            .order_by(tables.Stat.id).all()
-        for stat in c.stats:
-            field_name = stat.name.lower().replace(u' ', u'_')
+            .all()
 
-            c.stat_fields.append('stat_' + field_name)
-            c.effort_fields.append('effort_' + field_name)
-
-            setattr(F, 'stat_' + field_name,
-                fields.IntegerField(u'', [wtforms.validators.NumberRange(min=5, max=700)]))
-
-            setattr(F, 'effort_' + field_name,
-                fields.IntegerField(u'', [wtforms.validators.NumberRange(min=0, max=255)]))
+        class F(StatCalculatorForm):
+            stat = StatField(c.stats, validators=[wtforms.validators.NumberRange(min=5, max=700)])
+            effort = StatField(c.stats, validators=[wtforms.validators.NumberRange(min=0, max=255)])
 
         ### Parse form and so forth
-        c.form = F(request.params)
+        c.form = F(request.GET)
 
         c.results = None  # XXX shim
         if not request.GET or not c.form.validate():
             return render('/pokedex/gadgets/stat_calculator.mako')
+
+        # Possible shorten and redirect
+        if c.form.needs_shortening:
+            redirect(h.update_params(url.current(), **c.form.short_formdata))
 
         def filter_genes(genes, f):
             """Teeny helper function to only keep possible genes that fit the
@@ -821,7 +908,7 @@ class PokedexGadgetsController(BaseController):
         # Start with lists of possibly valid genes and cut down from there
         c.valid_range = {}  # stat => (min, max)
         valid_genes = {}
-        for stat, stat_field, effort_field in zip(c.stats, c.stat_fields, c.effort_fields):
+        for stat in c.stats:
             ### Bunch of setup, per stat
             # XXX let me stop typing this, christ
             if stat.name == u'HP':
@@ -839,8 +926,8 @@ class PokedexGadgetsController(BaseController):
             elif nature.decreased_stat == stat:
                 nature_mod = 0.9
 
-            stat_in = c.form[stat_field].data
-            effort_in = c.form[effort_field].data
+            stat_in = c.form.stat[stat].data
+            effort_in = c.form.effort[stat].data
 
             def calculate_stat(gene):
                 return int(nature_mod *
@@ -961,7 +1048,7 @@ class PokedexGadgetsController(BaseController):
                     # Starting a new subrange; remember the new left end
                     left_endpoint = n
 
-            c.results[stat] = u','.join(parts)
+            c.results[stat] = u', '.join(parts)
 
         c.stat_graph_chunk_color = stat_graph_chunk_color
 
