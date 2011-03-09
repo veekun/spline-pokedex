@@ -154,8 +154,6 @@ class ChainBreedingForm(Form):
 
 class StatCalculatorForm(Form):
     pokemon = PokedexLookupField(u'Pokémon', valid_type='pokemon')
-    level = fields.IntegerField(u'Level', [wtforms.validators.NumberRange(min=1, max=100)],
-                                     default=100)
     nature = QuerySelectField('Nature',
         query_factory=lambda: db.pokedex_session.query(tables.Nature).order_by(tables.Nature.name),
         get_pk=lambda _: _.name.lower(),
@@ -177,9 +175,9 @@ class StatCalculatorForm(Form):
 
     shorten = fields.HiddenField(default=u'')
     def __init__(self, formdata=None, obj=None, prefix='', **kwargs):
-        super(StatCalculatorForm, self).__init__(formdata, obj, prefix, **kwargs)
-
         self.needs_shortening = bool(formdata.get('shorten', False))
+
+        super(StatCalculatorForm, self).__init__(formdata, obj, prefix, **kwargs)
 
         if self.needs_shortening:
             # Strip out form data that doesn't need to exist
@@ -189,19 +187,16 @@ class StatCalculatorForm(Form):
             # Shorten the stat fields down to pipe-delimited
             for stat_field_name in ('stat', 'effort'):
                 stat_field = self[stat_field_name]
-                for field in stat_field:
-                    del sfd[field.short_name]
-                sfd[stat_field_name] = stat_field.short_data
+                if not stat_field.data:
+                    continue
+                for field in stat_field[0]:
+                    del sfd[field.name]
+                sfd[stat_field_name] = [subfield.short_data for subfield in stat_field]
 
             # Outright delete stuff that's left blank
             for field in ('nature', 'hint', 'hp_type'):
                 if not self[field].data:
                     del sfd[field]
-
-        else:
-            # Done AFTER the parsing: compact the stat fields into single
-            # pipe-delimited parameters
-            pass
 
 class StatField(fields.Field):
     """Compound field that contains one subfield for each of the six main
@@ -211,11 +206,11 @@ class StatField(fields.Field):
     Can be iterated to get the individual fields in stat id order, or used as a
     dictionary.
     """
-    def __init__(self, stats, label=u'', validators=None, **kwargs):
-        super(StatField, self).__init__(label, validators, **kwargs)
-
+    def __init__(self, stats, unbound_field, **kwargs):
         self._stats = stats
-        self._unbound_field = fields.IntegerField(label, validators)
+        self._unbound_field = unbound_field
+
+        super(StatField, self).__init__(**kwargs)
 
     def process(self, formdata, data=None):
         self.process_errors = []
@@ -233,8 +228,7 @@ class StatField(fields.Field):
                 # Something isn't an integer.  Shortening fucked up.  ABORT
                 pass
 
-        for stat in self._stats:
-            name = '_'.join((self.short_name, stat.name.lower().replace(' ', '_')))
+        for stat, name in zip(self._stats, self.subfield_names):
             field = self._fields[stat] = self._unbound_field.bind(form=None, name=name)
             if stat in short_data:
                 field.process({}, short_data[stat])
@@ -251,6 +245,11 @@ class StatField(fields.Field):
         return success
 
     def populate_obj(self, obj, name): raise NotImplementedError
+
+    @property
+    def subfield_names(self):
+        for stat in self._stats:
+            yield '_'.join((self.short_name, stat.name.lower().replace(' ', '_')))
 
     def __iter__(self):
         return (self._fields[stat] for stat in self._stats)
@@ -857,11 +856,10 @@ class PokedexGadgetsController(BaseController):
     def stat_calculator(self):
         """Calculates, well, stats."""
         # XXX features this needs:
-        # - show the pokemon!!
         # - more better error checking
         # - back-compat URL
         # - also calculate stats or effort
-        # - multiple levels
+        #   - NO don't do this; put it on the pokemon pages!!!
         # - track effort gained on the fly (as well as exp for auto level up?)
         #   - UI would need to be different and everything, ugh
         #   - would also need to track evolutions oh no!
@@ -869,6 +867,15 @@ class PokedexGadgetsController(BaseController):
         #   - given a pokemon and its genes and effort, graph all stats by level
         #   - given a pokemon and its gene results, graph approximate stats by level...?
         #   - given a pokemon, graph its min and max possible calc'd stats...
+        # - finish multiple-levels
+        #   - make level + stat + effort a subform, and wrap *that* in
+        #     duplicatefield, so I don't have to align them
+        #   - if a level is blank, or all the stats are zero, ignore that
+        #     entire set of fields.
+        #   - fix it so the 'bonus' level is the max of current levels, plus
+        #     one.  for bonus points, figure out the next "helpful" level, show
+        #     it, and use that as the default.
+        # - bring back the horizontal UI.  this isn't working so well.
 
         # Add the stat-based fields
         # XXX get rid of this stupid filter
@@ -876,9 +883,25 @@ class PokedexGadgetsController(BaseController):
             .filter(tables.Stat.id <= 6) \
             .all()
 
+        # Make sure there are the same number of level, stat, and effort
+        # fields.  Add an extra one (for more data), as long as we're not about
+        # to shorten
+        num_dupes = c.num_data_points = len(request.GET.getall('level'))
+        if not request.GET.get('shorten', False):
+            num_dupes += 1
         class F(StatCalculatorForm):
-            stat = StatField(c.stats, validators=[wtforms.validators.NumberRange(min=5, max=700)])
-            effort = StatField(c.stats, validators=[wtforms.validators.NumberRange(min=0, max=255)])
+            level = DuplicateField(
+                fields.IntegerField(u'Level', [wtforms.validators.NumberRange(min=1, max=100)], default=100),
+                min_entries=num_dupes,
+            )
+            stat = DuplicateField(
+                StatField(c.stats, fields.IntegerField(default=0, validators=[wtforms.validators.NumberRange(min=0, max=700)])),
+                min_entries=num_dupes,
+            )
+            effort = DuplicateField(
+                StatField(c.stats, fields.IntegerField(default=0, validators=[wtforms.validators.NumberRange(min=0, max=255)])),
+                min_entries=num_dupes,
+            )
 
         ### Parse form and so forth
         c.form = F(request.GET)
@@ -889,7 +912,8 @@ class PokedexGadgetsController(BaseController):
 
         # Possible shorten and redirect
         if c.form.needs_shortening:
-            redirect(h.update_params(url.current(), **c.form.short_formdata))
+            redirect(h.update_params(url.current(),
+                **c.form.short_formdata.mixed()))
 
         def filter_genes(genes, f):
             """Teeny helper function to only keep possible genes that fit the
@@ -906,9 +930,8 @@ class PokedexGadgetsController(BaseController):
         if nature and nature.is_neutral:
             # Neutral nature is equivalent to none at all
             nature = None
-        level = c.form.level.data
         # Start with lists of possibly valid genes and cut down from there
-        c.valid_range = {}  # stat => (min, max)
+        c.valid_range = defaultdict(dict)  # stat => level => (min, max)
         valid_genes = {}
         for stat in c.stats:
             ### Bunch of setup, per stat
@@ -928,29 +951,33 @@ class PokedexGadgetsController(BaseController):
             elif nature.decreased_stat == stat:
                 nature_mod = 0.9
 
-            stat_in = c.form.stat[stat].data
-            effort_in = c.form.effort[stat].data
-
-            def calculate_stat(gene):
-                return int(nature_mod *
-                    func(base_stat, level=level, iv=gene, effort=effort_in))
-
-            c.valid_range[stat] = min_stat, max_stat = \
-                calculate_stat(0), calculate_stat(31)
-
-            ### Actual work!
-            # Quick simple check: if the input is totally outside the valid
-            # range, no need to calculate anything
-            if not min_stat <= stat_in <= max_stat:
-                valid_genes[stat] = set()
-                continue
-
             # Start out with everything being considered valid
             valid_genes[stat] = set(range(32))
 
-            # Run through and maybe invalidate each gene
-            filter_genes(valid_genes[stat],
-                lambda gene: calculate_stat(gene) == stat_in)
+            for i in range(c.num_data_points):
+                stat_in = c.form.stat[i][stat].data
+                effort_in = c.form.effort[i][stat].data
+
+                level = c.form.level[i].data
+                def calculate_stat(gene):
+                    return int(nature_mod * func(
+                        base_stat, level=level,
+                        iv=gene, effort=effort_in))
+
+                c.valid_range[stat][level] = min_stat, max_stat = \
+                    calculate_stat(0), calculate_stat(31)
+
+                ### Actual work!
+                # Quick simple check: if the input is totally outside the valid
+                # range, no need to calculate anything
+                if not min_stat <= stat_in <= max_stat:
+                    valid_genes[stat] = set()
+                if not valid_genes[stat]:
+                    continue
+
+                # Run through and maybe invalidate each gene
+                filter_genes(valid_genes[stat],
+                    lambda gene: calculate_stat(gene) == stat_in)
 
         # Hidden Power type
         if c.form.hp_type.data:
@@ -997,8 +1024,9 @@ class PokedexGadgetsController(BaseController):
 
             # Also, the characteristic is only shown for the highest gene.  So,
             # no other stat can be higher than the new maximum for the hinted
-            # stat
-            max_gene = max(valid_genes[hint.stat])
+            # stat.  (Need the extra -1 in case there are actually no valid
+            # genes left; max() dies with an empty sequence.)
+            max_gene = max(itertools.chain(valid_genes[hint.stat], (-1,)))
             for genes in valid_genes.values():
                 filter_genes(genes, lambda gene: gene <= max_gene)
 

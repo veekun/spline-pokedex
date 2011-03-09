@@ -21,7 +21,6 @@
 ${h.form(url.current(), method=u'GET')}
 <dl class="standard-form">
     ${lib.field(u'pokemon')}
-    ${lib.field(u'level', size=3)}
     ${lib.field(u'nature')}
     ${lib.field(u'hint')}
     ${lib.field(u'hp_type')}
@@ -61,9 +60,21 @@ ${h.form(url.current(), method=u'GET')}
         <th>${stat.name}</th>
         % endfor
     </tr>
+    % if c.form.pokemon.data:
+    <tr>
+        <th>${_(u"Base stats")}</th>
+        % for stat in c.stats:
+        <td>${c.form.pokemon.data.stat(stat).base_stat}</td>
+        % endfor
+    </tr>
+    % endif
 </thead>
+% for i in range(c.num_data_points + 1):
 <tbody>
-    % if not c.results:
+    <tr class="subheader-row">
+        <th colspan="${len(c.stats) + 1}">Level ${lib.literal_field(c.form.level[i], size=3)}</th>
+    </tr>
+    % if i == 0 and not c.results:
     <tr>
         <th></th>
         <td colspan="${len(c.stats)}" class="protip">
@@ -73,12 +84,12 @@ ${h.form(url.current(), method=u'GET')}
     % endif
     <tr>
         <th>${_(u"Stats")}</th>
-        % for field in c.form.stat:
+        % for field in c.form.stat[i]:
         <td>${lib.literal_field(field, size=3)}</td>
         % endfor
     </tr>
 
-    % if c.results:
+    % if c.results and i < c.num_data_points:
     <tr>
         <th>${_(u"Possible range")}</th>
         % for stat in c.stats:
@@ -91,10 +102,11 @@ ${h.form(url.current(), method=u'GET')}
             class="dex-nature-nerf"
             % endif
         >
-            % if len(set(c.valid_range[stat])) == 1:
-            ${c.valid_range[stat][0]}
+            <% valid_range = c.valid_range[stat][ c.form.level[i].data ] %>\
+            % if len(set(valid_range)) == 1:
+            ${valid_range[0]}
             % else:
-            ${c.valid_range[stat][0]}–${c.valid_range[stat][1]}
+            ${valid_range[0]}–${valid_range[1]}
             % endif
         </td>
         % endfor
@@ -102,7 +114,7 @@ ${h.form(url.current(), method=u'GET')}
     % endif
 </tbody>
 <tbody>
-    % if not c.results:
+    % if i == 0 and not c.results:
     <tr>
         <th></th>
         <td colspan="${len(c.stats)}" class="protip">
@@ -113,20 +125,13 @@ ${h.form(url.current(), method=u'GET')}
     % endif
     <tr>
         <th>${_(u"Effort")}</th>
-        % for field in c.form.effort:
+        % for field in c.form.effort[i]:
         <td>${lib.literal_field(field, size=3)}</td>
         % endfor
     </tr>
 </tbody>
+% endfor  ## range(len(c.form.stat))
 % if c.results:
-<tbody>
-    <tr>
-        <th>${_(u"Base stats")}</th>
-        % for stat in c.stats:
-        <td>${c.form.pokemon.data.stat(stat).base_stat}</td>
-        % endfor
-    </tr>
-</tbody>
 <tbody>
     % if 0:
     <tr>

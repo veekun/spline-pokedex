@@ -412,6 +412,7 @@ table.dex-compare-pokemon.dex-compare-pokemon-moves th.versions { text-align: le
 .dex-col-stat-calc { width: 6em; }
 table.dex-stat-calculator { margin-bottom: 2em; }
 table.dex-stat-calculator tbody th { text-align: right; }
+table.dex-stat-calculator tbody tr.subheader-row th { text-align: left; }
 table.dex-stat-calculator td { text-align: center; }
 table.dex-stat-calculator td,
 table.dex-stat-calculator th { line-height: 1.33; }
