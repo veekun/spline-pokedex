@@ -69,7 +69,7 @@ ${h.form(url.current(), method=u'GET')}
     </tr>
     % endif
 </thead>
-% for i in range(c.num_data_points + 1):
+% for i in range(c.num_data_points + c.prompt_for_more):
 <tbody>
     <tr class="subheader-row">
         <th colspan="${len(c.stats) + 1}">Level ${lib.literal_field(c.form.level[i], size=3)}</th>

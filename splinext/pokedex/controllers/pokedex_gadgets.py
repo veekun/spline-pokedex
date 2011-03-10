@@ -193,6 +193,17 @@ class StatCalculatorForm(Form):
                     del sfd[field.name]
                 sfd[stat_field_name] = [subfield.short_data for subfield in stat_field]
 
+            # We always show one more set of level/stat/effort than was
+            # submitted, so the user can add more data.  If they submitted the
+            # form without adding more data, skip that last set
+            sfd['level'] = list(self.level.data)
+            if len(self.level.data) > 1 and not any(
+                subfield.data for subfield in self.stat[-1]):
+
+                sfd['level'].pop()
+                sfd['stat'].pop()
+                sfd['effort'].pop()
+
             # Outright delete stuff that's left blank
             for field in ('nature', 'hint', 'hp_type'):
                 if not self[field].data:
@@ -868,10 +879,6 @@ class PokedexGadgetsController(BaseController):
         #   - given a pokemon and its gene results, graph approximate stats by level...?
         #   - given a pokemon, graph its min and max possible calc'd stats...
         # - finish multiple-levels
-        #   - make level + stat + effort a subform, and wrap *that* in
-        #     duplicatefield, so I don't have to align them
-        #   - if a level is blank, or all the stats are zero, ignore that
-        #     entire set of fields.
         #   - fix it so the 'bonus' level is the max of current levels, plus
         #     one.  for bonus points, figure out the next "helpful" level, show
         #     it, and use that as the default.
@@ -891,15 +898,18 @@ class PokedexGadgetsController(BaseController):
             num_dupes += 1
         class F(StatCalculatorForm):
             level = DuplicateField(
-                fields.IntegerField(u'Level', [wtforms.validators.NumberRange(min=1, max=100)], default=100),
+                fields.IntegerField(u'Level', default=100,
+                    validators=[wtforms.validators.NumberRange(1, 100)]),
                 min_entries=num_dupes,
             )
             stat = DuplicateField(
-                StatField(c.stats, fields.IntegerField(default=0, validators=[wtforms.validators.NumberRange(min=0, max=700)])),
+                StatField(c.stats, fields.IntegerField(default=0, validators=[
+                    wtforms.validators.NumberRange(min=0, max=700)])),
                 min_entries=num_dupes,
             )
             effort = DuplicateField(
-                StatField(c.stats, fields.IntegerField(default=0, validators=[wtforms.validators.NumberRange(min=0, max=255)])),
+                StatField(c.stats, fields.IntegerField(default=0, validators=[
+                    wtforms.validators.NumberRange(min=0, max=255)])),
                 min_entries=num_dupes,
             )
 
@@ -1081,6 +1091,13 @@ class PokedexGadgetsController(BaseController):
             c.results[stat] = u', '.join(parts)
 
         c.stat_graph_chunk_color = stat_graph_chunk_color
+
+        next_level = max(c.form.level.data[:-1]) + 1
+        c.prompt_for_more = not c.exact
+        if next_level <= 100:
+            c.form.level[-1].data = next_level
+        else:
+            c.prompt_for_more = False
 
         return render('/pokedex/gadgets/stat_calculator.mako')
 
