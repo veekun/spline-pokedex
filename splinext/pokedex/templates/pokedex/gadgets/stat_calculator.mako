@@ -162,7 +162,7 @@ ${h.form(url.current(), method=u'GET')}
 % if all(c.results.values()):
 % if not c.exact:
 <p>
-    Hmm, I need more information to figure out your Pokémon's genes exactly.  Try raising it a level and entering new stats. <br>
+    Hmm, I need more information to figure out your Pokémon's genes exactly.  Try raising it to level ${c.next_useful_level} and entering its new stats. <br>
     Remember: if your Pokémon battles at all, you'll need to track the effort it gains.  Consider saving your game and using Rare Candy instead.
 </p>
 % endif

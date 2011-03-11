@@ -3,6 +3,7 @@ from __future__ import absolute_import, division
 
 from collections import defaultdict, namedtuple
 import colorsys
+import functools
 import itertools
 import logging
 import math
@@ -869,11 +870,9 @@ class PokedexGadgetsController(BaseController):
 
     def stat_calculator(self):
         """Calculates, well, stats."""
-        # XXX features this needs:
+        # possible TODO:
         # - more better error checking
         # - back-compat URL
-        # - also calculate stats or effort
-        #   - NO don't do this; put it on the pokemon pages!!!
         # - track effort gained on the fly (as well as exp for auto level up?)
         #   - UI would need to be different and everything, ugh
         #   - would also need to track evolutions oh no!
@@ -881,10 +880,7 @@ class PokedexGadgetsController(BaseController):
         #   - given a pokemon and its genes and effort, graph all stats by level
         #   - given a pokemon and its gene results, graph approximate stats by level...?
         #   - given a pokemon, graph its min and max possible calc'd stats...
-        # - finish multiple-levels
-        #   - fix it so the 'bonus' level is the max of current levels, plus
-        #     one.  for bonus points, figure out the next "helpful" level, show
-        #     it, and use that as the default.
+        # - this logic is pretty hairy; use a state object?
 
         # Add the stat-based fields
         # XXX get rid of this stupid filter
@@ -945,6 +941,13 @@ class PokedexGadgetsController(BaseController):
         # Start with lists of possibly valid genes and cut down from there
         c.valid_range = defaultdict(dict)  # stat => level => (min, max)
         valid_genes = {}
+        # Stuff for finding the next useful level
+        level_indices = sorted(range(c.num_data_points),
+            key=lambda i: c.form.level[i].data)
+        max_level_index = level_indices[-1]
+        max_given_level = c.form.level[max_level_index].data
+        c.next_useful_level = 100
+
         for stat in c.stats:
             ### Bunch of setup, per stat
             # XXX let me stop typing this, christ
@@ -963,21 +966,22 @@ class PokedexGadgetsController(BaseController):
             elif nature.decreased_stat == stat:
                 nature_mod = 0.9
 
+            meta_calculate_stat = functools.partial(func,
+                base_stat=base_stat, nature=nature_mod)
+
             # Start out with everything being considered valid
             valid_genes[stat] = set(range(32))
 
             for i in range(c.num_data_points):
                 stat_in = c.form.stat[i][stat].data
                 effort_in = c.form.effort[i][stat].data
-
                 level = c.form.level[i].data
-                def calculate_stat(gene):
-                    return int(nature_mod * func(
-                        base_stat, level=level,
-                        iv=gene, effort=effort_in))
+
+                calculate_stat = functools.partial(meta_calculate_stat,
+                    effort=effort_in, level=level)
 
                 c.valid_range[stat][level] = min_stat, max_stat = \
-                    calculate_stat(0), calculate_stat(31)
+                    calculate_stat(iv=0), calculate_stat(iv=31)
 
                 ### Actual work!
                 # Quick simple check: if the input is totally outside the valid
@@ -989,7 +993,24 @@ class PokedexGadgetsController(BaseController):
 
                 # Run through and maybe invalidate each gene
                 filter_genes(valid_genes[stat],
-                    lambda gene: calculate_stat(gene) == stat_in)
+                    lambda gene: calculate_stat(iv=gene) == stat_in)
+
+            # Find the next "useful" level.  This is the lowest level at which
+            # at least two possible genes give different stats, given how much
+            # effort the Pokémon has now.
+            # TODO should this show the *highest* level necessary to get exact?
+            if valid_genes[stat]:
+                min_gene = min(valid_genes[stat])
+                max_gene = max(valid_genes[stat])
+                max_effort = c.form.effort[max_level_index][stat].data
+                while level < c.next_useful_level and \
+                    meta_calculate_stat(level=level, effort=max_effort, iv=min_gene) == \
+                    meta_calculate_stat(level=level, effort=max_effort, iv=max_gene):
+
+                    level += 1
+                c.next_useful_level = level
+
+        c.form.level[-1].data = c.next_useful_level
 
         # Hidden Power type
         if c.form.hp_type.data:
@@ -1098,12 +1119,8 @@ class PokedexGadgetsController(BaseController):
 
         c.stat_graph_chunk_color = stat_graph_chunk_color
 
-        next_level = max(c.form.level.data[:-1]) + 1
-        c.prompt_for_more = not c.exact
-        if next_level <= 100:
-            c.form.level[-1].data = next_level
-        else:
-            c.prompt_for_more = False
+        c.prompt_for_more = (
+            not c.exact and c.next_useful_level > max_given_level)
 
         return render('/pokedex/gadgets/stat_calculator.mako')
 

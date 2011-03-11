@@ -419,7 +419,7 @@ table.dex-stat-calculator th { line-height: 1.33; }
 table.dex-stat-calculator td.impossible { text-decoration: underline; color: darkred; }
 table.dex-stat-calculator td.-possible-genes { padding-left: 1em; padding-right: 1em; text-align: left; vertical-align: top; /* need this because the graph has no text, so 'baseline' pushes it way up */ }
 table.dex-stat-calculator td .-valid-range { font-size: 0.8em; line-height: 2em; }
-table.dex-stat-calculator td.protip { font-size: 0.8em; padding-left: 1em; line-height: 1.33; text-align: left; font-style: italic; color: #606060; }
+p.dex-stat-calculator-protip { font-size: 0.8em; padding-left: 1em; line-height: 1.33; text-align: left; font-style: italic; color: #606060; }
 p.dex-stat-calculator-clipboard { margin-left: 4em; margin-right: 4em; padding: 0.5em 1em; font-family: monospace; background: #e8e8e8; }
 
 div.dex-stat-graph { overflow: hidden; height: 1.5em; margin: 0 0 0.33em; border: 1px solid #c0c0c0; background: white; -moz-border-radius: 2px; }
