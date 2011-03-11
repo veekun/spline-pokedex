@@ -19,6 +19,7 @@
 <h1>Stat calculator</h1>
 
 ${h.form(url.current(), method=u'GET')}
+<input type="hidden" name="shorten" value="1">
 <dl class="standard-form">
     ${lib.field(u'pokemon')}
     ${lib.field(u'nature')}
@@ -26,28 +27,25 @@ ${h.form(url.current(), method=u'GET')}
     ${lib.field(u'hp_type')}
 </dl>
 
-<table class="dex-stat-calculator striped-row-groups">
-<col class="dex-col-stat-calc-labels">
+<%
+    if c.results:
+        num_data_columns = c.num_data_points + c.prompt_for_more
+    else:
+        num_data_columns = 1
+%>\
+<table class="dex-stat-calculator striped-rows">
+<col>
+% if c.results:
+<col>
+% endif
+% for i in range(num_data_columns):
 <colgroup>
-    % for stat in c.stats:
     <col class="dex-col-stat-calc">
-    % endfor
+    <col class="dex-col-stat-calc">
 </colgroup>
+% endfor
+<col>
 <thead>
-    % if c.form.nature.data and not c.form.nature.data.is_neutral:
-    <tr>
-        <th></th>
-        % for stat in c.stats:
-        % if c.form.nature.data.increased_stat == stat:
-        <th class="dex-nature-buff">${_(u"+10%")}</th>
-        % elif c.form.nature.data.decreased_stat == stat:
-        <th class="dex-nature-nerf">${_(u"−10%")}</th>
-        % else:
-        <th></th>
-        % endif
-        % endfor
-    </tr>
-    % endif
     <tr class="header-row">
         <th>
             % if c.results:
@@ -56,111 +54,83 @@ ${h.form(url.current(), method=u'GET')}
                 c.pokemon.full_name))}
             % endif
         </th>
-        % for stat in c.stats:
-        <th>${stat.name}</th>
+        % if c.results:
+        <th>Base<br>stats</th>
+        % endif
+        % for i in range(num_data_columns):
+        <th>Stats</th>
+        <th>Effort</th>
         % endfor
+        % if c.results:
+        <th>Possible genes (IVs)</th>
+        % endif
     </tr>
-    % if c.form.pokemon.data:
-    <tr>
-        <th>${_(u"Base stats")}</th>
-        % for stat in c.stats:
-        <td>${c.form.pokemon.data.stat(stat).base_stat}</td>
-        % endfor
-    </tr>
-    % endif
-</thead>
-% for i in range(c.num_data_points + c.prompt_for_more):
-<tbody>
     <tr class="subheader-row">
-        <th colspan="${len(c.stats) + 1}">Level ${lib.literal_field(c.form.level[i], size=3)}</th>
-    </tr>
-    % if i == 0 and not c.results:
-    <tr>
-        <th></th>
-        <td colspan="${len(c.stats)}" class="protip">
-            ${_(u"Your Pokémon's actual stats, from the Summary screen in-game.")}
-        </td>
-    </tr>
-    % endif
-    <tr>
-        <th>${_(u"Stats")}</th>
-        % for field in c.form.stat[i]:
-        <td>${lib.literal_field(field, size=3)}</td>
-        % endfor
-    </tr>
-
-    % if c.results and i < c.num_data_points:
-    <tr>
-        <th>${_(u"Possible range")}</th>
-        % for stat in c.stats:
-        <td
-            % if not c.form.nature.data or c.form.nature.data.is_neutral:
-            <% pass %>\
-            % elif c.form.nature.data.increased_stat == stat:
-            class="dex-nature-buff"
-            % elif c.form.nature.data.decreased_stat == stat:
-            class="dex-nature-nerf"
-            % endif
+        <th
+        % if c.results:
+            colspan="2"
+        % endif
         >
-            <% valid_range = c.valid_range[stat][ c.form.level[i].data ] %>\
-            % if len(set(valid_range)) == 1:
-            ${valid_range[0]}
-            % else:
-            ${valid_range[0]}–${valid_range[1]}
+            <button type="submit">${_(u"Crunch numbers")}</button>
+        </th>
+        % for i in range(num_data_columns):
+        <th colspan="2">
+            Level ${lib.literal_field(c.form.level[i], size=3)}
+        </th>
+        % endfor
+        % if c.results:
+        <th></th>
+        % endif
+    </tr>
+</thead>
+<tbody>
+    % for stat in c.stats:
+    <tr
+    >
+        <th>
+            ${stat.name}
+          % if c.form.nature.data and not c.form.nature.data.is_neutral:
+            % if c.form.nature.data.increased_stat == stat:
+            <div class="dex-nature-buff">${_(u"+10%")}</div>
+            % elif c.form.nature.data.decreased_stat == stat:
+            <div class="dex-nature-nerf">${_(u"−10%")}</div>
+            % endif
+          % endif
+        </th>
+        % if c.results:
+        <td>${c.form.pokemon.data.stat(stat).base_stat}</td>
+        % endif
+        % for i in range(num_data_columns):
+        <td>
+            ${lib.literal_field(c.form.stat[i][stat], size=3, tabindex=len(c.stats) * (i * 2))}
+            % if c.results and i < c.num_data_points:
+            <div class="-valid-range
+                % if c.form.nature.data and not c.form.nature.data.is_neutral:
+                % if c.form.nature.data.increased_stat == stat:
+                dex-nature-buff
+                % elif c.form.nature.data.decreased_stat == stat:
+                dex-nature-nerf
+                % endif
+                % endif
+            ">
+                <% valid_range = c.valid_range[stat][ c.form.level[i].data ] %>\
+                % if len(set(valid_range)) == 1:
+                ${valid_range[0]}
+                % else:
+                ${valid_range[0]}–${valid_range[1]}
+                % endif
+            </div>
             % endif
         </td>
+        <td>${lib.literal_field(c.form.effort[i][stat], size=3, tabindex=len(c.stats) * (i * 2 + 1))}</td>
         % endfor
-    </tr>
-    % endif
-</tbody>
-<tbody>
-    % if i == 0 and not c.results:
-    <tr>
-        <th></th>
-        <td colspan="${len(c.stats)}" class="protip">
-            ${_(u"Accumulated as your Pokémon battles.")} <br>
-            ${_(u"If you don't know what this is, and your Pokémon has EVER battled or eaten a vitamin, this calculator CANNOT work.  Using Rare Candy is okay, though.")}
-        </td>
-    </tr>
-    % endif
-    <tr>
-        <th>${_(u"Effort")}</th>
-        % for field in c.form.effort[i]:
-        <td>${lib.literal_field(field, size=3)}</td>
-        % endfor
-    </tr>
-</tbody>
-% endfor  ## range(len(c.form.stat))
-% if c.results:
-<tbody>
-    % if 0:
-    <tr>
-        <th></th>
-        <td colspan="${len(c.stats)}" class="protip">
-            Your Pokémon's awesome-ness for each stat, from 0 to 31.
-        </td>
-    </tr>
-    % endif
-    <tr>
-        <th>${_(u"Genes (IVs)")}</th>
-        % for stat in c.stats:
-        <td>
-            % if c.results[stat]:
-            ${c.results[stat]}
-            % else:
-            <span class="impossible">impossible</span>
-            % endif
-        </td>
-        % endfor
-    </tr>
-    <tr>
-        ## Pretty graphs!
-        <th></th>
-        % for stat in c.stats:
-        <td>
-            % if c.results[stat]:
-            <div class="dex-stat-vertical-graph">
-            % for gene in xrange(31, -1, -1):
+
+        % if c.results:
+        % if c.results[stat]:
+        <td class="-possible-genes">
+            ## Pretty graphs!
+            <div class="dex-stat-graph">
+            % for gene in xrange(32):
                 % if gene in c.valid_genes[stat]:
                 <div class="point" style="background: ${c.stat_graph_chunk_color(gene)};"></div>
                 % else:
@@ -168,44 +138,56 @@ ${h.form(url.current(), method=u'GET')}
                 % endif
             % endfor
             </div>
-            % endif
+            <div>${c.results[stat]}</div>
         </td>
-        % endfor
+        % else:
+        <td class="impossible">impossible</td>
+        % endif
+        % endif
     </tr>
-    % if c.exact:
-    <tr>
-        <th>${_(u"Hidden Power")}</th>
-        <td colspan="${len(c.stats)}"> <p>
-            ${h.pokedex.type_link(c.hidden_power_type)} damage,
-            with ${c.hidden_power_power} power.
-        </p> </td>
-    </tr>
-    % endif
-    <tr>
-        <td colspan="${len(c.stats) + 1}">
-            % if all(c.results.values()):
-            <p>${_(u"And for your copy/pasting pleasure:")}</p>
-            <p class="clipboard">
-                ${c.results[c.stats[0]]} ${_(u"HP")};
-                ${c.results[c.stats[1]]}/${c.results[c.stats[2]]} ${_(u"Physical")};
-                ${c.results[c.stats[3]]}/${c.results[c.stats[4]]} ${_(u"Special")};
-                ${c.results[c.stats[5]]} ${_(u"Speed")}
-            </p>
-            % else:
-            <p>${_(u"Uh-oh.  The set of stats you gave is totally impossible. Better double-check against your game.")}</p>
-            <p>${_(u"The most common problem is effort; if a Pokémon has been trained at all, it'll have some effort accumulated.  This affects its stats, and there's no way to know how much effort it has unless you've been keeping track.  Sorry.")}</p>
-            <p>${_(u"If you're desperate, you could try the effort-lowering berries (Pomeg et al.), which will reduce effort in a given stat by 10 at a time.  Drop every stat's effort until it won't drop any further, then try again.")}</p>
-            % endif
-        </td>
-    </tr>
+    % endfor
 </tbody>
-% endif
 </table>
 
+% if c.results:
+% if c.exact:
+<p>Congratulations, you've narrowed your Pokémon's stats down exactly!</p>
 <p>
-    <input type="hidden" name="shorten" value="1">
-    <button type="submit">${_(u"Let's do this!")}</button>
+    This ${c.form.pokemon.data.full_name}'s
+    <a href="${url(controller='dex', action='moves', name=c.hidden_power.name.lower())}">${c.hidden_power.name}</a>
+    inflicts ${h.pokedex.type_link(c.hidden_power_type)} damage,
+    with ${c.hidden_power_power} power.
 </p>
+% endif
+% if all(c.results.values()):
+% if not c.exact:
+<p>
+    Hmm, I need more information to figure out your Pokémon's genes exactly.  Try raising it a level and entering new stats. <br>
+    Remember: if your Pokémon battles at all, you'll need to track the effort it gains.  Consider saving your game and using Rare Candy instead.
+</p>
+% endif
+<p>${_(u"And for your copy/pasting pleasure:")}</p>
+<p class="dex-stat-calculator-clipboard">
+    ${c.results[c.stats[0]]} ${_(u"HP")};
+    ${c.results[c.stats[1]]}/${c.results[c.stats[2]]} ${_(u"Physical")};
+    ${c.results[c.stats[3]]}/${c.results[c.stats[4]]} ${_(u"Special")};
+    ${c.results[c.stats[5]]} ${_(u"Speed")}
+</p>
+% else:  # not all(values)
+<p>${_(u"Uh-oh.  The set of stats you gave is totally impossible. Better double-check against your game.")}</p>
+<p>${_(u"The most common problem is effort; if a Pokémon has been trained at all, it'll have some effort accumulated.  This affects its stats, and there's no way to know how much effort it has unless you've been keeping track.  Sorry.")}</p>
+<p>${_(u"If you're desperate, you could try the effort-lowering berries (Pomeg et al.), which will reduce effort in a given stat by 10 at a time.  Drop every stat's effort until it won't drop any further, then try again.")}</p>
+% endif
+% else:  # not c.results
+<p class="dex-stat-calculator-protip">
+    ${_(u"\"Stats\" are your Pokémon's actual stats, from the Summary screen in-game.")}
+</p>
+<p class="dex-stat-calculator-protip">
+    ${_(u"\"Effort\" is accumulated as your Pokémon battles.")} <br>
+    ${_(u"If you don't know what this is, and your Pokémon has EVER battled or eaten a vitamin, this calculator CANNOT work.  Using Rare Candy is okay, though.")}
+</p>
+% endif  # c.results
+
 <p>
     <button type="reset">${_(u"Reset")}</button> ${_(u"or")}
     <a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/eraser.png')}" alt=""> ${_(u"start over")}</a>

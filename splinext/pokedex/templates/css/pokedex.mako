@@ -39,8 +39,8 @@ a.dex-box-link.selected { border: 1px solid #95b7ea; background: #bfd4f2; }
 .dex-priority-slow { font-weight: bold; color: red; }
 
 /* Nature-affected stats */
-.dex-nature-buff { font-weight: bold; color: green; }
-.dex-nature-nerf { font-weight: bold; color: red; }
+.dex-nature-buff { font-weight: bold; color: #e65858; }
+.dex-nature-nerf { font-weight: bold; color: #5875e6; }
 
 /* Links to Pokémon search */
 dd .dex-subtle-search-link { visibility: hidden; }
@@ -409,17 +409,23 @@ table.dex-compare-pokemon.dex-compare-pokemon-moves th.versions { text-align: le
 
 /* Stat calculator */
 .dex-col-stat-calc-labels { width: 8em; }
-.dex-col-stat-calc { width: 6em; }
+.dex-col-stat-calc { width: 4em; }
 table.dex-stat-calculator { margin-bottom: 2em; }
-table.dex-stat-calculator tbody th { text-align: right; }
+table.dex-stat-calculator tbody th { text-align: right; vertical-align: baseline; }
 table.dex-stat-calculator tbody tr.subheader-row th { text-align: left; }
 table.dex-stat-calculator td { text-align: center; }
 table.dex-stat-calculator td,
 table.dex-stat-calculator th { line-height: 1.33; }
-table.dex-stat-calculator span.impossible { text-decoration: underline; color: darkred; }
+table.dex-stat-calculator td.impossible { text-decoration: underline; color: darkred; }
+table.dex-stat-calculator td.-possible-genes { padding-left: 1em; padding-right: 1em; text-align: left; vertical-align: top; /* need this because the graph has no text, so 'baseline' pushes it way up */ }
+table.dex-stat-calculator td .-valid-range { font-size: 0.8em; line-height: 2em; }
 table.dex-stat-calculator td.protip { font-size: 0.8em; padding-left: 1em; line-height: 1.33; text-align: left; font-style: italic; color: #606060; }
-table.dex-stat-calculator p { margin: 0.67em 0.5em; text-align: left; }
-table.dex-stat-calculator p.clipboard { font-family: monospace; }
+p.dex-stat-calculator-clipboard { margin-left: 4em; margin-right: 4em; padding: 0.5em 1em; font-family: monospace; background: #e8e8e8; }
+
+div.dex-stat-graph { overflow: hidden; height: 1.5em; margin: 0 0 0.33em; border: 1px solid #c0c0c0; background: white; -moz-border-radius: 2px; }
+div.dex-stat-graph div.point,
+div.dex-stat-graph div.pointless { float: left; height: 1.5em; width: 0.5em; }
+div.dex-stat-graph div.point { background: #c0c0c0; }
 
 div.dex-stat-vertical-graph { width: 1.5em; margin: 0 auto; border: 1px solid #c0c0c0; background: white; -moz-border-radius: 2px; }
 div.dex-stat-vertical-graph div.point,

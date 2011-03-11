@@ -279,8 +279,11 @@ class StatField(fields.Field):
 
 def stat_graph_chunk_color(gene):
     """Returns a #rrggbb color, given a gene.  Used for the pretty graph."""
-    hue = gene / 31
-    r, g, b = colorsys.hls_to_rgb(hue, 0.75, 0.75)
+    # Normalizing 0-31 to 0-1 is simple division -- however, pure red shouldn't
+    # represent both 0 and 31.  Cut this off at bluish purple instead, which is
+    # around 5/6
+    hue = gene / 31 * 0.83
+    r, g, b = colorsys.hls_to_rgb(hue, 0.67, 0.75)
     return "#%02x%02x%02x" % (r * 256, g * 256, b * 256)
 
 
@@ -882,7 +885,6 @@ class PokedexGadgetsController(BaseController):
         #   - fix it so the 'bonus' level is the max of current levels, plus
         #     one.  for bonus points, figure out the next "helpful" level, show
         #     it, and use that as the default.
-        # - bring back the horizontal UI.  this isn't working so well.
 
         # Add the stat-based fields
         # XXX get rid of this stupid filter
@@ -1060,6 +1062,10 @@ class PokedexGadgetsController(BaseController):
             c.hidden_power_type = db.pokedex_session.query(tables.Type) \
                 .get(type_det * 15 // 63)
             c.hidden_power_power = power_det * 40 // 63 + 30
+
+            # Used for a link
+            c.hidden_power = db.pokedex_session.query(tables.Move) \
+                .filter_by(name='Hidden Power').one()
 
         # Turn those results into something more readable.
         # Template still needs valid_genes for drawing the graph
