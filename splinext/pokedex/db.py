@@ -8,6 +8,8 @@ import re
 import pokedex.db
 from pokedex.db import tables
 from sqlalchemy.sql import func
+from sqlalchemy import and_, or_, not_
+from pylons import tmpl_context as c
 
 from spline.lib.base import SQLATimerProxy
 
@@ -40,54 +42,95 @@ def connect(config):
 
 
 # Quick access to a few database objects
-def get_by_name_query(table, name):
+def get_by_identifier_query(table, identifier, query=None):
+    """Returns a query to find a single row in the given table by identifier.
+
+    Don't use this for Pokémon!  Use `pokemon_query(use_identifier=True)`,
+    as it knows about forms.
+    """
+
+    identifier = identifier.lower()
+    identifier = re.sub(u'[ _]+', u'-', identifier)
+    identifier = re.sub(u'[\'.]', u'', identifier)
+
+    query = pokedex_session.query(table).filter(
+                table.identifier == identifier)
+
+    return query
+
+def get_by_name_query(table, name, language=None, query=None):
     """Returns a query to find a single row in the given table by name,
     ignoring case.
 
     Don't use this for Pokémon!  Use `pokemon_query()`, as it knows about
     forms.
+
+    If query is given, it will be extended joined with table.name_table,
+    otherwise table will be queried.
     """
-    # XXX: Use the name, not identifier
+
+    if language is None:
+        language = c.game_language
 
     name = name.lower()
-    name = re.sub(u'[ _]+', u'-', name)
-    name = re.sub(u'[\'.]', u'', name)
 
-    q = pokedex_session.query(table).filter(func.lower(table.identifier)
-                                            == name)
+    if query is None:
+        query = pokedex_session.query(table)
 
-    return q
+    query = query.outerjoin(
+            (table.name_table, and_(
+                    table.name_table.object_id == table.id,
+                    table.name_table.language == language,
+                ))
+        ).filter(or_(
+                func.lower(table.name_table.name) == name,
+                and_(table.name_table.name == None, table.identifier == name),
+            )).order_by(table.name_table.name != None)
 
-def pokemon_query(name, form=None):
+    return query
+
+def pokemon_query(name, form=None, language=None, use_identifier=False):
     """Returns a query that will look for the named Pokémon."""
 
-    # Force case-insensitive matching the heavy-handed way
-    # XXX: Use the name, not identifier
-    q = pokedex_session.query(tables.Pokemon) \
-                       .filter(func.lower(tables.Pokemon.identifier) == name.lower())
+    if use_identifier:
+        q = get_by_identifier_query(tables.Pokemon, name)
+    else:
+        if language is None:
+            language = c.game_language
+
+        q = get_by_name_query(tables.Pokemon, name, language=language)
 
     if form:
         # If a form has been specified, it must match
         q = q.join('unique_form')
-        q = q.filter(func.lower(tables.PokemonForm.identifier) == form.lower())
+        if use_identifier:
+            q = q.filter(func.lower(tables.PokemonForm.identifier) == form.lower())
+        else:
+            q = get_by_name_query(tables.PokemonForm, form, language=language, query=q)
     else:
         # If there's NOT a form, just make sure we get a form base Pokémon
         q = q.filter(tables.Pokemon.forms.any())
 
     return q
 
-def pokemon_form_query(name, form=None):
+def pokemon_form_query(name, form=None, language=None):
     """Returns a query that will look for the specified Pokémon form, or the
     default form of the named Pokémon.
     """
 
-    q = pokedex_session.query(tables.PokemonForm) \
-                       .join('form_base_pokemon') \
-                       .filter(func.lower(tables.Pokemon.identifier) == name.lower())
+    if language is None:
+        language = c.game_language
+
+    q = get_by_name_query(
+            tables.Pokemon,
+            name,
+            language=language,
+            query=pokedex_session.query(tables.PokemonForm).join('form_base_pokemon')
+        )
 
     if form:
         # If a form has been specified, it must match
-        q = q.filter(func.lower(tables.PokemonForm.identifier) == form.lower())
+        q = get_by_name_query(tables.PokemonForm, form, language=language, query=q)
     else:
         # If there's NOT a form, just get the default form
         q = q.filter(tables.PokemonForm.is_default == True)
@@ -98,3 +141,15 @@ def generation(id):
     return pokedex_session.query(tables.Generation).get(id)
 def version(name):
     return pokedex_session.query(tables.Version).filter_by(name=name).one()
+
+def alphabetize(query, name_table, language=None, reverse=False):
+    if language is None:
+        language = c.game_language
+    query = query.outerjoin((name_table, and_(
+            name_table.object_id == name_table.object_table.id,
+            name_table.language == language,
+        )))
+    if reverse:
+        return query.order_by(name_table.name.desc(), name_table.object_table.identifier.desc())
+    else:
+        return query.order_by(name_table.name.asc(), name_table.object_table.identifier.asc())
