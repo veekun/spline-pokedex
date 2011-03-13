@@ -142,22 +142,33 @@ def generation(id):
 def version(name):
     return pokedex_session.query(tables.Version).filter_by(name=name).one()
 
-def alphabetize(query, name_table, language=None, reverse=False):
+def alphabetize(query, name_table, sort_column=None, language=None, reverse=False):
     if language is None:
         language = c.game_language
+    if sort_column is None:
+        sort_column = 'name'
+    if isinstance(sort_column, basestring):
+        sort_column = getattr(name_table, sort_column)
     query = query.outerjoin((name_table, and_(
             name_table.object_id == name_table.object_table.id,
             name_table.language == language,
         )))
+    identifier_column = getattr(name_table.object_table, 'identifier', None)
+    if identifier_column:
+        if reverse:
+            query = query.order_by(identifier_column.desc())
+        else:
+            query = query.order_by(identifier_column.asc())
     if reverse:
-        return query.order_by(name_table.name.desc(), name_table.object_table.identifier.desc())
+        return query.order_by(sort_column.desc())
     else:
-        return query.order_by(name_table.name.asc(), name_table.object_table.identifier.asc())
+        return query.order_by(sort_column.asc())
 
-def alphabetize_table(table, language=None, reverse=False):
+def alphabetize_table(table, sort_column=None, language=None, reverse=False):
     return alphabetize(
             pokedex_session.query(table),
             table.name_table,
+            sort_column=sort_column,
             language=language,
             reverse=reverse,
         )
