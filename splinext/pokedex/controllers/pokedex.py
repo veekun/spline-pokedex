@@ -22,10 +22,10 @@ from sqlalchemy.sql import exists, func
 
 from spline import model
 from spline.model import meta
-from spline.lib.base import BaseController, render
+from spline.lib.base import render
 from spline.lib import helpers as h
 
-from splinext.pokedex import db, helpers as pokedex_helpers
+from splinext.pokedex import db, helpers as pokedex_helpers, PokedexBaseController
 import splinext.pokedex.db as db
 from splinext.pokedex.magnitude import parse_size
 
@@ -181,7 +181,7 @@ class CombinedEncounter(object):
     def level(self):
         return level_range(self.min_level, self.max_level)
 
-class PokedexController(BaseController):
+class PokedexController(PokedexBaseController):
 
     # Used by lookup disambig pages
     table_labels = {
@@ -229,20 +229,6 @@ class PokedexController(BaseController):
         'Hoenn radio':          'radio-hoenn.png',
         'Sinnoh radio':         'radio-sinnoh.png',
     }
-
-    def __before__(self, action, **params):
-        super(PokedexController, self).__before__(action, **params)
-
-        c.javascripts.append(('pokedex', 'pokedex'))
-
-        try:
-            c.language = db.get_by_identifier_query(tables.Language, c.lang or 'en').one()
-        except NoResultFound:
-            c.language = db.get_by_identifier_query(tables.Language, u'en').one()
-
-        c.game_language = db.get_by_identifier_query(tables.Language, u'en').one()
-
-        #c.url_language = c.language.preferred_game_language
 
     def __call__(self, *args, **params):
         """Run the controller, making sure to discard the Pokédex session when

@@ -25,10 +25,10 @@ from sqlalchemy.sql import func
 from spline import model
 from spline.model import meta
 from spline.lib import helpers as h
-from spline.lib.base import BaseController, render
+from spline.lib.base import render
 from spline.lib.forms import DuplicateField, QueryTextField
 
-from splinext.pokedex import helpers as pokedex_helpers
+from splinext.pokedex import helpers as pokedex_helpers, PokedexBaseController
 import splinext.pokedex.db as db
 from splinext.pokedex.forms import PokedexLookupField
 
@@ -289,7 +289,7 @@ def stat_graph_chunk_color(gene):
     return "#%02x%02x%02x" % (r * 256, g * 256, b * 256)
 
 
-class PokedexGadgetsController(BaseController):
+class PokedexGadgetsController(PokedexBaseController):
 
     def capture_rate(self):
         """Calculate the successful capture rate of every Ball given a target

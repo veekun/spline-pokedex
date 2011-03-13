@@ -19,6 +19,7 @@ from splinext.pokedex import helpers as pokedex_helpers
 import spline.lib.helpers as h
 from spline.lib.plugin import PluginBase, PluginLink, Priority
 from splinext.pokedex import i18n
+from spline.lib.base import BaseController
 
 
 def add_routes_hook(map, *args, **kwargs):
@@ -59,6 +60,17 @@ def add_routes_hook(map, *args, **kwargs):
     # JSON API
     map.connect('/dex/api/pokemon', controller='dex_api', action='pokemon')
 
+class PokedexBaseController(BaseController):
+    def __before__(self, action, **params):
+        super(PokedexBaseController, self).__before__(action, **params)
+
+        identifier_query = splinext.pokedex.db.get_by_identifier_query
+        try:
+            c.language = identifier_query(tables.Language, c.lang or 'en').one()
+        except NoResultFound:
+            c.language = identifier_query(tables.Language, u'en').one()
+
+        c.game_language = identifier_query(tables.Language, u'en').one()
 
 ### Extend markdown to turn [Eevee]{pokemon} into a link in effects and
 ### descriptions

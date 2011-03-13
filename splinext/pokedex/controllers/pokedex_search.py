@@ -17,10 +17,10 @@ from sqlalchemy.sql import exists, func, and_, not_, or_
 from sqlalchemy.sql.operators import asc_op
 
 from spline.lib import helpers as h
-from spline.lib.base import BaseController, render
+from spline.lib.base import render
 from spline.lib.forms import DuplicateField, MultiCheckboxField, QueryCheckboxSelectMultipleField, QueryTextField
 
-from splinext.pokedex import helpers as pokedex_helpers
+from splinext.pokedex import helpers as pokedex_helpers, PokedexBaseController
 import splinext.pokedex.db as db
 from splinext.pokedex.forms import PokedexLookupField, RangeTextField
 from splinext.pokedex.magnitude import parse_size
@@ -527,7 +527,7 @@ class MoveSearchForm(BaseSearchForm):
     format = fields.TextField('Custom list format', default=u'$name')
 
 
-class PokedexSearchController(BaseController):
+class PokedexSearchController(PokedexBaseController):
     def __before__(self, action, **params):
         super(PokedexSearchController, self).__before__(action, **params)
 
