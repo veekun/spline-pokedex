@@ -589,9 +589,11 @@ ${h.h1(_('Moves'))}
     ${dexlib.move_table_columns()}\
 </colgroup>
 
+<% last_method_id = None %>
 % for method, method_list in c.moves:
 ## HEADERS
 <tbody>
+% if last_method_id != method.id:
 <%
     method_id = "moves:" + h.sanitize_id(method.name)
 %>\
@@ -604,6 +606,13 @@ ${h.h1(_('Moves'))}
     <tr class="subheader-row">
         <th colspan="${len(columns) + 8}"><a href="#${method_id}" class="subtle"><strong>${method.name}</strong></a>: ${method.description}</th>
     </tr>
+<% last_method_id = method.id %>\
+% endif
+% if method.pokemon != c.pokemon:
+    <tr class="subheader-row">
+        <th colspan="${len(columns) + 8}"><strong>${method.name}</strong>, learned by ${method.pokemon.full_name} but not ${c.pokemon.full_name}</th>
+    </tr>
+% endif
 </tbody>
 ## DATA
 <tbody>

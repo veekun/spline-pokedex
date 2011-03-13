@@ -18,7 +18,7 @@ from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join, joinedload, subqueryload, subqueryload_all
 from sqlalchemy.orm import subqueryload, subqueryload_all
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql import func
+from sqlalchemy.sql import exists, func
 
 from spline import model
 from spline.model import meta
@@ -53,10 +53,15 @@ def _pokemon_move_method_sort_key((method, _)):
     """Sorts methods by id, except that tutors and machines are bumped to the
     bottom, as they tend to be much longer than everything else.
     """
+    # XXX see FakeMoveMethod for explanation of this abomination
+    try:
+        p = -method.pokemon.order
+    except AttributeError:
+        p = None
     if method.name in (u'Tutor', u'Machine'):
-        return method.id + 1000
+        return method.id + 1000, p
     else:
-        return method.id
+        return method.id, p
 
 def _collapse_pokemon_move_columns(table, thing):
     """Combines adjacent identical columns in a pokemon_move structure.
@@ -855,16 +860,47 @@ class PokedexController(BaseController):
         # "data" is a dictionary of whatever per-version information is
         # appropriate for this move method, such as a TM number or level.
         move_methods = defaultdict(list)
+        q = db.pokedex_session.query(tables.PokemonMove) \
+            .outerjoin((tables.Machine, tables.PokemonMove.machine)) \
+            .outerjoin((tables.PokemonMoveMethod, tables.PokemonMove.method))
+        # Evolved Pokémon ought to show their predecessors' egg moves.
+        ancestors = []
+        possible_ancestor = c.pokemon.parent_pokemon
+        while possible_ancestor:
+            ancestors.append(possible_ancestor)
+            possible_ancestor = possible_ancestor.parent_pokemon
+        if ancestors:
+            # Include any moves learnable by an ancestor...
+            ancestor_ids = [p.id for p in ancestors]
+            ancestor_ids.append(c.pokemon.id)
+            q = q.filter(tables.PokemonMove.pokemon_id.in_(ancestor_ids))
+
+            # That AREN'T learnable by this Pokémon.  This NOT EXISTS strips
+            # out moves that are also learned by a "higher-ordered" Pokémon.
+            pm_outer = tables.PokemonMove
+            p_outer = tables.Pokemon
+            pm_inner = aliased(tables.PokemonMove)
+            p_inner = aliased(tables.Pokemon)
+
+            from_inner = join(pm_inner, p_inner, onclause=pm_inner.pokemon)
+            clause = exists(from_inner.select()).where(and_(
+                pm_outer.version_group_id == pm_inner.version_group_id,
+                pm_outer.move_id == pm_inner.move_id,
+                pm_outer.pokemon_move_method_id == pm_inner.pokemon_move_method_id,
+                pm_inner.pokemon_id.in_(ancestor_ids),
+                p_outer.order < p_inner.order,
+            ))
+
+            q = q.outerjoin(tables.PokemonMove.pokemon).filter(~ clause)
+        else:
+            q = q.filter(tables.PokemonMove.pokemon_id == c.pokemon.id)
         # Grab the rows with a manual query so we can sort them in about the
         # order they go in the table.  This should keep it as compact as
         # possible.  Levels go in level order, and machines go in TM number
         # order
-        q = db.pokedex_session.query(tables.PokemonMove) \
-            .filter_by(pokemon_id=c.pokemon.id) \
-            .outerjoin((tables.Machine, tables.PokemonMove.machine)) \
-            .options(
+        q = q.options(
                  contains_eager(tables.PokemonMove.machine),
-                 eagerload_all('method'),
+                 contains_eager(tables.PokemonMove.method),
                  eagerload_all('move.damage_class'),
                  eagerload_all('move.move_effect'),
                  eagerload_all('move.type'),
@@ -875,15 +911,31 @@ class PokedexController(BaseController):
                       tables.PokemonMove.order.asc(),
                       tables.PokemonMove.version_group_id.asc()) \
             .all()
+        # TODO this nonsense is to allow methods that don't actually exist,
+        # such as for parent's egg moves.  should go away once move tables get
+        # their own rendery class
+        FakeMoveMethod = namedtuple('FakeMoveMethod',
+            ['id', 'name', 'description', 'pokemon'])
+        methods_cache = {}
+        def find_method(pm):
+            key = pm.method, pm.pokemon
+            if key not in methods_cache:
+                methods_cache[key] = FakeMoveMethod(
+                    id=pm.method.id, name=pm.method.name,
+                    description=pm.method.description,
+                    pokemon=pm.pokemon)
+            return methods_cache[key]
+
         for pokemon_move in q:
-            method_list = move_methods[pokemon_move.method]
+            method = find_method(pokemon_move)
+            method_list = move_methods[method]
             this_vg = pokemon_move.version_group
 
             # Create a container for data for this method and version(s)
             vg_data = dict()
 
             # TMs need to know their own TM number
-            if pokemon_move.method.name == 'Machine':
+            if method.name == 'Machine':
                 vg_data['machine'] = pokemon_move.machine.machine_number
 
             # Find the best place to insert a row.
@@ -896,7 +948,7 @@ class PokedexController(BaseController):
             # a new row.  Only level-up moves have these restrictions
             lower_bound = None
             upper_bound = None
-            if pokemon_move.method.name in ('Level up', 'Machine'):
+            if method.name in ('Level up', 'Machine'):
                 vg_data['sort'] = (pokemon_move.level,
                                    vg_data.get('machine', None),
                                    pokemon_move.order)
