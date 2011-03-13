@@ -22,10 +22,10 @@ from sqlalchemy.sql import exists, func
 
 from spline import model
 from spline.model import meta
-from spline.lib.base import BaseController, render
+from spline.lib.base import render
 from spline.lib import helpers as h
 
-from splinext.pokedex import db, helpers as pokedex_helpers
+from splinext.pokedex import db, helpers as pokedex_helpers, PokedexBaseController
 import splinext.pokedex.db as db
 from splinext.pokedex.magnitude import parse_size
 
@@ -181,7 +181,7 @@ class CombinedEncounter(object):
     def level(self):
         return level_range(self.min_level, self.max_level)
 
-class PokedexController(BaseController):
+class PokedexController(PokedexBaseController):
 
     # Used by lookup disambig pages
     table_labels = {
@@ -230,21 +230,21 @@ class PokedexController(BaseController):
         'Sinnoh radio':         'radio-sinnoh.png',
     }
 
-    def __before__(self, action, **params):
-        super(PokedexController, self).__before__(action, **params)
-
-        c.javascripts.append(('pokedex', 'pokedex'))
-
     def __call__(self, *args, **params):
         """Run the controller, making sure to discard the Pokédex session when
         we're done.
 
         This is largely copied from the default Pylons lib.base.__call__.
         """
+
         try:
             return super(PokedexController, self).__call__(*args, **params)
         finally:
             db.pokedex_session.remove()
+
+    def cache_content(self, key, do_work, template):
+        key = key + '-' + c.game_language.identifier
+        return super(PokedexController, self).cache_content(key, do_work, template)
 
     def index(self):
         return ''
@@ -427,6 +427,45 @@ class PokedexController(BaseController):
         return json_data
 
 
+    def _prev_next(self, table, current, filters=[]):
+        """Figure out the previous/next thing for the navigation bar
+
+        table: the table to select from
+        current: list of the current values
+        filters: a list of filter expressions for the table
+        """
+        query = (db.pokedex_session.query(table)
+                .outerjoin(table.name_table)
+                .filter(table.name_table.language == c.game_language)
+            )
+
+        for filter in filters:
+            query = query.filter(filter)
+
+        name_col = table.name_table.name
+        ident_col = table.identifier
+        name_current = current.names[c.game_language]
+        ident_current = current.identifier
+
+        eq = name_col == name_current
+        lt = or_(name_col < name_current, and_(eq, ident_col < ident_current))
+        gt = or_(name_col > name_current, and_(eq, ident_col > ident_current))
+        asc = (name_col.asc(), ident_col.asc())
+        desc = (name_col.desc(), ident_col.desc())
+
+        # The previous thing is the biggest smaller, wrap around if
+        # nothing comes before
+        prev = query.filter(lt).order_by(*desc).first()
+        if prev is None:
+            prev = query.order_by(*desc).first()
+
+        # Similarly for next
+        next = query.filter(gt).order_by(*asc).first()
+        if next is None:
+            next = query.order_by(*asc).first()
+
+        return prev, next
+
     def _prev_next_pokemon(self, pokemon):
         """Returns a 2-tuple of the previous and next Pokémon."""
         max_id = db.pokedex_session.query(tables.Pokemon) \
@@ -491,6 +530,7 @@ class PokedexController(BaseController):
         ### Previous and next for the header
         c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
 
+        c.name_and_form = c.pokemon.name, c.pokemon.form_name or u''
         # Let's cache this bitch
         return self.cache_content(
             key=u';'.join((c.pokemon.name, c.pokemon.form_name or u'')),
@@ -499,7 +539,7 @@ class PokedexController(BaseController):
         )
 
     def _do_pokemon(self, name_plus_form):
-        name, form = name_plus_form.split(u';')
+        name, form = c.name_and_form
         if not form:
             form = None
 
@@ -529,7 +569,7 @@ class PokedexController(BaseController):
         if c.pokemon.gender_rate == -1:
             # Genderless; Ditto only
             ditto = db.pokedex_session.query(tables.Pokemon) \
-                .filter_by(name=u'Ditto').one()
+                .filter_by(identifier='ditto').one()
             c.compatible_families = [ditto]
         elif c.pokemon.egg_groups[0].id == 15:
             # No Eggs group
@@ -1239,33 +1279,11 @@ class PokedexController(BaseController):
         else:
             shadowness = tables.Move.type_id != 10002
 
-        # Find the move that comes right before this one alphabetically
-        c.prev_move = db.pokedex_session.query(tables.Move) \
-            .filter(shadowness) \
-            .filter(tables.Move.name < c.move.name) \
-            .order_by(tables.Move.name.desc()) \
-            .first()
-
-        if c.prev_move is None:
-            # No move comes before this one alphabetically; wrap to the last
-            c.prev_move = db.pokedex_session.query(tables.Move) \
-                .filter(shadowness) \
-                .order_by(tables.Move.name.desc()) \
-                .first()
-
-        # Find the next move alphabetically
-        c.next_move = db.pokedex_session.query(tables.Move) \
-            .filter(shadowness) \
-            .filter(tables.Move.name > c.move.name) \
-            .order_by(tables.Move.name.asc()) \
-            .first()
-
-        if c.next_move is None:
-            # There is no next move; wrap to the first
-            c.next_move = db.pokedex_session.query(tables.Move) \
-                .filter(shadowness) \
-                .order_by(tables.Move.name.asc()) \
-                .first()
+        c.prev_move, c.next_move = self._prev_next(
+                table=tables.Move,
+                filters=[shadowness],
+                current=c.move,
+            )
 
         return self.cache_content(
             key=c.move.name,
@@ -1288,7 +1306,7 @@ class PokedexController(BaseController):
                 eagerload('super_contest_effect'),
                 subqueryload_all('move_flags.flag'),
                 subqueryload_all('type.damage_efficacies.target_type'),
-                subqueryload_all('foreign_names.language'),
+                subqueryload_all('texts'),
                 subqueryload_all('flavor_text.version_group.generation'),
                 subqueryload_all('flavor_text.version_group.versions'),
                 subqueryload_all('contest_combo_first.second'),
@@ -1300,7 +1318,7 @@ class PokedexController(BaseController):
 
         # Used for item linkage
         c.pp_up = db.pokedex_session.query(tables.Item) \
-            .filter_by(name=u'PP Up').one()
+            .filter_by(identifier=u'pp-up').one()
 
         ### Power percentile
         if c.move.power in (0, 1):
@@ -1454,18 +1472,17 @@ class PokedexController(BaseController):
 
 
     def types_list(self):
-        c.types = db.pokedex_session.query(tables.Type) \
-            .order_by(tables.Type.name) \
+        # XXX: Use the name, not identifier
+        c.types = db.alphabetize_table(tables.Type) \
             .filter(tables.Type.damage_efficacies.any()) \
             .options(eagerload('damage_efficacies')) \
             .all()
 
         if 'secondary' in request.params:
             try:
-                c.secondary_type = db.pokedex_session.query(tables.Type) \
+                c.secondary_type = db.get_by_name_query(
+                        tables.Type, request.params['secondary'].lower()) \
                     .filter(tables.Type.damage_efficacies.any()) \
-                    .filter(func.lower(tables.Type.name) ==
-                            request.params['secondary']) \
                     .options(eagerload('target_efficacies')) \
                     .one()
             except NoResultFound:
@@ -1515,29 +1532,10 @@ class PokedexController(BaseController):
             return self._not_found()
 
         ### Prev/next for header
-        # Find the type that comes right before this one alphabetically
-        c.prev_type = db.pokedex_session.query(tables.Type) \
-            .filter(tables.Type.name < c.type.name) \
-            .order_by(tables.Type.name.desc()) \
-            .first()
-
-        if c.prev_type is None:
-            # No type comes before this one alphabetically; wrap to the last
-            c.prev_type = db.pokedex_session.query(tables.Type) \
-                .order_by(tables.Type.name.desc()) \
-                .first()
-
-        # Find the next type alphabetically
-        c.next_type = db.pokedex_session.query(tables.Type) \
-            .filter(tables.Type.name > c.type.name) \
-            .order_by(tables.Type.name.asc()) \
-            .first()
-
-        if c.next_type is None:
-            # There is no next type; wrap to the first
-            c.next_type = db.pokedex_session.query(tables.Type) \
-                .order_by(tables.Type.name.asc()) \
-                .first()
+        c.prev_type, c.next_type = self._prev_next(
+                table=tables.Type,
+                current=c.type,
+            )
 
         return self.cache_content(
             key=c.type.name,
@@ -1574,8 +1572,8 @@ class PokedexController(BaseController):
         return
 
     def abilities_list(sef):
-        c.abilities = db.pokedex_session.query(tables.Ability) \
-            .order_by(tables.Ability.generation_id, tables.Ability.name) \
+        c.abilities = db.alphabetize(db.pokedex_session.query(tables.Ability)
+            .order_by(tables.Ability.generation_id), tables.AbilityText) \
             .all()
         return render('/pokedex/ability_list.mako')
 
@@ -1586,29 +1584,10 @@ class PokedexController(BaseController):
             return self._not_found()
 
         ### Prev/next for header
-        # Find the ability that comes right before this one alphabetically
-        c.prev_ability = db.pokedex_session.query(tables.Ability) \
-            .filter(tables.Ability.name < c.ability.name) \
-            .order_by(tables.Ability.name.desc()) \
-            .first()
-
-        if c.prev_ability is None:
-            # No ability comes before this one alphabetically; wrap to the last
-            c.prev_ability = db.pokedex_session.query(tables.Ability) \
-                .order_by(tables.Ability.name.desc()) \
-                .first()
-
-        # Find the next ability alphabetically
-        c.next_ability = db.pokedex_session.query(tables.Ability) \
-            .filter(tables.Ability.name > c.ability.name) \
-            .order_by(tables.Ability.name.asc()) \
-            .first()
-
-        if c.next_ability is None:
-            # There is no next ability; wrap to the first
-            c.next_ability = db.pokedex_session.query(tables.Ability) \
-                .order_by(tables.Ability.name.asc()) \
-                .first()
+        c.prev_ability, c.next_ability = self._prev_next(
+                table=tables.Ability,
+                current=c.ability,
+            )
 
         return self.cache_content(
             key=c.ability.name,
@@ -1621,8 +1600,8 @@ class PokedexController(BaseController):
         db.pokedex_session.query(tables.Ability) \
             .filter_by(id=c.ability.id) \
             .options(
-                subqueryload('foreign_names'),
-                joinedload('foreign_names.language'),
+                subqueryload('texts'),
+                joinedload('texts.language'),
                 subqueryload('flavor_text'),
                 joinedload('flavor_text.version_group'),
                 joinedload('flavor_text.version_group.versions'),
@@ -1717,9 +1696,9 @@ class PokedexController(BaseController):
 
         # These are used for their item linkage
         c.growth_mulch = db.pokedex_session.query(tables.Item) \
-            .filter_by(name=u'Growth Mulch').one()
+            .filter_by(identifier=u'growth-mulch').one()
         c.damp_mulch = db.pokedex_session.query(tables.Item) \
-            .filter_by(name=u'Damp Mulch').one()
+            .filter_by(identifier=u'damp-mulch').one()
 
         # Pokémon that can hold this item are per version; break this up into a
         # two-dimensional structure of pokemon => version => rarity
@@ -1758,9 +1737,7 @@ class PokedexController(BaseController):
         # Note that it isn't against the rules for multiple locations to have
         # the same name.  To avoid complications, the name is stored in
         # c.location_name, and after that we only deal with areas.
-        c.locations = db.pokedex_session.query(tables.Location) \
-            .filter(func.lower(tables.Location.name) == name) \
-            .all()
+        c.locations = db.get_by_name_query(tables.Location, name).all()
 
         if not c.locations:
             return self._not_found()
@@ -1885,7 +1862,8 @@ class PokedexController(BaseController):
                 tables.Nature.decreased_stat_id.asc(),
             )
         else:
-            c.natures = c.natures.order_by(tables.Nature.name.asc())
+            # XXX: Use name, not identifier
+            c.natures = db.alphabetize(c.natures, tables.NatureText)
 
         return render('/pokedex/nature_list.mako')
 
@@ -1899,11 +1877,10 @@ class PokedexController(BaseController):
         # Other neutral natures if this one is neutral; otherwise, the inverse
         # of this one
         if c.nature.increased_stat == c.nature.decreased_stat:
-            c.neutral_natures = db.pokedex_session.query(tables.Nature) \
+            c.neutral_natures = db.alphabetize_table(tables.Nature) \
                 .filter(tables.Nature.increased_stat_id
                      == tables.Nature.decreased_stat_id) \
-                .filter(tables.Nature.id != c.nature.id) \
-                .order_by(tables.Nature.name)
+                .filter(tables.Nature.id != c.nature.id)
         else:
             c.inverse_nature = db.pokedex_session.query(tables.Nature) \
                 .filter_by(
@@ -1922,7 +1899,7 @@ class PokedexController(BaseController):
         # The useful thing here is that this cannot be done in the Pokémon
         # search, as it requires comparing a Pokémon's stats to themselves.
         # Also, HP doesn't count.  Durp.
-        hp = db.pokedex_session.query(tables.Stat).filter_by(name=u'HP').one()
+        hp = db.pokedex_session.query(tables.Stat).filter_by(identifier=u'hp').one()
         if c.nature.increased_stat == c.nature.decreased_stat:
             # Neutral.  Boring!
             # Create a subquery of neutral-ish Pokémon

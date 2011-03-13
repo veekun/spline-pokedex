@@ -90,18 +90,7 @@ ${h.h1(_('Essentials'))}
     </dl>
 
     <h2>${_(u"Names")}</h2>
-    <dl>
-        % for foreign_name in c.pokemon.normal_form.foreign_names:
-        ## </dt> has to come right after the flag or else there's space between the flag and the colon
-        <dt>${foreign_name.language.name}
-        <img src="${h.static_uri('spline', "flags/{0}.png".format(foreign_name.language.iso3166))}" alt=""></dt>
-        % if foreign_name.language.name == 'Japanese':
-        <dd>${foreign_name.name} (${h.pokedex.romanize(foreign_name.name)})</dd>
-        % else:
-        <dd>${foreign_name.name}</dd>
-        % endif
-        % endfor
-    </dl>
+    <%dexlib:foreign_names object="${c.pokemon}"/>
 </div>
 <div class="dex-column">
     <h2>${_(u"Breeding")}</h2>

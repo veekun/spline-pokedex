@@ -17,10 +17,10 @@ from sqlalchemy.sql import exists, func, and_, not_, or_
 from sqlalchemy.sql.operators import asc_op
 
 from spline.lib import helpers as h
-from spline.lib.base import BaseController, render
+from spline.lib.base import render
 from spline.lib.forms import DuplicateField, MultiCheckboxField, QueryCheckboxSelectMultipleField, QueryTextField
 
-from splinext.pokedex import helpers as pokedex_helpers
+from splinext.pokedex import helpers as pokedex_helpers, PokedexBaseController
 import splinext.pokedex.db as db
 from splinext.pokedex.forms import PokedexLookupField, RangeTextField
 from splinext.pokedex.magnitude import parse_size
@@ -319,7 +319,7 @@ class PokemonSearchForm(BaseSearchForm):
     )
     shape = QuerySelectField('Shape',
         query_factory=lambda: db.pokedex_session.query(tables.PokemonShape)
-            .order_by(tables.PokemonShape.name.asc()),
+            .order_by(tables.PokemonShape.identifier.asc()),
         get_label=lambda _: _.name,
         get_pk=lambda _: _.name.lower(),
         allow_blank=True,
@@ -527,7 +527,7 @@ class MoveSearchForm(BaseSearchForm):
     format = fields.TextField('Custom list format', default=u'$name')
 
 
-class PokedexSearchController(BaseController):
+class PokedexSearchController(PokedexBaseController):
     def __before__(self, action, **params):
         super(PokedexSearchController, self).__before__(action, **params)
 
@@ -1031,8 +1031,9 @@ class PokedexSearchController(BaseController):
         # nb: the below sort ascending for words (a->z) and descending for
         # numbers (9->1), because that's how it should be, okay
         # Default fallback sort is by name, then by form
-        sort_clauses = [me.name.asc(), base_form.order.asc(),
-                        base_form.name.asc()]
+        # XXX: Use name, not identifier
+        sort_clauses = [me.identifier.asc(), base_form.order.asc(),
+                        base_form.identifier.asc()]
 
         if c.form.sort.data == 'id':
             # Sorting by both name and national ID is redundant, since both are
@@ -1135,7 +1136,7 @@ class PokedexSearchController(BaseController):
                     # put NULL first
                     type_sort_clauses.append((type_alias.id == None).desc())
 
-                type_sort_clauses.append(type_alias.name.asc())
+                type_sort_clauses.append(type_alias.identifier.asc())
 
             sort_clauses = type_sort_clauses + sort_clauses
 
@@ -1153,11 +1154,11 @@ class PokedexSearchController(BaseController):
 
         elif c.form.sort.data == 'color':
             query = query.outerjoin(me.pokemon_color)
-            sort_clauses.insert(0, tables.PokemonColor.name.asc())
+            sort_clauses.insert(0, tables.PokemonColor.identifier.asc())
 
         elif c.form.sort.data == 'habitat':
             query = query.outerjoin(me.pokemon_habitat)
-            sort_clauses.insert(0, tables.PokemonHabitat.name.asc())
+            sort_clauses.insert(0, tables.PokemonHabitat.identifier.asc())
 
         elif c.form.sort.data == 'hatch-counter':
             sort_clauses.insert(0, me.hatch_counter.asc())
@@ -1500,7 +1501,8 @@ class PokedexSearchController(BaseController):
         # nb: the below sort ascending for words (a->z) and descending for
         # numbers (9->1), because that's how it should be, okay
         # Default fallback sort is by name, then by id (in case of form)
-        sort_clauses = [ me.name.asc(), me.id.asc() ]
+        # XXX: Use name, not identifier
+        sort_clauses = [ me.identifier.asc(), me.id.asc() ]
         if c.form.sort.data == 'id':
             sort_clauses.insert(0,
                 me.id.asc()
@@ -1513,7 +1515,7 @@ class PokedexSearchController(BaseController):
         elif c.form.sort.data == 'type':
             # Sort by type name
             query = query.join(me.type)
-            sort_clauses.insert(0, tables.Type.name.asc())
+            sort_clauses.insert(0, tables.Type.identifier.asc())
 
         elif c.form.sort.data == 'class':
             sort_clauses.insert(0, me.damage_class_id.asc())

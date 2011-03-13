@@ -314,3 +314,20 @@ cry_url = url(controller='dex', action='media', path=h.pokedex.pokemon_media_pat
         <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="${_('Search: ')}" title="${_('Search')}">
     </a>
 </%def>
+
+<%def name="foreign_names(object)">
+    <dl>
+        % for language, foreign_name in sorted(object.names.items(), key=lambda item: (item[0].order or 1000, item[0].identifier)):
+        % if language != c.game_language:
+        ## </dt> needs to come right after the flag or else there's space between it and the colon
+        <dt>${language.name}
+        <img src="${h.static_uri('spline', "flags/{0}.png".format(language.iso3166))}" alt=""></dt>
+        % if language.identifier == 'ja':
+        <dd>${foreign_name} (${h.pokedex.romanize(foreign_name)})</dd>
+        % else:
+        <dd>${foreign_name}</dd>
+        % endif
+        % endif
+        % endfor
+    </dl>
+</%def>

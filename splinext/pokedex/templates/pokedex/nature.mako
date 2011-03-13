@@ -45,9 +45,9 @@ ${h.h1(_('Essentials'))}
         <dt>${_(u"Taste preference")}</dt>
         <dd>
             ${_(u"Likes %s; good for") % c.nature.likes_flavor.flavor}
-            ${h.pokedex.pokedex_img("chrome/contest/{0}.png".format(c.nature.likes_flavor.name), alt=c.nature.likes_flavor.name)}<br>
+            ${h.pokedex.pokedex_img("chrome/contest/{0}.png".format(c.nature.likes_flavor.identifier), alt=c.nature.likes_flavor.name)}<br>
             ${_(u"Hates %s; bad for") % c.nature.hates_flavor.flavor}
-            ${h.pokedex.pokedex_img("chrome/contest/{0}.png".format(c.nature.hates_flavor.name), alt=c.nature.hates_flavor.name)}
+            ${h.pokedex.pokedex_img("chrome/contest/{0}.png".format(c.nature.hates_flavor.identifier), alt=c.nature.hates_flavor.name)}
         </dd>
     </dl>
     % endif
@@ -87,16 +87,7 @@ ${h.h1(_('Not-so-essentials'))}
 
 <div class="dex-column">
     <h2>${_(u"Foreign Names")}</h2>
-    <dl>
-        % for foreign_name in c.nature.foreign_names:
-        <dt>${foreign_name.language.name} <img src="${h.static_uri('spline', "flags/{0}.png".format(foreign_name.language.iso3166))}" alt=""></dt>
-        % if foreign_name.language.name == 'Japanese':
-        <dd>${foreign_name.name} (${h.pokedex.romanize(foreign_name.name)})</dd>
-        % else:
-        <dd>${foreign_name.name}</dd>
-        % endif
-        % endfor
-    </dl>
+    <%dexlib:foreign_names object="${c.nature}"/>
 </div>
 </div>
 

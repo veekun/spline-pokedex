@@ -267,18 +267,7 @@ ${h.h1(_('Flavor'))}
 
 <div class="dex-column">
     <h2>${_("Foreign Names")}</h2>
-    <dl>
-        % for foreign_name in c.move.foreign_names:
-        ## </dt> needs to come right after the flag or else there's space between it and the colon
-        <dt>${foreign_name.language.name}
-        <img src="${h.static_uri('spline', "flags/{0}.png".format(foreign_name.language.iso3166))}" alt=""></dt>
-        % if foreign_name.language.name == 'Japanese':
-        <dd>${foreign_name.name} (${h.pokedex.romanize(foreign_name.name)})</dd>
-        % else:
-        <dd>${foreign_name.name}</dd>
-        % endif
-        % endfor
-    </dl>
+    <%dexlib:foreign_names object="${c.move}"/>
 </div>
 </div>
 
@@ -292,7 +281,7 @@ ${h.h1(_('Contests'))}
     <h2>${_("%s Contest") % h.pokedex.generation_icon(3) | n}</h2>
     <dl>
         <dt>${_("Type")}</dt>
-        <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type.name, alt=c.move.contest_type.name)}</dd>
+        <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type.identifier, alt=c.move.contest_type.name)}</dd>
         <dt>${_("Appeal")}</dt>
         <dd title="${c.move.contest_effect.appeal}">${u'♡' * c.move.contest_effect.appeal}</dd>
         <dt>${_("Jam")}</dt>
@@ -333,7 +322,7 @@ ${h.h1(_('Contests'))}
     <h2>${h.pokedex.generation_icon(4)} Super Contest</h2>
     <dl>
         <dt>${_("Type")}</dt>
-        <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type.name, alt=c.move.contest_type.name)}</dd>
+        <dd>${h.pokedex.pokedex_img('chrome/contest/%s.png' % c.move.contest_type.identifier, alt=c.move.contest_type.name)}</dd>
         <dt>${_("Appeal")}</dt>
         <dd title="${c.move.super_contest_effect.appeal}">${u'♡' * c.move.super_contest_effect.appeal}</dd>
         <dt>${_("Flavor text")}</dt>
