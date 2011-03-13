@@ -872,10 +872,8 @@ class PokedexGadgetsController(BaseController):
         """Calculates, well, stats."""
         # possible TODO:
         # - more better error checking
-        # - back-compat URL
         # - track effort gained on the fly (as well as exp for auto level up?)
-        #   - UI would need to be different and everything, ugh
-        #   - would also need to track evolutions oh no!
+        # - track evolutions?
         # - graphs of potential stats?
         #   - given a pokemon and its genes and effort, graph all stats by level
         #   - given a pokemon and its gene results, graph approximate stats by level...?

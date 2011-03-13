@@ -21,10 +21,10 @@
 ${h.form(url.current(), method=u'GET')}
 <input type="hidden" name="shorten" value="1">
 <dl class="standard-form">
-    ${lib.field(u'pokemon')}
-    ${lib.field(u'nature')}
-    ${lib.field(u'hint')}
-    ${lib.field(u'hp_type')}
+    ${lib.field(u'pokemon', tabindex=100)}
+    ${lib.field(u'nature', tabindex=100)}
+    ${lib.field(u'hint', tabindex=100)}
+    ${lib.field(u'hp_type', tabindex=100)}
 </dl>
 
 <%
@@ -71,11 +71,11 @@ ${h.form(url.current(), method=u'GET')}
             colspan="2"
         % endif
         >
-            <button type="submit">${_(u"Crunch numbers")}</button>
+            <button type="submit" tabindex="100">${_(u"Crunch numbers")}</button>
         </th>
         % for i in range(num_data_columns):
         <th colspan="2">
-            Level ${lib.literal_field(c.form.level[i], size=3)}
+            Level ${lib.literal_field(c.form.level[i], size=3, tabindex=200 + (len(c.stats) + 1) * (i * 3))}
         </th>
         % endfor
         % if c.results:
@@ -102,7 +102,7 @@ ${h.form(url.current(), method=u'GET')}
         % endif
         % for i in range(num_data_columns):
         <td>
-            ${lib.literal_field(c.form.stat[i][stat], size=3, tabindex=len(c.stats) * (i * 2))}
+            ${lib.literal_field(c.form.stat[i][stat], size=3, tabindex=200 + (len(c.stats) + 1) * (i * 3 + 1))}
             % if c.results and i < c.num_data_points:
             <div class="-valid-range
                 % if c.form.nature.data and not c.form.nature.data.is_neutral:
@@ -122,7 +122,7 @@ ${h.form(url.current(), method=u'GET')}
             </div>
             % endif
         </td>
-        <td>${lib.literal_field(c.form.effort[i][stat], size=3, tabindex=len(c.stats) * (i * 2 + 1))}</td>
+        <td>${lib.literal_field(c.form.effort[i][stat], size=3, tabindex=200 + (len(c.stats) + 1) * (i * 3 + 2))}</td>
         % endfor
 
         % if c.results:
