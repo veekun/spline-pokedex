@@ -194,7 +194,7 @@ class PokedexController(PokedexBaseController):
         tables.Type: 'type',
     }
 
-    # Dict of terrain identifier => icon path
+    # Dict of method identifier => icon path
     encounter_method_icons = {
         'surf': 'surfing.png',
         'old-rod': 'old-rod.png',
@@ -1777,7 +1777,7 @@ class PokedexController(PokedexBaseController):
                 eagerload('pokemon'),
                 eagerload('version'),
             ) \
-            .filter(tables.Encounter.location_area_id.in_(_.id for _ in c.areas))
+            .filter(tables.Encounter.location_area_id.in_(x.id for x in c.areas))
 
         # area => method => pokemon => version => condition =>
         #     condition_values => encounter_bits
