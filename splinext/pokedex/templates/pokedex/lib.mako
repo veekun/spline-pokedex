@@ -317,7 +317,7 @@ cry_url = url(controller='dex', action='media', path=h.pokedex.pokemon_media_pat
 
 <%def name="foreign_names(object)">
     <dl>
-        % for language, foreign_name in sorted(object.names.items(), key=lambda item: (item[0].order or 1000, item[0].identifier)):
+        % for language, foreign_name in h.keysort(object.name_map, lambda lang: lang.order):
         % if language != c.game_language:
         ## </dt> needs to come right after the flag or else there's space between it and the colon
         <dt>${language.name}

@@ -16,7 +16,6 @@ from pylons.controllers.util import abort, redirect
 from pylons.decorators import jsonify
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join, joinedload, subqueryload, subqueryload_all
-from sqlalchemy.orm import subqueryload, subqueryload_all
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import exists, func
 
@@ -434,35 +433,33 @@ class PokedexController(PokedexBaseController):
         current: list of the current values
         filters: a list of filter expressions for the table
         """
+        name_table = table.__mapper__.get_property('names').argument
         query = (db.pokedex_session.query(table)
-                .outerjoin(table.name_table)
-                .filter(table.name_table.language == c.game_language)
+                .join(name_table)
+                .filter(name_table.language == c.game_language)
             )
 
         for filter in filters:
             query = query.filter(filter)
 
-        name_col = table.name_table.name
-        ident_col = table.identifier
-        name_current = current.names[c.game_language]
-        ident_current = current.identifier
+        name_col = name_table.name
+        name_current = current.name_map[c.game_language]
 
-        eq = name_col == name_current
-        lt = or_(name_col < name_current, and_(eq, ident_col < ident_current))
-        gt = or_(name_col > name_current, and_(eq, ident_col > ident_current))
-        asc = (name_col.asc(), ident_col.asc())
-        desc = (name_col.desc(), ident_col.desc())
+        lt = name_col < name_current
+        gt = name_col > name_current
+        asc = name_col.asc()
+        desc = name_col.desc()
 
         # The previous thing is the biggest smaller, wrap around if
         # nothing comes before
-        prev = query.filter(lt).order_by(*desc).first()
+        prev = query.filter(lt).order_by(desc).first()
         if prev is None:
-            prev = query.order_by(*desc).first()
+            prev = query.order_by(desc).first()
 
         # Similarly for next
-        next = query.filter(gt).order_by(*asc).first()
+        next = query.filter(gt).order_by(asc).first()
         if next is None:
-            next = query.order_by(*asc).first()
+            next = query.order_by(asc).first()
 
         return prev, next
 
@@ -1298,21 +1295,23 @@ class PokedexController(PokedexBaseController):
             .options(
                 eagerload('damage_class'),
                 eagerload('type'),
+                subqueryload('type.damage_efficacies'),
+                joinedload('type.damage_efficacies.target_type'),
                 eagerload('target'),
                 eagerload('move_effect'),
                 eagerload('move_effect.category_map.category'),
-                eagerload('contest_effect'),
+                eagerload_all(tables.Move.contest_effect, tables.ContestEffect.flavor_text),
                 eagerload('contest_type'),
-                eagerload('super_contest_effect'),
-                subqueryload_all('move_flags.flag'),
-                subqueryload_all('type.damage_efficacies.target_type'),
+                #eagerload('super_contest_effect'),
+                joinedload('move_flags.flag'),
                 subqueryload_all('texts'),
-                subqueryload_all('flavor_text.version_group.generation'),
-                subqueryload_all('flavor_text.version_group.versions'),
-                subqueryload_all('contest_combo_first.second'),
-                subqueryload_all('contest_combo_second.first'),
-                subqueryload_all('super_contest_combo_first.second'),
-                subqueryload_all('super_contest_combo_second.first'),
+                joinedload(tables.Move.flavor_text, tables.MoveFlavorText.version_group),
+                joinedload(tables.Move.flavor_text, tables.MoveFlavorText.version_group, tables.VersionGroup.generation),
+                joinedload(tables.Move.flavor_text, tables.MoveFlavorText.version_group, tables.VersionGroup.versions),
+                joinedload('contest_combo_first.second'),
+                joinedload('contest_combo_second.first'),
+                joinedload('super_contest_combo_first.second'),
+                joinedload('super_contest_combo_second.first'),
             ) \
             .one()
 
@@ -1600,19 +1599,21 @@ class PokedexController(PokedexBaseController):
         db.pokedex_session.query(tables.Ability) \
             .filter_by(id=c.ability.id) \
             .options(
-                subqueryload('texts'),
-                joinedload('texts.language'),
-                subqueryload('flavor_text'),
-                joinedload('flavor_text.version_group'),
-                joinedload('flavor_text.version_group.versions'),
+                joinedload(tables.Ability.names_local),
+
+                subqueryload(tables.Ability.flavor_text),
+                joinedload(tables.Ability.flavor_text, tables.AbilityFlavorText.version_group),
+                joinedload(tables.Ability.flavor_text, tables.AbilityFlavorText.version_group, tables.VersionGroup.versions),
 
                 # Pokémon stuff
-                subqueryload('pokemon'),
-                subqueryload('dream_pokemon'),
-                subqueryload_all('all_pokemon.abilities'),
-                subqueryload_all('all_pokemon.egg_groups'),
-                subqueryload_all('all_pokemon.types'),
-                subqueryload_all('all_pokemon.stats.stat'),
+                subqueryload(tables.Ability.pokemon),
+                subqueryload(tables.Ability.dream_pokemon),
+                subqueryload(tables.Ability.all_pokemon),
+                subqueryload(tables.Ability.all_pokemon, tables.Pokemon.abilities),
+                subqueryload(tables.Ability.all_pokemon, tables.Pokemon.egg_groups),
+                subqueryload(tables.Ability.all_pokemon, tables.Pokemon.types),
+                subqueryload(tables.Ability.all_pokemon, tables.Pokemon.stats),
+                joinedload(tables.Ability.all_pokemon, tables.Pokemon.stats, tables.PokemonStat.stat),
             ) \
             .one()
 
