@@ -541,7 +541,7 @@ class PokedexSearchController(PokedexBaseController):
         c.stat_fields = []
         for stat in db.pokedex_session.query(tables.Stat) \
                                    .order_by(tables.Stat.id):
-            field_name = stat.name.lower().replace(u' ', u'_')
+            field_name = stat.identifier.replace(u'-', u'_')
 
             stat_field = RangeTextField(stat.name, inflator=int)
             effort_field = RangeTextField(stat.name, inflator=int)
@@ -591,10 +591,10 @@ class PokedexSearchController(PokedexBaseController):
         # doing them multiple times
         stat_aliases = {}
         def join_to_stat(stat):
-            # stat can be an id, object, or name
+            # stat can be an id, object, or identifier
             if isinstance(stat, basestring):
-                stat = db.pokedex_session.query(tables.Stat).filter_by(name=stat) \
-                                      .one()
+                stat = db.pokedex_session.query(tables.Stat) \
+                    .filter_by(identifier=stat).one()
             elif isinstance(stat, int):
                 stat = db.pokedex_session.query(tables.Stat).get(stat)
 
@@ -630,21 +630,21 @@ class PokedexSearchController(PokedexBaseController):
             if ' ' in name:
                 # Hmm.  If there's a space, it might be a form name
                 form_name, name_sans_form = name.split(' ', 1)
-                query = query.filter(
+                query = query.join(me.names_local).join(base_form.names_local).filter(
                     or_(
                         # Either it was a form name...
                         and_(
-                            me.unique_form.has(ilike(tables.PokemonForm.name,
-                                form_name)),
-                            ilike( me.name, name_sans_form ),
+                            ilike(base_form.names_table.name, form_name),
+                            ilike(me.names_table.name, name_sans_form),
                         ),
                         # ...or not.
-                        ilike( me.name, name ),
+                        ilike( me.names_table.name, name ),
                     )
                 )
             else:
-                # Busines as usual
-                query = query.filter( ilike(me.name, name) )
+                # Business as usual
+                query = query.join(me.names_local) \
+                    .filter( ilike(me.names_table.name, name) )
 
         # Ability
         if c.form.ability.data:
@@ -964,7 +964,7 @@ class PokedexSearchController(PokedexBaseController):
 
         # Species string
         if c.form.species.data:
-            query = query.filter(ilike(me.species, c.form.species.data))
+            query = query.join(me.names_local).filter(ilike(me.names_table.species, c.form.species.data))
 
         # Color
         if c.form.color.data:
@@ -1150,7 +1150,8 @@ class PokedexSearchController(PokedexBaseController):
             sort_clauses.insert(0, me.gender_rate.asc())
 
         elif c.form.sort.data == 'species':
-            sort_clauses.insert(0, me.species.asc())
+            query = query.join(me.names_local)
+            sort_clauses.insert(0, me.names_table.species.asc())
 
         elif c.form.sort.data == 'color':
             query = query.outerjoin(me.pokemon_color)
@@ -1190,14 +1191,8 @@ class PokedexSearchController(PokedexBaseController):
             sort_clauses.insert(0, stat_total_subquery.c.stat_total.desc())
 
         elif c.form.sort.data[0:5] == 'stat-':
-            # Gross!  stat_special_attack => Special Attack
-            stat_name = c.form.sort.data[5:]
-            if stat_name == 'hp':
-                stat_name = u'HP'
-            else:
-                stat_name = stat_name.replace('-', ' ').title()
-
-            query, stat_alias = join_to_stat(stat_name)
+            stat_ident = c.form.sort.data[5:]
+            query, stat_alias = join_to_stat(stat_ident)
             sort_clauses.insert(0, stat_alias.base_stat.desc())
 
         # Reverse sort
@@ -1338,7 +1333,7 @@ class PokedexSearchController(PokedexBaseController):
 
         # Name
         if c.form.name.data:
-            query = query.filter( ilike(me.name, c.form.name.data) )
+            query = query.join(me.names_local).filter( ilike(me.names_table.name, c.form.name.data) )
 
         # Damage class
         if c.form.damage_class.data:
@@ -1533,7 +1528,8 @@ class PokedexSearchController(PokedexBaseController):
             sort_clauses.insert(0, tables.Move.priority.desc())
 
         elif c.form.sort.data == 'effect':
-            sort_clauses.insert(0, tables.MoveEffect.effect.desc())
+            query = query.join(tables.MoveEffect.prose)
+            sort_clauses.insert(0, tables.MoveEffect.prose_table.effect.desc())
 
         # Reverse sort
         if c.form.sort_backwards.data:

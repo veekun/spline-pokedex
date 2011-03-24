@@ -74,10 +74,8 @@ def get_by_name_query(table, name, query=None):
     if query is None:
         query = pokedex_session.query(table)
 
-    # XXX THIS IS NOT A THING THAT CAN STICK AROUND
-    query = query.filter_by(
-        name=name.capitalize()
-    ).params(_default_language='en')
+    query = query.join(table.names_table) \
+        .filter(func.lower(table.names_table.name) == name)
 
     return query
 
@@ -102,19 +100,15 @@ def pokemon_form_query(name, form=None):
     default form of the named Pokémon.
     """
 
-    if language is None:
-        language = c.game_language
-
     q = get_by_name_query(
             tables.Pokemon,
             name,
-            language=language,
             query=pokedex_session.query(tables.PokemonForm).join('form_base_pokemon')
         )
 
     if form:
         # If a form has been specified, it must match
-        q = get_by_name_query(tables.PokemonForm, form, language=language, query=q)
+        q = get_by_name_query(tables.PokemonForm, form, query=q)
     else:
         # If there's NOT a form, just get the default form
         q = q.filter(tables.PokemonForm.is_default == True)

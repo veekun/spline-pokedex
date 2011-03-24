@@ -163,7 +163,7 @@ class TestPokemonSearchController(TestController):
     def test_color(self):
         """Checks searching by color."""
         self.check_search(
-            dict(color=u'brown'),
+            dict(color=u'Brown'),
             [ u'Cubone', u'Eevee', u'Feebas', u'Pidgey', u'Spinda', u'Zigzagoon' ],
                 # etc.
             'color',
@@ -314,7 +314,7 @@ class TestPokemonSearchController(TestController):
         )
         self.check_search(
             dict(gender_rate_operator=u'equal', gender_rate=u'4'),
-            [ u'Absol', u'Castform', u'Delibird', u'Grimer', u'Teddiursa' ],
+            [ u'Absol', (u'Castform', u''), u'Delibird', u'Grimer', u'Teddiursa' ],
             'half and half',
         )
         self.check_search(
@@ -340,7 +340,7 @@ class TestPokemonSearchController(TestController):
         # 6 + 11 == Fairy + Indeterminate
         self.check_search(
             dict(egg_group_operator=u'all', egg_group=[u'6', u'11']),
-            [  u'Castform',            (u'Castform', u'Sunny'),
+            [ (u'Castform', u''),      (u'Castform', u'Sunny'),
               (u'Castform', u'Rainy'), (u'Castform', u'Snowy') ],
             'fairy + indeterm; only one result, kinda...',
             exact=True,
