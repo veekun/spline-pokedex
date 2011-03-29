@@ -129,7 +129,7 @@ def alphabetize(query, name_table, sort_column=None, language=None, reverse=Fals
         sort_column = getattr(name_table, sort_column)
     query = query.outerjoin((name_table, and_(
             name_table.object_id == name_table.object_table.id,
-            name_table.language == language,
+            name_table.local_language == language,
         )))
     identifier_column = getattr(name_table.object_table, 'identifier', None)
     if identifier_column:

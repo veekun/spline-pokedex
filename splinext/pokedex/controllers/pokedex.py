@@ -436,7 +436,7 @@ class PokedexController(PokedexBaseController):
         name_table = table.__mapper__.get_property('names').argument
         query = (db.pokedex_session.query(table)
                 .join(name_table)
-                .filter(name_table.language == c.game_language)
+                .filter(name_table.local_language == c.game_language)
             )
 
         for filter in filters:
