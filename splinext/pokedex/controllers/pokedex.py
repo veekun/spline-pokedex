@@ -1740,6 +1740,16 @@ class PokedexController(PokedexBaseController):
         return render('/pokedex/item.mako')
 
 
+    def locations_list(self):
+        c.locations = (db.pokedex_session.query(tables.Location)
+            .join(tables.Location.names_local)
+            .join(tables.LocationArea, tables.Encounter)
+            .order_by(tables.Location.region_id, tables.Location.names_table.name)
+            .all()
+        )
+
+        return render('/pokedex/location_list.mako')
+
     def locations(self, name):
         # Note that it isn't against the rules for multiple locations to have
         # the same name.  To avoid complications, the name is stored in
