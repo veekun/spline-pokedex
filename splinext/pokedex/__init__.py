@@ -70,7 +70,10 @@ class PokedexBaseController(BaseController):
         except NoResultFound:
             c.language = identifier_query(tables.Language, u'en').one()
 
+        # XXX get rid of these
+        # TODO move the session-remove stuff into here, oops
         c.game_language = identifier_query(tables.Language, u'en').one()
+        c.all_languages = splinext.pokedex.db.pokedex_session.query(tables.Language).order_by(tables.Language.order.asc()).all()
 
 ### Extend markdown to turn [Eevee]{pokemon} into a link in effects and
 ### descriptions

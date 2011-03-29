@@ -287,7 +287,7 @@ ${h.h1(_('Contests'))}
         <dt>${_("Jam")}</dt>
         <dd title="${c.move.contest_effect.jam}">${u'♥' * c.move.contest_effect.jam}</dd>
         <dt>${_("Flavor text")}</dt>
-        <dd>${(c.move.contest_effect.flavor_text)}</dd>
+        <dd>${c.move.contest_effect.flavor_text}</dd>
 
         <dt>${_("Use after")}</dt>
         <dd>

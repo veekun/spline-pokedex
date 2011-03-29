@@ -24,8 +24,8 @@ class TestMarkdownData(SplineTest):
 
         # Move effects have their own special wrappers, so they aren't actually
         # marked as MarkdownColumns.  Explicitly test them separately
-        yield self.check_markdown_column, MoveEffect.__table__.c.short_effect
-        yield self.check_markdown_column, MoveEffect.__table__.c.effect
+        yield self.check_markdown_column, MoveEffect.prose_table.__table__.c.short_effect
+        yield self.check_markdown_column, MoveEffect.prose_table.__table__.c.effect
 
     def check_markdown_column(self, column):
         """Implementation for the above"""
