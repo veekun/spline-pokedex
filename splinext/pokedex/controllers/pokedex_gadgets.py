@@ -783,7 +783,9 @@ class PokedexGadgetsController(PokedexBaseController):
 
         # Setup only done if the page is actually showing
         if c.did_anything:
-            c.stats = db.pokedex_session.query(tables.Stat).all()
+            c.stats = db.pokedex_session.query(tables.Stat) \
+                .filter(~ tables.Stat.is_battle_only) \
+                .all()
 
             # Relative numbers -- breeding and stats
             # Construct a nested dictionary of label => pokemon => (value, pct)
