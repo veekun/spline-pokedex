@@ -229,18 +229,6 @@ class PokedexController(PokedexBaseController):
         'Sinnoh radio':         'radio-sinnoh.png',
     }
 
-    def __call__(self, *args, **params):
-        """Run the controller, making sure to discard the Pokédex session when
-        we're done.
-
-        This is largely copied from the default Pylons lib.base.__call__.
-        """
-
-        try:
-            return super(PokedexController, self).__call__(*args, **params)
-        finally:
-            db.pokedex_session.remove()
-
     def cache_content(self, key, do_work, template):
         key = key + '-' + c.game_language.identifier
         return super(PokedexController, self).cache_content(key, do_work, template)

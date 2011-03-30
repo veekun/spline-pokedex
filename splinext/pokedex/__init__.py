@@ -70,10 +70,20 @@ class PokedexBaseController(BaseController):
         except NoResultFound:
             c.language = identifier_query(tables.Language, u'en').one()
 
-        # XXX get rid of these
-        # TODO move the session-remove stuff into here, oops
         c.game_language = identifier_query(tables.Language, u'en').one()
-        c.all_languages = splinext.pokedex.db.pokedex_session.query(tables.Language).order_by(tables.Language.order.asc()).all()
+        db.pokedex_session.default_language = c.game_language.id
+
+    def __call__(self, *args, **params):
+        """Run the controller, making sure to discard the Pokédex session when
+        we're done.
+
+        Stolen from the default Pylons lib.base.__call__.
+        """
+        try:
+            return super(PokedexBaseController, self).__call__(*args, **params)
+        finally:
+            db.pokedex_session.remove()
+
 
 ### Extend markdown to turn [Eevee]{pokemon} into a link in effects and
 ### descriptions
