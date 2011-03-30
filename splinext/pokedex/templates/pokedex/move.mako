@@ -77,7 +77,7 @@ ${h.h1(_('Essentials'))}
             ${_(u"—  (cannot miss)")}
             % else:
             ${c.move.accuracy}%
-            % if c.move.accuracy != 100 and c.move.damage_class.name != 'non-damaging':
+            % if c.move.accuracy != 100 and c.move.damage_class.identifier != 'non-damaging':
             ${_(u"≈ {0:.1f} power").format(c.move.power * c.move.accuracy / 100.0)}
             % endif
             % endif
@@ -384,7 +384,7 @@ ${h.h1(_(u'Similar moves'))}
 % endif
 
 ${h.h1(_(u'Pokémon', context='plural'))}
-% if c.move.damage_class.name != u'non-damaging':
+% if c.move.damage_class.identifier != u'non-damaging':
 <p>${c.move.type.name} Pokémon get STAB, and have their types highlighted in green.</p>
 <p>Pokémon with higher ${u'Special Attack' if c.move.damage_class.name == u'special' else u'Attack'} are more suited to ${c.move.name}'s ${c.move.damage_class.name} damage, and have the stat highlighted in green.</p>
 % endif
@@ -423,7 +423,7 @@ ${h.h1(_(u'Pokémon', context='plural'))}
 <tbody>
 % for pokemon, version_group_data in method_list:
     <tr class="\
-        % if c.move.damage_class.name != u'non-damaging' and c.move.type in pokemon.types:
+        % if c.move.damage_class.identifier != u'non-damaging' and c.move.type in pokemon.types:
         better-move-type\
         % endif
         % if c.move.damage_class == c.better_damage_classes[pokemon]:
