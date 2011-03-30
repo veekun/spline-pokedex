@@ -367,7 +367,7 @@ ${move.effect_chance}% \
 
 <%def name="col_effect()"><col class="dex-col-effect"></%def>
 <%def name="th_effect()"><th>${_("Effect")}</th></%def>
-<%def name="td_effect(move)"><td class="markdown effect">${move.short_effect.as_html | n}</td></%def>
+<%def name="td_effect(move)"><td class="markdown effect">${move.short_effect}</td></%def>
 
 <%def name="col_link()"><col class="dex-col-link"></%def>
 <%def name="th_link()"><th></th></%def>

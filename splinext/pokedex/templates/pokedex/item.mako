@@ -59,7 +59,7 @@ ${h.h1(_('Essentials'))}
 
 ${h.h1(_('Effect'))}
 <div class="markdown">
-${c.item.effect.as_html | n}
+${c.item.effect}
 </div>
 
 % if c.item.fling_effect or c.item.berry:
