@@ -156,20 +156,26 @@ class ChainBreedingForm(Form):
 class StatCalculatorForm(Form):
     pokemon = PokedexLookupField(u'Pokémon', valid_type='pokemon')
     nature = QuerySelectField('Nature',
-        # XXX: Use name, not identifier
-        query_factory=lambda: db.alphabetize_table(tables.Nature),
+        query_factory=lambda: db.pokedex_session.query(tables.Nature)
+            .join(tables.Nature.names_local)
+            .order_by(tables.Nature.names_table.name.asc()),
         get_pk=lambda _: _.name.lower(),
         get_label=lambda _: _.name,
         allow_blank=True,
     )
     hint = QuerySelectField('Characteristic',
-        query_factory=lambda: db.alphabetize(db.pokedex_session.query(tables.StatHint), tables.StatHint.text_table, sort_column='message'),
+        query_factory=lambda: db.pokedex_session.query(tables.StatHint)
+            .join(tables.StatHint.names_table)
+            .order_by(tables.StatHint.names_table.message.asc()),
         get_pk=lambda _: _.id,
         get_label=lambda _: _.message,
         allow_blank=True,
     )
     hp_type = QuerySelectField('Hidden Power type',
-        query_factory=lambda: db.alphabetize_table(tables.Type).filter(tables.Type.id < 10000),
+        query_factory=lambda: db.pokedex_session.query(tables.Type)
+            .filter(tables.Type.id < 10000)
+            .join(tables.Type.names_local)
+            .order_by(tables.Type.names_table.name.asc()),
         get_pk=lambda _: _.id,
         get_label=lambda _: _.name,
         allow_blank=True,

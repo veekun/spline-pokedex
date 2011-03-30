@@ -1471,9 +1471,11 @@ class PokedexController(PokedexBaseController):
 
 
     def types_list(self):
-        # XXX: Use the name, not identifier
-        c.types = db.alphabetize_table(tables.Type) \
+        c.types = db.pokedex_session.query(tables.Type) \
+            .join(tables.Type.names_local) \
             .filter(tables.Type.damage_efficacies.any()) \
+            .order_by(tables.Type.names_table.name) \
+            .options(contains_eager(tables.Type.names_local)) \
             .options(eagerload('damage_efficacies')) \
             .all()
 
@@ -1571,8 +1573,10 @@ class PokedexController(PokedexBaseController):
         return
 
     def abilities_list(sef):
-        c.abilities = db.alphabetize(db.pokedex_session.query(tables.Ability)
-            .order_by(tables.Ability.generation_id), tables.AbilityText) \
+        c.abilities = db.pokedex_session.query(tables.Ability) \
+            .join(tables.Ability.names_local) \
+            .order_by(tables.Ability.generation_id.asc(),
+                tables.Ability.names_table.name.asc()) \
             .all()
         return render('/pokedex/ability_list.mako')
 
@@ -1849,7 +1853,15 @@ class PokedexController(PokedexBaseController):
 
 
     def natures_list(self):
-        c.natures = db.pokedex_session.query(tables.Nature)
+        c.natures = db.pokedex_session.query(tables.Nature) \
+            .join(tables.Nature.names_local) \
+            .options(
+                contains_eager(tables.Nature.names_local),
+                joinedload(tables.Nature.likes_flavor),
+                joinedload(tables.Nature.hates_flavor),
+                joinedload(tables.Nature.increased_stat),
+                joinedload(tables.Nature.decreased_stat),
+            )
 
         # Figure out sort order
         c.sort_order = request.params.get('sort', None)
@@ -1863,8 +1875,8 @@ class PokedexController(PokedexBaseController):
                 tables.Nature.decreased_stat_id.asc(),
             )
         else:
-            # XXX: Use name, not identifier
-            c.natures = db.alphabetize(c.natures, tables.NatureText)
+            c.natures = c.natures.order_by(
+                tables.Nature.names_table.name.asc())
 
         return render('/pokedex/nature_list.mako')
 
@@ -1878,10 +1890,12 @@ class PokedexController(PokedexBaseController):
         # Other neutral natures if this one is neutral; otherwise, the inverse
         # of this one
         if c.nature.increased_stat == c.nature.decreased_stat:
-            c.neutral_natures = db.alphabetize_table(tables.Nature) \
+            c.neutral_natures = db.pokedex_session.query(tables.Nature) \
+                .join(tables.Nature.names_local) \
                 .filter(tables.Nature.increased_stat_id
                      == tables.Nature.decreased_stat_id) \
-                .filter(tables.Nature.id != c.nature.id)
+                .filter(tables.Nature.id != c.nature.id) \
+                .order_by(tables.Nature.names_table.name)
         else:
             c.inverse_nature = db.pokedex_session.query(tables.Nature) \
                 .filter_by(
