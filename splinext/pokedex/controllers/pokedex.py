@@ -15,7 +15,7 @@ from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from pylons.decorators import jsonify
 from sqlalchemy import and_, or_, not_
-from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join, joinedload, subqueryload, subqueryload_all
+from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join, joinedload, joinedload_all, subqueryload, subqueryload_all
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import exists, func
 
@@ -1655,7 +1655,10 @@ class PokedexController(PokedexBaseController):
         try:
             c.item_pocket = db.pokedex_session.query(tables.ItemPocket) \
                 .filter(tables.ItemPocket.identifier == pocket) \
-                .options(eagerload_all('categories.items.berry')) \
+                .options(
+                    joinedload_all('categories.items.berry'),
+                    joinedload_all('categories.items.prose_local'),
+                ) \
                 .one()
         except NoResultFound:
             # It's possible this is an old item URL; redirect if so

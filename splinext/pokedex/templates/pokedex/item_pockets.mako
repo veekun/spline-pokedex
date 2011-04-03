@@ -47,7 +47,7 @@ ${_("%s pocket - Items") % (c.item_pocket.name)}
     <td>${item.berry.id}</td>
     % endif
     <td>${h.pokedex.item_link(item)}</td>
-    <td>${item.short_effect}</td>
+    <td>${item.short_effect.as_html | n}</td>
 </tr>
 % endfor
 % endfor
