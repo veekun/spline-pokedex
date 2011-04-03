@@ -229,6 +229,11 @@ class PokedexController(PokedexBaseController):
         'Sinnoh radio':         'radio-sinnoh.png',
     }
 
+    def __before__(self, action, **params):
+        super(PokedexController, self).__before__(action, **params)
+
+        c.javascripts.append(('pokedex', 'pokedex'))
+
     def cache_content(self, key, do_work, template):
         key = key + '-' + c.game_language.identifier
         return super(PokedexController, self).cache_content(key, do_work, template)
