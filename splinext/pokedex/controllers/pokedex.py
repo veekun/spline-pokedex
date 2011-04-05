@@ -926,6 +926,12 @@ class PokedexController(PokedexBaseController):
         q = q.options(
                  contains_eager(tables.PokemonMove.machine),
                  contains_eager(tables.PokemonMove.method),
+                 # n.b: contains_eager interacts badly with joinedload with
+                 # innerjoin=True.  Disable the inner joining explicitly.
+                 # See: http://www.sqlalchemy.org/trac/ticket/2120
+                 joinedload(
+                     tables.PokemonMove.machine, tables.Machine.version_group,
+                     innerjoin=False),
                  eagerload_all('move.damage_class'),
                  eagerload_all('move.move_effect'),
                  eagerload_all('move.type'),
