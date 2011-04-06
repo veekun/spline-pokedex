@@ -90,7 +90,7 @@ ${h.h1(_('Essentials'))}
     </dl>
 
     <h2>${_(u"Names")}</h2>
-    <%dexlib:foreign_names object="${c.pokemon}"/>
+    ${dexlib.foreign_names(c.pokemon)}
 </div>
 <div class="dex-column">
     <h2>${_(u"Breeding")}</h2>

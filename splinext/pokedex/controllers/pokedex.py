@@ -493,6 +493,8 @@ class PokedexController(PokedexBaseController):
 
             # Need to eagerload some, uh, little stuff
             pokemon_q = pokemon_q.options(
+                joinedload(tables.Pokemon.abilities, tables.Ability.prose_local),
+                joinedload(tables.Pokemon.dream_ability, tables.Ability.prose_local),
                 eagerload('evolution_chain.pokemon'),
                 eagerload('generation'),
                 eagerload('items.item'),
@@ -933,7 +935,9 @@ class PokedexController(PokedexBaseController):
                      tables.PokemonMove.machine, tables.Machine.version_group,
                      innerjoin=False),
                  eagerload_all('move.damage_class'),
-                 eagerload_all('move.move_effect'),
+                 joinedload_all(tables.PokemonMove.move,
+                     tables.Move.move_effect,
+                     tables.MoveEffect.prose_local),
                  eagerload_all('move.type'),
                  eagerload_all('version_group'),
              ) \
