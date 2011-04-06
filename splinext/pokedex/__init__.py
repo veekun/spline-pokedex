@@ -71,7 +71,7 @@ class PokedexBaseController(BaseController):
             c.language = identifier_query(tables.Language, u'en').one()
 
         c.game_language = identifier_query(tables.Language, u'en').one()
-        db.pokedex_session.default_language = c.game_language.id
+        db.pokedex_session.default_language = c.game_language
 
     def __call__(self, *args, **params):
         """Run the controller, making sure to discard the Pokédex session when
