@@ -533,14 +533,14 @@ ${h.h1(_('Locations'))}
 
 <dl class="dex-simple-encounters">
     ## Sort versions by order, which happens to be id
-    % for version, terrain_etc in h.keysort(c.locations, lambda k: k.id):
+    % for version, method_etc in h.keysort(c.locations, lambda k: k.id):
     <dt>${(version.name)} ${h.pokedex.version_icons(version, _=_)}</dt>
     <dd>
-        ## Sort terrain by name
-        % for terrain, area_condition_encounters in h.keysort(terrain_etc, lambda k: k.id):
-        <div class="dex-simple-encounters-terrain">
-            ${h.pokedex.pokedex_img('encounters/' + c.encounter_terrain_icons.get(terrain.name, 'unknown.png'), \
-                                    alt=terrain.name)}
+        ## Sort method by name
+        % for method, area_condition_encounters in h.keysort(method_etc, lambda k: k.id):
+        <div class="dex-simple-encounters-method">
+            ${h.pokedex.pokedex_img('encounters/' + c.encounter_method_icons.get(method.name, 'unknown.png'), \
+                                    alt=method.name)}
             <ul>
                 ## Sort locations by name
                 % for location_area, (conditions, combined_encounter) \

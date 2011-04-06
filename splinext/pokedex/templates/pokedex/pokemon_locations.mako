@@ -19,7 +19,7 @@ ${dexlib.pokemon_page_header()}
 <%lib:cache_content>
 
 ## Sort regions by the generation that introduced them
-% for region, terrain_area_version_condition_encounters \
+% for region, method_area_version_condition_encounters \
    in h.keysort(c.grouped_encounters, lambda k: k.generation.id):
 ${h.h1(region.name)}
 
@@ -39,10 +39,10 @@ ${h.h1(region.name)}
     % endif
     % endfor
 
-    ## Draw a divider to separate terrain, in id order.  Why not?
+    ## Draw a divider to separate method, in id order.  Why not?
     ## Include the versions header, too.
-    % for terrain, area_version_condition_encounters \
-       in h.keysort(terrain_area_version_condition_encounters, lambda k: k.id):
+    % for method, area_version_condition_encounters \
+       in h.keysort(method_area_version_condition_encounters, lambda k: k.id):
 
     <tr class="header-row">
         <th></th>
@@ -52,8 +52,8 @@ ${h.h1(region.name)}
     </tr>
     <tr class="subheader-row">
         <th colspan="100">
-            ${h.pokedex.pokedex_img('encounters/' + c.encounter_terrain_icons.get(terrain.name, 'unknown.png'))}
-            ${terrain.name}
+            ${h.pokedex.pokedex_img('encounters/' + c.encounter_method_icons.get(method.name, 'unknown.png'))}
+            ${method.name}
         </th>
     </tr>
 

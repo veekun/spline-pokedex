@@ -218,7 +218,7 @@ table.dex-pokemon-stats td.dex-pokemon-stats-pctile { text-align: right; }
 table.dex-pokemon-stats td.dex-pokemon-stats-result { text-align: right; }
 
 /* Pokémon page -- simple-encounters list */
-.dex-simple-encounters-terrain { margin-bottom: 0.5em; }
+.dex-simple-encounters-method { margin-bottom: 0.5em; }
 dl.dex-simple-encounters dd img { vertical-align: bottom; }
 dl.dex-simple-encounters ul { display: inline; }
 dl.dex-simple-encounters ul li { display: inline; }

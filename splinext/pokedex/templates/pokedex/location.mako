@@ -37,9 +37,9 @@
     % endif
     % endfor
 
-    ## Draw a divider to separate terrain, in id order.  Why not?
+    ## Draw a divider to separate method, in id order.  Why not?
     ## Include the versions header, too.
-    % for terrain, pokemon_version_condition_encounters \
+    % for method, pokemon_version_condition_encounters \
        in h.keysort(c.grouped_encounters.get(location_area, {}), lambda k: k.id):
 
     <tr class="header-row">
@@ -50,8 +50,8 @@
     </tr>
     <tr class="subheader-row">
         <th colspan="100">
-            ${h.pokedex.pokedex_img('encounters/' + c.encounter_terrain_icons.get(terrain.name, 'unknown.png'))}
-            ${terrain.name}
+            ${h.pokedex.pokedex_img('encounters/' + c.encounter_method_icons.get(method.name, 'unknown.png'))}
+            ${method.name}
         </th>
     </tr>
 

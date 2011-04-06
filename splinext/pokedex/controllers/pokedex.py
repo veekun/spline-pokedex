@@ -149,11 +149,11 @@ class CombinedEncounter(object):
     """Represents several encounter rows, collapsed together.  Rarities and
     level ranges are combined correctly.
 
-    Assumed to have the same terrain.  Also location and area and so forth, but
+    Assumed to have the same method.  Also location and area and so forth, but
     those aren't actually needed.
     """
     def __init__(self, encounter=None):
-        self.terrain = None
+        self.method = None
         self.rarity = 0
         self.min_level = 0
         self.max_level = 0
@@ -162,10 +162,10 @@ class CombinedEncounter(object):
             self.combine_with(encounter)
 
     def combine_with(self, encounter):
-        if self.terrain and self.terrain != encounter.slot.terrain:
+        if self.method and self.method != encounter.slot.method:
             raise ValueError(
-                "Can't combine terrain {0} with {1}"
-                .format(self.terrain.name, encounter.slot.terrain.name)
+                "Can't combine method {0} with {1}"
+                .format(self.method.name, encounter.slot.method.name)
             )
 
         self.rarity += encounter.slot.rarity
@@ -194,8 +194,8 @@ class PokedexController(PokedexBaseController):
         tables.Type: 'type',
     }
 
-    # Dict of terrain name => icon path
-    encounter_terrain_icons = {
+    # Dict of method name => icon path
+    encounter_method_icons = {
         'Surfing':                          'surfing.png',
         'Fishing with an Old Rod':          'old-rod.png',
         'Fishing with a Good Rod':          'good-rod.png',
@@ -822,7 +822,7 @@ class PokedexController(PokedexBaseController):
 
         ### Encounters -- briefly
         # One row per version, then a list of places the Pokémon appears.
-        # version => terrain => location_area => conditions => CombinedEncounters
+        # version => method => location_area => conditions => CombinedEncounters
         c.locations = defaultdict(
             lambda: defaultdict(
                 lambda: defaultdict(
@@ -838,24 +838,24 @@ class PokedexController(PokedexBaseController):
             .options(
                 eagerload_all('condition_value_map.condition_value'),
                 eagerload_all('version'),
-                eagerload_all('slot.terrain'),
+                eagerload_all('slot.method'),
                 eagerload_all('location_area.location'),
             )
         for encounter in q:
             condition_values = [cv for cv in encounter.condition_values
                                    if not cv.is_default]
             c.locations[encounter.version] \
-                       [encounter.slot.terrain] \
+                       [encounter.slot.method] \
                        [encounter.location_area] \
                        [tuple(condition_values)].combine_with(encounter)
 
         # Strip each version+location down to just the condition values that
-        # are the most common per terrain
+        # are the most common per method
         # Results in:
-        # version => location_area => terrain => (conditions, combined_encounter)
-        for version, terrain_etc in c.locations.items():
-            for terrain, area_condition_encounters \
-                in terrain_etc.items():
+        # version => location_area => method => (conditions, combined_encounter)
+        for version, method_etc in c.locations.items():
+            for method, area_condition_encounters \
+                in method_etc.items():
                 for location_area, condition_encounters \
                     in area_condition_encounters.items():
 
@@ -871,7 +871,7 @@ class PokedexController(PokedexBaseController):
                         = condition_encounter_items[-1]
 
         # Used for prettiness
-        c.encounter_terrain_icons = self.encounter_terrain_icons
+        c.encounter_method_icons = self.encounter_method_icons
 
         ### Moves
         # Oh no.
@@ -1160,7 +1160,7 @@ class PokedexController(PokedexBaseController):
         # percentage.
 
         # Encounters are grouped by region -- <h1>s.
-        # Then by terrain -- table sections.
+        # Then by method -- table sections.
         # Then by area -- table rows.
         # Then by version -- table columns.
         # Finally, condition values associated with levels/rarity.
@@ -1168,12 +1168,12 @@ class PokedexController(PokedexBaseController):
             .options(
                 eagerload_all('condition_value_map.condition_value'),
                 eagerload_all('version'),
-                eagerload_all('slot.terrain'),
+                eagerload_all('slot.method'),
                 eagerload_all('location_area.location'),
             )\
             .filter(tables.Encounter.pokemon == c.pokemon)
 
-        # region => terrain => area => version => condition =>
+        # region => method => area => version => condition =>
         #     condition_values => encounter_bits
         grouped_encounters = defaultdict(
             lambda: defaultdict(
@@ -1206,14 +1206,14 @@ class PokedexController(PokedexBaseController):
 
         for encounter in q.all():
             # Fetches the list of encounters that match this region, version,
-            # terrain, etc.
+            # method, etc.
             region = encounter.location_area.location.region
 
             # n.b.: conditions and values must be tuples because lists aren't
             # hashable.
             encounter_bits = grouped_encounters \
                 [region] \
-                [encounter.slot.terrain] \
+                [encounter.slot.method] \
                 [encounter.location_area] \
                 [encounter.version] \
                 [ tuple(cv.condition for cv in encounter.condition_values) ] \
@@ -1238,7 +1238,7 @@ class PokedexController(PokedexBaseController):
         c.grouped_encounters = grouped_encounters
 
         # Pass some data/functions
-        c.encounter_terrain_icons = self.encounter_terrain_icons
+        c.encounter_method_icons = self.encounter_method_icons
         c.encounter_condition_value_icons = self.encounter_condition_value_icons
         c.level_range = level_range
 
@@ -1761,20 +1761,20 @@ class PokedexController(PokedexBaseController):
         # percentage.
 
         # Encounters are grouped by area -- <h2>s.
-        # Then by terrain -- table sections.
+        # Then by method -- table sections.
         # Then by pokemon -- table rows.
         # Then by version -- table columns.
         # Finally, condition values associated with levels/rarity.
         q = db.pokedex_session.query(tables.Encounter) \
             .options(
                 eagerload_all('condition_value_map.condition_value'),
-                eagerload_all('slot.terrain'),
+                eagerload_all('slot.method'),
                 eagerload('pokemon'),
                 eagerload('version'),
             ) \
             .filter(tables.Encounter.location_area_id.in_(_.id for _ in c.areas))
 
-        # area => terrain => pokemon => version => condition =>
+        # area => method => pokemon => version => condition =>
         #     condition_values => encounter_bits
         grouped_encounters = defaultdict(
             lambda: defaultdict(
@@ -1801,13 +1801,13 @@ class PokedexController(PokedexBaseController):
 
         for encounter in q.all():
             # Fetches the list of encounters that match this region, version,
-            # terrain, etc.
+            # method, etc.
 
             # n.b.: conditions and values must be tuples because lists aren't
             # hashable.
             encounter_bits = grouped_encounters \
                 [encounter.location_area] \
-                [encounter.slot.terrain] \
+                [encounter.slot.method] \
                 [encounter.pokemon] \
                 [encounter.version] \
                 [ tuple(cv.condition for cv in encounter.condition_values) ] \
@@ -1832,7 +1832,7 @@ class PokedexController(PokedexBaseController):
         c.grouped_encounters = grouped_encounters
 
         # Pass some data/functions
-        c.encounter_terrain_icons = self.encounter_terrain_icons
+        c.encounter_method_icons = self.encounter_method_icons
         c.encounter_condition_value_icons = self.encounter_condition_value_icons
         c.level_range = level_range
 
