@@ -227,9 +227,23 @@ class TestMoveSearchController(TestController):
         )
 
         self.check_search(
-            dict(effect_chance=u'70'),
+            dict(ailment_chance=u'50'),
+            [u'Sacred Fire'],
+            'searching by status ailment chance',
+            exact=True,
+        )
+
+        self.check_search(
+            dict(flinch_chance=u'100'),
+            [u'Fake Out'],
+            'searching by flinch chance',
+            exact=True,
+        )
+
+        self.check_search(
+            dict(stat_chance=u'70'),
             [u'Charge Beam'],
-            'searching by effect chance',
+            'searching by stat chance',
             exact=True,
         )
 
@@ -305,43 +319,45 @@ class TestMoveSearchController(TestController):
             'Venusaur gets elemental beam in FR',
         )
 
-    def test_category(self):
-        """Checks searching by move categories.
+    def test_ailment(self):
+        """Checks searching by move ailments: confusion, trapping, etc.
 
-        Categories are like types: must include at least one of the selected
-        categories.  There's no AND; I can't see that being useful.
+        A move can inflict only one ailment, and it must be one of those
+        selected in the form.
         """
-        # XXX identifiers would be groovy
         self.check_search(
-            dict(category=u'36:self'),  # trap
+            dict(ailment=u'ingrain'),
             [u'Ingrain'],
-            'simple category search, vs self',
-            exact=True,
-        )
-        self.check_search(
-            dict(category=u'14:target'),  # protect
-            [u'Conversion 2', u'False Swipe'],
-            'simple category search, vs target',
+            'dead simple ailment search',
             exact=True,
         )
 
-        # Multiple categories
-        # sleep OR attack up
+        # Multiple ailments
         self.check_search(
-            dict(category=[u'29:self', u'15:target'], category_operator=u'any'),
-            [u'Rest', u'Swagger'],
-            'multiple category search (OR)',
-            exact=True,
+            dict(ailment=[u'sleep', u'freeze']),
+            [u'Sleep Powder', u'Blizzard'],
+            'multiple ailment search',
         )
 
-        # sleep AND heal self
+    def test_checkboxes(self):
+        """Couple boolean meta things."""
         self.check_search(
-            dict(category=[u'29:self', u'13:self'], category_operator=u'all'),
-            [u'Rest'],
-            'multiple category search (AND)',
-            exact=True,
+            dict(crit_rate=u'y'),
+            [u'Aeroblast', u'Air Cutter', u'Karate Chop', u'Slash'],
+            'increased crit chance',
         )
 
+        self.check_search(
+            dict(multi_hit=u'y'),
+            [u'Barrage', u'Gear Grind', u'Tail Slap'],
+            'multi-hit',
+        )
+
+        self.check_search(
+            dict(multi_turn=u'y'),
+            [u'Confusion', u'Psybeam', u'Telekinesis'],
+            'multi-turn',
+        )
 
     def test_sort(self):
         """Make sure all the sort methods actually work."""

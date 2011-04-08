@@ -131,19 +131,27 @@ ${h.form(url.current(), method='GET')}
         </dd>
     </dl>
 </div>
-<div class="dex-column">
+<div class="dex-column-2x">
     <h2>${_("Flags")}</h2>
-    <p>${_("Exact same effect as:")} ${lib.bare_field('similar_to')}</p>
-    <ul>
+    <ul style="-moz-column-count: 2; -moz-column-gap: 1em;">
         % for field, dummy in c.flag_fields:
         <li>${c.form[field]() | n} ${c.form[field].label() | n}</li>
         % endfor
     </ul>
 </div>
-<div class="dex-column">
-    <h2>${_("Categories")}</h2>
+</div>
+
+<h2>${_("Effect")}</h2>
+<ul>
+    <li>${_("Exact same effect as:")} ${lib.bare_field('similar_to')}</li>
+    <li><label>${c.form.crit_rate() | n} ${c.form.crit_rate.label()}</label></li>
+    <li><label>${c.form.multi_hit() | n} ${c.form.multi_hit.label()}</label></li>
+    <li><label>${c.form.multi_turn() | n} ${c.form.multi_turn.label()}</label></li>
+</ul>
+<div class="dex-column-container">
+<div class="dex-column-2x">
+    <h3>${_("Category")}</h3>
     <div class="dex-move-search-categories">
-        ${lib.bare_field('category_operator')}
         <ul>
             % for field in c.form.category:
             <li>${field() | n} ${field.label() | n}</li>
@@ -151,7 +159,18 @@ ${h.form(url.current(), method='GET')}
         </ul>
     </div>
 </div>
+<div class="dex-column">
+    <h3>${_("Status ailment")}</h3>
+    <div class="dex-move-search-categories">
+        <ul>
+            % for field in c.form.ailment:
+            <li>${field() | n} ${field.label() | n}</li>
+            % endfor
+        </ul>
+    </div>
 </div>
+</div>
+
 
 <h2>${_("Type")}</h2>
 <ul class="dex-type-list">
@@ -170,13 +189,23 @@ ${h.form(url.current(), method='GET')}
 ${c.form.shadow_moves()} ${c.form.shadow_moves.label()}
 
 <h2>${_("Numbers")}</h2>
-<dl class="standard-form">
-    ${lib.field('accuracy')}
-    ${lib.field('pp')}
-    ${lib.field('power')}
-    ${lib.field('effect_chance')}
-    ${lib.field('priority')}
-</dl>
+<div class="dex-column-container">
+<div class="dex-column">
+    <dl class="standard-form">
+        ${lib.field('accuracy')}
+        ${lib.field('pp')}
+        ${lib.field('power')}
+        ${lib.field('priority')}
+    </dl>
+</div>
+<div class="dex-column">
+    <dl class="standard-form">
+        ${lib.field('ailment_chance')}
+        ${lib.field('flinch_chance')}
+        ${lib.field('stat_chance')}
+    </dl>
+</div>
+</div>
 
 <h2>${_(u"Pokémon")}</h2>
 <div class="dex-column-container">
