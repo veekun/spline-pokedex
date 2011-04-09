@@ -138,7 +138,7 @@ ${h.h1(_('Essentials'))}
     <p>${_(u"Ditto can breed with any other breedable Pokémon, but can never produce a Ditto egg.")}</p>
     % elif c.pokemon.egg_groups[0].id == 15:
     ## Egg group 15 is the special No Eggs group
-    <p>${_("{0} cannot breed.").format(c.pokemon.name)}.</p>
+    <p>${_("{0} cannot breed.").format(c.pokemon.name)}</p>
     % else:
     <ul class="inline dex-pokemon-compatibility">
         % for pokemon in c.compatible_families:
