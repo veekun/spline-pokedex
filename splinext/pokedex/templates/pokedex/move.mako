@@ -172,20 +172,30 @@ ${h.literal(c.move.effect.as_html)}
 </ul>
 
 <h2>Meta</h2>
+<p><em>This reflects how the games treat moves and may be somewhat idealistic.</em></p>
 <% meta = c.move.meta %>
 <ul class="classic-list">
-    <li>Category: ${meta.category.description}</li>
+    <li>
+        <a href="${url(controller='dex_search', action='move_search', category=meta.category.identifier)}">
+            ${meta.category.description}</a>
+    </li>
     % if meta.meta_ailment_id:
     <li>
         % if meta.ailment_chance:
-        ${meta.ailment_chance}% chance to inflict ${meta.ailment.name}
+        ${meta.ailment_chance}% chance to
+        <a href="${url(controller='dex_search', action='move_search', ailment=meta.ailment.identifier)}">
+            inflict ${meta.ailment.name}</a>
         % else:
-        Inflicts ${meta.ailment.name}
+        <a href="${url(controller='dex_search', action='move_search', ailment=meta.ailment.identifier)}">
+            Inflicts ${meta.ailment.name}</a>
         % endif
     </li>
     % endif
     % if meta.flinch_chance:
-    <li>${meta.flinch_chance}% chance to make the target flinch</li>
+    <li>${meta.flinch_chance}% chance to
+        <a href="${url(controller='dex_search', action='move_search', flinch_chance='>0')}">
+            make the target flinch</a>
+    </li>
     % endif
     % if c.move.meta_stat_changes:
     <li>
@@ -193,25 +203,52 @@ ${h.literal(c.move.effect.as_html)}
         ${meta.stat_chance}% chance to
         % endif
         % for stat_change in c.move.meta_stat_changes:
-        ${stat_change.change} ${stat_change.stat.name}
+        <a href="${url(controller='dex_search', action='move_search', **dict([('stat_change_' + stat_change.stat.identifier.replace('-', '_'), stat_change.change)]))}">
+            ${u'raise' if stat_change.change > 0 else u'lower'} ${stat_change.stat.name}
+            by ${abs(stat_change.change)}</a>
         % endfor
     </li>
     % endif
 
     % if meta.crit_rate:
-    <li>Critical hit rate is increased by ${meta.crit_rate}</li>
+    <li>
+        <a href="${url(controller='dex_search', action='move_search', crit_rate='y')}">
+            Critical hit rate increased by ${meta.crit_rate}</a>
+    </li>
     % endif
     % if meta.min_hits:
-    <li>Hits ${meta.min_hits} to ${meta.max_hits} times</li>
+    <li>
+        <a href="${url(controller='dex_search', action='move_search', multi_hit='y')}">
+            Hits ${meta.min_hits}${u'–{0}'.format(meta.max_hits) if meta.max_hits != meta.min_hits else u''} times</a>
+    </li>
     % endif
     % if meta.min_turns:
-    <li>Effect lasts for ${meta.min_turns} to ${meta.max_turns} turns</li>
+    <li>
+        <a href="${url(controller='dex_search', action='move_search', multi_turn='y')}">
+            Effect lasts ${meta.min_turns}${u'–{0}'.format(meta.max_turns) if meta.max_turns != meta.min_turns else u''} turns</a>
+    </li>
     % endif
-    % if meta.recoil:
-    <li>User absorbs ${meta.recoil}% of damage inflicted</li>
+    % if meta.recoil and meta.recoil > 0:
+    <li>
+        <a href="${url(controller='dex_search', action='move_search', recoil='>0')}">
+            User takes ${meta.recoil}% of the damage inflicted as recoil</a>
+    </li>
+    % elif meta.recoil and meta.recoil < 0:
+    <li>
+        <a href="${url(controller='dex_search', action='move_search', recoil='<0')}">
+            User absorbs ${abs(meta.healing)}% of the damage inflicted</a>
+    </li>
     % endif
-    % if meta.healing:
-    <li>User absorbs ${meta.healing}% of its max HP</li>
+    % if meta.healing and meta.healing > 0:
+    <li>
+        <a href="${url(controller='dex_search', action='move_search', healing='>0')}">
+            User regains ${meta.healing}% of its max HP</a>
+    </li>
+    % elif meta.healing and meta.healing < 0:
+    <li>
+        <a href="${url(controller='dex_search', action='move_search', healing='<0')}">
+            User loses ${abs(meta.healing)}% of its max HP</a>
+    </li>
     % endif
 </ul>
 

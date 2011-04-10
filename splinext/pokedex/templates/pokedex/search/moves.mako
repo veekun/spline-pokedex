@@ -200,9 +200,22 @@ ${c.form.shadow_moves()} ${c.form.shadow_moves.label()}
 </div>
 <div class="dex-column">
     <dl class="standard-form">
+        ${lib.field('recoil')}
+        ${lib.field('healing')}
         ${lib.field('ailment_chance')}
         ${lib.field('flinch_chance')}
         ${lib.field('stat_chance')}
+    </dl>
+</div>
+<div class="dex-column">
+    <dl class="standard-form">
+    % for subfield in c.form.stat_change:
+        <dt>${subfield.stat.name}</dt>
+        <dd>${subfield()}</dd>
+        % for error in subfield.errors:
+        <dd class="error">${error}</dd>
+        % endfor
+    % endfor
     </dl>
 </div>
 </div>

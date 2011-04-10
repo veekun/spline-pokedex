@@ -227,6 +227,25 @@ class TestMoveSearchController(TestController):
         )
 
         self.check_search(
+            dict(recoil=u'50'),
+            [u'Absorb', u'Mega Drain', u'Giga Drain'],
+            'searching by positive recoil (absorb)',
+        )
+        self.check_search(
+            dict(recoil=u'-50'),
+            [u'Head Smash'],
+            'searching by recoil',
+            exact=True,
+        )
+
+        self.check_search(
+            dict(healing=u'-25'),
+            [u'Struggle'],
+            'searching by negative healing',
+            exact=True,
+        )
+
+        self.check_search(
             dict(ailment_chance=u'50'),
             [u'Sacred Fire'],
             'searching by status ailment chance',
@@ -244,6 +263,15 @@ class TestMoveSearchController(TestController):
             dict(stat_chance=u'70'),
             [u'Charge Beam'],
             'searching by stat chance',
+            exact=True,
+        )
+
+    def test_stat_changes(self):
+        u"""Similar to the above but for stats changes."""
+        self.check_search(
+            dict(stat_change_accuracy=u'1'),
+            [u'Coil', u'Hone Claws'],
+            'searching by accuracy change',
             exact=True,
         )
 

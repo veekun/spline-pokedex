@@ -30,7 +30,7 @@ from spline.lib.forms import DuplicateField, QueryTextField
 
 from splinext.pokedex import helpers as pokedex_helpers, PokedexBaseController
 import splinext.pokedex.db as db
-from splinext.pokedex.forms import PokedexLookupField
+from splinext.pokedex.forms import PokedexLookupField, StatField
 
 log = logging.getLogger(__name__)
 
@@ -216,73 +216,6 @@ class StatCalculatorForm(Form):
             for field in ('nature', 'hint', 'hp_type'):
                 if not self[field].data:
                     del sfd[field]
-
-class StatField(fields.Field):
-    """Compound field that contains one subfield for each of the six main
-    statistics, which need to be passed in on creation since they're db
-    objects.
-
-    Can be iterated to get the individual fields in stat id order, or used as a
-    dictionary.
-    """
-    def __init__(self, stats, unbound_field, **kwargs):
-        self._stats = stats
-        self._unbound_field = unbound_field
-
-        super(StatField, self).__init__(**kwargs)
-
-    def process(self, formdata, data=None):
-        self.process_errors = []
-        self._fields = {}
-
-        short_data = {}
-        if self.short_name in formdata:
-            # Must be a shortened field; unshorten it and clobber the actual
-            # formdata
-            values = formdata.getlist(self.short_name)[0].split(u'|')
-            try:
-                int_values = [int(value) for value in values]
-                short_data = dict(zip(self._stats, int_values))
-            except ValueError:
-                # Something isn't an integer.  Shortening fucked up.  ABORT
-                pass
-
-        for stat, name in zip(self._stats, self.subfield_names):
-            field = self._fields[stat] = self._unbound_field.bind(form=None, name=name)
-            if stat in short_data:
-                field.process({}, short_data[stat])
-            else:
-                field.process(formdata)
-
-    def validate(self, form, extra_validators=()):
-        self.errors = []
-        success = True
-        for field in self:
-            if not field.validate(form):
-                success = False
-                self.errors.append(field.errors)
-        return success
-
-    def populate_obj(self, obj, name): raise NotImplementedError
-
-    @property
-    def subfield_names(self):
-        for stat in self._stats:
-            yield '_'.join((self.short_name, stat.name.lower().replace(' ', '_')))
-
-    def __iter__(self):
-        return (self._fields[stat] for stat in self._stats)
-
-    def __getitem__(self, stat):
-        return self._fields[stat]
-
-    @property
-    def data(self):
-        return dict((stat, self._fields[stat].data) for stat in self._stats)
-
-    @property
-    def short_data(self):
-        return u'|'.join(str(field.data) for field in self)
 
 
 def stat_graph_chunk_color(gene):

@@ -22,7 +22,7 @@ from spline.lib.forms import DuplicateField, MultiCheckboxField, QueryCheckboxSe
 
 from splinext.pokedex import helpers as pokedex_helpers, PokedexBaseController
 import splinext.pokedex.db as db
-from splinext.pokedex.forms import PokedexLookupField, RangeTextField
+from splinext.pokedex.forms import PokedexLookupField, RangeTextField, StatField
 from splinext.pokedex.magnitude import parse_size
 
 log = logging.getLogger(__name__)
@@ -457,7 +457,6 @@ class MoveSearchForm(BaseSearchForm):
         allow_blank=True,
     )
 
-
     # Pokémon
     pokemon = DuplicateField(
         PokedexLookupField(u'Pokémon', valid_type='pokemon', allow_blank=True),
@@ -489,6 +488,8 @@ class MoveSearchForm(BaseSearchForm):
     power = RangeTextField('Power', inflator=int)
     priority = RangeTextField('Priority', inflator=int, signed=True)
 
+    recoil = RangeTextField('% damage absorbed/recoiled', inflator=int, signed=True)
+    healing = RangeTextField('% max HP healed', inflator=int, signed=True)
     ailment_chance = RangeTextField('Ailment chance', inflator=int)
     flinch_chance = RangeTextField('Flinch chance', inflator=int)
     stat_chance = RangeTextField('Stat chance', inflator=int)
@@ -1279,8 +1280,10 @@ class PokedexSearchController(PokedexBaseController):
 
     def move_search(self):
         ### First tack some database-driven fields onto the form
+        c.stats = db.pokedex_session.query(tables.Stat).all()
+
         class F(MoveSearchForm):
-            pass
+            stat_change = StatField(c.stats, RangeTextField('', inflator=int, signed=True))
 
         # Add flag fields dynamically
         c.flag_fields = []
@@ -1393,6 +1396,16 @@ class PokedexSearchController(PokedexBaseController):
         if c.form.multi_turn.data:
             query = query.filter(tables.MoveMeta.min_turns != None)
 
+        # TODO: shorten this field correctly
+        for stat_field in c.form.stat_change:
+            if not stat_field.data:
+                continue
+
+            query = query.filter(me.meta_stat_changes.any(and_(
+                tables.MoveMetaStatChange.stat == stat_field.stat,
+                stat_field.data(tables.MoveMetaStatChange.change),
+            )))
+
         ### Numbers
         # These are all ranges:
         for form_field, column in [
@@ -1400,6 +1413,8 @@ class PokedexSearchController(PokedexBaseController):
             (c.form.pp,                 me.pp),
             (c.form.power,              me.power),
             (c.form.priority,           me.priority),
+            (c.form.recoil,             tables.MoveMeta.recoil),
+            (c.form.healing,            tables.MoveMeta.healing),
             (c.form.ailment_chance,     tables.MoveMeta.ailment_chance),
             (c.form.flinch_chance,      tables.MoveMeta.flinch_chance),
             (c.form.stat_chance,        tables.MoveMeta.stat_chance),
