@@ -653,14 +653,15 @@ class PokedexController(PokedexBaseController):
                     c.pokemon.normal_form.evolution_chain_id) \
             .filter(tables.Pokemon.forms.any()) \
             .options(
-                eagerload_all('parent_evolution.trigger'),
-                eagerload_all('parent_evolution.trigger_item'),
-                eagerload_all('parent_evolution.held_item'),
-                eagerload_all('parent_evolution.location'),
-                eagerload_all('parent_evolution.known_move'),
-                eagerload_all('parent_evolution.party_pokemon'),
-                eagerload_all('parent_pokemon'),
-                eagerload_all('unique_form'),
+                subqueryload('evolutions'),
+                joinedload('evolutions.trigger'),
+                joinedload('evolutions.trigger_item'),
+                joinedload('evolutions.held_item'),
+                joinedload('evolutions.location'),
+                joinedload('evolutions.known_move'),
+                joinedload('evolutions.party_pokemon'),
+                joinedload('parent_pokemon'),
+                joinedload('unique_form'),
             ) \
             .all()
         # Strategy: build this table going backwards.

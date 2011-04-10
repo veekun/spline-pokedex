@@ -402,11 +402,11 @@ def evolution_description(evolution, _=_):
     chunks = []
 
     # Trigger
-    if evolution.trigger.identifier == u'level_up':
+    if evolution.trigger.identifier == u'level-up':
         chunks.append(_(u'Level up'))
     elif evolution.trigger.identifier == u'trade':
         chunks.append(_(u'Trade'))
-    elif evolution.trigger.identifier == u'use_item':
+    elif evolution.trigger.identifier == u'use-item':
         item_name = evolution.trigger_item.name
         chunks.append(_(u"Use {article} {item}").format(
             article=article(item_name, _=_),
@@ -415,8 +415,8 @@ def evolution_description(evolution, _=_):
         chunks.append(
             _(u"Evolve {from_pokemon} ({to_pokemon} will consume "
             u"a Poké Ball and appear in a free party slot)").format(
-                from_pokemon=evolution.from_pokemon.full_name,
-                to_pokemon=evolution.to_pokemon.full_name))
+                from_pokemon=evolution.evolved_pokemon.parent_pokemon.full_name,
+                to_pokemon=evolution.evolved_pokemon.full_name))
     else:
         chunks.append(_(u'Do something'))
 
