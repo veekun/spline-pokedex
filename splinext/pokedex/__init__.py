@@ -6,7 +6,7 @@ import markdown
 import markdown.inlinepatterns
 from pylons import config, tmpl_context as c
 from routes import url_for as url
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 import pokedex.db
 from pokedex.db.markdown import MarkdownString
@@ -71,7 +71,7 @@ class PokedexBaseController(BaseController):
             c.language = identifier_query(tables.Language, u'en').one()
 
         c.game_language = identifier_query(tables.Language, u'en').one()
-        db.pokedex_session.default_language = c.game_language
+        db.pokedex_session.default_language_id = c.game_language.id
 
     def __call__(self, *args, **params):
         """Run the controller, making sure to discard the Pokédex session when
@@ -112,11 +112,20 @@ class PokedexLinkPattern(markdown.inlinepatterns.Pattern):
 
         # Find the thingy and figure out its URL
         if self.thingy_type.lower() == u'pokemon':
-            obj = splinext.pokedex.db.pokemon_query(target).one()
-            name = obj.name
+            query = splinext.pokedex.db.pokemon_query(target)
         else:
-            obj = splinext.pokedex.db.get_by_name_query(self.thingy_table, target).one()
-            name = obj.name
+            query = splinext.pokedex.db.get_by_name_query(self.thingy_table, target)
+
+        try:
+            obj = query.one()
+        except NoResultFound:
+            raise ValueError("Nothing matches [%s]{%s}" %
+                (target, self.thingy_table.__singlename__))
+        except MultipleResultsFound:
+            raise ValueError("Too many matches for [%s]{%s}" %
+                (target, self.thingy_table.__singlename__))
+
+        name = obj.name
         url = pokedex_helpers.make_thingy_url(obj)
 
         # Construct a link node

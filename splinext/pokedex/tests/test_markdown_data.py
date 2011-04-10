@@ -5,8 +5,9 @@ from nose.tools import ok_
 import pylons.test
 
 from spline.tests import *
+import splinext.pokedex.db
 
-from pokedex.db import connect, markdown
+from pokedex.db import markdown
 from pokedex.db.tables import metadata, MoveEffect
 
 class TestMarkdownData(SplineTest):
@@ -30,8 +31,7 @@ class TestMarkdownData(SplineTest):
     def check_markdown_column(self, column):
         """Implementation for the above"""
         # Well this is a bit roundabout
-        session = connect(
-            pylons.test.pylonsapp.config['spline-pokedex.sqlalchemy.url'])
+        session = splinext.pokedex.db.pokedex_session
 
         table = column.table
         columns = (column,) + tuple(table.primary_key.columns)
@@ -40,6 +40,9 @@ class TestMarkdownData(SplineTest):
             if not isinstance(column.type, markdown.MarkdownColumn):
                 # For move effect columns
                 mdtext = markdown.MarkdownString(mdtext)
+
+            assert mdtext, "row %r in table %s has no %s" % (
+                data[1:], table.name, column.name)
 
             key = "{0} / {1}".format(table.name, data[1:])
 
