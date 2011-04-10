@@ -159,18 +159,6 @@ ${h.h1(_('Effect'))}
 ${h.literal(c.move.effect.as_html)}
 </div>
 
-<h2>${_("Categories")}</h2>
-<ul class="classic-list">
-    % for category_map in c.move.move_effect.category_map:
-    <li>
-        <a href="${url(controller='dex_search', action='move_search', \
-            category="{0}:{1}".format(category_map.category.id, 'self' if category_map.affects_user else 'target'))}">
-        ${_("{category}, vs {target}").format(category=category_map.category.name, target=('user' if category_map.affects_user else 'target'))}
-        </a>
-    </li>
-    % endfor
-</ul>
-
 <h2>Meta</h2>
 <p><em>This reflects how the games treat moves and may be somewhat idealistic.</em></p>
 <% meta = c.move.meta %>

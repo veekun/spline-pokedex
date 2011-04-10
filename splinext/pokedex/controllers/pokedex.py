@@ -1297,7 +1297,6 @@ class PokedexController(PokedexBaseController):
                 joinedload('type.damage_efficacies.target_type'),
                 eagerload('target'),
                 eagerload('move_effect'),
-                eagerload('move_effect.category_map.category'),
                 eagerload_all(tables.Move.contest_effect, tables.ContestEffect.prose),
                 eagerload('contest_type'),
                 #eagerload('super_contest_effect'),
