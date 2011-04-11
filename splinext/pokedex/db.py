@@ -74,7 +74,7 @@ def get_by_name_query(table, name, query=None):
     if query is None:
         query = pokedex_session.query(table)
 
-    query = query.join(table.names_table) \
+    query = query.join(table.names_local) \
         .filter(func.lower(table.names_table.name) == name)
 
     return query
