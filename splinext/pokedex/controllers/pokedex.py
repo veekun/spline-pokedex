@@ -1645,7 +1645,8 @@ class PokedexController(PokedexBaseController):
             c.moves = db.pokedex_session.query(tables.Move) \
                 .join(tables.MoveFlag, tables.MoveFlagType) \
                 .filter(tables.MoveFlagType.identifier == move_flag) \
-                .order_by(tables.Move.name) \
+                .join(tables.Move.names_local) \
+                .order_by(tables.Move.names_table.name) \
                 .options(
                     subqueryload('move_effect'),
                     subqueryload('type'),
