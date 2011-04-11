@@ -771,8 +771,8 @@ class PokedexSearchController(PokedexBaseController):
             query = query.outerjoin(
                 # If we're a specific form, check the base form, too
                 (tables.PokemonEvolution,
-                    tables.PokemonEvolution.to_pokemon_id == base_form_id),
-                (parent_pokemon, tables.PokemonEvolution.from_pokemon),
+                    tables.PokemonEvolution.evolved_pokemon_id == base_form_id),
+                (parent_pokemon, me.parent_pokemon),
 
                 # No Pokémon ever evolve, gain forms, then evolve again
                 (grandparent_pokemon, parent_pokemon.parent_pokemon)
@@ -780,12 +780,12 @@ class PokedexSearchController(PokedexBaseController):
 
         # ...whereas position and special tend to need children
         if c.form.evolution_position.data or c.form.evolution_special.data:
-            child_evolution = aliased(tables.PokemonEvolution)
+            child_pokemon = aliased(tables.Pokemon)
             child_subquery = db.pokedex_session.query(
-                    child_evolution.from_pokemon_id.label('parent_id'),
+                    child_pokemon.evolves_from_pokemon_id.label('parent_id'),
                     func.count('*').label('child_count'),
                 ) \
-                .group_by(child_evolution.from_pokemon_id) \
+                .group_by(child_pokemon.evolves_from_pokemon_id) \
                 .subquery()
 
             query = query.outerjoin((child_subquery,
@@ -887,12 +887,12 @@ class PokedexSearchController(PokedexBaseController):
 
             if u'branched' in c.form.evolution_special.data:
                 # Need to join to..  siblings.  Ugh.
-                sibling_evolution = aliased(tables.PokemonEvolution)
+                sibling_pokemon = aliased(tables.Pokemon)
                 sibling_subquery = db.pokedex_session.query(
-                    sibling_evolution.from_pokemon_id.label('parent_id'),
+                    sibling_pokemon.evolves_from_pokemon_id.label('parent_id'),
                     func.count('*').label('sibling_count'),
                 ) \
-                    .group_by(sibling_evolution.from_pokemon_id) \
+                    .group_by(sibling_pokemon.evolves_from_pokemon_id) \
                     .subquery()
 
                 query = query.outerjoin((
