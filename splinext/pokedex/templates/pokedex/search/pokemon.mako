@@ -412,7 +412,7 @@ ${h.pokedex.type_link(type)}
 
 <%def name="col_gender()"><col class="dex-col-gender"></%def>
 <%def name="th_gender()"><th>${_(u"Gender")}</th></%def>
-<%def name="td_gender(pokemon)"><td>${h.pokedex.pokedex_img('gender-rates/%d.png' % pokemon.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.gender_rate])}</td></%def>
+<%def name="td_gender(pokemon)"><td>${h.pokedex.chrome_img('gender-rates/%d.png' % pokemon.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.gender_rate])}</td></%def>
 
 <%def name="col_egg_group()"><col class="dex-col-egg-group"></%def>
 <%def name="th_egg_group()"><th>${_(u"Egg Group")}</th></%def>
@@ -502,7 +502,7 @@ ${pokemon.habitat}\
 <%def name="th_shape()"><th>${_(u"Shape")}</th></%def>
 <%def name="td_shape(pokemon)"><td class="icon">
 % if pokemon.shape:
-${h.pokedex.pokedex_img('chrome/shapes/%d.png' % pokemon.shape.id, title=pokemon.shape.awesome_name, alt='')}
+${h.pokedex.pokedex_img('shapes/%s.png' % pokemon.shape.identifier, title=pokemon.shape.awesome_name, alt='')}
 % endif
 </td></%def>
 

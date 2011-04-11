@@ -350,18 +350,20 @@ class PokedexController(PokedexBaseController):
             image = None
             if isinstance(row, tables.Pokemon):
                 if row.form_name:
-                    image = u"icons/{0}-{1}.png".format(row.normal_form.id, row.form_name.lower())
+                    image = u"pokemon/icons/{0}-{1}.png".format(row.normal_form.id, row.form_name.lower())
                 else:
-                    image = u"icons/{0}.png".format(row.normal_form.id)
+                    image = u"pokemon/icons/{0}.png".format(row.normal_form.id)
             elif isinstance(row, tables.PokemonForm):
                 if row.name:
-                    image = u"icons/{0}-{1}.png".format(row.form_base_pokemon_id, row.name.lower())
+                    image = u"pokemon/icons/{0}-{1}.png".format(row.form_base_pokemon_id, row.name.lower())
                 else:
-                    image = u"icons/{0}.png".format(row.form_base_pokemon_id)
+                    image = u"pokemon/icons/{0}.png".format(row.form_base_pokemon_id)
             elif isinstance(row, tables.Move):
-                image = u"chrome/types/{0}.png".format(row.type.name.lower())
+                image = u"types/{1}/{0}.png".format(row.type.name.lower(),
+                        c.game_language.identifier)
             elif isinstance(row, tables.Type):
-                image = u"chrome/types/{0}.png".format(row.name.lower())
+                image = u"types/{1}/{0}.png".format(row.name.lower(),
+                        c.game_language.identifier)
             elif isinstance(row, tables.Item):
                 image = u"items/{0}.png".format(
                     pokedex_helpers.filename_from_name(row.name))
