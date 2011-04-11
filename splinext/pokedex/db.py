@@ -87,7 +87,8 @@ def pokemon_query(name, form=None):
     if form:
         # If a form has been specified, it must match
         q = q.join(tables.Pokemon.unique_form) \
-            .filter(tables.PokemonForm.form == form)
+            .join(tables.PokemonForm.names_local) \
+            .filter(func.lower(tables.PokemonForm.names_table.name) == form)
     else:
         # If there's NOT a form, just make sure we get a form base Pokémon
         # TODO wtf is this any() for?
