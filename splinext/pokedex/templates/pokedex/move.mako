@@ -159,9 +159,10 @@ ${h.h1(_('Effect'))}
 ${c.move.effect}
 </div>
 
+<% meta = c.move.meta %>
+% if meta:
 <h2>Meta</h2>
 <p><em>This reflects how the games treat moves and may be somewhat idealistic.</em></p>
-<% meta = c.move.meta %>
 <ul class="classic-list">
     <li>
         <a href="${url(controller='dex_search', action='move_search', category=meta.category.identifier)}">
@@ -239,7 +240,7 @@ ${c.move.effect}
     </li>
     % endif
 </ul>
-
+% endif
 
 % if c.move.changelog or c.move.move_effect.changelog:
 ${h.h1(_('History'))}
