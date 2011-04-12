@@ -1023,7 +1023,7 @@ class PokedexSearchController(PokedexBaseController):
 
             # Asterisk at the beginning is secret code to make this a
             # traditional list
-            if list_format[0] == u'*':
+            if list_format and list_format[0] == u'*':
                 c.display_mode = 'custom-list-bullets'
                 list_format = list_format[1:]
 
