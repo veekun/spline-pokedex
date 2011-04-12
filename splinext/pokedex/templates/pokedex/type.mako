@@ -85,7 +85,7 @@ Roost and one of these only through the use of [Mimic]{move}, [Sketch]{move}, [R
 Generation IV has [sprites for a ???-type Arceus](%s), even though Arceus cannot become ???-type through regular play.
 Eggs are purely ???-type before hatching before Generation V, and are displayed as such in the Generation III status
 screen.  In Generation V, the ??? type no longer exists.
-""") % url(controller='dex', action='pokemon_flavor', name='arceus', form='???')).as_html | n}
+""") % url(controller='dex', action='pokemon_flavor', name='arceus', form='???'))}
 </div>
 % elif c.type.name == 'Shadow':
 <p>Shadow Pokémon are Pokémon whose hearts have been closed in Pokémon Colosseum and Pokémon XD: Gale of Darkness.  The

@@ -36,14 +36,14 @@ ${h.h1(_('Essentials'))}
 <div class="dex-page-beside-portrait">
     <h2>${_("Summary")}</h2>
     <div class="markdown">
-        ${c.ability.short_effect.as_html | n}
+        ${c.ability.short_effect}
     </div>
 </div>
 
 
 ${h.h1(_('Effect'))}
 <div class="markdown">
-    ${c.ability.effect.as_html | n}
+    ${c.ability.effect}
 </div>
 
 % if c.moves:
@@ -71,7 +71,7 @@ ${h.h1(_('History'))}
 <dl>
     % for change in c.ability.changelog:
     <dt>${_('Before %s') % h.pokedex.version_icons(*change.changed_in.versions) | n}</dt>
-    <dd class="markdown">${change.effect.as_html | n}</dd>
+    <dd class="markdown">${change.effect}</dd>
     % endfor
 </dl>
 % endif

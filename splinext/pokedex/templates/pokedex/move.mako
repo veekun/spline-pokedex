@@ -40,7 +40,7 @@ ${h.h1(_('Essentials'))}
 <div class="dex-page-beside-portrait">
     <h2>${_(u"Summary")}</h2>
     <div class="markdown">
-        ${h.literal(c.move.short_effect.as_html)}
+        ${c.move.short_effect}
     </div>
 
     <h2>${_(u"Damage Dealt")}</h2>
@@ -115,7 +115,7 @@ ${h.h1(_('Essentials'))}
         <li>
             <a href="${url(controller='dex_search', action='move_search', **search_query)}">${flag.name}</a>
             <div class="markdown">
-                ${h.literal(flag.description.as_html)}
+                ${flag.description}
             </div>
         </li>
         % else:
@@ -156,7 +156,7 @@ ${h.h1(_('Essentials'))}
 
 ${h.h1(_('Effect'))}
 <div class="markdown">
-${h.literal(c.move.effect.as_html)}
+${c.move.effect}
 </div>
 
 <h2>Meta</h2>

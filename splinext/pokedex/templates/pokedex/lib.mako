@@ -265,7 +265,7 @@ ${h.pokedex.pokemon_image(pokemon.form, prefix='icons')}\
 % else:
 <td class="dex-priority-slow">${move.priority}</td>
 % endif
-<td class="markdown effect">${move.short_effect.as_html | n}</td>
+<td class="markdown effect">${move.short_effect}</td>
 </%def>
 
 <%def name="move_table_blank_row()">

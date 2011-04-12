@@ -44,7 +44,7 @@ ${h.h1(_('Essentials'))}
 <h2>${_(u"Abilities")}</h2>
 <%def name="_render_ability(ability, _=_)">
     <dt><a href="${url(controller='dex', action='abilities', name=ability.name.lower())}">${ability.name}</a></dt>
-    <dd class="markdown">${ability.short_effect.as_html | n}</dd>
+    <dd class="markdown">${ability.short_effect}</dd>
 </%def>
 <dl class="pokemon-abilities">
     % for ability in c.pokemon.abilities:
@@ -302,7 +302,7 @@ ${h.h1(_('Evolution'))}
     <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_image(form, 'black-white'), form=form.name, class_=link_class)}</li>
     % endfor
 </ul>
-<p> ${(c.pokemon.normal_form.form_group.description).as_html | n} </p>
+<p> ${c.pokemon.normal_form.form_group.description} </p>
 % endif
 
 ${h.h1(_('Stats'))}
@@ -540,7 +540,7 @@ ${h.h1(_('Locations'))}
         ## Sort method by name
         % for method, area_condition_encounters in h.keysort(method_etc, lambda k: k.id):
         <div class="dex-simple-encounters-method">
-            ${h.pokedex.pokedex_img('encounters/' + c.encounter_method_icons.get(method.name, 'unknown.png'), \
+            ${h.pokedex.pokedex_img('encounters/' + c.encounter_method_icons.get(method.identifier, 'unknown.png'), \
                                     alt=method.name)}
             <ul>
                 ## Sort locations by name
