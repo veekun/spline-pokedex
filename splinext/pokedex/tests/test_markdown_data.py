@@ -1,6 +1,7 @@
 # encoding: utf8
 from __future__ import unicode_literals
 
+from markupsafe import escape
 from nose.tools import ok_
 import pylons.test
 
@@ -47,7 +48,7 @@ class TestMarkdownData(SplineTest):
             key = "{0} / {1}".format(table.name, data[1:])
 
             # Test 1: HTML conversion shouldn't crash!
-            html = mdtext.as_html
+            html = escape(mdtext)
 
             # Test 2: It almost certainly shouldn't have brackets or braces;
             # those are going to be junk left over from mistyped markup
