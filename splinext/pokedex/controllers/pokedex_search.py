@@ -596,7 +596,7 @@ class PokedexSearchController(PokedexBaseController):
 
         ### Do the searching!
         me = tables.Pokemon
-        query = db.pokedex_session.query(me)
+        query = db.pokedex_session.query(me).join(me.names_local)
 
         # Several joins need to know the base form
         base_form = tables.PokemonForm
@@ -647,7 +647,7 @@ class PokedexSearchController(PokedexBaseController):
             if ' ' in name:
                 # Hmm.  If there's a space, it might be a form name
                 form_name, name_sans_form = name.split(' ', 1)
-                query = query.join(me.names_local).join(base_form.names_local).filter(
+                query = query.join(base_form.names_local).filter(
                     or_(
                         # Either it was a form name...
                         and_(
@@ -660,8 +660,7 @@ class PokedexSearchController(PokedexBaseController):
                 )
             else:
                 # Business as usual
-                query = query.join(me.names_local) \
-                    .filter( ilike(me.names_table.name, name) )
+                query = query.filter( ilike(me.names_table.name, name) )
 
         # Ability
         if c.form.ability.data:
@@ -981,7 +980,7 @@ class PokedexSearchController(PokedexBaseController):
 
         # Species string
         if c.form.species.data:
-            query = query.join(me.names_local).filter(ilike(me.names_table.species, c.form.species.data))
+            query = query.filter(ilike(me.names_table.species, c.form.species.data))
 
         # Color
         if c.form.color.data:
@@ -1167,7 +1166,6 @@ class PokedexSearchController(PokedexBaseController):
             sort_clauses.insert(0, me.gender_rate.asc())
 
         elif c.form.sort.data == 'species':
-            query = query.join(me.names_local)
             sort_clauses.insert(0, me.names_table.species.asc())
 
         elif c.form.sort.data == 'color':
@@ -1336,7 +1334,7 @@ class PokedexSearchController(PokedexBaseController):
 
         # Name
         if c.form.name.data:
-            query = query.join(me.names_local).filter( ilike(me.names_table.name, c.form.name.data) )
+            query = query.filter( ilike(me.names_table.name, c.form.name.data) )
 
         # Damage class
         if c.form.damage_class.data:
