@@ -42,10 +42,10 @@ def connect(config):
 
 
 # Quick access to a few database objects
-def get_by_identifier_query(table, identifier, query=None):
+def get_by_identifier_query(table, identifier):
     """Returns a query to find a single row in the given table by identifier.
 
-    Don't use this for Pokémon!  Use `pokemon_query(use_identifier=True)`,
+    Don't use this for Pokémon!  Use `pokemon_identifier_query()`,
     as it knows about forms.
     """
 
@@ -57,6 +57,23 @@ def get_by_identifier_query(table, identifier, query=None):
                 table.identifier == identifier)
 
     return query
+
+def pokemon_identifier_query(identifier, form=None):
+    """Returns a query that will look for the Pokémon with the given identifier.
+    """
+
+    q = get_by_identifier_query(tables.Pokemon, identifier)
+
+    if form:
+        # If a form has been specified, it must match
+        q = q.join(tables.Pokemon.unique_form) \
+            .filter(tables.PokemonForm.identifier == form)
+    else:
+        # If there's NOT a form, just make sure we get a form base Pokémon
+        # TODO wtf is this any() for?
+        q = q.filter(tables.Pokemon.forms.any())
+
+    return q
 
 def get_by_name_query(table, name, query=None):
     """Returns a query to find a single row in the given table by name,

@@ -86,7 +86,7 @@ class PokedexBaseController(BaseController):
             db.pokedex_session.remove()
 
 
-### Extend markdown to turn [Eevee]{pokemon} into a link in effects and
+### Extend markdown to turn [Eevee]{pokemon:eevee} into a link in effects and
 ### descriptions
 
 class PokedexLinkPattern(markdown.inlinepatterns.Pattern):
@@ -95,36 +95,32 @@ class PokedexLinkPattern(markdown.inlinepatterns.Pattern):
         self.thingy_table = table
         self.thingy_type = table.__name__
 
-        # Match [target]{tablename} and [label]{tablename:target}
-        regex = ur'(?x) \[ ([^]]+) \] \s* \{' + table.__singlename__ + ur'(?: :([^}]+) )? \}'
+        # Match [label]{tablename:target}
+        regex = ur'(?x) \[ ([^]]+) \] \s* \{' + table.__singlename__ + ur':([^}]+) \}'
 
         # old-style classes augh!
         markdown.inlinepatterns.Pattern.__init__(self, regex)
 
     def handleMatch(self, m):
-        if m.group(3):
-            # [A]{foo:B} -- A is the label, B is the target
-            manual_label = m.group(2)
-            target = m.group(3)
-        else:
-            # [A]{foo} -- A is the label and the target
-            manual_label = None
-            target = m.group(2)
+        # [A]{foo:B} -- A is the label, B is the target
+        manual_label = m.group(2)
+        target = m.group(3)
 
         # Find the thingy and figure out its URL
         if self.thingy_type.lower() == u'pokemon':
-            query = splinext.pokedex.db.pokemon_query(target)
+            query = splinext.pokedex.db.pokemon_identifier_query(target)
         else:
-            query = splinext.pokedex.db.get_by_name_query(self.thingy_table, target)
+            query = splinext.pokedex.db.get_by_identifier_query(
+                    self.thingy_table, target)
 
         try:
             obj = query.one()
         except NoResultFound:
-            raise ValueError("Nothing matches [%s]{%s}" %
-                (target, self.thingy_table.__singlename__))
+            raise ValueError("Nothing matches [%s]{%s:%s}" %
+                (manual_label, self.thingy_table.__singlename__, target))
         except MultipleResultsFound:
-            raise ValueError("Too many matches for [%s]{%s}" %
-                (target, self.thingy_table.__singlename__))
+            raise ValueError("Too many matches for [%s]{%s:%s}" %
+                (manual_label, self.thingy_table.__singlename__, target))
 
         name = obj.name
         url = pokedex_helpers.make_thingy_url(obj)
