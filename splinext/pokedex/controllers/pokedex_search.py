@@ -1541,6 +1541,7 @@ class PokedexSearchController(PokedexBaseController):
             eagerload('type'),
             eagerload('damage_class'),
             eagerload('move_effect'),
+            eagerload('move_effect.prose_local'),
         )
 
         c.results = query.all()
