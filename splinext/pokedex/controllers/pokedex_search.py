@@ -1329,6 +1329,7 @@ class PokedexSearchController(PokedexBaseController):
         ### Do the searching!
         me = tables.Move
         query = db.pokedex_session.query(me) \
+            .join(me.names_local) \
             .join(tables.MoveEffect) \
             .join(tables.MoveMeta)
 
@@ -1490,8 +1491,7 @@ class PokedexSearchController(PokedexBaseController):
         # nb: the below sort ascending for words (a->z) and descending for
         # numbers (9->1), because that's how it should be, okay
         # Default fallback sort is by name, then by id (in case of form)
-        # XXX: Use name, not identifier
-        sort_clauses = [ me.identifier.asc(), me.id.asc() ]
+        sort_clauses = [ me.names_table.name.asc(), me.id.asc() ]
         if c.form.sort.data == 'id':
             sort_clauses.insert(0,
                 me.id.asc()
