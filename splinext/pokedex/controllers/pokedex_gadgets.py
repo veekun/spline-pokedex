@@ -860,8 +860,12 @@ class PokedexGadgetsController(PokedexBaseController):
 
         # Possible shorten and redirect
         if c.form.needs_shortening:
-            redirect(h.update_params(url.current(),
-                **c.form.short_formdata.mixed()))
+            # This is stupid, but update_params doesn't understand unicode
+            kwargs = c.form.short_formdata.dict_of_lists()
+            for key, vals in kwargs.iteritems():
+                kwargs[key] = [unicode(val).encode('utf8') for val in vals]
+
+            redirect(h.update_params(url.current(), **kwargs))
 
         def filter_genes(genes, f):
             """Teeny helper function to only keep possible genes that fit the
