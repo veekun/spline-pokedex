@@ -189,7 +189,7 @@ class StatCalculatorForm(Form):
 
         if self.needs_shortening:
             # Strip out form data that doesn't need to exist
-            sfd = self.short_formdata = formdata.copy()
+            sfd = self.short_formdata = formdata.copy().dict_of_lists()
             del sfd['shorten']
 
             # Shorten the stat fields down to pipe-delimited
@@ -861,7 +861,7 @@ class PokedexGadgetsController(PokedexBaseController):
         # Possible shorten and redirect
         if c.form.needs_shortening:
             # This is stupid, but update_params doesn't understand unicode
-            kwargs = c.form.short_formdata.dict_of_lists()
+            kwargs = c.form.short_formdata
             for key, vals in kwargs.iteritems():
                 kwargs[key] = [unicode(val).encode('utf8') for val in vals]
 
