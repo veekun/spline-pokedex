@@ -119,11 +119,11 @@ ${h.end_form()}
     ${subheader_row(_('Flavor'), 'flavor')}
 
     <tr class="size">
-        <th>${h.pokedex.pokedex_img('chrome/trainer-male.png', alt='${_(u"Trainer dude")}', style="height: %.2f%%" % (c.heights['trainer'] * 100))}</th>
+        <th>${h.pokedex.chrome_img('trainer-male.png', alt='${_(u"Trainer dude")}', style="height: %.2f%%" % (c.heights['trainer'] * 100))}</th>
         % for i, found_pokemon in enumerate(c.found_pokemon):
         <td>
             % if found_pokemon.pokemon:
-            ${h.pokedex.pokemon_image(found_pokemon.form, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.heights[i] * 100))}
+            ${h.pokedex.pokemon_image(found_pokemon.form, prefix='cropped', style="height: %.2f%%;" % (c.heights[i] * 100))}
             % endif
         </td>
         % endfor
@@ -131,11 +131,11 @@ ${h.end_form()}
     ${row(_(u'Height'), height_cell, class_='dex-compare-flavor-text')}
 
     <tr class="size">
-        <th>${h.pokedex.pokedex_img('chrome/trainer-female.png', alt='${_(u"Trainer dudette")}', style="height: %.2f%%" % (c.weights['trainer'] * 100))}</th>
+        <th>${h.pokedex.chrome_img('trainer-female.png', alt='${_(u"Trainer dudette")}', style="height: %.2f%%" % (c.weights['trainer'] * 100))}</th>
         % for i, found_pokemon in enumerate(c.found_pokemon):
         <td>
             % if found_pokemon.pokemon:
-            ${h.pokedex.pokemon_image(found_pokemon.form, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.weights[i] * 100))}
+            ${h.pokedex.pokemon_image(found_pokemon.form, prefix='cropped', style="height: %.2f%%;" % (c.weights[i] * 100))}
             % endif
         </td>
         % endfor
@@ -276,7 +276,7 @@ ${move_table_header()}
 </%def>
 
 <%def name="gender_cell(pokemon)">
-${h.pokedex.pokedex_img('gender-rates/%d.png' % pokemon.gender_rate, alt='')}<br>
+${h.pokedex.chrome_img('gender-rates/%d.png' % pokemon.gender_rate, alt='')}<br>
 ${h.pokedex.gender_rate_label[pokemon.gender_rate]}
 </%def>
 
@@ -318,7 +318,7 @@ ${h.pokedex.format_weight_metric(pokemon.weight)}
 <%def name="color_cell(pokemon)"><span class="dex-color-${pokemon.color}"></span> ${pokemon.color}</%def>
 <%def name="habitat_cell(pokemon)">
 % if pokemon.generation.id <= 3:
-${h.pokedex.pokedex_img('chrome/habitats/%s.png' % h.pokedex.filename_from_name(pokemon.habitat), \
+${h.pokedex.pokedex_img('habitats/%s.png' % h.pokedex.filename_from_name(pokemon.habitat), \
     alt='', title=pokemon.habitat)}<br>
 % else:
 n/a
@@ -329,7 +329,7 @@ n/a
 
 <%def name="shape_cell(pokemon)">
 % if pokemon.shape:
-${h.pokedex.pokedex_img('chrome/shapes/%d.png' % pokemon.shape.id, alt='', title=pokemon.shape.name)}<br>
+${h.pokedex.pokedex_img('shapes/%s.png' % pokemon.shape.identifier, alt='', title=pokemon.shape.name)}<br>
 ${pokemon.shape.awesome_name}
 % else:
 n/a

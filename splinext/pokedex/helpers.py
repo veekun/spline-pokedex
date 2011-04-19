@@ -173,12 +173,14 @@ def filename_from_name(name):
         return u'data-card'
 
     name = re.sub(u'[ _]+', u'-', name)
-    name = re.sub(u'[\'.]', u'', name)
+    name = re.sub(u'[\'.()]', u'', name)
     return name
 
 def pokedex_img(src, **attr):
     return h.HTML.img(src=url(controller='dex', action='media', path=src), **attr)
 
+def chrome_img(src, **attr):
+    return h.HTML.img(src=h.static_uri('pokedex', 'images/' + src), **attr)
 
 # XXX Should these be able to promote to db objects, rather than demoting to
 # strings and integers?  If so, how to do that without requiring db access
@@ -189,9 +191,10 @@ def generation_icon(generation, _=_):
     if not isinstance(generation, int):
         generation = generation.id
 
-    return pokedex_img('versions/generation-%d.png' % generation,
-                       alt=_(u"Generation %d") % generation,
-                       title=_(u"Generation %d") % generation)
+
+    return chrome_img('versions/generation-%s.png' % generation,
+            alt=_(u"Generation %d") % generation,
+            title=_(u"Generation %d") % generation)
 
 def version_icons(*versions, **kwargs):
     """Returns some version icons, given a list of version names.
@@ -205,13 +208,17 @@ def version_icons(*versions, **kwargs):
     comma = chain([u''], repeat(u', '))
     for version in versions:
         # Convert version to string if necessary
-        if not isinstance(version, basestring):
-            version = version.name
+        if isinstance(version, basestring):
+            identifier = filename_from_name(version)
+            name = version
+        else:
+            identifier = version.identifier
+            name = version.name
 
-        version_filename = filename_from_name(version)
-        version_icons += pokedex_img(u'versions/%s.png' % version_filename,
-                                     alt=comma.next() + version,
-                                     title=version)
+        version_icons += h.HTML.img(
+                src=h.static_uri('pokedex', 'images/versions/%s.png' % identifier),
+                alt=comma.next() + name,
+                title=name)
 
     return version_icons
 
@@ -231,8 +238,7 @@ def pokemon_media_path(pokemon_form, prefix, ext, use_form=True):
     """
 
     # Leave it as None if it's null; pass it by filename_from_name otherwise
-    # XXX Temporary solution until we can use identifiers
-    form_name = pokemon_form.name and filename_from_name(pokemon_form.name)
+    form_name = pokemon_form.identifier
 
     if use_form and form_name:
         filename = '{id}-{form}.{ext}'
@@ -245,9 +251,9 @@ def pokemon_media_path(pokemon_form, prefix, ext, use_form=True):
         ext=ext
     )
 
-    return '/'.join((prefix, filename))
+    return '/'.join(('pokemon', prefix, filename))
 
-def pokemon_image(pokemon_form, prefix='black-white', use_form=True, **attr):
+def pokemon_image(pokemon_form, prefix='main-sprites/black-white', use_form=True, **attr):
     """Returns an <img> tag for a Pokémon image."""
 
     if use_form:
@@ -317,7 +323,7 @@ def pokemon_link(pokemon, content=None, to_flavor=False, **attr):
 
 def damage_class_icon(damage_class, _=_):
     return pokedex_img(
-        "chrome/damage-classes/%s.png" % damage_class.name,
+        "damage-classes/%s.png" % damage_class.name,
         alt=damage_class.name,
         title=_("%s: %s", context="damage class: description") % (
                 damage_class.name.capitalize(),
@@ -327,14 +333,22 @@ def damage_class_icon(damage_class, _=_):
 
 
 def type_icon(type):
-    if not isinstance(type, basestring):
-        type = type.name
-    return pokedex_img('chrome/types/%s.png' % type.lower(), alt=type, title=type)
+    if isinstance(type, basestring):
+        if type == '???':
+            identifier = 'unknown'
+        else:
+            identifier = type.lower()
+        name = type
+    else:
+        name = type.name
+        identifier = type.identifier
+    return pokedex_img('types/{1}/{0}.png'.format(identifier, c.game_language.identifier),
+            alt=name, title=name)
 
 def type_link(type):
     return h.HTML.a(
         type_icon(type),
-        href=url(controller='dex', action='types', name=type.name.lower()),
+        href=url(controller='dex', action='types', name=type.identifier),
     )
 
 
@@ -347,9 +361,11 @@ def item_link(item, include_icon=True, _=_):
         if item.pocket.identifier == u'machines':
             machines = item.machines
             prefix = u'hm' if machines[-1].is_hm else u'tm'
-            filename = prefix + u'-' + machines[-1].move.type.name.lower()
+            filename = prefix + u'-' + machines[-1].move.type.identifier
+        elif item.identifier.startswith(u'data-card-'):
+            filename = u'data-card'
         else:
-            filename = filename_from_name(item_name)
+            filename = item.identifier
 
         label = pokedex_img("items/%s.png" % filename,
             alt=item_name, title=item_name) + ' ' + item_name

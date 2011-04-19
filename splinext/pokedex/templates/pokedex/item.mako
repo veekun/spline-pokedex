@@ -19,8 +19,10 @@ ${h.h1(_('Essentials'))}
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.item.name}</p>
     <%
-        if c.item.appears_underground or c.item.berry:
-            sprite_path = 'items/big'
+        if c.item.berry:
+            sprite_path = 'items/berries'
+        if c.item.appears_underground:
+            sprite_path = 'items/underground'
         else:
             sprite_path = 'items'
     %>\
@@ -29,7 +31,7 @@ ${h.h1(_('Essentials'))}
     </div>
     <p id="dex-page-types">
         <a href="${url(controller='dex', action='item_pockets', pocket=c.item.pocket.identifier)}">
-            ${h.pokedex.pokedex_img(u"chrome/bag/{0}.png".format(c.item.pocket.identifier))}
+            ${h.pokedex.pokedex_img(u"item-pockets/{0}.png".format(c.item.pocket.identifier))}
             ${c.item.pocket.name}
         </a> ${_("pocket")}
     </p>
@@ -121,7 +123,7 @@ ${h.h1(_('Berry tag'))}
         <dd>
             % if berry_flavor.flavor:
             ${berry_flavor.flavor}
-            ${_("(raises %s)") % h.pokedex.pokedex_img("chrome/contest/{0}.png".format(berry_flavor.contest_type.identifier), alt=(berry_flavor.contest_type.name)) | n}
+            ${_("(raises %s)") % h.pokedex.pokedex_img("contest-flavors/{0}.png".format(berry_flavor.contest_type.identifier), alt=(berry_flavor.contest_type.name)) | n}
             % else:
             ${_(u"—")}
             % endif

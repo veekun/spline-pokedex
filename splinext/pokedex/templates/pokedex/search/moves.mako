@@ -105,7 +105,7 @@ ${h.form(url.current(), method='GET')}
                 % for a_field in c.form.damage_class:
                 <li> <label>
                     ${a_field() | n}
-                    ${h.pokedex.pokedex_img("chrome/damage-classes/{0}.png".format(a_field.data), alt=u'')}
+                    ${h.pokedex.pokedex_img("damage-classes/{0}.png".format(a_field.data), alt=u'')}
                     ${a_field.label}
                 </label> </li>
                 % endfor
@@ -120,7 +120,7 @@ ${h.form(url.current(), method='GET')}
                 % for a_field in c.form.introduced_in:
                 <li> <label>
                     ${a_field() | n}
-                    ${h.pokedex.pokedex_img("versions/generation-{0}.png".format(a_field.data), alt=u'')}
+                    ${h.pokedex.chrome_img("versions/generation-{0}.png".format(a_field.data), alt=u'')}
                     ${a_field.label}
                 </label> </li>
                 % endfor

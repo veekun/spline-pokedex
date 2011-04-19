@@ -120,7 +120,7 @@ ${h.pokedex.pokemon_image(pokemon.form, prefix='icons')}\
   % endif
 </td>
 % elif method.name == 'Egg':
-<td class="dex-moves-egg">${h.pokedex.pokedex_img('icons/egg-cropped.png', alt=u"&bull;")}</td>
+<td class="dex-moves-egg">${h.pokedex.chrome_img('egg-cropped.png', alt=u"&bull;")}</td>
 % else:
 <td>&bull;</td>
 % endif
@@ -183,7 +183,7 @@ ${h.pokedex.pokemon_image(pokemon.form, prefix='icons')}\
     <em>${_pokemon_ability_link(pokemon.dream_ability)}</em>
   % endif
 </td>
-<td>${h.pokedex.pokedex_img('gender-rates/%d.png' % pokemon.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.gender_rate])}</td>
+<td>${h.pokedex.chrome_img('gender-rates/%d.png' % pokemon.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.gender_rate])}</td>
 <td class="egg-group">
   % for i, egg_group in enumerate(pokemon.egg_groups):
     % if i > 0:

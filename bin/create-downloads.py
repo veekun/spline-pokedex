@@ -43,222 +43,226 @@ def create_downloads():
     os.unlink(db_filename)
 
     # Per-generation Pokémon tarballs
-    make_tarball('generation-1.tar.gz', ['red-green', 'red-blue', 'yellow'])
-    make_tarball('generation-2.tar.gz', ['gold', 'silver', 'crystal'])
-    make_tarball('generation-3.tar.gz', ['ruby-sapphire', 'emerald', 'firered-leafgreen'])
-    make_tarball('generation-4.tar.gz', ['diamond-pearl', 'platinum', 'heartgold-soulsilver'])
-    make_tarball('generation-5.tar.gz', ['black-white'])
+    main_tarball('generation-1.tar.gz', ['red-green', 'red-blue', 'yellow'])
+    main_tarball('generation-2.tar.gz', ['gold', 'silver', 'crystal'])
+    main_tarball('generation-3.tar.gz', ['ruby-sapphire', 'emerald', 'firered-leafgreen'])
+    main_tarball('generation-4.tar.gz', ['diamond-pearl', 'platinum', 'heartgold-soulsilver'])
+    main_tarball('generation-5.tar.gz', ['black-white'])
 
     # Other Pokémon stuff
-    make_tarball('overworld.tar.gz', ['overworld'])
-    make_tarball('pokemon-cries.tar.gz', ['cries'])
-    make_tarball('pokemon-sugimori.tar.gz', ['sugimori'])
-    make_tarball('pokemon-footprints.tar.gz', ['footprints'])
-    make_tarball('pokemon-trozei.tar.gz', ['trozei'])
-    make_tarball('pokemon-icons.tar.gz', ['icons'])
+    make_tarball('overworld.tar.gz', ['pokemon/overworld'])
+    make_tarball('pokemon-cries.tar.gz', ['pokemon/cries'])
+    make_tarball('pokemon-sugimori.tar.gz', ['pokemon/sugimori'])
+    make_tarball('pokemon-footprints.tar.gz', ['pokemon/footprints'])
+    make_tarball('pokemon-trozei.tar.gz', ['pokemon/trozei'])
+    make_tarball('pokemon-icons.tar.gz', ['pokemon/icons'])
 
     # Not Pokémon at all!
     make_tarball('chrome.tar.gz', ['chrome', 'ribbons'])
     make_tarball('items.tar.gz', ['items'])
 
     # Bunch o' montages
-    make_montage('red-green.png',       'red-green/gray/{0}.png',   56, 151)
-    make_montage('red-green-sgb.png',   'red-green/{0}.png',        56, 151)
-    make_montage('red-blue.png',        'red-blue/gray/{0}.png',    56, 151)
-    make_montage('red-blue-sgb.png',    'red-blue/{0}.png',         56, 151)
-    make_montage('yellow.png',          'yellow/gray/{0}.png',      56, 151)
-    make_montage('yellow-sgb.png',      'yellow/{0}.png',           56, 151)
-    make_montage('yellow-gbc.png',      'yellow/gbc/{0}.png',       56, 151)
-    make_montage('generation-1-back.png',
+    main_montage('red-green.png',       'red-green/gray/{0}.png',   56, 151)
+    main_montage('red-green-sgb.png',   'red-green/{0}.png',        56, 151)
+    main_montage('red-blue.png',        'red-blue/gray/{0}.png',    56, 151)
+    main_montage('red-blue-sgb.png',    'red-blue/{0}.png',         56, 151)
+    main_montage('yellow.png',          'yellow/gray/{0}.png',      56, 151)
+    main_montage('yellow-sgb.png',      'yellow/{0}.png',           56, 151)
+    main_montage('yellow-gbc.png',      'yellow/gbc/{0}.png',       56, 151)
+    main_montage('generation-1-back.png',
         'red-blue/back/gray/{0}.png',       32, 151)
-    make_montage('red-green-blue-back-sgb.png',
+    main_montage('red-green-blue-back-sgb.png',
         'red-blue/back/{0}.png',            32, 151)
-    make_montage('yellow-back-sgb.png', 'yellow/back/{0}.png',      32, 151)
-    make_montage('yellow-back-gbc.png', 'yellow/back/gbc/{0}.png',  32, 151)
+    main_montage('yellow-back-sgb.png', 'yellow/back/{0}.png',      32, 151)
+    main_montage('yellow-back-gbc.png', 'yellow/back/gbc/{0}.png',  32, 151)
 
-    make_montage('gold.png',            'gold/{0}.png',             56, 251)
-    make_montage('gold-shiny.png',      'gold/shiny/{0}.png',       56, 251)
-    make_montage('silver.png',          'silver/{0}.png',           56, 251)
-    make_montage('silver-shiny.png',    'silver/shiny/{0}.png',     56, 251)
-    make_montage('crystal.png',         'crystal/{0}.png',          56, 251)
-    make_montage('crystal-shiny.png',   'crystal/shiny/{0}.png',    56, 251)
-    make_montage('gold-silver-back.png',
+    main_montage('gold.png',            'gold/{0}.png',             56, 251)
+    main_montage('gold-shiny.png',      'gold/shiny/{0}.png',       56, 251)
+    main_montage('silver.png',          'silver/{0}.png',           56, 251)
+    main_montage('silver-shiny.png',    'silver/shiny/{0}.png',     56, 251)
+    main_montage('crystal.png',         'crystal/{0}.png',          56, 251)
+    main_montage('crystal-shiny.png',   'crystal/shiny/{0}.png',    56, 251)
+    main_montage('gold-silver-back.png',
         'silver/back/{0}.png',              48, 251)
-    make_montage('gold-silver-back-shiny.png',
+    main_montage('gold-silver-back-shiny.png',
         'silver/back/shiny/{0}.png',        48, 251)
-    make_montage('crystal-back.png',
+    main_montage('crystal-back.png',
         'crystal/back/{0}.png',              48, 251)
-    make_montage('crystal-back-shiny.png',
+    main_montage('crystal-back-shiny.png',
         'crystal/back/shiny/{0}.png',        48, 251)
 
-    make_montage('generation-3.png',
+    main_montage('generation-3.png',
         'ruby-sapphire/{0}.png',            64, 386, transparent=True)
-    make_montage('generation-3-shiny.png',
+    main_montage('generation-3-shiny.png',
         'ruby-sapphire/shiny/{0}.png',      64, 386, transparent=True)
-    make_montage('emerald-frame2.png',
+    main_montage('emerald-frame2.png',
         'emerald/frame2/{0}.png',           64, 386, transparent=True)
-    make_montage('emerald-frame2-shiny.png',
+    main_montage('emerald-frame2-shiny.png',
         'emerald/shiny/frame2/{0}.png',     64, 386, transparent=True)
-    make_montage('firered-leafgreen.png',
+    main_montage('firered-leafgreen.png',
         'firered-leafgreen/{0}.png',        64, 151, transparent=True)
-    make_montage('firered-leafgreen-shiny.png',
+    main_montage('firered-leafgreen-shiny.png',
         'firered-leafgreen/shiny/{0}.png',  64, 151, transparent=True)
-    make_montage('generation-3-back.png',
+    main_montage('generation-3-back.png',
         'ruby-sapphire/back/{0}.png',       64, 386, transparent=True)
-    make_montage('generation-3-back-shiny.png',
+    main_montage('generation-3-back-shiny.png',
         'ruby-sapphire/back/shiny/{0}.png', 64, 386, transparent=True)
-    make_montage('firered-leafgreen-back.png',
+    main_montage('firered-leafgreen-back.png',
         'firered-leafgreen/back/{0}.png',   64, 151, transparent=True)
-    make_montage('firered-leafgreen-back-shiny.png',
+    main_montage('firered-leafgreen-back-shiny.png',
         'firered-leafgreen/back/shiny/{0}.png', 64, 151, transparent=True)
 
-    make_montage('diamond-pearl.png',
+    main_montage('diamond-pearl.png',
         'diamond-pearl/{0}.png',            80, 493, transparent=True)
-    make_montage('diamond-pearl-shiny.png',
+    main_montage('diamond-pearl-shiny.png',
         'diamond-pearl/shiny/{0}.png',      80, 493, transparent=True)
-    make_montage('diamond-pearl-frame2.png',
+    main_montage('diamond-pearl-frame2.png',
         'diamond-pearl/frame2/{0}.png',     80, 493, transparent=True)
-    make_montage('diamond-pearl-shiny-frame2.png',
+    main_montage('diamond-pearl-shiny-frame2.png',
         'diamond-pearl/shiny/frame2/{0}.png', 80, 493, transparent=True)
-    make_montage('platinum.png',
+    main_montage('platinum.png',
         'platinum/{0}.png',                 80, 493, transparent=True)
-    make_montage('platinum-shiny.png',
+    main_montage('platinum-shiny.png',
         'platinum/shiny/{0}.png',           80, 493, transparent=True)
-    make_montage('platinum-frame2.png',
+    main_montage('platinum-frame2.png',
         'platinum/frame2/{0}.png',          80, 493, transparent=True)
-    make_montage('platinum-shiny-frame2.png',
+    main_montage('platinum-shiny-frame2.png',
         'platinum/shiny/frame2/{0}.png',    80, 493, transparent=True)
-    make_montage('heartgold-soulsilver.png',
+    main_montage('heartgold-soulsilver.png',
         'heartgold-soulsilver/{0}.png',     80, 493, transparent=True)
-    make_montage('heartgold-soulsilver-shiny.png',
+    main_montage('heartgold-soulsilver-shiny.png',
         'heartgold-soulsilver/shiny/{0}.png', 80, 493, transparent=True)
-    make_montage('heartgold-soulsilver-frame2.png',
+    main_montage('heartgold-soulsilver-frame2.png',
         'heartgold-soulsilver/frame2/{0}.png', 80, 493, transparent=True)
-    make_montage('heartgold-soulsilver-shiny-frame2.png',
+    main_montage('heartgold-soulsilver-shiny-frame2.png',
         'heartgold-soulsilver/shiny/frame2/{0}.png', 80, 493, transparent=True)
-    make_montage('diamond-pearl-back.png',
+    main_montage('diamond-pearl-back.png',
         'diamond-pearl/back/{0}.png',       80, 493, transparent=True)
-    make_montage('diamond-pearl-back-shiny.png',
+    main_montage('diamond-pearl-back-shiny.png',
         'diamond-pearl/back/shiny/{0}.png', 80, 493, transparent=True)
-    make_montage('platinum-back.png',
+    main_montage('platinum-back.png',
         'platinum/back/{0}.png',            80, 493, transparent=True)
-    make_montage('platinum-back-shiny.png',
+    main_montage('platinum-back-shiny.png',
         'platinum/back/shiny/{0}.png',      80, 493, transparent=True)
-    make_montage('platinum-back-frame2.png',
+    main_montage('platinum-back-frame2.png',
         'platinum/back/frame2/{0}.png',     80, 493, transparent=True)
-    make_montage('platinum-back-shiny-frame2.png',
+    main_montage('platinum-back-shiny-frame2.png',
         'platinum/back/shiny/frame2/{0}.png', 80, 493, transparent=True)
-    make_montage('heartgold-soulsilver-back.png',
+    main_montage('heartgold-soulsilver-back.png',
         'heartgold-soulsilver/back/{0}.png', 80, 493, transparent=True)
-    make_montage('heartgold-soulsilver-back-shiny.png',
+    main_montage('heartgold-soulsilver-back-shiny.png',
         'heartgold-soulsilver/back/shiny/{0}.png', 80, 493, transparent=True)
-    make_montage('heartgold-soulsilver-back-frame2.png',
+    main_montage('heartgold-soulsilver-back-frame2.png',
         'heartgold-soulsilver/back/frame2/{0}.png', 80, 493, transparent=True)
-    make_montage('heartgold-soulsilver-back-shiny-frame2.png',
+    main_montage('heartgold-soulsilver-back-shiny-frame2.png',
         'heartgold-soulsilver/back/shiny/frame2/{0}.png', 80, 493, transparent=True)
 
-    make_montage('black-white.png',
+    main_montage('black-white.png',
         'black-white/{0}.png', 96, 649, transparent=True)
-    make_montage('black-white-shiny.png',
+    main_montage('black-white-shiny.png',
         'black-white/shiny/{0}.png', 96, 649, transparent=True)
-    make_montage('black-white-back.png',
+    main_montage('black-white-back.png',
         'black-white/back/{0}.png', 96, 649, transparent=True)
-    make_montage('black-white-back-shiny.png',
+    main_montage('black-white-back-shiny.png',
         'black-white/back/shiny/{0}.png', 96, 649, transparent=True)
 
     # And female montages, which are a little different
     make_diff_montage(
         filename='diamond-pearl-female-diff.png',
         other_filename='diamond-pearl.png',
-        pattern='diamond-pearl/female/{0}.png',
-        fallback_pattern='diamond-pearl/{0}.png',
+        pattern='pokemon/main-sprites/diamond-pearl/female/{0}.png',
+        fallback_pattern='pokemon/main-sprites/diamond-pearl/{0}.png',
         sprite_size=80,
         pokemon=493,
     )
     make_diff_montage(
         filename='platinum-female-diff.png',
         other_filename='platinum.png',
-        pattern='platinum/female/{0}.png',
-        fallback_pattern='platinum/{0}.png',
+        pattern='pokemon/main-sprites/platinum/female/{0}.png',
+        fallback_pattern='pokemon/main-sprites/platinum/{0}.png',
         sprite_size=80,
         pokemon=493,
     )
     make_diff_montage(
         filename='heartgold-soulsilver-female-diff.png',
         other_filename='heartgold-soulsilver.png',
-        pattern='heartgold-soulsilver/female/{0}.png',
-        fallback_pattern='heartgold-soulsilver/{0}.png',
+        pattern='pokemon/main-sprites/heartgold-soulsilver/female/{0}.png',
+        fallback_pattern='pokemon/main-sprites/heartgold-soulsilver/{0}.png',
         sprite_size=80,
         pokemon=493,
     )
     make_diff_montage(
         filename='black-white-female-diff.png',
         other_filename='black-white.png',
-        pattern='black-white/female/{0}.png',
-        fallback_pattern='black-white/{0}.png',
+        pattern='pokemon/main-sprites/black-white/female/{0}.png',
+        fallback_pattern='pokemon/main-sprites/black-white/{0}.png',
         sprite_size=96,
         pokemon=649,
     )
     make_diff_montage(
         filename='diamond-pearl-back-female-diff.png',
         other_filename='diamond-pearl-back.png',
-        pattern='diamond-pearl/back/female/{0}.png',
-        fallback_pattern='diamond-pearl/back/{0}.png',
+        pattern='pokemon/main-sprites/diamond-pearl/back/female/{0}.png',
+        fallback_pattern='pokemon/main-sprites/diamond-pearl/back/{0}.png',
         sprite_size=80,
         pokemon=493,
     )
     make_diff_montage(
         filename='platinum-back-female-diff.png',
         other_filename='platinum-back.png',
-        pattern='platinum/back/female/{0}.png',
-        fallback_pattern='platinum/back/{0}.png',
+        pattern='pokemon/main-sprites/platinum/back/female/{0}.png',
+        fallback_pattern='pokemon/main-sprites/platinum/back/{0}.png',
         sprite_size=80,
         pokemon=493,
     )
     make_diff_montage(
         filename='heartgold-soulsilver-back-female-diff.png',
         other_filename='heartgold-soulsilver-back.png',
-        pattern='heartgold-soulsilver/back/female/{0}.png',
-        fallback_pattern='heartgold-soulsilver/back/{0}.png',
+        pattern='pokemon/main-sprites/heartgold-soulsilver/back/female/{0}.png',
+        fallback_pattern='pokemon/main-sprites/heartgold-soulsilver/back/{0}.png',
         sprite_size=80,
         pokemon=493,
     )
     make_diff_montage(
         filename='black-white-back-female-diff.png',
         other_filename='black-white-back.png',
-        pattern='black-white/back/female/{0}.png',
-        fallback_pattern='black-white/back/{0}.png',
+        pattern='pokemon/main-sprites/black-white/back/female/{0}.png',
+        fallback_pattern='pokemon/main-sprites/black-white/back/{0}.png',
         sprite_size=96,
         pokemon=649,
     )
 
     # Overworld
     make_montage('overworld-right.png',
-        'overworld/right/{0}.png', 32, 493, transparent=True)
+        'pokemon/overworld/right/{0}.png', 32, 493, transparent=True)
     make_montage('overworld-down.png',
-        'overworld/down/{0}.png', 32, 493, transparent=True)
+        'pokemon/overworld/down/{0}.png', 32, 493, transparent=True)
     make_montage('overworld-up.png',
-        'overworld/up/{0}.png', 32, 493, transparent=True)
+        'pokemon/overworld/up/{0}.png', 32, 493, transparent=True)
     make_montage('overworld-right-shiny.png',
-        'overworld/shiny/right/{0}.png', 32, 493, transparent=True)
+        'pokemon/overworld/shiny/right/{0}.png', 32, 493, transparent=True)
     make_montage('overworld-down-shiny.png',
-        'overworld/shiny/down/{0}.png', 32, 493, transparent=True)
+        'pokemon/overworld/shiny/down/{0}.png', 32, 493, transparent=True)
     make_montage('overworld-up-shiny.png',
-        'overworld/shiny/up/{0}.png', 32, 493, transparent=True)
+        'pokemon/overworld/shiny/up/{0}.png', 32, 493, transparent=True)
 
     # Other miscellaneous
-    make_montage('footprints.png', 'footprints/{0}.png', 16, 649,
-        subst_forms=False)
-    make_montage('sugimori.png', 'sugimori/{0}.png', 96, 493,
-        padding=2, subst_forms=False, filter='lanczos')
+    make_montage('footprints.png', 'pokemon/footprints/{0}.png', 16, 649)
+    make_montage('sugimori.png', 'pokemon/sugimori/{0}.png', 96, 493,
+        padding=2, filter='lanczos')
     make_labeled_montage(
         'items.png', 'items', suffix='.png',
         sprite_size=24, horiz_padding=36, vert_padding=6,
     )
     make_labeled_montage(
-        'berries.png', 'items/big', suffix='-berry.png',
+        'berries.png', 'items/berries', suffix='.png',
         sprite_size=48, horiz_padding=4, vert_padding=4,
     )
+
+def main_tarball(filename, contents):
+    """As make_tarball, but prepends pokemon/main-sprites/ to all contents
+    """
+    make_tarball(filename, ['pokemon/main-sprites/' + c for c in contents])
 
 def make_tarball(filename, contents):
     """Packs `contents` into the tar file `filename`."""
@@ -272,8 +276,13 @@ def make_tarball(filename, contents):
 
     print "ok"
 
+def main_montage(filename, pattern, *args, **kwargs):
+    """As make_montage, but prepends pokemon/main-sprites/ to pattern
+    """
+    make_montage(filename, 'pokemon/main-sprites/' + pattern, *args, **kwargs)
+
 def make_montage(filename, pattern, sprite_size, pokemon,
-    padding=0, subst_forms=True, filter='point', transparent=False):
+    padding=0, filter='point', transparent=False):
 
     u"""Creates a montage in `filename` out of PNG images matching `pattern`,
     which should be a str.format pattern.  `sprite_size` is the size of each
@@ -294,14 +303,6 @@ def make_montage(filename, pattern, sprite_size, pokemon,
         os.path.join(media_dir, pattern.format(n))
         for n in range(1, pokemon + 1)
     ]
-    if subst_forms:
-        # Fill in reliable forms for overworld sprites
-        for n, form in [(201, 'j'), (386, 'normal'),
-                        (412, 'plant'), (413, 'plant'),
-                        (422, 'west'), (423, 'west')]:
-            if n >= len(files): break
-            img = "{0}-{1}".format(n, form)
-            files[n - 1] = os.path.join(media_dir, pattern.format(img))
 
     # Figure out the dimensions of the image.  Try to keep to the golden ratio,
     # because it rocks.

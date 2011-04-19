@@ -20,7 +20,6 @@ ${_(u"{name} – Pokémon #{number}").format(name=(c.pokemon.full_name), number=
 
 ${dexlib.pokemon_page_header()}
 
-
 <%lib:cache_content>
 ${h.h1(_('Essentials'))}
 
@@ -31,7 +30,7 @@ ${h.h1(_('Essentials'))}
     <p id="dex-pokemon-forme">${c.pokemon.unique_form.full_name}</p>
     % endif
     <div id="dex-pokemon-portrait-sprite">
-        ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white')}
+        ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white')}
     </div>
     <p id="dex-page-types">
         % for type in c.pokemon.types:
@@ -97,7 +96,7 @@ ${h.h1(_('Essentials'))}
     <dl>
         <dt>${_(u"Gender")}</dt>
         <dd>
-            ${h.pokedex.pokedex_img('gender-rates/%d.png' % c.pokemon.gender_rate, alt='')}
+            ${h.pokedex.chrome_img('gender-rates/%d.png' % c.pokemon.gender_rate, alt='')}
             ${_(h.pokedex.gender_rate_label[c.pokemon.gender_rate])}
             ${dexlib.subtle_search(action='pokemon_search', gender_rate=c.pokemon.gender_rate, _=_)}
         </dd>
@@ -299,7 +298,7 @@ ${h.h1(_('Evolution'))}
     if form == c.pokemon.unique_form:
         link_class = link_class + ' selected'
 %>\
-    <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_image(form, 'black-white'), form=form.name, class_=link_class)}</li>
+    <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_image(form, 'main-sprites/black-white'), form=form.name, class_=link_class)}</li>
     % endfor
 </ul>
 <p> ${c.pokemon.normal_form.form_group.description} </p>
@@ -383,9 +382,9 @@ ${h.h1(_('Stats'))}
 % if c.pokeathlon_stats:
 ${h.h2(h.pokedex.version_icons('HeartGold', 'SoulSilver') + u' Pokéathlon Performance', id='pokeathlon')}
 <%
-    star_buffed = h.pokedex.pokedex_img('chrome/pokeathlon-star-buffed.png', alt=u'★')
-    star_base = h.pokedex.pokedex_img('chrome/pokeathlon-star.png', alt=u'✯')
-    star_empty = h.pokedex.pokedex_img('chrome/pokeathlon-star-empty.png', alt=u'☆')
+    star_buffed = h.pokedex.pokedex_img('chrome/pokeathlon/star-buffed.png', alt=u'★')
+    star_base = h.pokedex.pokedex_img('chrome/pokeathlon/star.png', alt=u'✯')
+    star_empty = h.pokedex.pokedex_img('chrome/pokeathlon/star-empty.png', alt=u'☆')
 %>
 
 <p>${star_buffed} Minimum; ${star_base} Base; ${star_empty} Maximum</p>
@@ -425,19 +424,19 @@ ${h.h1(_('Flavor'))}
 </div>
 <div class="dex-column">
     <h2>${_("Sprites")}</h2>
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white')}
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white/shiny')}
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white/back')}
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white/back/shiny')}
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white')}
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white/shiny')}
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white/back')}
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white/back/shiny')}
     % if c.pokemon.has_gender_differences:
     <br/>
-    % if h.pokedex.pokemon_has_media(c.pokemon.form, 'black-white/female', 'png'):
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white/female')}
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white/shiny/female')}
+    % if h.pokedex.pokemon_has_media(c.pokemon.form, 'main-sprites/black-white/female', 'png'):
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white/female')}
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white/shiny/female')}
     % endif
-    % if h.pokedex.pokemon_has_media(c.pokemon.form, 'black-white/back/female', 'png'):
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white/back/female')}
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='black-white/back/shiny/female')}
+    % if h.pokedex.pokemon_has_media(c.pokemon.form, 'main-sprites/black-white/back/female', 'png'):
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white/back/female')}
+    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white/back/shiny/female')}
     % endif
     % endif
 </div>
@@ -468,7 +467,7 @@ ${h.h1(_('Flavor'))}
         % if c.pokemon.generation.id <= 3:
         <dt>${_("Habitat")} ${h.pokedex.version_icons(u'FireRed', u'LeafGreen')}</dt>
         <dd>
-            ${h.pokedex.pokedex_img('chrome/habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.habitat))}
+            ${h.pokedex.pokedex_img('habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.habitat))}
             ${c.pokemon.habitat}
             ${dexlib.subtle_search(action='pokemon_search', habitat=c.pokemon.habitat, _=_)}
         </dd>
@@ -480,7 +479,7 @@ ${h.h1(_('Flavor'))}
         % if c.pokemon.generation.id <= 4:
         <dt>${_("Shape")} ${h.pokedex.generation_icon(4)}</dt>
         <dd>
-            ${h.pokedex.pokedex_img('chrome/shapes/%d.png' % c.pokemon.shape.id, alt='', title=c.pokemon.shape.name)}
+            ${h.pokedex.pokedex_img('shapes/%s.png' % c.pokemon.shape.identifier, alt='', title=c.pokemon.shape.name)}
             ${c.pokemon.shape.awesome_name}
             ${dexlib.subtle_search(action='pokemon_search', shape=c.pokemon.shape.name.lower(), _=_)}
         </dd>
@@ -491,13 +490,13 @@ ${h.h1(_('Flavor'))}
     <h2>${_("Height")}</h2>
     <div class="dex-size">
         <div class="dex-size-trainer">
-            ${h.pokedex.pokedex_img('chrome/trainer-male.png', alt='${_("Trainer dude")}', style="height: %.2f%%" % (c.heights['trainer'] * 100))}
+            ${h.pokedex.chrome_img('trainer-male.png', alt='${_("Trainer dude")}', style="height: %.2f%%" % (c.heights['trainer'] * 100))}
             <p class="dex-size-value">
                 <input type="text" size="6" value="${h.pokedex.format_height_imperial(c.trainer_height)}" disabled="disabled" id="dex-pokemon-height">
             </p>
         </div>
         <div class="dex-size-pokemon">
-            ${h.pokedex.pokemon_image(c.pokemon.form, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
+            ${h.pokedex.pokemon_image(c.pokemon.form, prefix='cropped', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
             <div class="js-dex-size-raw">${c.pokemon.height}</div>
             <p class="dex-size-value">
                 ${h.pokedex.format_height_imperial(c.pokemon.height)} <br/>
@@ -510,13 +509,13 @@ ${h.h1(_('Flavor'))}
     <h2>${_("Weight")}</h2>
     <div class="dex-size">
         <div class="dex-size-trainer">
-            ${h.pokedex.pokedex_img('chrome/trainer-female.png', alt='${_("Trainer dudette")}', style="height: %.2f%%" % (c.weights['trainer'] * 100))}
+            ${h.pokedex.chrome_img('trainer-female.png', alt='${_("Trainer dudette")}', style="height: %.2f%%" % (c.weights['trainer'] * 100))}
             <p class="dex-size-value">
                 <input type="text" size="6" value="${h.pokedex.format_weight_imperial(c.trainer_weight)}" disabled="disabled" id="dex-pokemon-weight">
             </p>
         </div>
         <div class="dex-size-pokemon">
-            ${h.pokedex.pokemon_image(c.pokemon.form, prefix='cropped-pokemon', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
+            ${h.pokedex.pokemon_image(c.pokemon.form, prefix='cropped', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
             <div class="js-dex-size-raw">${c.pokemon.weight}</div>
             <p class="dex-size-value">
                 ${h.pokedex.format_weight_imperial(c.pokemon.weight)} <br/>
@@ -540,7 +539,7 @@ ${h.h1(_('Locations'))}
         ## Sort method by name
         % for method, area_condition_encounters in h.keysort(method_etc, lambda k: k.id):
         <div class="dex-simple-encounters-method">
-            ${h.pokedex.pokedex_img('encounters/' + c.encounter_method_icons.get(method.identifier, 'unknown.png'), \
+            ${h.pokedex.chrome_img('encounters/' + c.encounter_method_icons.get(method.identifier, 'unknown.png'), \
                                     alt=method.name)}
             <ul>
                 ## Sort locations by name

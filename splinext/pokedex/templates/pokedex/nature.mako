@@ -45,9 +45,9 @@ ${h.h1(_('Essentials'))}
         <dt>${_(u"Taste preference")}</dt>
         <dd>
             ${_(u"Likes %s; good for") % c.nature.likes_flavor.flavor}
-            ${h.pokedex.pokedex_img("chrome/contest/{0}.png".format(c.nature.likes_flavor.identifier), alt=c.nature.likes_flavor.name)}<br>
+            ${h.pokedex.pokedex_img("contest-types/{1}/{0}.png".format(c.nature.likes_flavor.identifier, c.game_language.identifier), alt=c.nature.likes_flavor.name)}<br>
             ${_(u"Hates %s; bad for") % c.nature.hates_flavor.flavor}
-            ${h.pokedex.pokedex_img("chrome/contest/{0}.png".format(c.nature.hates_flavor.identifier), alt=c.nature.hates_flavor.name)}
+            ${h.pokedex.pokedex_img("contest-types/{1}/{0}.png".format(c.nature.hates_flavor.identifier, c.game_language.identifier), alt=c.nature.hates_flavor.name)}
         </dd>
     </dl>
     % endif
