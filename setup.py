@@ -18,7 +18,7 @@ setup(
     entry_points = {'spline.plugins': [
         'pokedex = splinext.pokedex:PokedexPlugin',
         'gts = splinext.gts:GTSPlugin',
-    ]}
+    ]},
 
     namespace_packages = ['splinext'],
 
