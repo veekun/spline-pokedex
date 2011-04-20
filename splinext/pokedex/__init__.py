@@ -2,14 +2,12 @@
 import os.path
 from pkg_resources import resource_filename
 
-import markdown
-import markdown.inlinepatterns
 from pylons import config, tmpl_context as c
 from routes import url_for as url
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 import pokedex.db
-from pokedex.db.markdown import MarkdownString
+from pokedex.db.markdown import MarkdownLinkMaker
 import pokedex.db.tables as tables
 import pokedex.lookup
 import spline.lib.markdown
@@ -89,83 +87,22 @@ class PokedexBaseController(BaseController):
 ### Extend markdown to turn [Eevee]{pokemon:eevee} into a link in effects and
 ### descriptions
 
-class PokedexLinkPattern(markdown.inlinepatterns.Pattern):
-    def __init__(self, table):
-        """Generates a pattern-matcher for a type of link, given a table."""
-        self.thingy_table = table
-        self.thingy_type = table.__name__
-
-        # Match [label]{tablename:target}
-        regex = ur'(?x) \[ ([^]]+) \] \s* \{' + table.__singlename__ + ur':([^}]+) \}'
-
-        # old-style classes augh!
-        markdown.inlinepatterns.Pattern.__init__(self, regex)
-
-    def handleMatch(self, m):
-        # [A]{foo:B} -- A is the label, B is the target
-        manual_label = m.group(2)
-        target = m.group(3)
-
-        # Find the thingy and figure out its URL
-        if self.thingy_type.lower() == u'pokemon':
-            query = splinext.pokedex.db.pokemon_identifier_query(target)
-        else:
-            query = splinext.pokedex.db.get_by_identifier_query(
-                    self.thingy_table, target)
-
-        try:
-            obj = query.one()
-        except NoResultFound:
-            raise ValueError("Nothing matches [%s]{%s:%s}" %
-                (manual_label, self.thingy_table.__singlename__, target))
-        except MultipleResultsFound:
-            raise ValueError("Too many matches for [%s]{%s:%s}" %
-                (manual_label, self.thingy_table.__singlename__, target))
-
-        name = obj.name
-        url = pokedex_helpers.make_thingy_url(obj)
-
-        # Construct a link node
-        el = markdown.etree.Element('a')
-        el.set('href', url)
-        el.text = markdown.AtomicString(manual_label or name)
-        return el
-
-class PokedexMechanicsPattern(markdown.inlinepatterns.Pattern):
-    """Matches [target]{mechanic} and [label]{mechanic:target}.  For now, this
-    doesn't actually do anything.
-    """
-    def handleMatch(self, m):
-        # Don't do anything for now
-        el = markdown.etree.Element('span')
-        el.text = markdown.AtomicString(m.group(2))
-        return el
-
-class PokedexExtension(markdown.Extension):
-    """Plugs the [foo]{bar} syntax into the markdown parser."""
-    def extendMarkdown(self, md, md_globals):
-        for table in (tables.Ability, tables.Item, tables.Location,
-                      tables.Move, tables.Pokemon, tables.Type):
-            key = "pokedex-link-{table.__tablename__}".format(table=table)
-            md.inlinePatterns[key] = PokedexLinkPattern(table)
-
-        mechanics_regex = ur'(?x) \[ ([^]]+) \] \s* \{mechanic(?: :([^}]+) )?\}'
-        md.inlinePatterns['pokedex-mechanics'] \
-            = PokedexMechanicsPattern(mechanics_regex)
-
-
 def after_setup_hook(config, *args, **kwargs):
     """Hook to do some housekeeping after the app starts."""
     # Connect to the database
     splinext.pokedex.db.connect(config)
 
-    # Extend Markdown via monkey-patching..  boo  :(
-    MarkdownString.markdown_extensions.append(PokedexExtension())
-
-    # And extend spline's markdowning a slightly less terrible way
-    spline.lib.markdown.register_extension(PokedexExtension())
-
 def before_controller_hook(*args, **kwargs):
+    session = splinext.pokedex.db.pokedex_session
+
+    # Register URLs with the session
+    def object_url(category, obj):
+        return pokedex_helpers.make_thingy_url(obj)
+    session.pokedex_link_maker.object_url = object_url
+
+    # And extend spline's markdowning
+    spline.lib.markdown.register_extension(session.pokedex_link_maker.get_extension())
+
     """Hook to inject suggestion-box Javascript into every page."""
     c.javascripts.append(('pokedex', 'pokedex-suggestions'))
 
