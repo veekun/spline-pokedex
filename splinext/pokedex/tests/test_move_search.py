@@ -276,7 +276,7 @@ class TestMoveSearchController(TestController):
         )
 
     def test_pokemon(self):
-        u"""Checks searching by learning Pokémon.
+        u"""Checks searching by learning Pokemon.
 
         Unlike the Pokémon search's search-by-move, results are ORed.
 

@@ -9,8 +9,8 @@ class TestComparePokemonController(TestController):
                                 pokemon=pokemon))
 
     def test_pokemon_query_parsing(self):
-        u"""Check that the query is correctly parsed.  Real Pokémon names
-        should become real Pokémon, and anything ambiguous should be left blank
+        u"""Check that the query is correctly parsed.  Real Pokemon names
+        should become real Pokemon, and anything ambiguous should be left blank
         but have suggestions in place.  If there are no definite Pokémon, there
         should be no comparing.
         """

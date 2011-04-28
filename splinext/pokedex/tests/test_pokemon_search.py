@@ -375,7 +375,7 @@ class TestPokemonSearchController(TestController):
 
 
     def test_pokedex(self):
-        u"""Checks searching by Pokédex."""
+        u"""Checks searching by Pokedex."""
         self.check_search(
             dict(in_pokedex=u'4'),
             [ u'Sandshrew', u'Crobat', u'Lombre' ],
