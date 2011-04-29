@@ -2,3 +2,7 @@
 #-- Pokédex plugin
 # SQLAlchemy URL to the Pokédex database
 spline-pokedex.sqlalchemy.url = sqlite:///%(here)s/data/pokedex.db
+
+# Directory containing the pokedex-media checkout; media will all 404 if this
+# is missing or blank, which is probably fine in production
+spline-pokedex.media_directory = %(here)s/../pokedex-media.git/

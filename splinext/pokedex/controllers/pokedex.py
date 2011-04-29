@@ -6,11 +6,12 @@ import colorsys
 import json
 import logging
 import mimetypes
+import os.path
 import re
+import warnings
 
 import pokedex.db
 import pokedex.db.tables as tables
-import pkg_resources
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from pylons.decorators import jsonify
@@ -180,6 +181,13 @@ class CombinedEncounter(object):
     def level(self):
         return level_range(self.min_level, self.max_level)
 
+def wsgi_stream_file(f):
+    while True:
+        buf = f.read(4096)
+        if not buf:
+            break
+        yield buf
+
 class PokedexController(PokedexBaseController):
 
     # Used by lookup disambig pages
@@ -237,10 +245,18 @@ class PokedexController(PokedexBaseController):
         return ''
 
     def media(self, path):
-        (mimetype, whatever) = mimetypes.guess_type(path)
+        media_dir = config.get('spline-pokedex.media_directory', None)
+        if not media_dir:
+            warnings.warn(
+                "No media_directory found; "
+                "you may want to clone pokedex-media.git")
+            abort(404)
+
+        (mimetype, _) = mimetypes.guess_type(path)
         response.headers['content-type'] = mimetype
-        pkg_path = "data/media/%s" % path
-        return pkg_resources.resource_string('pokedex', pkg_path)
+
+        media_path = os.path.join(media_dir, path)
+        return wsgi_stream_file(open(media_path))
 
     def lookup(self):
         """Find a page in the Pokédex given a name.
