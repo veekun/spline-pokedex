@@ -1347,8 +1347,8 @@ class PokedexController(PokedexBaseController):
 
         ### Flags
         c.flags = []
-        move_flags = db.pokedex_session.query(tables.MoveFlagType) \
-                                    .order_by(tables.MoveFlagType.id.asc())
+        move_flags = db.pokedex_session.query(tables.MoveFlag) \
+                                    .order_by(tables.MoveFlag.id.asc())
         for flag in move_flags:
             has_flag = flag in c.move.flags
             c.flags.append((flag, has_flag))
@@ -1661,8 +1661,8 @@ class PokedexController(PokedexBaseController):
         c.moves = None
         if move_flag:
             c.moves = db.pokedex_session.query(tables.Move) \
-                .join(tables.MoveFlag, tables.MoveFlagType) \
-                .filter(tables.MoveFlagType.identifier == move_flag) \
+                .join(tables.MoveFlagMap, tables.MoveFlag) \
+                .filter(tables.MoveFlag.identifier == move_flag) \
                 .join(tables.Move.names_local) \
                 .order_by(tables.Move.names_table.name) \
                 .options(

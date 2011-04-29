@@ -1285,8 +1285,8 @@ class PokedexSearchController(PokedexBaseController):
 
         # Add flag fields dynamically
         c.flag_fields = []
-        c.flags = db.pokedex_session.query(tables.MoveFlagType) \
-            .order_by(tables.MoveFlagType.id)
+        c.flags = db.pokedex_session.query(tables.MoveFlag) \
+            .order_by(tables.MoveFlag.id)
         for flag in c.flags:
             field_name = 'flag_' + flag.identifier
             field = fields.SelectField(flag.name,
@@ -1365,9 +1365,9 @@ class PokedexSearchController(PokedexBaseController):
         for field, flag_id in c.flag_fields:
             if c.form[field].data != u'any':
                 # Join to a move-flag table that's cut down to just this flag
-                flag_alias = aliased(tables.MoveFlag)
+                flag_alias = aliased(tables.MoveFlagMap)
                 subq = db.pokedex_session.query(flag_alias) \
-                    .filter(flag_alias.move_flag_type_id == flag_id) \
+                    .filter(flag_alias.move_flag_id == flag_id) \
                     .subquery()
 
                 # Then join or nega-join against it
