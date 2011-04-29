@@ -123,7 +123,7 @@ ${h.h1(_('Berry tag'))}
         <dd>
             % if berry_flavor.flavor:
             ${berry_flavor.flavor}
-            ${_("(raises %s)") % h.pokedex.pokedex_img("contest-flavors/{0}.png".format(berry_flavor.contest_type.identifier), alt=(berry_flavor.contest_type.name)) | n}
+            ${_("(raises %s)") % h.pokedex.pokedex_img("contest-types/{1}/{0}.png".format(berry_flavor.contest_type.identifier, c.game_language.identifier), alt=(berry_flavor.contest_type.name)) | n}
             % else:
             ${_(u"—")}
             % endif
