@@ -238,7 +238,7 @@ ${h.form(url.current(), method='GET')}
 
 <h2>${_(u"Numbers")}</h2>
 <p>${_(u"Understands single numbers (<code>50</code>); ranges (<code>17-29</code>); at-least (<code>100+</code>); at-most (<code>&lt; 100</code>); approximations (<code>120~10</code> = <code>110-130</code>); and any combination of those (<code>20, 50-60, 90~5</code>).") | n }</p>
-<p>${_(u"Height and weight work the same way, but require units.  Anything is acceptable.")}</p>
+<p>${_(u"Height and weight work the same way, but require units.  Anything is acceptable.  You can even use Pokémon names as units.")}</p>
 
 <div class="dex-column-container">
 <div class="dex-column">
