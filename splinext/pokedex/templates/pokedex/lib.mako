@@ -1,10 +1,10 @@
 <%! from splinext.pokedex import i18n %>\
 
 <%def name="pokemon_icon(pokemon)">\
-% if pokemon.is_base_form:
-<span class="sprite-icon sprite-icon-${pokemon.normal_form.id}"></span>\
+% if pokemon.is_default:
+<span class="sprite-icon sprite-icon-${pokemon.species.id}"></span>\
 % else:
-${h.pokedex.pokemon_image(pokemon.form, prefix='icons')}\
+${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons')}\
 % endif
 </%def>
 

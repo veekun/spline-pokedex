@@ -304,7 +304,7 @@ class PokemonSearchForm(BaseSearchForm):
     weight = RangeTextField('Weight', inflator=lambda _: parse_size(_, 'weight'))
 
     # Flavor
-    species = fields.TextField('Species', default=u'')
+    genus = fields.TextField('Species', default=u'')
     color = QuerySelectField('Color',
         query_factory=lambda: db.pokedex_session.query(tables.PokemonColor),
         get_label=lambda _: _.name,
@@ -341,7 +341,7 @@ class PokemonSearchForm(BaseSearchForm):
             ('height', 'Height'),
             ('weight', 'Weight'),
             ('gender', 'Gender rate'),
-            ('species', 'Species'),
+            ('genus', 'Species'),
             ('color', 'Color'),
             ('habitat', 'Habitat'),
             ('shape', 'Shape'),
@@ -385,7 +385,7 @@ class PokemonSearchForm(BaseSearchForm):
             ('height_metric', 'Height (in metric)'),
             ('weight', 'Weight'),
             ('weight_metric', 'Weight (in metric)'),
-            ('species', 'Species'),
+            ('genus', 'Species'),
             ('color', 'Color'),
             ('habitat', 'Habitat'),
             ('shape', 'Shape'),
@@ -596,12 +596,13 @@ class PokedexSearchController(PokedexBaseController):
 
         ### Do the searching!
         me = tables.Pokemon
-        query = db.pokedex_session.query(me).join(me.names_local)
+        my_species = tables.PokemonSpecies
+        query = db.pokedex_session.query(me).join((my_species, me.species))
+        query = query.join(my_species.names_local)
 
-        # Several joins need to know the base form
-        base_form = tables.PokemonForm
-        query = query.outerjoin((base_form, me.unique_form))
-        base_form_id = func.coalesce(base_form.form_base_pokemon_id, me.id)
+        # Several joins need to know the default form
+        default_form = tables.PokemonForm
+        query = query.outerjoin((default_form, me.default_form))
 
         # Sorting and filtering by stat both need to join to the stat table for
         # the specific stat in question.  Keep track of these joins to avoid
@@ -637,30 +638,21 @@ class PokedexSearchController(PokedexBaseController):
 
         # ID
         if c.form.id.data:
-            # Have to handle forms and not-forms differently
-            query = query.filter(c.form.id.data(base_form_id))
+            query = query.filter(c.form.id.data(my_species.id))
 
         # Name
         if c.form.name.data:
             name = c.form.name.data.strip().lower()
 
-            if ' ' in name:
-                # Hmm.  If there's a space, it might be a form name
-                form_name, name_sans_form = name.split(' ', 1)
-                query = query.join(base_form.names_local).filter(
-                    or_(
-                        # Either it was a form name...
-                        and_(
-                            ilike(base_form.names_table.name, form_name),
-                            ilike(me.names_table.name, name_sans_form),
-                        ),
-                        # ...or not.
-                        ilike( me.names_table.name, name ),
-                    )
+            query = query.join(default_form.names_local)
+            query = query.filter(
+                or_(
+                    # Either it was a form name...
+                    ilike(default_form.names_table.pokemon_name, name),
+                    # ...or not.
+                    ilike(my_species.names_table.name, name),
                 )
-            else:
-                # Business as usual
-                query = query.filter( ilike(me.names_table.name, name) )
+            )
 
         # Ability
         if c.form.ability.data:
@@ -683,8 +675,7 @@ class PokedexSearchController(PokedexBaseController):
 
         # Growth rate
         if c.form.growth_rate.data:
-            query = join_once(me.evolution_chain) \
-                .filter(tables.EvolutionChain.growth_rate == c.form.growth_rate.data)
+            query = query.filter(my_species.growth_rate == c.form.growth_rate.data)
 
         # Type
         if c.form.type.data:
@@ -723,16 +714,16 @@ class PokedexSearchController(PokedexBaseController):
 
             # Genderless ignores the operator
             if gender_rate == -1 or gender_rate_op == 'equal':
-                clause = me.gender_rate == gender_rate
+                clause = my_species.gender_rate == gender_rate
             elif gender_rate_op == 'less_equal':
-                clause = me.gender_rate <= gender_rate
+                clause = my_species.gender_rate <= gender_rate
             elif gender_rate_op == 'more_equal':
-                clause = me.gender_rate >= gender_rate
+                clause = my_species.gender_rate >= gender_rate
 
             if gender_rate != -1:
                 # No amount of math should make "<= 1/4 female" include
                 # genderless
-                clause = and_(clause, me.gender_rate != -1)
+                clause = and_(clause, my_species.gender_rate != -1)
 
             query = query.filter(clause)
 
@@ -742,7 +733,7 @@ class PokedexSearchController(PokedexBaseController):
             for egg_group in c.form.egg_group.data:
                 if not egg_group:
                     continue
-                subclause = me.egg_groups.any(
+                subclause = my_species.egg_groups.any(
                     tables.EggGroup.id == egg_group.id
                 )
                 clauses.append(subclause)
@@ -764,48 +755,48 @@ class PokedexSearchController(PokedexBaseController):
             # 10+ years no Pokémon has ever been able to evolve more than
             # twice.  If this changes, then either this query will need a
             # greatgrandparent, or (likely) the table structure will change
-            parent_pokemon = aliased(tables.Pokemon)
-            grandparent_pokemon = aliased(tables.Pokemon)
+            parent_species = aliased(tables.PokemonSpecies)
+            grandparent_species = aliased(tables.PokemonSpecies)
 
             query = query.outerjoin(
                 # If we're a specific form, check the base form, too
                 (tables.PokemonEvolution,
-                    tables.PokemonEvolution.evolved_pokemon_id == base_form_id),
-                (parent_pokemon, me.parent_pokemon),
+                    tables.PokemonEvolution.evolved_species_id == my_species.id),
+                (parent_species, my_species.parent_species),
 
                 # No Pokémon ever evolve, gain forms, then evolve again
-                (grandparent_pokemon, parent_pokemon.parent_pokemon)
+                (grandparent_species, parent_species.parent_species)
             )
 
         # ...whereas position and special tend to need children
         if c.form.evolution_position.data or c.form.evolution_special.data:
-            child_pokemon = aliased(tables.Pokemon)
+            child_species = aliased(tables.PokemonSpecies)
             child_subquery = db.pokedex_session.query(
-                    child_pokemon.evolves_from_pokemon_id.label('parent_id'),
+                    child_species.evolves_from_species_id.label('parent_id'),
                     func.count('*').label('child_count'),
                 ) \
-                .group_by(child_pokemon.evolves_from_pokemon_id) \
+                .group_by(child_species.evolves_from_species_id) \
                 .subquery()
 
             query = query.outerjoin((child_subquery,
-                base_form_id == child_subquery.c.parent_id))
+                my_species.id == child_subquery.c.parent_id))
 
         if c.form.evolution_stage.data:
             # Collect clauses for the requested stages and add to the query
             clauses = []
             if u'baby' in c.form.evolution_stage.data:
                 # Baby form: is_baby.  Cool, easy.
-                clauses.append( me.is_baby == True )
+                clauses.append( my_species.is_baby == True )
 
             if u'basic' in c.form.evolution_stage.data:
                 # Basic: this is not a baby.  Either there's no parent, or
                 # parent is a baby
                 clauses.append(
                     and_(
-                        me.is_baby == False,
+                        my_species.is_baby == False,
                         or_(
-                            parent_pokemon.id == None,
-                            parent_pokemon.is_baby == True,
+                            parent_species.id == None,
+                            parent_species.is_baby == True,
                         )
                     )
                 )
@@ -815,11 +806,11 @@ class PokedexSearchController(PokedexBaseController):
                 # doesn't exist or is a baby
                 clauses.append(
                     and_(
-                        parent_pokemon.id != None,
-                        parent_pokemon.is_baby == False,
+                        parent_species.id != None,
+                        parent_species.is_baby == False,
                         or_(
-                            grandparent_pokemon.id == None,
-                            grandparent_pokemon.is_baby == True,
+                            grandparent_species.id == None,
+                            grandparent_species.is_baby == True,
                         ),
                     )
                 )
@@ -828,8 +819,8 @@ class PokedexSearchController(PokedexBaseController):
                 # Stage 2: grandparent exists and is not a baby
                 clauses.append(
                     and_(
-                        grandparent_pokemon.id != None,
-                        grandparent_pokemon.is_baby == False,
+                        grandparent_species.id != None,
+                        grandparent_species.is_baby == False,
                     )
                 )
 
@@ -843,7 +834,7 @@ class PokedexSearchController(PokedexBaseController):
                 # No parent; at least one child
                 clauses.append(
                     and_(
-                        parent_pokemon.id == None,
+                        parent_species.id == None,
                         child_subquery.c.child_count != None,
                     )
                 )
@@ -852,7 +843,7 @@ class PokedexSearchController(PokedexBaseController):
                 # Has a parent AND a child
                 clauses.append(
                     and_(
-                        parent_pokemon.id != None,
+                        parent_species.id != None,
                         child_subquery.c.child_count != None,
                     )
                 )
@@ -861,7 +852,7 @@ class PokedexSearchController(PokedexBaseController):
                 # Has a parent but no children
                 clauses.append(
                     and_(
-                        parent_pokemon.id != None,
+                        parent_species.id != None,
                         child_subquery.c.child_count == None
                     )
                 )
@@ -870,7 +861,7 @@ class PokedexSearchController(PokedexBaseController):
                 # No parent or children
                 clauses.append(
                     and_(
-                        parent_pokemon.id == None,
+                        parent_species.id == None,
                         child_subquery.c.child_count == None,
                     )
                 )
@@ -886,17 +877,17 @@ class PokedexSearchController(PokedexBaseController):
 
             if u'branched' in c.form.evolution_special.data:
                 # Need to join to..  siblings.  Ugh.
-                sibling_pokemon = aliased(tables.Pokemon)
+                sibling_species = aliased(tables.PokemonSpecies)
                 sibling_subquery = db.pokedex_session.query(
-                    sibling_pokemon.evolves_from_pokemon_id.label('parent_id'),
+                    sibling_species.evolves_from_species_id.label('parent_id'),
                     func.count('*').label('sibling_count'),
                 ) \
-                    .group_by(sibling_pokemon.evolves_from_pokemon_id) \
+                    .group_by(sibling_species.evolves_from_species_id) \
                     .subquery()
 
                 query = query.outerjoin((
                     sibling_subquery,
-                    parent_pokemon.id == sibling_subquery.c.parent_id
+                    parent_species.id == sibling_subquery.c.parent_id
                 ))
 
                 clauses.append( sibling_subquery.c.sibling_count > 1 )
@@ -906,17 +897,17 @@ class PokedexSearchController(PokedexBaseController):
         # Generation
         if c.form.introduced_in.data:
             query = query.filter(
-                me.generation_id.in_(_.id for _ in c.form.introduced_in.data)
+                my_species.generation_id.in_(data.id for data in c.form.introduced_in.data)
             )
 
         # Regional dex inclusion
         if c.form.in_pokedex.data:
             pokedex_query = db.pokedex_session.query(
-                    tables.PokemonDexNumber.pokemon_id) \
+                    tables.PokemonDexNumber.species_id) \
                 .filter(tables.PokemonDexNumber.pokedex_id.in_(
-                    _.id for _ in c.form.in_pokedex.data))
+                    data.id for data in c.form.in_pokedex.data))
 
-            query = query.filter(base_form_id.in_(pokedex_query.subquery()))
+            query = query.filter(my_species.id.in_(pokedex_query.subquery()))
 
         # Moves
         # To avoid stupid group-by-having-count tricks, each move needs to
@@ -961,16 +952,16 @@ class PokedexSearchController(PokedexBaseController):
                     query = query.filter(effort_field.data(stat_alias.effort))
 
         if c.form.hatch_counter.data:
-            query = query.filter(c.form.hatch_counter.data(me.hatch_counter))
+            query = query.filter(c.form.hatch_counter.data(my_species.hatch_counter))
 
         if c.form.base_experience.data:
             query = query.filter(c.form.base_experience.data(me.base_experience))
 
         if c.form.capture_rate.data:
-            query = query.filter(c.form.capture_rate.data(me.capture_rate))
+            query = query.filter(c.form.capture_rate.data(my_species.capture_rate))
 
         if c.form.base_happiness.data:
-            query = query.filter(c.form.base_happiness.data(me.base_happiness))
+            query = query.filter(c.form.base_happiness.data(my_species.base_happiness))
 
         if c.form.height.data:
             query = query.filter(c.form.height.data(me.height))
@@ -978,21 +969,21 @@ class PokedexSearchController(PokedexBaseController):
         if c.form.weight.data:
             query = query.filter(c.form.weight.data(me.weight))
 
-        # Species string
-        if c.form.species.data:
-            query = query.filter(ilike(me.names_table.species, c.form.species.data))
+        # Genus string
+        if c.form.genus.data:
+            query = query.filter(ilike(my_species.names_table.genus, c.form.genus.data))
 
         # Color
         if c.form.color.data:
-            query = query.filter( me.color_id == c.form.color.data.id )
+            query = query.filter( my_species.color_id == c.form.color.data.id )
 
         # Habitat
         if c.form.habitat.data:
-            query = query.filter( me.habitat_id == c.form.habitat.data.id )
+            query = query.filter( my_species.habitat_id == c.form.habitat.data.id )
 
         # Shape
         if c.form.shape.data:
-            query = query.filter( me.pokemon_shape_id == c.form.shape.data.id )
+            query = query.filter( my_species.shape_id == c.form.shape.data.id )
 
 
         ### Display
@@ -1048,13 +1039,13 @@ class PokedexSearchController(PokedexBaseController):
         # numbers (9->1), because that's how it should be, okay
         # Default fallback sort is by name, then by form
         # XXX: Use name, not identifier
-        sort_clauses = [me.identifier.asc(), base_form.order.asc(),
-                        base_form.identifier.asc()]
+        sort_clauses = [my_species.identifier.asc(), default_form.order.asc(),
+                        default_form.form_identifier.asc()]
 
         if c.form.sort.data == 'id':
             # Sorting by both name and national ID is redundant, since both are
-            # the same for two Pokémon iff they're the same base species.
-            sort_clauses[0] = base_form_id.asc()
+            # the same for two species.
+            sort_clauses[0] = my_species.id.asc()
 
         elif c.form.sort.data == 'evolution-chain':
             # This one is very special!  It affects sorting, but if the display
@@ -1073,21 +1064,22 @@ class PokedexSearchController(PokedexBaseController):
             # otherwise left alone, boo
             pokemon_ids = {}
             evolution_chain_ids = set()
-            for id, chain_id in query.values(me.id, me.evolution_chain_id):
+            for id, chain_id in query.values(me.id, my_species.evolution_chain_id):
                 evolution_chain_ids.add(chain_id)
                 pokemon_ids[id] = None
 
             # Rebuild the query
             if c.display_mode in ('custom-table',):
                 query = db.pokedex_session.query(me).filter(
-                    me.evolution_chain_id.in_( list(evolution_chain_ids) )
+                    my_species.evolution_chain_id.in_( list(evolution_chain_ids) )
                 )
             else:
                 query = db.pokedex_session.query(me) \
-                    .filter(me.id.in_(pokemon_ids.keys()))
+                    .filter(my_species.id.in_(species_ids.keys()))
 
-            # Outer join the new query to forms again; needed for sorting
-            query = query.outerjoin((base_form, me.unique_form))
+            # Join the new query to pokemon & forms again; needed for sorting
+            query = query.join((me, my_species.pokemon))
+            query = query.outerjoin((default_form, me.default_form))
 
             # Let the template know which Pokémon are actually in the original
             # result set
@@ -1097,32 +1089,30 @@ class PokedexSearchController(PokedexBaseController):
             # their chain to actually appear in the results.  This is wonky,
             # but makes sure that fake results don't affect sorting
             chain_sorting_alias = aliased(tables.Pokemon)
+            chain_sorting_species = aliased(tables.PokemonSpecies)
             chain_sorting_forms = aliased(tables.PokemonForm)
-            chain_sorting_base_id = func.coalesce(
-                chain_sorting_forms.form_base_pokemon_id,
-                chain_sorting_alias.id
-            )
             chain_sorting_subquery = db.pokedex_session.query(
-                    chain_sorting_alias.evolution_chain_id,
-                    func.min(chain_sorting_base_id).label('chain_position')
-                ) \
-                .filter(chain_sorting_alias.id.in_(pokemon_ids)) \
-                .outerjoin((chain_sorting_forms, 'unique_form')) \
-                .group_by(chain_sorting_alias.evolution_chain_id) \
+                    chain_sorting_species.evolution_chain_id,
+                    func.min(chain_sorting_species.id).label('chain_position')
+                ).select_from(chain_sorting_alias) \
+                .filter(chain_sorting_species.id.in_(pokemon_ids)) \
+                .outerjoin((chain_sorting_species, 'species')) \
+                .outerjoin((chain_sorting_forms, 'default_form')) \
+                .group_by(chain_sorting_species.evolution_chain_id) \
                 .subquery()
 
             query = query.join((
                 chain_sorting_subquery,
                 chain_sorting_subquery.c.evolution_chain_id
-                    == me.evolution_chain_id
+                    == my_species.evolution_chain_id
             ))
 
             # Sort by ID instead of name within families
-            sort_clauses[0] = base_form_id.asc()
+            sort_clauses[0] = default_form.id.asc()
 
             sort_clauses = [
                 chain_sorting_subquery.c.chain_position,
-                me.is_baby.desc()
+                my_species.is_baby.desc()
             ] + sort_clauses
 
         elif c.form.sort.data == 'name':
@@ -1163,30 +1153,30 @@ class PokedexSearchController(PokedexBaseController):
             sort_clauses.insert(0, me.weight.desc())
 
         elif c.form.sort.data == 'gender':
-            sort_clauses.insert(0, me.gender_rate.asc())
+            sort_clauses.insert(0, my_species.gender_rate.asc())
 
-        elif c.form.sort.data == 'species':
-            sort_clauses.insert(0, me.names_table.species.asc())
+        elif c.form.sort.data == 'genus':
+            sort_clauses.insert(0, my_species.names_table.genus.asc())
 
         elif c.form.sort.data == 'color':
-            query = query.outerjoin(me.pokemon_color)
+            query = query.outerjoin(my_species.color)
             sort_clauses.insert(0, tables.PokemonColor.identifier.asc())
 
         elif c.form.sort.data == 'habitat':
-            query = query.outerjoin(me.pokemon_habitat)
+            query = query.outerjoin(my_species.habitat)
             sort_clauses.insert(0, tables.PokemonHabitat.identifier.asc())
 
         elif c.form.sort.data == 'hatch-counter':
-            sort_clauses.insert(0, me.hatch_counter.asc())
+            sort_clauses.insert(0, my_species.hatch_counter.asc())
 
         elif c.form.sort.data == 'base-experience':
             sort_clauses.insert(0, me.base_experience.desc())
 
         elif c.form.sort.data == 'capture-rate':
-            sort_clauses.insert(0, me.capture_rate.desc())
+            sort_clauses.insert(0, my_species.capture_rate.desc())
 
         elif c.form.sort.data == 'base-happiness':
-            sort_clauses.insert(0, me.base_happiness.desc())
+            sort_clauses.insert(0, my_species.base_happiness.desc())
 
         elif c.form.sort.data == 'stat-total':
             # Create a subquery that sums all base stats

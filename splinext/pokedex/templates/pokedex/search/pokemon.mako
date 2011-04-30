@@ -66,28 +66,28 @@ ${getattr(self, 'col_' + column)()}
             # Indenting is kept right by keeping a running list of this
             # Pokémon's ancestry.  Luckily, except for babies, National Dex
             # order is always post-order
-            if last_evolution_chain_id == result.evolution_chain_id and \
-               result.parent_pokemon in evolution_chain_stack:
+            if last_evolution_chain_id == result.species.evolution_chain_id and \
+               result.species.parent_species in evolution_chain_stack:
                 # Still in the same family.  Look for this Pokémon's immediate
                 # parent somewhere in the stack, in case this is a sibling.
                 # Yes, this will die if the parent hasn't been seen
                 while evolution_chain_stack[-1] != \
-                   result.normal_form.parent_pokemon:
+                   result.species.parent_species:
                     evolution_chain_stack.pop()
 
             else:
                 # New family or new sub-chain; reset everything and show a
                 # divider
-                if result.is_baby:
+                if result.species.is_baby:
                     evolution_chain_stack = []
                 else:
                     # Stub out a baby
                     evolution_chain_stack = [None]
 
                 if last_evolution_chain_id is not None and \
-                   last_evolution_chain_id != result.evolution_chain_id:
+                   last_evolution_chain_id != result.species.evolution_chain_id:
                     tr_classes.append(u'chain-divider')
-                last_evolution_chain_id = result.evolution_chain_id
+                last_evolution_chain_id = result.species.evolution_chain_id
 
             # nb: babies are depth zero
             tr_classes.append(
@@ -177,7 +177,7 @@ ${h.form(url.current(), method='GET')}
 <div class="dex-column">
     <h2>Flavor</h2>
     <dl class="standard-form">
-        ${lib.field('species')}
+        ${lib.field('genus')}
         ${lib.field('color')}
         ${lib.field('habitat')}
         ${lib.field('shape')}
@@ -339,7 +339,7 @@ ${h.form(url.current(), method='GET')}
             '$special_attack', '$special_defense', '$speed', \
             '$height', '$height_ft', '$height_m', \
             '$weight', '$weight_lb', '$weight_kg', \
-            '$species', '$color', '$habitat', '$shape', \
+            '$genus', '$color', '$habitat', '$shape', \
             '$hatch_counter', '$steps_to_hatch', '$base_experience', '$capture_rate', '$base_happiness', \
         ):
         <%! from string import Template %>\
@@ -366,7 +366,7 @@ ${h.end_form()}
 ### Display columns defs
 <%def name="col_id()"><col class="dex-col-id"></%def>
 <%def name="th_id()"><th>${_(u"Num")}</th></%def>
-<%def name="td_id(pokemon)"><td>${pokemon.normal_form.id}</td></%def>
+<%def name="td_id(pokemon)"><td>${pokemon.default_form.id}</td></%def>
 
 <%def name="col_icon()"><col class="dex-col-icon"></%def>
 <%def name="th_icon()"><th></th></%def>
@@ -374,11 +374,11 @@ ${h.end_form()}
 
 <%def name="col_name()"><col class="dex-col-name"></%def>
 <%def name="th_name()"><th>${_(u"Name")}</th></%def>
-<%def name="td_name(pokemon)"><td class="name">${h.pokedex.pokemon_link(pokemon, pokemon.full_name)}</td></%def>
+<%def name="td_name(pokemon)"><td class="name">${h.pokedex.pokemon_link(pokemon, pokemon.default_form.name)}</td></%def>
 
 <%def name="col_growth_rate()"><col class="dex-col-max-exp"></%def>
 <%def name="th_growth_rate()"><th>${_(u"EXP to L100")}</th></%def>
-<%def name="td_growth_rate(pokemon)"><td class="max-exp">${pokemon.evolution_chain.growth_rate.max_experience}</td></%def>
+<%def name="td_growth_rate(pokemon)"><td class="max-exp">${pokemon.species.growth_rate.max_experience}</td></%def>
 
 <%def name="col_type()"><col class="dex-col-type2"></%def>
 <%def name="th_type()"><th>${_(u"Type")}</th></%def>
@@ -412,13 +412,13 @@ ${h.pokedex.type_link(type)}
 
 <%def name="col_gender()"><col class="dex-col-gender"></%def>
 <%def name="th_gender()"><th>${_(u"Gender")}</th></%def>
-<%def name="td_gender(pokemon)"><td>${h.pokedex.chrome_img('gender-rates/%d.png' % pokemon.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.gender_rate])}</td></%def>
+<%def name="td_gender(pokemon)"><td>${h.pokedex.chrome_img('gender-rates/%d.png' % pokemon.species.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.species.gender_rate])}</td></%def>
 
 <%def name="col_egg_group()"><col class="dex-col-egg-group"></%def>
 <%def name="th_egg_group()"><th>${_(u"Egg Group")}</th></%def>
 <%def name="td_egg_group(pokemon)">\
 <td class="egg-group">
-% for egg_group in pokemon.egg_groups:
+% for egg_group in pokemon.species.egg_groups:
 ${egg_group.name}<br>
 % endfor
 </td>
@@ -480,19 +480,19 @@ ${pokemon_stat.effort} ${pokemon_stat.stat.name}<br>
 <%def name="th_weight_metric()"><th>${_(u"Weight")}</th></%def>
 <%def name="td_weight_metric(pokemon)"><td class="size">${h.pokedex.format_weight_metric(pokemon.weight)}</td></%def>
 
-<%def name="col_species()"><col class="dex-col-species"></%def>
-<%def name="th_species()"><th>${_(u"Species")}</th></%def>
-<%def name="td_species(pokemon)"><td class="species">${pokemon.species}</td></%def>
+<%def name="col_genus()"><col class="dex-col-genus"></%def>
+<%def name="th_genus()"><th>${_(u"Species")}</th></%def>
+<%def name="td_genus(pokemon)"><td class="genus">${pokemon.species.genus}</td></%def>
 
 <%def name="col_color()"><col class="dex-col-color"></%def>
 <%def name="th_color()"><th>${_(u"Color")}</th></%def>
-<%def name="td_color(pokemon)"><td class="color"><span class="dex-color-${pokemon.color}"></span> ${pokemon.color}</td></%def>
+<%def name="td_color(pokemon)"><td class="color"><span class="dex-color-${pokemon.species.color}"></span> ${pokemon.species.color}</td></%def>
 
 <%def name="col_habitat()"><col class="dex-col-habitat"></%def>
 <%def name="th_habitat()"><th>${_(u"Habitat")}</th></%def>
 <%def name="td_habitat(pokemon)"><td class="habitat">\
-% if pokemon.generation.id <= 3:
-${pokemon.habitat}\
+% if pokemon.species.generation.id <= 3:
+${pokemon.species.habitat}\
 % else:
 —\
 % endif
@@ -501,18 +501,18 @@ ${pokemon.habitat}\
 <%def name="col_shape()"><col class="dex-col-icon"></%def>
 <%def name="th_shape()"><th>${_(u"Shape")}</th></%def>
 <%def name="td_shape(pokemon)"><td class="icon">
-% if pokemon.shape:
-${h.pokedex.pokedex_img('shapes/%s.png' % pokemon.shape.identifier, title=pokemon.shape.awesome_name, alt='')}
+% if pokemon.species.shape:
+${h.pokedex.pokedex_img('shapes/%s.png' % pokemon.species.shape.identifier, title=pokemon.species.shape.awesome_name, alt='')}
 % endif
 </td></%def>
 
 <%def name="col_hatch_counter()"><col class="dex-col-stat"></%def>
 <%def name="th_hatch_counter()"><th><abbr title="${_(u"Initial hatch counter")}">${_(u"Hatch")}</abbr></th></%def>
-<%def name="td_hatch_counter(pokemon)"><td class="stat">${pokemon.hatch_counter}</td></%def>
+<%def name="td_hatch_counter(pokemon)"><td class="stat">${pokemon.species.hatch_counter}</td></%def>
 
 <%def name="col_steps_to_hatch()"><col class="dex-col-stat"></%def>
 <%def name="th_steps_to_hatch()"><th><abbr title="${_(u"Steps to hatch")}">${_(u"Steps")}</abbr></th></%def>
-<%def name="td_steps_to_hatch(pokemon)"><td class="stat">${(pokemon.hatch_counter + 1) * 255}</td></%def>
+<%def name="td_steps_to_hatch(pokemon)"><td class="stat">${(pokemon.species.hatch_counter + 1) * 255}</td></%def>
 
 <%def name="col_base_experience()"><col class="dex-col-stat"></%def>
 <%def name="th_base_experience()"><th>${_(u"EXP")}</th></%def>
@@ -520,11 +520,11 @@ ${h.pokedex.pokedex_img('shapes/%s.png' % pokemon.shape.identifier, title=pokemo
 
 <%def name="col_capture_rate()"><col class="dex-col-stat"></%def>
 <%def name="th_capture_rate()"><th>${_(u"Cap.")}</th></%def>
-<%def name="td_capture_rate(pokemon)"><td class="stat">${pokemon.capture_rate}</td></%def>
+<%def name="td_capture_rate(pokemon)"><td class="stat">${pokemon.species.capture_rate}</td></%def>
 
 <%def name="col_base_happiness()"><col class="dex-col-stat"></%def>
 <%def name="th_base_happiness()"><th>${_(u":)")}</th></%def>
-<%def name="td_base_happiness(pokemon)"><td class="stat">${pokemon.base_happiness}</td></%def>
+<%def name="td_base_happiness(pokemon)"><td class="stat">${pokemon.species.base_happiness}</td></%def>
 
 <%def name="col_link()"><col class="dex-col-link"></%def>
 <%def name="th_link()"><th></th></%def>

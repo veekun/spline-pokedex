@@ -507,7 +507,7 @@ class PokedexController(PokedexBaseController):
     def pokemon(self, name=None):
         form = request.params.get('form', None)
         try:
-            pokemon_q = db.pokemon_query(name, form=form)
+            pokemon_q = db.pokemon_query(name, form)
 
             # Need to eagerload some, uh, little stuff
             pokemon_q = pokemon_q.options(

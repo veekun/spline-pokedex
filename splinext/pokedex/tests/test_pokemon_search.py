@@ -37,15 +37,12 @@ class TestPokemonSearchController(TestController):
 
         # Normalize expecteds to (name, form_name)
         for name in expected:
-            if isinstance(name, tuple):
-                leftover_expected.append(name)
-            else:
-                leftover_expected.append((name, None))
+            leftover_expected.append(name)
 
         # Remove expected results from the 'leftover' list, and add unexpected
         # results to the other leftover list
         for result in results:
-            result_name = result.name, result.form_name
+            result_name = result.name
 
             if result_name in leftover_expected:
                 leftover_expected.remove(result_name)
@@ -53,6 +50,8 @@ class TestPokemonSearchController(TestController):
                 leftover_results.append(result_name)
 
         # The leftovers now contain no names in common
+        if leftover_expected:
+            print leftover_expected
         self.assertEquals(
             leftover_expected, [],
             u"all expected Pokémon found: {0}".format(message)
@@ -82,7 +81,7 @@ class TestPokemonSearchController(TestController):
 
         self.check_search(
             dict(name=u'speed deoxys'),
-            [(u'Deoxys', u'Speed')],
+            [u'Speed Deoxys'],
             'searching by form name',
             exact=True,
         )
@@ -153,9 +152,9 @@ class TestPokemonSearchController(TestController):
     def test_species(self):
         """Checks searching by species flavor."""
         self.check_search(
-            dict(species=u'evolutio'),
+            dict(genus=u'evolutio'),
             [ u'Eevee' ],
-            'species',
+            'genus',
             exact=True,
         )
 
@@ -314,7 +313,7 @@ class TestPokemonSearchController(TestController):
         )
         self.check_search(
             dict(gender_rate_operator=u'equal', gender_rate=u'4'),
-            [ u'Absol', (u'Castform', u''), u'Delibird', u'Grimer', u'Teddiursa' ],
+            [ u'Absol', u'Castform', u'Delibird', u'Grimer', u'Teddiursa' ],
             'half and half',
         )
         self.check_search(
@@ -340,8 +339,8 @@ class TestPokemonSearchController(TestController):
         # 6 + 11 == Fairy + Indeterminate
         self.check_search(
             dict(egg_group_operator=u'all', egg_group=[u'6', u'11']),
-            [ (u'Castform', u''),      (u'Castform', u'Sunny'),
-              (u'Castform', u'Rainy'), (u'Castform', u'Snowy') ],
+            [ u'Castform',       u'Sunny Castform',
+              u'Rainy Castform', u'Snowy Castform', ],
             'fairy + indeterm; only one result, kinda...',
             exact=True,
         )
@@ -383,7 +382,7 @@ class TestPokemonSearchController(TestController):
         )
         self.check_search(
             dict(in_pokedex=u'6'),
-            [ u'Eevee', u'Staraptor', (u'Giratina', u'Altered') ],
+            [ u'Eevee', u'Staraptor', u'Altered Giratina' ],
             u'in Sinnoh Pokedex',
         )
 
@@ -543,19 +542,19 @@ class TestPokemonSearchController(TestController):
 
         self.check_search(
             dict(id=u'648+'),
-            [ (u'Meloetta', u'Pirouette'), (u'Meloetta', u'Aria'), u'Genesect' ],
+            [ u'Pirouette Meloetta', u'Aria Meloetta', u'Genesect' ],
             'range: n+',
             exact=True,
         )
         self.check_search(
             dict(id=u'648-'),
-            [ (u'Meloetta', u'Pirouette'), (u'Meloetta', u'Aria'), u'Genesect' ],
+            [ u'Pirouette Meloetta', u'Aria Meloetta', u'Genesect' ],
             'range: n-',
             exact=True,
         )
         self.check_search(
             dict(id=u'>=648'),
-            [ (u'Meloetta', u'Pirouette'), (u'Meloetta', u'Aria'), u'Genesect' ],
+            [ u'Pirouette Meloetta', u'Aria Meloetta', u'Genesect' ],
             'range: >=n',
             exact=True,
         )
