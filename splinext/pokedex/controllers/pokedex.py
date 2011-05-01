@@ -517,9 +517,11 @@ class PokedexController(PokedexBaseController):
                 eagerload('generation'),
                 eagerload('items.item'),
                 eagerload('items.version'),
-                eagerload('pokemon_color'),
-                eagerload('pokemon_habitat'),
-                eagerload('shape'),
+                eagerload('species'),
+                eagerload('species.color'),
+                eagerload('species.habitat'),
+                eagerload('species.shape'),
+                eagerload('species.egg_groups'),
                 subqueryload_all('stats.stat'),
                 subqueryload_all('types.target_efficacies.damage_type'),
             )
@@ -1424,7 +1426,8 @@ class PokedexController(PokedexBaseController):
                 # Pokémon table stuff
                 subqueryload('pokemon.abilities'),
                 subqueryload('pokemon.dream_ability'),
-                subqueryload('pokemon.egg_groups'),
+                subqueryload('pokemon.species'),
+                subqueryload('pokemon.species.egg_groups'),
                 subqueryload('pokemon.stats'),
                 subqueryload('pokemon.types'),
             ) \
@@ -1579,7 +1582,9 @@ class PokedexController(PokedexBaseController):
                 # Pokémon stuff
                 subqueryload('pokemon'),
                 joinedload('pokemon.abilities'),
-                joinedload('pokemon.egg_groups'),
+                joinedload('pokemon.dream_ability'),
+                joinedload('pokemon.species'),
+                subqueryload('pokemon.species.egg_groups'),
                 joinedload('pokemon.types'),
                 joinedload('pokemon.stats'),
             ) \
@@ -1590,6 +1595,7 @@ class PokedexController(PokedexBaseController):
     def abilities_list(sef):
         c.abilities = db.pokedex_session.query(tables.Ability) \
             .join(tables.Ability.names_local) \
+            .options(eagerload('short_effect')) \
             .order_by(tables.Ability.generation_id.asc(),
                 tables.Ability.names_table.name.asc()) \
             .all()
@@ -1801,7 +1807,7 @@ class PokedexController(PokedexBaseController):
             .options(
                 eagerload_all('condition_value_map.condition_value'),
                 eagerload_all('slot.method'),
-                eagerload('pokemon'),
+                eagerload_all('pokemon.species'),
                 eagerload('version'),
             ) \
             .filter(tables.Encounter.location_area_id.in_(x.id for x in c.areas))

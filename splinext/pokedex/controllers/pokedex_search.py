@@ -1211,6 +1211,8 @@ class PokedexSearchController(PokedexBaseController):
 
         query = query.order_by(*sort_clauses)
 
+        # We always want the species
+        query = query.options(eagerload('species'))
 
         ### Run the query!
         c.results = query.all()
@@ -1241,7 +1243,7 @@ class PokedexSearchController(PokedexBaseController):
                 eagerloads.append('dream_ability')
 
             if 'egg_group' in c.display_columns:
-                eagerloads.append('egg_groups')
+                eagerloads.append('species.egg_groups')
 
             if any(column[0:5] == 'stat_' for column in c.display_columns) \
                 or 'effort' in c.display_columns:
