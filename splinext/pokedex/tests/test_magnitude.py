@@ -30,6 +30,7 @@ class TestSizeParsing(TestCase):
         # log10(n) gives the position of the first sigdigit in n.
         # Find the most precise such value of a and b, negate it to get what
         # assertAlmostEqual expects, and allow three places of fudging
+        print a_value, b_value
         places = min(log10(a_value), log10(b_value))
         places = int(floor(places))
         places = -places

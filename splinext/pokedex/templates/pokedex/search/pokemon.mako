@@ -130,7 +130,7 @@ ${h.pokedex.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_temp
 ## Grid of icons
 <ul class="inline">
     % for result in c.results:
-    <li>${h.pokedex.pokemon_link(result, h.pokedex.pokemon_image(result.form, prefix=u'icons'), class_='dex-icon-link')}</li>
+    <li>${h.pokedex.pokemon_link(result, h.pokedex.pokemon_form_image(result.form, prefix=u'icons'), class_='dex-icon-link')}</li>
     % endfor
 </ul>
 
@@ -138,7 +138,7 @@ ${h.pokedex.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_temp
 ## Grid of most recent sprites
 <ul class="inline">
     % for result in c.results:
-    <li>${h.pokedex.pokemon_link(result, h.pokedex.pokemon_image(result.form), class_='dex-icon-link')}</li>
+    <li>${h.pokedex.pokemon_link(result, h.pokedex.pokemon_form_image(result.form), class_='dex-icon-link')}</li>
     % endfor
 </ul>
 
@@ -366,7 +366,7 @@ ${h.end_form()}
 ### Display columns defs
 <%def name="col_id()"><col class="dex-col-id"></%def>
 <%def name="th_id()"><th>${_(u"Num")}</th></%def>
-<%def name="td_id(pokemon)"><td>${pokemon.default_form.id}</td></%def>
+<%def name="td_id(pokemon)"><td>${pokemon.species.id}</td></%def>
 
 <%def name="col_icon()"><col class="dex-col-icon"></%def>
 <%def name="th_icon()"><th></th></%def>

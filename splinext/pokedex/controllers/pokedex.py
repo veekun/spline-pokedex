@@ -474,10 +474,10 @@ class PokedexController(PokedexBaseController):
         max_id = db.pokedex_session.query(tables.Pokemon) \
                                 .filter(tables.Pokemon.forms.any()) \
                                 .count()
-        prev_pokemon = db.pokedex_session.query(tables.Pokemon).get(
-            (c.pokemon.normal_form.id - 1 - 1) % max_id + 1)
-        next_pokemon = db.pokedex_session.query(tables.Pokemon).get(
-            (c.pokemon.normal_form.id - 1 + 1) % max_id + 1)
+        prev_pokemon = db.pokedex_session.query(tables.PokemonSpecies).get(
+            (c.pokemon.species.id - 1 - 1) % max_id + 1).default_pokemon
+        next_pokemon = db.pokedex_session.query(tables.PokemonSpecies).get(
+            (c.pokemon.species.id - 1 + 1) % max_id + 1).default_pokemon
         return prev_pokemon, next_pokemon
 
     @jsonify
@@ -535,18 +535,14 @@ class PokedexController(PokedexBaseController):
         ### Previous and next for the header
         c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
 
-        c.name_and_form = c.pokemon.name, c.pokemon.form_name or u''
         # Let's cache this bitch
         return self.cache_content(
-            key=u';'.join((c.pokemon.name, c.pokemon.form_name or u'')),
+            key=c.pokemon.default_form.name,
             template='/pokedex/pokemon.mako',
             do_work=self._do_pokemon,
         )
 
     def _do_pokemon(self, name_plus_form):
-        name, form = c.name_and_form
-        if not form:
-            form = None
 
         ### Type efficacy
         c.type_efficacies = defaultdict(lambda: 100)
@@ -571,24 +567,23 @@ class PokedexController(PokedexBaseController):
         # conditions.
         # ASSUMPTION: Every base-form Pokémon in a breedable family can breed.
         # ASSUMPTION: Every family has the same breeding groups throughout.
-        if c.pokemon.gender_rate == -1:
+        if c.pokemon.species.gender_rate == -1:
             # Genderless; Ditto only
-            ditto = db.pokedex_session.query(tables.Pokemon) \
+            ditto = db.pokedex_session.query(tables.PokemonSpecies) \
                 .filter_by(identifier='ditto').one()
             c.compatible_families = [ditto]
-        elif c.pokemon.egg_groups[0].id == 15:
+        elif c.pokemon.species.egg_groups[0].id == 15:
             # No Eggs group
             pass
         else:
-            parent_a = aliased(tables.Pokemon)
-            grandparent_a = aliased(tables.Pokemon)
-            egg_group_ids = [_.id for _ in c.pokemon.egg_groups]
-            q = db.pokedex_session.query(tables.Pokemon)
+            parent_a = aliased(tables.PokemonSpecies)
+            grandparent_a = aliased(tables.PokemonSpecies)
+            egg_group_ids = [group.id for group in c.pokemon.species.egg_groups]
+            q = db.pokedex_session.query(tables.PokemonSpecies)
             q = q.join(tables.PokemonEggGroup) \
-                 .outerjoin((parent_a, tables.Pokemon.parent_pokemon)) \
-                 .outerjoin((grandparent_a, parent_a.parent_pokemon)) \
-                 .filter(tables.Pokemon.gender_rate != -1) \
-                 .filter(tables.Pokemon.forms.any()) \
+                 .outerjoin((parent_a, tables.PokemonSpecies.parent_species)) \
+                 .outerjoin((grandparent_a, parent_a.parent_species)) \
+                 .filter(tables.PokemonSpecies.gender_rate != -1) \
                  .filter(
                     # This is a "base form" iff either:
                     or_(
@@ -604,7 +599,7 @@ class PokedexController(PokedexBaseController):
                  ) \
                  .filter(tables.PokemonEggGroup.egg_group_id.in_(egg_group_ids)) \
                  .options(joinedload('unique_form')) \
-                 .order_by(tables.Pokemon.order)
+                 .order_by(tables.PokemonSpecies.id)
             c.compatible_families = q.all()
 
         ### Wild held items
@@ -624,7 +619,7 @@ class PokedexController(PokedexBaseController):
         # Preload with a list of versions so we know which ones are empty
         generations = db.pokedex_session.query(tables.Generation) \
             .options( eagerload('versions') ) \
-            .filter(tables.Generation.id >= max(3, c.pokemon.generation.id))
+            .filter(tables.Generation.id >= max(3, c.pokemon.species.generation_id))
         for generation in generations:
             version_held_items[generation] = {}
             for version in generation.versions:
@@ -666,10 +661,9 @@ class PokedexController(PokedexBaseController):
         # total of seven descendents, so it would need to span 7 rows.
         c.evolution_table = []
         # Prefetch the evolution details
-        family = db.pokedex_session.query(tables.Pokemon) \
-            .filter(tables.Pokemon.evolution_chain_id ==
-                    c.pokemon.normal_form.evolution_chain_id) \
-            .filter(tables.Pokemon.forms.any()) \
+        family = db.pokedex_session.query(tables.PokemonSpecies) \
+            .filter(tables.PokemonSpecies.evolution_chain_id ==
+                    c.pokemon.species.evolution_chain_id) \
             .options(
                 subqueryload('evolutions'),
                 joinedload('evolutions.trigger'),
@@ -691,8 +685,8 @@ class PokedexController(PokedexBaseController):
         while True:
             # First, find some unseen nodes
             unseen_leaves = []
-            for pokemon in family:
-                if pokemon in seen_nodes:
+            for species in family:
+                if species in seen_nodes:
                     continue
 
                 children = []
@@ -700,10 +694,10 @@ class PokedexController(PokedexBaseController):
                 for possible_child in family:
                     if possible_child in seen_nodes:
                         continue
-                    if possible_child.parent_pokemon == pokemon:
+                    if possible_child.parent_species == species:
                         children.append(possible_child)
                 if len(children) == 0:
-                    unseen_leaves.append(pokemon)
+                    unseen_leaves.append(species)
 
             # If there are none, we're done!  Bail.
             # Note that it is impossible to have any unseen non-leaves if there
@@ -719,31 +713,31 @@ class PokedexController(PokedexBaseController):
             current_path = []
 
             # Finally, go back up the tree to the root
-            current_pokemon = leaf
-            while current_pokemon:
-                # The loop bails just after current_pokemon is no longer the
+            current_species = leaf
+            while current_species:
+                # The loop bails just after current_species is no longer the
                 # root, so this will give us the root after the loop ends;
                 # we need to know if it's a baby to see whether to indent the
                 # entire table below
-                root_pokemon = current_pokemon
+                root_pokemon = current_species
 
-                if current_pokemon in seen_nodes:
-                    current_node = seen_nodes[current_pokemon]
+                if current_species in seen_nodes:
+                    current_node = seen_nodes[current_species]
                     # Don't need to repeat this node; the first instance will
                     # have a rowspan
                     current_path.insert(0, None)
                 else:
                     current_node = {
-                        'pokemon': current_pokemon,
+                        'species': current_species,
                         'span':    0,
                     }
                     current_path.insert(0, current_node)
-                    seen_nodes[current_pokemon] = current_node
+                    seen_nodes[current_species] = current_node
 
                 # This node has one more row to span: our current leaf
                 current_node['span'] += 1
 
-                current_pokemon = current_pokemon.parent_pokemon
+                current_species = current_species.parent_species
 
             # We want every path to have four nodes: baby, basic, stage 1 and 2.
             # Every root node is basic, unless it's defined as being a baby.
@@ -910,11 +904,16 @@ class PokedexController(PokedexBaseController):
             .outerjoin((tables.Machine, tables.PokemonMove.machine)) \
             .outerjoin((tables.PokemonMoveMethod, tables.PokemonMove.method))
         # Evolved Pokémon ought to show their predecessors' egg moves.
+        # So far, no species evolves from a parent with multiple functional
+        # forms, but don't rely on that
+        possible_ancestors = set([c.pokemon])
         ancestors = []
-        possible_ancestor = c.pokemon.parent_pokemon
-        while possible_ancestor:
-            ancestors.append(possible_ancestor)
-            possible_ancestor = possible_ancestor.parent_pokemon
+        while possible_ancestors:
+            ancestor = possible_ancestors.pop()
+            ancestors.append(ancestor)
+            parent_species = ancestor.species.parent_species
+            if parent_species:
+                possible_ancestors.update(parent_species.pokemon)
         if ancestors:
             # Include any moves learnable by an ancestor...
             ancestor_ids = [p.id for p in ancestors]
@@ -1086,7 +1085,7 @@ class PokedexController(PokedexBaseController):
 
         # Finally, collapse identical columns within the same generation
         c.move_columns \
-            = _collapse_pokemon_move_columns(table=c.moves, thing=c.pokemon)
+            = _collapse_pokemon_move_columns(table=c.moves, thing=c.pokemon.species)
 
         # Grab list of all the version groups with tutor moves
         c.move_tutor_version_groups = _move_tutor_version_groups(c.moves)

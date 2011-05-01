@@ -14,17 +14,17 @@ ${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons')}\
     <a href="${url.current(name=c.prev_pokemon.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">
         <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
         ${pokemon_icon(c.prev_pokemon)}
-        ${c.prev_pokemon.normal_form.id}: ${c.prev_pokemon.name}
+        ${c.prev_pokemon.species.id}: ${c.prev_pokemon.species.name}
     </a>
     <a href="${url.current(name=c.next_pokemon.name.lower(), form=None)}" id="dex-header-next" class="dex-box-link">
-        ${c.next_pokemon.normal_form.id}: ${c.next_pokemon.name}
+        ${c.next_pokemon.species.id}: ${c.next_pokemon.species.name}
         ${pokemon_icon(c.next_pokemon)}
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
-    ${h.pokedex.pokemon_image(icon_form or c.pokemon.form, prefix='icons')}
-    <br>${c.pokemon.normal_form.id}: ${c.pokemon.name}
+    ${h.pokedex.pokemon_form_image(icon_form or c.pokemon.default_form, prefix='icons')}
+    <br>${c.pokemon.species.id}: ${c.pokemon.species.name}
     <ul class="inline-menu">
-    <% form = c.pokemon.form_name.lower() if not c.pokemon.is_base_form else None %>\
+    <% form = c.pokemon.default_form.identifier if not c.pokemon.is_default else None %>\
     % for action, label in (('pokemon', u'Pokédex'), \
                             ('pokemon_flavor', u'Flavor'), \
                             ('pokemon_locations', u'Locations')):
@@ -299,7 +299,7 @@ collapse_key = h.pokedex.collapse_flavor_text_key(literal=obdurate)
 <%
 # Shaymin (and nothing else) has different cries for its different forms
 cry_url = url(controller='dex', action='media', path=h.pokedex.pokemon_media_path(
-    pokemon_form, 'cries', 'ogg', pokemon_form.form_base_pokemon_id == 492))
+    pokemon_form, 'cries', 'ogg', pokemon_form.species.id == 492))
 %>
 <audio src="${cry_url}" controls preload="auto" class="cry">
     <!-- Totally the best fallback -->
@@ -315,9 +315,9 @@ cry_url = url(controller='dex', action='media', path=h.pokedex.pokemon_media_pat
     </a>
 </%def>
 
-<%def name="foreign_names(object)">
+<%def name="foreign_names(object, name_attr='name')">
     <dl>
-        % for language, foreign_name in h.keysort(object.name_map, lambda lang: lang.order):
+        % for language, foreign_name in h.keysort(getattr(object, name_attr + '_map'), lambda lang: lang.order):
         % if language != c.game_language:
         ## </dt> needs to come right after the flag or else there's space between it and the colon
         <dt>${language.name}

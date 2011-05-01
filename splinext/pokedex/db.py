@@ -106,7 +106,8 @@ def pokemon_query(name, form=None):
 
     query = pokedex_session.query(tables.Pokemon)
     query = query.join(tables.Pokemon.species)
-    query = query.filter(func.lower(tables.PokemonSpecies.name) == name.lower())
+    query = query.join(tables.PokemonSpecies.names_local)
+    query = query.filter(func.lower(tables.PokemonSpecies.names_table.name) == name.lower())
 
     if form:
         # If a form has been specified, it must match

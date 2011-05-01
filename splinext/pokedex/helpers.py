@@ -307,7 +307,7 @@ def pokemon_link(pokemon, content=None, to_flavor=False, **attr):
     """
 
     if 'form' in attr:
-        forms = [f for f in pokemon.forms if f.identifier == attr['form']]
+        forms = [f for f in pokemon.forms if f.form_identifier == attr['form']]
         if forms:
             form = forms[0]
         else:
@@ -483,12 +483,12 @@ def evolution_description(evolution, _=_):
         else:
             op = _(u'=')
         chunks.append(_(u"when Attack {0} Defense").format(op))
-    if evolution.party_pokemon_id:
+    if evolution.party_species_id:
         chunks.append(_(u"with {0} in the party").format(
-            evolution.party_pokemon.name))
-    if evolution.trade_pokemon_id:
+            evolution.party_species.name))
+    if evolution.party_species_id:
         chunks.append(_(u"in exchange for {0}")
-            .format(evolution.trade_pokemon.name))
+            .format(evolution.party_species.name))
 
     return u', '.join(chunks)
 
