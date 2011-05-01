@@ -197,7 +197,7 @@ class PokedexController(PokedexBaseController):
         tables.Location: 'location',
         tables.Move: 'move',
         tables.Nature: 'nature',
-        tables.Pokemon: u'Pokémon',
+        tables.PokemonSpecies: u'Pokémon',
         tables.PokemonForm: u'Pokémon form',
         tables.Type: 'type',
     }
@@ -285,11 +285,11 @@ class PokedexController(PokedexBaseController):
         # Subpage suffixes: 'flavor' and 'locations' for Pokémon bits
         if lookup.endswith((u' flavor', u' flavour')):
             c.subpage = 'flavor'
-            valid_types = [u'pokemon', u'pokemon_forms']
+            valid_types = [u'pokemon_species', u'pokemon_forms']
             name = re.sub('(?i) flavou?r$', '', name)
         elif lookup.endswith(u' locations'):
             c.subpage = 'locations'
-            valid_types = [u'pokemon']
+            valid_types = [u'pokemon_species', u'pokemon_forms']
             name = re.sub('(?i) locations$', '', name)
 
         results = db.pokedex_lookup.lookup(name, valid_types=valid_types)
@@ -823,7 +823,7 @@ class PokedexController(PokedexBaseController):
                                   ('! and ?', forms[26].pokeathlon_stats)]
         else:
             # Different stats for every form
-            c.pokeathlon_stats = [(form.full_name or 'Normal',
+            c.pokeathlon_stats = [(form.form_name or 'Normal Form',
                                    form.pokeathlon_stats) for form in forms]
 
         ### Sizing
@@ -1132,10 +1132,7 @@ class PokedexController(PokedexBaseController):
         c.sprite_exists = sprite_exists
 
         # Figure out if a sprite form appears in the overworld
-        c.appears_in_overworld = c.form.is_default or (
-            c.form.form_base_pokemon.form_group and not
-            c.form.form_base_pokemon.form_group.is_battle_only
-        )
+        c.appears_in_overworld = not c.form.is_battle_only
 
         # Some sprite-existence shortcuts based on this information
         c.sprites['overworld'] = (c.appears_in_overworld and

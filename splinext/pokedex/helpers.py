@@ -41,10 +41,10 @@ def make_thingy_url(thingy, subpage=None):
     # Pokémon with forms need the form attached to the URL
     if isinstance(thingy, tables.PokemonForm):
         action = 'pokemon'
-        args['form'] = thingy.name.lower()
-        args['name'] = thingy.default_pokemon.species.name.lower()
+        args['form'] = thingy.form_name.lower()
+        args['name'] = thingy.pokemon.species.name.lower()
 
-        if thingy.unique_pokemon is None:
+        if not thingy.is_default:
             subpage = 'flavor'
     elif isinstance(thingy, tables.PokemonSpecies):
         action = 'pokemon'

@@ -281,9 +281,9 @@ ${h.h1(_('Evolution'))}
             ${h.pokedex.evolution_description(evolution, _=_)}
         </span>
         % endfor
-        % if col['species'].is_baby and c.pokemon.evolution_chain.baby_trigger_item:
+        % if col['species'].is_baby and c.pokemon.species.evolution_chain.baby_trigger_item:
         <span class="dex-evolution-chain-method">
-            ${_(u"Either parent must hold ")} ${h.pokedex.item_link(c.pokemon.evolution_chain.baby_trigger_item, include_icon=False, _=_)}
+            ${_(u"Either parent must hold ")} ${h.pokedex.item_link(c.pokemon.species.evolution_chain.baby_trigger_item, include_icon=False, _=_)}
         </span>
         % endif
     </td>
