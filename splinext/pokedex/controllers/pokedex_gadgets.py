@@ -1025,12 +1025,12 @@ class PokedexGadgetsController(PokedexBaseController):
             # Our types are also in the correct order, except that we start
             # from 1 rather than 0, and HP skips Normal
             c.hidden_power_type = db.pokedex_session.query(tables.Type) \
-                .get(type_det * 15 // 63)
+                .get(type_det * 15 // 63 + 2)
             c.hidden_power_power = power_det * 40 // 63 + 30
 
             # Used for a link
             c.hidden_power = db.pokedex_session.query(tables.Move) \
-                .filter_by(name='Hidden Power').one()
+                .filter_by(identifier='hidden-power').one()
 
         # Turn those results into something more readable.
         # Template still needs valid_genes for drawing the graph
