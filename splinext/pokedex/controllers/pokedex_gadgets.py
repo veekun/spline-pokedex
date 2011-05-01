@@ -643,22 +643,23 @@ class PokedexGadgetsController(PokedexBaseController):
                 continue
 
             results = db.pokedex_lookup.lookup(
-                raw_pokemon, valid_types=['pokemon', 'pokemon_form'])
+                raw_pokemon, valid_types=['pokemon_species', 'pokemon_form'])
 
             # Two separate things to do here.
             # 1: Use the first result as the actual Pokémon
             pokemon = None
             form = None
             if results:
-                pokemon = results[0].object
+                result = results[0].object
                 c.did_anything = True
 
                 # 1.5: Deal with form matches
-                if isinstance(pokemon, tables.PokemonForm):
-                    form = pokemon
-                    pokemon = pokemon.pokemon
+                if isinstance(result, tables.PokemonForm):
+                    pokemon = result.pokemon
+                    form = result
                 else:
-                    form = pokemon.form
+                    pokemon = result.default_pokemon
+                    form = pokemon.default_form
 
             # 2: Use the other results as suggestions.  Doing this informs the
             # template that this was a multi-match
@@ -727,8 +728,8 @@ class PokedexGadgetsController(PokedexBaseController):
             # Use the label from the page as the key, because why not
             relative_things = [
                 (u'Base EXP',       lambda pokemon: pokemon.base_experience),
-                (u'Base happiness', lambda pokemon: pokemon.base_happiness),
-                (u'Capture rate',   lambda pokemon: pokemon.capture_rate),
+                (u'Base happiness', lambda pokemon: pokemon.species.base_happiness),
+                (u'Capture rate',   lambda pokemon: pokemon.species.capture_rate),
             ]
             def relative_stat_factory(local_stat):
                 return lambda pokemon: pokemon.stat(local_stat).base_stat

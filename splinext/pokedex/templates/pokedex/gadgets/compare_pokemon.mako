@@ -65,8 +65,8 @@ ${h.form(url.current(), method='GET')}
         <th>
             % if found_pokemon.pokemon:
             ${h.pokedex.pokemon_link(found_pokemon.pokemon,
-                h.pokedex.pokemon_image(found_pokemon.form, prefix=u'icons')
-                    + h.literal(u'<br>') + found_pokemon.pokemon.full_name,
+                h.pokedex.pokemon_form_image(found_pokemon.form, prefix=u'icons')
+                    + h.literal(u'<br>') + found_pokemon.pokemon.default_form.name,
             )}<br>
             % endif
             <input type="text" name="pokemon" value="${found_pokemon.input}">
@@ -123,7 +123,7 @@ ${h.end_form()}
         % for i, found_pokemon in enumerate(c.found_pokemon):
         <td>
             % if found_pokemon.pokemon:
-            ${h.pokedex.pokemon_image(found_pokemon.form, prefix='cropped', style="height: %.2f%%;" % (c.heights[i] * 100))}
+            ${h.pokedex.pokemon_form_image(found_pokemon.form, prefix='cropped', style="height: %.2f%%;" % (c.heights[i] * 100))}
             % endif
         </td>
         % endfor
@@ -135,7 +135,7 @@ ${h.end_form()}
         % for i, found_pokemon in enumerate(c.found_pokemon):
         <td>
             % if found_pokemon.pokemon:
-            ${h.pokedex.pokemon_image(found_pokemon.form, prefix='cropped', style="height: %.2f%%;" % (c.weights[i] * 100))}
+            ${h.pokedex.pokemon_form_image(found_pokemon.form, prefix='cropped', style="height: %.2f%%;" % (c.weights[i] * 100))}
             % endif
         </td>
         % endfor
@@ -204,9 +204,9 @@ ${move_table_header()}
         <th>
             % if found_pokemon.pokemon:
             ${h.pokedex.pokemon_link(found_pokemon.pokemon,
-                h.pokedex.pokemon_image(found_pokemon.form, prefix=u'icons')
+                h.pokedex.pokemon_form_image(found_pokemon.form, prefix=u'icons')
                 + h.literal('<br>')
-                + found_pokemon.pokemon.full_name)}
+                + found_pokemon.pokemon.default_form.name)}
             % endif
         </th>
         % endfor
@@ -269,15 +269,15 @@ ${move_table_header()}
 
 <%def name="egg_groups_cell(pokemon)">
 <ul>
-    % for egg_group in pokemon.egg_groups:
+    % for egg_group in pokemon.species.egg_groups:
     <li>${egg_group.name}</li>
     % endfor
 </ul>
 </%def>
 
 <%def name="gender_cell(pokemon)">
-${h.pokedex.chrome_img('gender-rates/%d.png' % pokemon.gender_rate, alt='')}<br>
-${h.pokedex.gender_rate_label[pokemon.gender_rate]}
+${h.pokedex.chrome_img('gender-rates/%d.png' % pokemon.species.gender_rate, alt='')}<br>
+${h.pokedex.gender_rate_label[pokemon.species.gender_rate]}
 </%def>
 
 <%def name="base_exp_cell(pokemon)">
@@ -315,22 +315,22 @@ ${h.pokedex.format_weight_metric(pokemon.weight)}
 </%def>
 
 <%def name="species_cell(pokemon)">${pokemon.species}</%def>
-<%def name="color_cell(pokemon)"><span class="dex-color-${pokemon.color}"></span> ${pokemon.color}</%def>
+<%def name="color_cell(pokemon)"><span class="dex-color-${pokemon.species.color}"></span> ${pokemon.species.color}</%def>
 <%def name="habitat_cell(pokemon)">
-% if pokemon.generation.id <= 3:
-${h.pokedex.pokedex_img('habitats/%s.png' % h.pokedex.filename_from_name(pokemon.habitat), \
-    alt='', title=pokemon.habitat)}<br>
+% if pokemon.species.generation_id <= 3:
+${h.pokedex.pokedex_img('habitats/%s.png' % h.pokedex.filename_from_name(pokemon.species.habitat.identifier), \
+    alt='', title=pokemon.species.habitat.name)}<br>
 % else:
 n/a
 % endif
 </%def>
 
-<%def name="footprint_cell(pokemon)">${h.pokedex.pokemon_image(pokemon.form, prefix='footprints', use_form=False)}</%def>
+<%def name="footprint_cell(pokemon)">${h.pokedex.species_image(pokemon.species, prefix='footprints', use_form=False)}</%def>
 
 <%def name="shape_cell(pokemon)">
-% if pokemon.shape:
-${h.pokedex.pokedex_img('shapes/%s.png' % pokemon.shape.identifier, alt='', title=pokemon.shape.name)}<br>
-${pokemon.shape.awesome_name}
+% if pokemon.species.shape:
+${h.pokedex.pokedex_img('shapes/%s.png' % pokemon.species.shape.identifier, alt='', title=pokemon.species.shape.name)}<br>
+${pokemon.species.shape.awesome_name}
 % else:
 n/a
 % endif
