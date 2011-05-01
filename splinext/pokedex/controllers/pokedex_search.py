@@ -1075,7 +1075,7 @@ class PokedexSearchController(PokedexBaseController):
                 )
             else:
                 query = db.pokedex_session.query(me) \
-                    .filter(my_species.id.in_(species_ids.keys()))
+                    .filter(me.id.in_(pokemon_ids.keys()))
 
             # Join the new query to pokemon & forms again; needed for sorting
             query = query.join((me, my_species.pokemon))

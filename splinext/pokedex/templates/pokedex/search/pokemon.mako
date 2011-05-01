@@ -130,7 +130,7 @@ ${h.pokedex.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_temp
 ## Grid of icons
 <ul class="inline">
     % for result in c.results:
-    <li>${h.pokedex.pokemon_link(result, h.pokedex.pokemon_form_image(result.form, prefix=u'icons'), class_='dex-icon-link')}</li>
+    <li>${h.pokedex.pokemon_link(result, h.pokedex.pokemon_form_image(result.default_form, prefix=u'icons'), class_='dex-icon-link')}</li>
     % endfor
 </ul>
 
@@ -138,7 +138,7 @@ ${h.pokedex.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_temp
 ## Grid of most recent sprites
 <ul class="inline">
     % for result in c.results:
-    <li>${h.pokedex.pokemon_link(result, h.pokedex.pokemon_form_image(result.form), class_='dex-icon-link')}</li>
+    <li>${h.pokedex.pokemon_link(result, h.pokedex.pokemon_form_image(result.default_form), class_='dex-icon-link')}</li>
     % endfor
 </ul>
 
@@ -486,13 +486,13 @@ ${pokemon_stat.effort} ${pokemon_stat.stat.name}<br>
 
 <%def name="col_color()"><col class="dex-col-color"></%def>
 <%def name="th_color()"><th>${_(u"Color")}</th></%def>
-<%def name="td_color(pokemon)"><td class="color"><span class="dex-color-${pokemon.species.color}"></span> ${pokemon.species.color}</td></%def>
+<%def name="td_color(pokemon)"><td class="color"><span class="dex-color-${pokemon.species.color.identifier}"></span> ${pokemon.species.color.name}</td></%def>
 
 <%def name="col_habitat()"><col class="dex-col-habitat"></%def>
 <%def name="th_habitat()"><th>${_(u"Habitat")}</th></%def>
 <%def name="td_habitat(pokemon)"><td class="habitat">\
 % if pokemon.species.generation.id <= 3:
-${pokemon.species.habitat}\
+${pokemon.species.habitat.name}\
 % else:
 —\
 % endif

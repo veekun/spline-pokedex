@@ -25,8 +25,8 @@ ${h.h1(_('Essentials'))}
 
 ## Portrait block
 <div class="dex-page-portrait">
-    <p id="dex-page-name">${c.pokemon.name}</p>
-    % if c.pokemon.default_form.form_name:
+    <p id="dex-page-name">${c.pokemon.species.name}</p>
+    % if len(c.pokemon.species.pokemon) > 1:
     <p id="dex-pokemon-forme">${c.pokemon.default_form.form_name}</p>
     % endif
     <div id="dex-pokemon-portrait-sprite">
@@ -89,11 +89,7 @@ ${h.h1(_('Essentials'))}
     </dl>
 
     <h2>${_(u"Names")}</h2>
-    % if c.pokemon.default_form.form_identifier:
-        ${dexlib.foreign_names(c.pokemon.default_form, name_attr='pokemon_name')}
-    % else:
-        ${dexlib.foreign_names(c.pokemon.species)}
-    % endif
+    ${dexlib.foreign_names(c.pokemon.species)}
 </div>
 <div class="dex-column">
     <h2>${_(u"Breeding")}</h2>
@@ -146,7 +142,7 @@ ${h.h1(_('Essentials'))}
     <ul class="inline dex-pokemon-compatibility">
         % for species in c.compatible_families:
         <li>${h.pokedex.pokemon_link(
-            species,
+            species.default_pokemon,
             h.literal(capture(dexlib.pokemon_icon, species.default_pokemon)),
             form=None,
             class_='dex-icon-link',
@@ -293,16 +289,16 @@ ${h.h1(_('Evolution'))}
 % endfor
 </tbody>
 </table>
-% if c.pokemon.species.form_description:
-<h2 id="forms"> <a href="#forms" class="subtle">${_("%s Forms") % c.pokemon.name}</a> </h2>
+% if len(c.pokemon.species.forms) > 1:
+<h2 id="forms"> <a href="#forms" class="subtle">${_("%s Forms") % c.pokemon.species.name}</a> </h2>
 <ul class="inline">
-    % for form in c.pokemon.species.forms:
+    % for form in sorted(c.pokemon.species.forms, key=lambda f: (f.order, f.name)):
 <%
     link_class = 'dex-box-link'
     if form == c.pokemon.default_form:
         link_class = link_class + ' selected'
 %>\
-    <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_form_image(form, 'main-sprites/black-white'), form=form.name, class_=link_class)}</li>
+    <li>${h.pokedex.pokemon_link(form.pokemon, h.pokedex.pokemon_form_image(form, 'main-sprites/black-white'), form=form.form_identifier, class_=link_class)}</li>
     % endfor
 </ul>
 <p> ${c.pokemon.species.form_description} </p>
@@ -453,7 +449,7 @@ ${h.h1(_('Flavor'))}
         <dt>${_("Species")}</dt>
         <dd>
             ${c.pokemon.species.genus}
-            ${dexlib.subtle_search(action='pokemon_search', species=c.pokemon.species.genus, _=_)}
+            ${dexlib.subtle_search(action='pokemon_search', genus=c.pokemon.species.genus, _=_)}
         </dd>
 
         <dt>${_("Color")}</dt>
@@ -465,7 +461,7 @@ ${h.h1(_('Flavor'))}
 
         <dt>${_("Cry")}</dt>
         <dd>
-            ${dexlib.pokemon_cry(c.pokemon.default_form)}
+            ${dexlib.pokemon_cry(c.pokemon)}
         </dd>
 
         % if c.pokemon.species.generation_id <= 3:

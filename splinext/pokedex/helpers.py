@@ -41,7 +41,7 @@ def make_thingy_url(thingy, subpage=None):
     # Pokémon with forms need the form attached to the URL
     if isinstance(thingy, tables.PokemonForm):
         action = 'pokemon'
-        args['form'] = thingy.form_name.lower()
+        args['form'] = thingy.form_identifier.lower()
         args['name'] = thingy.pokemon.species.name.lower()
 
         if not thingy.is_default:
@@ -313,7 +313,7 @@ def pokemon_link(pokemon, content=None, to_flavor=False, **attr):
         form.
     """
 
-    if 'form' in attr:
+    if 'form' in attr and attr['form']:
         forms = [f for f in pokemon.forms if f.form_identifier == attr['form']]
         if forms:
             form = forms[0]
@@ -341,7 +341,7 @@ def pokemon_link(pokemon, content=None, to_flavor=False, **attr):
     return h.HTML.a(
         content,
         href=url(controller='dex', action=action,
-                       name=pokemon.name.lower(), **url_kwargs),
+                       name=pokemon.species.name.lower(), **url_kwargs),
         **attr
         )
 
@@ -456,8 +456,8 @@ def evolution_description(evolution, _=_):
         chunks.append(
             _(u"Evolve {from_pokemon} ({to_pokemon} will consume "
             u"a Poké Ball and appear in a free party slot)").format(
-                from_pokemon=evolution.evolved_pokemon.parent_pokemon.full_name,
-                to_pokemon=evolution.evolved_pokemon.full_name))
+                from_pokemon=evolution.evolved_species.parent_species.name,
+                to_pokemon=evolution.evolved_species.name))
     else:
         chunks.append(_(u'Do something'))
 

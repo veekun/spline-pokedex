@@ -471,9 +471,7 @@ class PokedexController(PokedexBaseController):
 
     def _prev_next_pokemon(self, pokemon):
         """Returns a 2-tuple of the previous and next Pokémon."""
-        max_id = db.pokedex_session.query(tables.Pokemon) \
-                                .filter(tables.Pokemon.forms.any()) \
-                                .count()
+        max_id = db.pokedex_session.query(tables.PokemonSpecies).count()
         prev_pokemon = db.pokedex_session.query(tables.PokemonSpecies).get(
             (c.pokemon.species.id - 1 - 1) % max_id + 1).default_pokemon
         next_pokemon = db.pokedex_session.query(tables.PokemonSpecies).get(

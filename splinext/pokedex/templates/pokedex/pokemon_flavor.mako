@@ -63,7 +63,7 @@ ${h.h1(_('Essentials'))}
         % endif
 
         <dt>${_("Footprint")}</dt>
-        <dd>${h.pokedex.pokemon_form_image(c.form, prefix='footprints', use_form=False)}</dd>
+        <dd>${h.pokedex.species_image(c.pokemon.species, prefix='footprints', use_form=False)}</dd>
 
         <dt>${_("Shape")}</dt>
         <dd>
@@ -133,9 +133,9 @@ ${h.h1(_('Main Game Portraits'), id=_('main-sprites', context='anchor'))}
         <% prefix = 'main-sprites/black-white' %>
     % endif
     <li>${h.pokedex.pokemon_link(
-            c.pokemon.species,
+            c.pokemon,
             h.pokedex.pokemon_form_image(form, prefix=prefix),
-            to_flavor=True, form=form.name,
+            to_flavor=True, form=form.form_identifier,
             class_='dex-icon-link' + (' selected' if form == c.form else ''),
     )}</li>
 % endfor
