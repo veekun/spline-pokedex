@@ -85,6 +85,10 @@ class TestPagesController(SplineTest):
                 dict(controller='dex_gadgets', action='stat_calculator'),
                 dict(controller='dex_gadgets', action='whos_that_pokemon'),
 
+                dict(controller='dex_gadgets', action='stat_calculator',
+                        pokemon='Sky Shaymin', stat='310|211|155|245|155|259',
+                        level='100', effort='0|0|0|0|0|0', nature='bashful'),
+
                 dict(action='lookup', lookup='eevee'),
                 dict(action='lookup', lookup='arceus'),
                 dict(action='lookup', lookup='flying arceus'),
