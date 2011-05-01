@@ -183,9 +183,9 @@ ${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons')}\
     <em>${_pokemon_ability_link(pokemon.dream_ability)}</em>
   % endif
 </td>
-<td>${h.pokedex.chrome_img('gender-rates/%d.png' % pokemon.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.gender_rate])}</td>
+<td>${h.pokedex.chrome_img('gender-rates/%d.png' % pokemon.species.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.species.gender_rate])}</td>
 <td class="egg-group">
-  % for i, egg_group in enumerate(pokemon.egg_groups):
+  % for i, egg_group in enumerate(pokemon.species.egg_groups):
     % if i > 0:
     <br>
     % endif

@@ -1629,7 +1629,7 @@ class PokedexController(PokedexBaseController):
                 subqueryload(tables.Ability.dream_pokemon),
                 subqueryload(tables.Ability.all_pokemon),
                 subqueryload(tables.Ability.all_pokemon, tables.Pokemon.abilities),
-                subqueryload(tables.Ability.all_pokemon, tables.Pokemon.egg_groups),
+                subqueryload(tables.Ability.all_pokemon, tables.Pokemon.species, tables.PokemonSpecies.egg_groups),
                 subqueryload(tables.Ability.all_pokemon, tables.Pokemon.types),
                 subqueryload(tables.Ability.all_pokemon, tables.Pokemon.stats),
                 joinedload(tables.Ability.all_pokemon, tables.Pokemon.stats, tables.PokemonStat.stat),

@@ -2,6 +2,7 @@
 <%namespace name="lib" file="/lib.mako"/>
 <%namespace name="dexlib" file="lib.mako"/>
 <%! from splinext.pokedex import i18n %>\
+<%! from splinext.pokedex import db %>\
 
 <%def name="title()">${_(u"%s - Types") % c.type.name.title()}</%def>
 
@@ -77,15 +78,15 @@ ${h.h1(_(u'Pokémon'), id='pokemon')}
 <%! from pokedex.db import markdown %>
 <div class="markdown">
 ${markdown.MarkdownString(_(u"""
-In Generation IV, pure [flying]{type}-types become ???-type during [Roost]{move}.  This can be accomplished with
-[Conversion]{move}, [Conversion 2]{move}, or the ability [Color Change]{ability}.  A Pokémon can legitimately have both
-Roost and one of these only through the use of [Mimic]{move}, [Sketch]{move}, [Role Play]{move}, or [Skill Swap]{move}.
-(No Pokémon that has [Trace]{ability} or [Multitype]{ability} learns Roost, and Multitype cannot be copied.)
+In Generation IV, pure []{type:flying}-types become ???-type during []{move:roost}.  This can be accomplished with
+[]{move:conversion}, []{move:conversion-2}, or the ability []{ability:color-change}.  A Pokémon can legitimately have both
+Roost and one of these only through the use of []{move:mimic}, []{move:sketch}, []{move:role-play}, or []{move:skill-swap}.
+(No Pokémon that has []{ability:trace} or []{ability:multitype} learns Roost, and Multitype cannot be copied.)
 
 Generation IV has [sprites for a ???-type Arceus](%s), even though Arceus cannot become ???-type through regular play.
 Eggs are purely ???-type before hatching before Generation V, and are displayed as such in the Generation III status
 screen.  In Generation V, the ??? type no longer exists.
-""") % url(controller='dex', action='pokemon_flavor', name='arceus', form='???'))}
+""") % url(controller='dex', action='pokemon_flavor', name='arceus', form='???'), db.pokedex_session, c.language)}
 </div>
 % elif c.type.name == 'Shadow':
 <p>Shadow Pokémon are Pokémon whose hearts have been closed in Pokémon Colosseum and Pokémon XD: Gale of Darkness.  The
