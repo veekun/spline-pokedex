@@ -46,25 +46,31 @@ class PokedexLookupField(fields.TextField):
 
             valid_types = [self.valid_type]
             if self.valid_type == 'pokemon':
-                valid_types.append('pokemon_form')
+                valid_types = ['pokemon_species', 'pokemon_form']
 
             results = db.pokedex_lookup.lookup(
                 valuelist[0],
                 valid_types=valid_types,
             )
 
-            if not results:
+            all_data = set()
+            for result in results:
+                obj = result.object
+                print result, obj
+                if obj.__tablename__ == 'pokemon_forms':
+                    all_data.add(obj.pokemon)
+                elif obj.__tablename__ == 'pokemon_species':
+                    all_data.add(obj.default_pokemon)
+                else:
+                    all_data.add(obj)
+
+            if not all_data:
                 raise ValidationError('Nothing found')
-            elif len(results) > 1:
+            if len(all_data) > 1:
                 # XXX fix this to offer alternatives somehow
                 raise ValidationError('Too vague')
-            else:
-                self.data = results[0].object
 
-                if self.valid_type == 'pokemon' and \
-                   self.data.__tablename__ == 'pokemon_forms':
-                    self.data = self.data.unique_pokemon or \
-                        self.data.form_base_pokemon
+            self.data = all_data.pop()
 
     def _value(self):
         """Converts Python value back to a form value."""
@@ -72,7 +78,7 @@ class PokedexLookupField(fields.TextField):
             return self.raw_data[0] if self.raw_data else u''
         elif self.valid_type == 'pokemon':
             # Pokémon need form names
-            return self.data.full_name
+            return self.data.default_form.name
         else:
             return self.data.name
 
