@@ -27,7 +27,7 @@ ${h.h1(_('Essentials'))}
             sprite_path = 'items'
     %>\
     <div id="dex-pokemon-portrait-sprite">
-        ${h.pokedex.pokedex_img(u"{0}/{1}.png".format(sprite_path, h.pokedex.filename_from_name(c.item.name)))}
+        ${h.pokedex.pokedex_img(u"{0}/{1}.png".format(sprite_path, h.pokedex.filename_from_name(c.item.identifier)))}
     </div>
     <p id="dex-page-types">
         <a href="${url(controller='dex', action='item_pockets', pocket=c.item.pocket.identifier)}">
