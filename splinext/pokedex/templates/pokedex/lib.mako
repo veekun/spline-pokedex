@@ -24,7 +24,7 @@ ${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons')}\
     ${h.pokedex.pokemon_form_image(icon_form or c.pokemon.default_form, prefix='icons')}
     <br>${c.pokemon.species.id}: ${c.pokemon.species.name}
     <ul class="inline-menu">
-    <% form = c.pokemon.default_form.identifier if not c.pokemon.is_default else None %>\
+    <% form = c.pokemon.default_form.form_identifier if not c.pokemon.is_default else None %>\
     % for action, label in (('pokemon', u'Pokédex'), \
                             ('pokemon_flavor', u'Flavor'), \
                             ('pokemon_locations', u'Locations')):

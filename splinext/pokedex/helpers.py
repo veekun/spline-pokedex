@@ -42,10 +42,13 @@ def make_thingy_url(thingy, subpage=None):
     if isinstance(thingy, tables.PokemonForm):
         action = 'pokemon'
         args['form'] = thingy.name.lower()
-        args['name'] = thingy.form_base_pokemon.name.lower()
+        args['name'] = thingy.default_pokemon.species.name.lower()
 
         if thingy.unique_pokemon is None:
             subpage = 'flavor'
+    elif isinstance(thingy, tables.PokemonSpecies):
+        action = 'pokemon'
+        args['name'] = thingy.name.lower()
     else:
         action = thingy.__tablename__
         args['name'] = thingy.name.lower()
@@ -227,8 +230,12 @@ def pokemon_has_media(pokemon_form, prefix, ext, use_form=True):
     in the specified directory for the specified Pokémon form.
     """
 
+    if use_form:
+        kwargs = dict(form=pokemon_form)
+    else:
+        kwargs = dict()
     return resource_exists('pokedex', 'data/media/{0}'.format(
-        pokemon_media_path(pokemon_form, prefix, ext, use_form)))
+        pokemon_media_path(pokemon_form.species, prefix, ext, **kwargs)))
 
 def pokemon_media_path(pokemon_species, prefix, ext, form=None):
     """Returns a path to a Pokémon media file.

@@ -634,7 +634,7 @@ class TestPokemonSearchController(TestController):
         """Checks searching by base experience."""
         self.check_search(
             dict(base_experience=u'255'),
-            [ u'Arceus', u'Blissey', u'Chansey', u'Happiny' ],
+            [ u'Normal Arceus', u'Blissey', u'Chansey', u'Happiny' ],
             'base EXP',
         )
 

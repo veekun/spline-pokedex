@@ -458,9 +458,9 @@ ${h.h1(_('Flavor'))}
 
         <dt>${_("Color")}</dt>
         <dd>
-            <span class="dex-color-${c.pokemon.species.color}"></span>
-            ${c.pokemon.species.color}
-            ${dexlib.subtle_search(action='pokemon_search', color=c.pokemon.species.color, _=_)}
+            <span class="dex-color-${c.pokemon.species.color.identifier}"></span>
+            ${c.pokemon.species.color.name}
+            ${dexlib.subtle_search(action='pokemon_search', color=c.pokemon.species.color.identifier, _=_)}
         </dd>
 
         <dt>${_("Cry")}</dt>
@@ -471,23 +471,21 @@ ${h.h1(_('Flavor'))}
         % if c.pokemon.species.generation_id <= 3:
         <dt>${_("Habitat")} ${h.pokedex.version_icons(u'FireRed', u'LeafGreen')}</dt>
         <dd>
-            ${h.pokedex.pokedex_img('habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.species.habitat))}
-            ${c.pokemon.species.habitat}
-            ${dexlib.subtle_search(action='pokemon_search', habitat=c.pokemon.species.habitat, _=_)}
+            ${h.pokedex.pokedex_img('habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.species.habitat.identifier))}
+            ${c.pokemon.species.habitat.name}
+            ${dexlib.subtle_search(action='pokemon_search', habitat=c.pokemon.species.habitat.identifier, _=_)}
         </dd>
         % endif
 
         <dt>${_("Footprint")}</dt>
         <dd>${h.pokedex.species_image(c.pokemon.species, prefix='footprints', use_form=False)}</dd>
 
-        % if c.pokemon.species.generation_id <= 4:
-        <dt>${_("Shape")} ${h.pokedex.generation_icon(4)}</dt>
+        <dt>${_("Shape")}</dt>
         <dd>
             ${h.pokedex.pokedex_img('shapes/%s.png' % c.pokemon.species.shape.identifier, alt='', title=c.pokemon.species.shape.name)}
             ${c.pokemon.species.shape.awesome_name}
             ${dexlib.subtle_search(action='pokemon_search', shape=c.pokemon.species.shape.identifier, _=_)}
         </dd>
-        % endif
     </dl>
 </div>
 <div class="dex-column">
@@ -646,15 +644,15 @@ ${h.h1(_('External Links'), id=_('links', context='header id'))}
         ghpd_name = re.sub('[^\w-]', '', ghpd_name)
         smogon_name = ghpd_name
 
-    if not c.pokemon.is_default:
-        if c.pokemon.form_name == 'Sandy':
+    if not c.pokemon.is_default and c.pokemon.default_form.form_name:
+        if c.pokemon.default_form.form_name == 'Sandy Cloak':
             smogon_name += '-g'
-        elif c.pokemon.form_name == 'Mow':
+        elif c.pokemon.default_form.form_name == 'Mow Form':
             smogon_name += '-c'
-        elif c.pokemon.form_name in ('Fan', 'Trash'):
+        elif c.pokemon.default_form.form_name in ('Fan Form', 'Trash Cloak'):
             smogon_name += '-s'
         else:
-            smogon_name += '-' + c.pokemon.form_name[0].lower()
+            smogon_name += '-' + c.pokemon.default_form.form_name[0].lower()
 %>
 <ul class="classic-list">
 % if c.pokemon.species.generation_id <= 1:

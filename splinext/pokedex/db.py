@@ -112,7 +112,7 @@ def pokemon_query(name, form=None):
     if form:
         # If a form has been specified, it must match
         query = query.join(tables.Pokemon.forms) \
-            .filter(tables.PokemonForm.identifier == form)
+            .filter(tables.PokemonForm.form_identifier == form)
     else:
         # If there's NOT a form, just make sure we get a default Pokémon
         query = query.filter(tables.Pokemon.is_default == True)
@@ -124,17 +124,18 @@ def pokemon_form_query(name, form=None):
     default form of the named Pokémon.
     """
 
-    q = get_by_name_query(
-            tables.Pokemon,
-            name,
-            query=pokedex_session.query(tables.PokemonForm).join('form_base_pokemon')
-        )
+    q = pokedex_session.query(tables.PokemonForm)
+    q = q.join(tables.PokemonForm.pokemon)
+    q = q.join(tables.Pokemon.species)
+    q = q.join(tables.PokemonSpecies.names_local) \
+        .filter(func.lower(tables.PokemonSpecies.names_table.name) == name)
 
     if form:
         # If a form has been specified, it must match
-        q = get_by_name_query(tables.PokemonForm, form, query=q)
+        q = q.filter(tables.PokemonForm.form_identifier == form)
     else:
         # If there's NOT a form, just get the default form
+        q = q.filter(tables.Pokemon.is_default == True)
         q = q.filter(tables.PokemonForm.is_default == True)
 
     return q

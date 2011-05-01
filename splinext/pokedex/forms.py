@@ -56,7 +56,6 @@ class PokedexLookupField(fields.TextField):
             all_data = set()
             for result in results:
                 obj = result.object
-                print result, obj
                 if obj.__tablename__ == 'pokemon_forms':
                     all_data.add(obj.pokemon)
                 elif obj.__tablename__ == 'pokemon_species':

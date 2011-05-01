@@ -3,14 +3,14 @@
 <%namespace name="dexlib" file="lib.mako"/>
 <%! from splinext.pokedex import i18n %>\
 
-<%def name="title()">${_(u"{pkmn} locations - Pokémon #{id}").format(pkmn=c.pokemon.name, id=c.pokemon.normal_form.id)}</%def>
+<%def name="title()">${_(u"{pkmn} locations - Pokémon #{id}").format(pkmn=c.pokemon.default_form.name, id=c.pokemon.species_id)}</%def>
 
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
     <li><a href="${url('/dex')}">${_(u"Pokédex")}</a></li>
     <li><a href="${url(controller='dex', action='pokemon_list')}">${_(u"Pokémon")}</a></li>
-    <li>${h.pokedex.pokemon_link(c.pokemon, content=c.pokemon.name)}</li>
-    <li>${_(u"%s locations") % c.pokemon.name}</li>
+    <li>${h.pokedex.pokemon_link(c.pokemon, content=c.pokemon.default_form.name)}</li>
+    <li>${_(u"%s locations") % c.pokemon.default_form.name}</li>
 </ul>
 </%def>
 
