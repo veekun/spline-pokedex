@@ -511,8 +511,8 @@ class PokedexController(PokedexBaseController):
             pokemon_q = pokemon_q.options(
                 joinedload(tables.Pokemon.abilities, tables.Ability.prose_local),
                 joinedload(tables.Pokemon.dream_ability, tables.Ability.prose_local),
-                eagerload('evolution_chain.pokemon'),
-                eagerload('generation'),
+                eagerload('species.evolution_chain.species'),
+                eagerload('species.generation'),
                 eagerload('items.item'),
                 eagerload('items.version'),
                 eagerload('species'),
@@ -598,7 +598,7 @@ class PokedexController(PokedexBaseController):
                     )
                  ) \
                  .filter(tables.PokemonEggGroup.egg_group_id.in_(egg_group_ids)) \
-                 .options(joinedload('unique_form')) \
+                 .options(joinedload('default_form')) \
                  .order_by(tables.PokemonSpecies.id)
             c.compatible_families = q.all()
 
@@ -671,9 +671,9 @@ class PokedexController(PokedexBaseController):
                 joinedload('evolutions.held_item'),
                 joinedload('evolutions.location'),
                 joinedload('evolutions.known_move'),
-                joinedload('evolutions.party_pokemon'),
-                joinedload('parent_pokemon'),
-                joinedload('unique_form'),
+                joinedload('evolutions.party_species'),
+                joinedload('parent_species'),
+                joinedload('default_form'),
             ) \
             .all()
         # Strategy: build this table going backwards.
@@ -1413,10 +1413,10 @@ class PokedexController(PokedexBaseController):
                 eagerload('method'),
                 eagerload('pokemon'),
                 eagerload('version_group'),
-                eagerload('pokemon.form_group'),
+                eagerload('pokemon.species'),
                 eagerload('pokemon.stats.stat'),
                 eagerload('pokemon.stats.stat.damage_class'),
-                eagerload('pokemon.unique_form'),
+                eagerload('pokemon.default_form'),
 
                 # Pokémon table stuff
                 subqueryload('pokemon.abilities'),
@@ -1590,7 +1590,7 @@ class PokedexController(PokedexBaseController):
     def abilities_list(sef):
         c.abilities = db.pokedex_session.query(tables.Ability) \
             .join(tables.Ability.names_local) \
-            .options(eagerload('short_effect')) \
+            .options(eagerload('prose.short_effect')) \
             .order_by(tables.Ability.generation_id.asc(),
                 tables.Ability.names_table.name.asc()) \
             .all()

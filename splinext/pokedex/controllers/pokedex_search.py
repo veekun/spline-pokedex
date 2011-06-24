@@ -1231,7 +1231,7 @@ class PokedexSearchController(PokedexBaseController):
             eagerloads = []
 
             if 'icon' in c.display_columns:
-                eagerloads.append('unique_form')
+                eagerloads.append('default_form')
 
             if 'type' in c.display_columns:
                 eagerloads.append('types')
@@ -1253,17 +1253,18 @@ class PokedexSearchController(PokedexBaseController):
             if c.form.sort.data == 'evolution-chain':
                 # Gotta know the chain itself and the parent Pokémon to make
                 # the cool indented tree work
-                eagerloads.append('parent_pokemon')
+                eagerloads.append('species.parent_species')
 
 
             ids = [_.id for _ in c.results]
             for relation in eagerloads:
+                print relation
                 # Run the query again, selecting only by id this time, but
                 # eagerloading some relation
-                db.pokedex_session.query(tables.Pokemon) \
+                (db.pokedex_session.query(tables.Pokemon) \
                     .filter(tables.Pokemon.id.in_(ids)) \
                     .options(eagerload_all(relation)) \
-                    .all()
+                    .all())
 
         ### Done.
         return render('/pokedex/search/pokemon.mako')
