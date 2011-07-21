@@ -57,8 +57,8 @@ ${h.h1(_('Essentials'))}
 ${h.h1(_('Not-so-essentials'))}
 <div class="dex-column-container">
 <div class="dex-column">
-    <h2>${_(u"Battle Style Preferences")}</h2>
-    <p>${_(u"These only affect the Battle Palace and Battle Tent.")}</p>
+    <h2>${h.pokedex.version_icons('Emerald')} ${_(u"Battle Style Preferences")}</h2>
+    <p>${_(u"These only affect the Battle Palace and Verdanturf Battle Tent.")}</p>
 
     <dl>
         <dt>${_(u"> 50% HP")}</dt>
@@ -77,7 +77,7 @@ ${h.h1(_('Not-so-essentials'))}
 </div>
 
 <div class="dex-column">
-    <h2>${_(u"Pokéathlon Stats")}</h2>
+    <h2>${h.pokedex.version_icons('HeartGold', 'SoulSilver')} ${_(u"Pokéathlon Stats")}</h2>
     <ul class="classic-list">
         % for effect in c.nature.pokeathlon_effects:
         <li>${_(u"Up to {change} {stat}").format(change=effect.max_change, stat=effect.pokeathlon_stat.name)}</li>
