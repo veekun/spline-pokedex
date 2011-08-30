@@ -557,6 +557,7 @@ class PokedexSearchController(PokedexBaseController):
         # Add stat-based fields dynamically
         c.stat_fields = []
         for stat in db.pokedex_session.query(tables.Stat) \
+                                   .filter(~tables.Stat.is_battle_only) \
                                    .order_by(tables.Stat.id):
             field_name = stat.identifier.replace(u'-', u'_')
 
