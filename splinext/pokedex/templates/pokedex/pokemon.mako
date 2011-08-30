@@ -7,14 +7,14 @@
 <%! from splinext.pokedex import i18n %>\
 
 <%def name="title()">\
-${_(u"{name} – Pokémon #{number}").format(name=(c.pokemon.full_name), number=c.pokemon.normal_form.id)}
+${_(u"{name} – Pokémon #{number}").format(name=(c.pokemon.default_form.name), number=c.pokemon.species.id)}
 </%def>
 
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
     <li><a href="${url('/dex')}">${_(u'Pokédex')}</a></li>
     <li><a href="${url(controller='dex', action='pokemon_list')}">${_(u'Pokémon')}</a></li>
-    <li>${c.pokemon.full_name}</li>
+    <li>${c.pokemon.default_form.name}</li>
 </ul>
 </%def>
 
@@ -25,12 +25,12 @@ ${h.h1(_('Essentials'))}
 
 ## Portrait block
 <div class="dex-page-portrait">
-    <p id="dex-page-name">${c.pokemon.name}</p>
-    % if c.pokemon.form_name:
-    <p id="dex-pokemon-forme">${c.pokemon.unique_form.full_name}</p>
+    <p id="dex-page-name">${c.pokemon.species.name}</p>
+    % if len(c.pokemon.species.pokemon) > 1:
+    <p id="dex-pokemon-forme">${c.pokemon.default_form.form_name}</p>
     % endif
     <div id="dex-pokemon-portrait-sprite">
-        ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white')}
+        ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white')}
     </div>
     <p id="dex-page-types">
         % for type in c.pokemon.types:
@@ -74,9 +74,9 @@ ${h.h1(_('Essentials'))}
     <h2>${_(u"Pokédex Numbers")}</h2>
     <dl>
         <dt>${_(u"Introduced in")}</dt>
-        <dd>${h.pokedex.generation_icon(c.pokemon.generation, _=_)}</dd>\
+        <dd>${h.pokedex.generation_icon(c.pokemon.species.generation, _=_)}</dd>\
 
-        % for number in c.pokemon.normal_form.dex_numbers:
+        % for number in c.pokemon.species.dex_numbers:
         <dt>${number.pokedex.name}</dt>
         <dd>
             ${number.pokedex_number}
@@ -89,64 +89,64 @@ ${h.h1(_('Essentials'))}
     </dl>
 
     <h2>${_(u"Names")}</h2>
-    ${dexlib.foreign_names(c.pokemon)}
+    ${dexlib.foreign_names(c.pokemon.species)}
 </div>
 <div class="dex-column">
     <h2>${_(u"Breeding")}</h2>
     <dl>
         <dt>${_(u"Gender")}</dt>
         <dd>
-            ${h.pokedex.chrome_img('gender-rates/%d.png' % c.pokemon.gender_rate, alt='')}
-            ${_(h.pokedex.gender_rate_label[c.pokemon.gender_rate])}
-            ${dexlib.subtle_search(action='pokemon_search', gender_rate=c.pokemon.gender_rate, _=_)}
+            ${h.pokedex.chrome_img('gender-rates/%d.png' % c.pokemon.species.gender_rate, alt='')}
+            ${_(h.pokedex.gender_rate_label[c.pokemon.species.gender_rate])}
+            ${dexlib.subtle_search(action='pokemon_search', gender_rate=c.pokemon.species.gender_rate, _=_)}
         </dd>
 
         <dt>${_(u"Egg groups")}</dt>
         <dd>
             <ul class="inline-commas">
-                % for i, egg_group in enumerate(c.pokemon.egg_groups):
+                % for i, egg_group in enumerate(c.pokemon.species.egg_groups):
                 <li>${egg_group.name}</li>
                 % endfor
             </ul>
-            % if len(c.pokemon.egg_groups) > 1:
-            ${dexlib.subtle_search(action='pokemon_search', egg_group=[group.id for group in c.pokemon.egg_groups], _=_)}
+            % if len(c.pokemon.species.egg_groups) > 1:
+            ${dexlib.subtle_search(action='pokemon_search', egg_group=[group.id for group in c.pokemon.species.egg_groups], _=_)}
             % endif
         </dd>
 
         <dt>${_(u"Hatch counter")}</dt>
         <dd>
-            ${c.pokemon.hatch_counter}
-            ${dexlib.subtle_search(action='pokemon_search', hatch_counter=c.pokemon.hatch_counter, sort='evolution-chain', _=_)}
+            ${c.pokemon.species.hatch_counter}
+            ${dexlib.subtle_search(action='pokemon_search', hatch_counter=c.pokemon.species.hatch_counter, sort='evolution-chain', _=_)}
         </dd>
 
         <dt>${_(u"Steps to hatch")}</dt>
         <dd>
-            ${(c.pokemon.hatch_counter + 1) * 255} /
+            ${(c.pokemon.species.hatch_counter + 1) * 255} /
 
             ## If any party Pokémon has Magma Armor or Flame Body, hatch counters go down by two (instead of one) every 255 steps.
             ## Then there's the final lap after the egg hits zero.  So, for MA/FB steps: (ceil(counter / 2.0) + 1) * 255
             ## ceil() returns a float, but we can avoid a messy int(ceil(...)) like so: ceil(x / 2.0) == floor((x + 1) / 2.0) == (x + 1) // 2
             ## And thus: (ceil(x / 2.0) + 1) * 255 == ((x + 1) // 2 + 1) * 255 == (x + 3) // 2 * 255
-            <span class="annotation" title="${_('With Magma Armor or Flame Body')}">${(c.pokemon.hatch_counter + 3) // 2 * 255}</span>
+            <span class="annotation" title="${_('With Magma Armor or Flame Body')}">${(c.pokemon.species.hatch_counter + 3) // 2 * 255}</span>
         </dd>
     </dl>
 
     <h2>${_(u"Compatibility")}</h2>
-    % if c.pokemon.egg_groups[0].id == 13:
+    % if c.pokemon.species.egg_groups[0].id == 13:
     ## Egg group 13 is the special Ditto group
     <p>${_(u"Ditto can breed with any other breedable Pokémon, but can never produce a Ditto egg.")}</p>
-    % elif c.pokemon.egg_groups[0].id == 15:
+    % elif c.pokemon.species.egg_groups[0].id == 15:
     ## Egg group 15 is the special No Eggs group
     <p>${_("{0} cannot breed.").format(c.pokemon.name)}</p>
     % else:
     <ul class="inline dex-pokemon-compatibility">
-        % for pokemon in c.compatible_families:
+        % for species in c.compatible_families:
         <li>${h.pokedex.pokemon_link(
-            pokemon,
-            h.literal(capture(dexlib.pokemon_icon, pokemon)),
+            species.default_pokemon,
+            h.literal(capture(dexlib.pokemon_icon, species.default_pokemon)),
             form=None,
             class_='dex-icon-link',
-            title=pokemon.name,
+            title=species.name,
         )}</li>
         % endfor
     </ul>
@@ -175,18 +175,18 @@ ${h.h1(_('Essentials'))}
         </dd>
         <dt>${_(u"Capture rate")}</dt>
         <dd>
-            ${c.pokemon.capture_rate}
-            ${dexlib.subtle_search(action='pokemon_search', capture_rate=c.pokemon.capture_rate, _=_)}
+            ${c.pokemon.species.capture_rate}
+            ${dexlib.subtle_search(action='pokemon_search', capture_rate=c.pokemon.species.capture_rate, _=_)}
         </dd>
         <dt>${_(u"Base happiness")}</dt>
         <dd>
-            ${c.pokemon.base_happiness}
-            ${dexlib.subtle_search(action='pokemon_search', base_happiness=c.pokemon.base_happiness, _=_)}
+            ${c.pokemon.species.base_happiness}
+            ${dexlib.subtle_search(action='pokemon_search', base_happiness=c.pokemon.species.base_happiness, _=_)}
         </dd>
         <dt>${_(u"Growth rate")}</dt>
         <dd>
-            ${c.pokemon.evolution_chain.growth_rate.name}
-            ${dexlib.subtle_search(action='pokemon_search', growth_rate=c.pokemon.evolution_chain.growth_rate.max_experience, _=_)}
+            ${c.pokemon.species.growth_rate.name}
+            ${dexlib.subtle_search(action='pokemon_search', growth_rate=c.pokemon.species.growth_rate.max_experience, _=_)}
         </dd>
     </dl>
 
@@ -232,7 +232,7 @@ ${h.h1(_('Evolution'))}
 <li>
     <img src="${h.static_uri('spline', 'icons/chart--arrow.png')}" alt="${_(u"See also:")}">
     <a href="${url(controller='dex_gadgets', action='compare_pokemon',
-        pokemon=[pokemon.full_name for pokemon in c.pokemon.evolution_chain.pokemon]
+        pokemon=[species.name for species in c.pokemon.species.evolution_chain.species]
         )}">${_('Compare this family')}</a>
 </li>
 </ul>
@@ -255,31 +255,31 @@ ${h.h1(_('Evolution'))}
     <td></td>
     % elif col != None:
     <td rowspan="${col['span']}"\
-        % if col['pokemon'] == c.pokemon.normal_form:
+        % if col['species'] == c.pokemon.species:
         ${h.literal(' class="selected"')}\
         % endif
     >
-        % if col['pokemon'] == c.pokemon:
+        % if col['species'] == c.pokemon.species:
         <span class="dex-evolution-chain-pokemon">
-            ${dexlib.pokemon_icon(col['pokemon'])}
-            ${col['pokemon'].name}
+            ${dexlib.pokemon_icon(col['species'].default_pokemon)}
+            ${col['species'].name}
         </span>
         % else:
         ${h.pokedex.pokemon_link(
-            pokemon=col['pokemon'],
-            content=h.literal(capture(dexlib.pokemon_icon, col['pokemon']))
-                   + col['pokemon'].name,
+            pokemon=col['species'].default_pokemon,
+            content=h.literal(capture(dexlib.pokemon_icon, col['species'].default_pokemon))
+                   + col['species'].name,
             class_='dex-evolution-chain-pokemon',
         )}
         % endif
-        % for evolution in col['pokemon'].evolutions:
+        % for evolution in col['species'].evolutions:
         <span class="dex-evolution-chain-method">
             ${h.pokedex.evolution_description(evolution, _=_)}
         </span>
         % endfor
-        % if col['pokemon'].is_baby and c.pokemon.evolution_chain.baby_trigger_item:
+        % if col['species'].is_baby and c.pokemon.species.evolution_chain.baby_trigger_item:
         <span class="dex-evolution-chain-method">
-            ${_(u"Either parent must hold ")} ${h.pokedex.item_link(c.pokemon.evolution_chain.baby_trigger_item, include_icon=False, _=_)}
+            ${_(u"Either parent must hold ")} ${h.pokedex.item_link(c.pokemon.species.evolution_chain.baby_trigger_item, include_icon=False, _=_)}
         </span>
         % endif
     </td>
@@ -289,19 +289,19 @@ ${h.h1(_('Evolution'))}
 % endfor
 </tbody>
 </table>
-% if c.pokemon.normal_form.form_group:
-<h2 id="forms"> <a href="#forms" class="subtle">${_("%s Forms") % c.pokemon.name}</a> </h2>
+% if len(c.pokemon.species.forms) > 1:
+<h2 id="forms"> <a href="#forms" class="subtle">${_("%s Forms") % c.pokemon.species.name}</a> </h2>
 <ul class="inline">
-    % for form in c.pokemon.normal_form.forms:
+    % for form in sorted(c.pokemon.species.forms, key=lambda f: (f.order, f.name)):
 <%
     link_class = 'dex-box-link'
-    if form == c.pokemon.unique_form:
+    if form == c.pokemon.default_form:
         link_class = link_class + ' selected'
 %>\
-    <li>${h.pokedex.pokemon_link(c.pokemon, h.pokedex.pokemon_image(form, 'main-sprites/black-white'), form=form.name, class_=link_class)}</li>
+    <li>${h.pokedex.pokemon_link(form.pokemon, h.pokedex.pokemon_form_image(form, 'main-sprites/black-white'), form=form.form_identifier, class_=link_class)}</li>
     % endfor
 </ul>
-<p> ${c.pokemon.normal_form.form_group.description} </p>
+<p> ${c.pokemon.species.form_description} </p>
 % endif
 
 ${h.h1(_('Stats'))}
@@ -419,24 +419,24 @@ ${h.h1(_('Flavor'))}
 <div class="dex-column-2x">
     <h2>${_("Flavor Text")}</h2>
     <% flavor_text = filter(lambda text: text.version.generation.id >= 4,
-                            c.pokemon.normal_form.flavor_text) %>
+                            c.pokemon.species.flavor_text) %>
     ${dexlib.flavor_text_list(flavor_text, 'dex-pokemon-flavor-text')}
 </div>
 <div class="dex-column">
     <h2>${_("Sprites")}</h2>
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white')}
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white/shiny')}
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white/back')}
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white/back/shiny')}
-    % if c.pokemon.has_gender_differences:
+    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white')}
+    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/shiny')}
+    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/back')}
+    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/back/shiny')}
+    % if c.pokemon.species.has_gender_differences:
     <br/>
-    % if h.pokedex.pokemon_has_media(c.pokemon.form, 'main-sprites/black-white/female', 'png'):
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white/female')}
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white/shiny/female')}
+    % if h.pokedex.pokemon_has_media(c.pokemon.default_form, 'main-sprites/black-white/female', 'png'):
+    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/female')}
+    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/shiny/female')}
     % endif
-    % if h.pokedex.pokemon_has_media(c.pokemon.form, 'main-sprites/black-white/back/female', 'png'):
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white/back/female')}
-    ${h.pokedex.pokemon_image(c.pokemon.form, prefix='main-sprites/black-white/back/shiny/female')}
+    % if h.pokedex.pokemon_has_media(c.pokemon.default_form, 'main-sprites/black-white/back/female', 'png'):
+    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/back/female')}
+    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/back/shiny/female')}
     % endif
     % endif
 </div>
@@ -448,42 +448,40 @@ ${h.h1(_('Flavor'))}
     <dl>
         <dt>${_("Species")}</dt>
         <dd>
-            ${c.pokemon.species}
-            ${dexlib.subtle_search(action='pokemon_search', species=c.pokemon.species, _=_)}
+            ${c.pokemon.species.genus}
+            ${dexlib.subtle_search(action='pokemon_search', genus=c.pokemon.species.genus, _=_)}
         </dd>
 
         <dt>${_("Color")}</dt>
         <dd>
-            <span class="dex-color-${c.pokemon.color}"></span>
-            ${c.pokemon.color}
-            ${dexlib.subtle_search(action='pokemon_search', color=c.pokemon.color, _=_)}
+            <span class="dex-color-${c.pokemon.species.color.identifier}"></span>
+            ${c.pokemon.species.color.name}
+            ${dexlib.subtle_search(action='pokemon_search', color=c.pokemon.species.color.identifier, _=_)}
         </dd>
 
         <dt>${_("Cry")}</dt>
         <dd>
-            ${dexlib.pokemon_cry(c.pokemon.form)}
+            ${dexlib.pokemon_cry(c.pokemon)}
         </dd>
 
-        % if c.pokemon.generation.id <= 3:
+        % if c.pokemon.species.generation_id <= 3:
         <dt>${_("Habitat")} ${h.pokedex.version_icons(u'FireRed', u'LeafGreen')}</dt>
         <dd>
-            ${h.pokedex.pokedex_img('habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.habitat))}
-            ${c.pokemon.habitat}
-            ${dexlib.subtle_search(action='pokemon_search', habitat=c.pokemon.habitat, _=_)}
+            ${h.pokedex.pokedex_img('habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.species.habitat.identifier))}
+            ${c.pokemon.species.habitat.name}
+            ${dexlib.subtle_search(action='pokemon_search', habitat=c.pokemon.species.habitat.identifier, _=_)}
         </dd>
         % endif
 
         <dt>${_("Footprint")}</dt>
-        <dd>${h.pokedex.pokemon_image(c.pokemon.form, prefix='footprints', use_form=False)}</dd>
+        <dd>${h.pokedex.species_image(c.pokemon.species, prefix='footprints', use_form=False)}</dd>
 
-        % if c.pokemon.generation.id <= 4:
-        <dt>${_("Shape")} ${h.pokedex.generation_icon(4)}</dt>
+        <dt>${_("Shape")}</dt>
         <dd>
-            ${h.pokedex.pokedex_img('shapes/%s.png' % c.pokemon.shape.identifier, alt='', title=c.pokemon.shape.name)}
-            ${c.pokemon.shape.awesome_name}
-            ${dexlib.subtle_search(action='pokemon_search', shape=c.pokemon.shape.name.lower(), _=_)}
+            ${h.pokedex.pokedex_img('shapes/%s.png' % c.pokemon.species.shape.identifier, alt='', title=c.pokemon.species.shape.name)}
+            ${c.pokemon.species.shape.awesome_name}
+            ${dexlib.subtle_search(action='pokemon_search', shape=c.pokemon.species.shape.identifier, _=_)}
         </dd>
-        % endif
     </dl>
 </div>
 <div class="dex-column">
@@ -496,7 +494,7 @@ ${h.h1(_('Flavor'))}
             </p>
         </div>
         <div class="dex-size-pokemon">
-            ${h.pokedex.pokemon_image(c.pokemon.form, prefix='cropped', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
+            ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='cropped', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
             <div class="js-dex-size-raw">${c.pokemon.height}</div>
             <p class="dex-size-value">
                 ${h.pokedex.format_height_imperial(c.pokemon.height)} <br/>
@@ -515,7 +513,7 @@ ${h.h1(_('Flavor'))}
             </p>
         </div>
         <div class="dex-size-pokemon">
-            ${h.pokedex.pokemon_image(c.pokemon.form, prefix='cropped', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
+            ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='cropped', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
             <div class="js-dex-size-raw">${c.pokemon.weight}</div>
             <p class="dex-size-value">
                 ${h.pokedex.format_weight_imperial(c.pokemon.weight)} <br/>
@@ -561,7 +559,7 @@ ${h.h1(_('Locations'))}
 ${h.h1(_('Moves'))}
 <p>${u' and '.join(t.name for t in c.pokemon.types)} moves get STAB, and have their type highlighted in green.</p>
 % if c.better_damage_class:
-<p>${c.better_damage_class.name.capitalize()} moves better suit ${c.pokemon.full_name}'s higher ${u'Special Attack' if c.better_damage_class.name == u'special' else u'Attack'}, and have their class highlighted in green.</p>
+<p>${c.better_damage_class.name.capitalize()} moves better suit ${c.pokemon.species.name}'s higher ${u'Special Attack' if c.better_damage_class.name == u'special' else u'Attack'}, and have their class highlighted in green.</p>
 % endif
 <% columns = sum(c.move_columns, []) %>
 <table class="dex-pokemon-moves dex-pokemon-pokemon-moves striped-rows">
@@ -599,7 +597,7 @@ ${h.h1(_('Moves'))}
 % endif
 % if method.pokemon != c.pokemon:
     <tr class="subheader-row">
-        <th colspan="${len(columns) + 8}"><strong>${method.name}</strong>, learned by ${method.pokemon.full_name} but not ${c.pokemon.full_name}</th>
+        <th colspan="${len(columns) + 8}"><strong>${method.name}</strong>, learned by ${method.pokemon.species.name} but not ${c.pokemon.species.name}</th>
     </tr>
 % endif
 </tbody>
@@ -637,32 +635,32 @@ ${h.h1(_('External Links'), id=_('links', context='header id'))}
         ghpd_name = 'nidoran_m'
         smogon_name = 'nidoran-m'
     else:
-        lp_name = c.pokemon.name
-        ghpd_name = re.sub(' ', '_', c.pokemon.name.lower())
+        lp_name = c.pokemon.species.name
+        ghpd_name = re.sub(' ', '_', c.pokemon.species.name.lower())
         ghpd_name = re.sub('[^\w-]', '', ghpd_name)
         smogon_name = ghpd_name
 
-    if not c.pokemon.is_base_form:
-        if c.pokemon.form_name == 'Sandy':
+    if not c.pokemon.is_default and c.pokemon.default_form.form_name:
+        if c.pokemon.default_form.form_name == 'Sandy Cloak':
             smogon_name += '-g'
-        elif c.pokemon.form_name == 'Mow':
+        elif c.pokemon.default_form.form_name == 'Mow Form':
             smogon_name += '-c'
-        elif c.pokemon.form_name in ('Fan', 'Trash'):
+        elif c.pokemon.default_form.form_name in ('Fan Form', 'Trash Cloak'):
             smogon_name += '-s'
         else:
-            smogon_name += '-' + c.pokemon.form_name[0].lower()
+            smogon_name += '-' + c.pokemon.default_form.form_name[0].lower()
 %>
 <ul class="classic-list">
-% if c.pokemon.generation.id <= 1:
-<li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/species/${"%03d" % c.pokemon.normal_form.id}.htm">${_("Azure Heights")}</a></li>
+% if c.pokemon.species.generation_id <= 1:
+<li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/species/${"%03d" % c.pokemon.species.id}.htm">${_("Azure Heights")}</a></li>
 % endif
-<li><a href="http://bulbapedia.bulbagarden.net/wiki/${re.sub(' ', '_', c.pokemon.name)}_%28Pok%C3%A9mon%29">${_("Bulbapedia")}</a></li>
-% if c.pokemon.generation.id <= 2:
+<li><a href="http://bulbapedia.bulbagarden.net/wiki/${re.sub(' ', '_', c.pokemon.species.name)}_%28Pok%C3%A9mon%29">${_("Bulbapedia")}</a></li>
+% if c.pokemon.species.generation_id <= 2:
 <li>${h.pokedex.generation_icon(2)} <a href="http://www.pokemondungeon.com/pokedex/${ghpd_name}.shtml">${_(u"Gengar and Haunter's Pokémon Dungeon")}</a></li>
 % endif
 <li><a href="http://www.legendarypokemon.net/pokedex/${lp_name}">${_(u"Legendary Pokémon")}</a></li>
-<li><a href="http://www.psypokes.com/dex/psydex/${"%03d" % c.pokemon.normal_form.id}">${_(u"PsyPoke")}</a></li>
-<li><a href="http://www.serebii.net/pokedex-bw/${"%03d" % c.pokemon.normal_form.id}.shtml">${_(u"Serebii.net")}</a></li>
+<li><a href="http://www.psypokes.com/dex/psydex/${"%03d" % c.pokemon.species.id}">${_(u"PsyPoke")}</a></li>
+<li><a href="http://www.serebii.net/pokedex-bw/${"%03d" % c.pokemon.species.id}.shtml">${_(u"Serebii.net")}</a></li>
 <li><a href="http://www.smogon.com/dp/pokemon/${smogon_name}">${_(u"Smogon")}</a></li>
 </ul>
 </%lib:cache_content>

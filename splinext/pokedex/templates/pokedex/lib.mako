@@ -1,30 +1,30 @@
 <%! from splinext.pokedex import i18n %>\
 
 <%def name="pokemon_icon(pokemon)">\
-% if pokemon.is_base_form:
-<span class="sprite-icon sprite-icon-${pokemon.normal_form.id}"></span>\
+% if pokemon.is_default:
+<span class="sprite-icon sprite-icon-${pokemon.species.id}"></span>\
 % else:
-${h.pokedex.pokemon_image(pokemon.form, prefix='icons')}\
+${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons')}\
 % endif
 </%def>
 
 
 <%def name="pokemon_page_header(icon_form=None)">
 <div id="dex-header">
-    <a href="${url.current(name=c.prev_pokemon.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">
+    <a href="${url.current(name=c.prev_pokemon.species.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">
         <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
         ${pokemon_icon(c.prev_pokemon)}
-        ${c.prev_pokemon.normal_form.id}: ${c.prev_pokemon.name}
+        ${c.prev_pokemon.species.id}: ${c.prev_pokemon.species.name}
     </a>
-    <a href="${url.current(name=c.next_pokemon.name.lower(), form=None)}" id="dex-header-next" class="dex-box-link">
-        ${c.next_pokemon.normal_form.id}: ${c.next_pokemon.name}
+    <a href="${url.current(name=c.next_pokemon.species.name.lower(), form=None)}" id="dex-header-next" class="dex-box-link">
+        ${c.next_pokemon.species.id}: ${c.next_pokemon.species.name}
         ${pokemon_icon(c.next_pokemon)}
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
-    ${h.pokedex.pokemon_image(icon_form or c.pokemon.form, prefix='icons')}
-    <br>${c.pokemon.normal_form.id}: ${c.pokemon.name}
+    ${h.pokedex.pokemon_form_image(icon_form or c.pokemon.default_form, prefix='icons')}
+    <br>${c.pokemon.species.id}: ${c.pokemon.species.name}
     <ul class="inline-menu">
-    <% form = c.pokemon.form_name.lower() if not c.pokemon.is_base_form else None %>\
+    <% form = c.pokemon.default_form.form_identifier if not c.pokemon.is_default else None %>\
     % for action, label in (('pokemon', u'Pokédex'), \
                             ('pokemon_flavor', u'Flavor'), \
                             ('pokemon_locations', u'Locations')):
@@ -183,9 +183,9 @@ ${h.pokedex.pokemon_image(pokemon.form, prefix='icons')}\
     <em>${_pokemon_ability_link(pokemon.dream_ability)}</em>
   % endif
 </td>
-<td>${h.pokedex.chrome_img('gender-rates/%d.png' % pokemon.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.gender_rate])}</td>
+<td>${h.pokedex.chrome_img('gender-rates/%d.png' % pokemon.species.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.species.gender_rate])}</td>
 <td class="egg-group">
-  % for i, egg_group in enumerate(pokemon.egg_groups):
+  % for i, egg_group in enumerate(pokemon.species.egg_groups):
     % if i > 0:
     <br>
     % endif
@@ -295,11 +295,13 @@ collapse_key = h.pokedex.collapse_flavor_text_key(literal=obdurate)
 </dl>
 </%def>
 
-<%def name="pokemon_cry(pokemon_form)">
+<%def name="pokemon_cry(pokemon)">
 <%
 # Shaymin (and nothing else) has different cries for its different forms
+if pokemon.species.id != 492:
+    pokemon = pokemon.species.default_pokemon
 cry_url = url(controller='dex', action='media', path=h.pokedex.pokemon_media_path(
-    pokemon_form, 'cries', 'ogg', pokemon_form.form_base_pokemon_id == 492))
+    pokemon, 'cries', 'ogg'))
 %>
 <audio src="${cry_url}" controls preload="auto" class="cry">
     <!-- Totally the best fallback -->
@@ -315,10 +317,10 @@ cry_url = url(controller='dex', action='media', path=h.pokedex.pokemon_media_pat
     </a>
 </%def>
 
-<%def name="foreign_names(object)">
+<%def name="foreign_names(object, name_attr='name')">
     <dl>
-        % for language, foreign_name in h.keysort(object.name_map, lambda lang: lang.order):
-        % if language != c.game_language:
+        % for language, foreign_name in h.keysort(getattr(object, name_attr + '_map'), lambda lang: lang.order):
+        % if language != c.game_language and foreign_name:
         ## </dt> needs to come right after the flag or else there's space between it and the colon
         <dt>${language.name}
         <img src="${h.static_uri('spline', "flags/{0}.png".format(language.iso3166))}" alt=""></dt>

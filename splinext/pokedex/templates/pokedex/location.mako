@@ -50,7 +50,7 @@
     </tr>
     <tr class="subheader-row">
         <th colspan="100">
-            ${h.pokedex.pokedex_img('encounters/' + c.encounter_method_icons.get(method.identifier, 'unknown.png'))}
+            ${h.pokedex.chrome_img('encounters/' + c.encounter_method_icons.get(method.identifier, 'unknown.png'))}
             ${method.name}
         </th>
     </tr>
@@ -89,7 +89,7 @@
             <div class="dex-encounter-conditions">
                 % for condition_value in condition_values:
                 <div class="dex-encounter-icon">
-                    ${h.pokedex.pokedex_img('encounters/' \
+                    ${h.pokedex.chrome_img('encounters/' \
                                             + c.encounter_condition_value_icons.get(condition_value.identifier, 'unknown.png'), \
                                             alt=condition_value.name, \
                                             title=condition_value.name)}

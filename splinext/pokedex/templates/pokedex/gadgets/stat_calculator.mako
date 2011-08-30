@@ -50,8 +50,8 @@ ${h.form(url.current(), method=u'GET')}
         <th>
             % if c.results:
             ${h.pokedex.pokemon_link(c.pokemon, content=h.literal(u"{0}<br>{1}").format( \
-                h.pokedex.pokemon_image(c.pokemon.form, prefix=u'icons'), \
-                c.pokemon.full_name))}
+                h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix=u'icons'), \
+                c.pokemon.name))}
             % endif
         </th>
         % if c.results:
@@ -153,7 +153,7 @@ ${h.form(url.current(), method=u'GET')}
 % if c.exact:
 <p>Congratulations, you've narrowed your Pokémon's stats down exactly!</p>
 <p>
-    This ${c.form.pokemon.data.full_name}'s
+    This ${c.form.pokemon.data.name}'s
     <a href="${url(controller='dex', action='moves', name=c.hidden_power.name.lower())}">${c.hidden_power.name}</a>
     inflicts ${h.pokedex.type_link(c.hidden_power_type)} damage,
     with ${c.hidden_power_power} power.

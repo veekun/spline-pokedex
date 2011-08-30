@@ -41,11 +41,14 @@ def make_thingy_url(thingy, subpage=None):
     # Pokémon with forms need the form attached to the URL
     if isinstance(thingy, tables.PokemonForm):
         action = 'pokemon'
-        args['form'] = thingy.name.lower()
-        args['name'] = thingy.form_base_pokemon.name.lower()
+        args['form'] = thingy.form_identifier.lower()
+        args['name'] = thingy.pokemon.species.name.lower()
 
-        if thingy.unique_pokemon is None:
+        if not thingy.is_default:
             subpage = 'flavor'
+    elif isinstance(thingy, tables.PokemonSpecies):
+        action = 'pokemon'
+        args['name'] = thingy.name.lower()
     else:
         action = thingy.__tablename__
         args['name'] = thingy.name.lower()
@@ -227,40 +230,43 @@ def pokemon_has_media(pokemon_form, prefix, ext, use_form=True):
     in the specified directory for the specified Pokémon form.
     """
 
+    if use_form:
+        kwargs = dict(form=pokemon_form)
+    else:
+        kwargs = dict()
     return resource_exists('pokedex', 'data/media/{0}'.format(
-        pokemon_media_path(pokemon_form, prefix, ext, use_form)))
+        pokemon_media_path(pokemon_form.species, prefix, ext, **kwargs)))
 
-def pokemon_media_path(pokemon_form, prefix, ext, use_form=True):
+def pokemon_media_path(pokemon_species, prefix, ext, form=None):
     """Returns a path to a Pokémon media file.
 
-    use_form is True if the form should be in the filename; it should be False
+    form is not None if the form should be in the filename; it should be False
     if the form should be ignored, e.g. for footprints.
     """
 
     # Leave it as None if it's null; pass it by filename_from_name otherwise
-    form_name = pokemon_form.identifier
+    if form:
+        form_identifier = form.form_identifier
+    else:
+        form_identifier = None
 
-    if use_form and form_name:
+    if form_identifier:
         filename = '{id}-{form}.{ext}'
     else:
         filename = '{id}.{ext}'
 
     filename = filename.format(
-        id=pokemon_form.form_base_pokemon_id,
-        form=form_name,
+        id=pokemon_species.id,
+        form=form_identifier,
         ext=ext
     )
 
     return '/'.join(('pokemon', prefix, filename))
 
-def pokemon_image(pokemon_form, prefix='main-sprites/black-white', use_form=True, **attr):
-    """Returns an <img> tag for a Pokémon image."""
+def species_image(pokemon_species, prefix='main-sprites/black-white', **attr):
+    u"""Returns an <img> tag for a Pokémon species image."""
 
-    if use_form:
-        default_text = pokemon_form.form_base_pokemon.name
-    else:
-        # If we're ignoring form, use the Pokémon's name alone
-        default_text = pokemon_form.pokemon_name
+    default_text = pokemon_species.name
 
     if 'animated' in prefix:
         ext = 'gif'
@@ -270,7 +276,23 @@ def pokemon_image(pokemon_form, prefix='main-sprites/black-white', use_form=True
     attr.setdefault('alt', default_text)
     attr.setdefault('title', default_text)
 
-    return pokedex_img(pokemon_media_path(pokemon_form, prefix, ext, use_form),
+    return pokedex_img(pokemon_media_path(pokemon_species, prefix, ext),
+                       **attr)
+
+def pokemon_form_image(pokemon_form, prefix='main-sprites/black-white', **attr):
+    """Returns an <img> tag for a Pokémon form image."""
+
+    default_text = pokemon_form.name
+
+    if 'animated' in prefix:
+        ext = 'gif'
+    else:
+        ext = 'png'
+
+    attr.setdefault('alt', default_text)
+    attr.setdefault('title', default_text)
+
+    return pokedex_img(pokemon_media_path(pokemon_form.species, prefix, ext, form=pokemon_form),
                        **attr)
 
 def pokemon_link(pokemon, content=None, to_flavor=False, **attr):
@@ -291,32 +313,35 @@ def pokemon_link(pokemon, content=None, to_flavor=False, **attr):
         form.
     """
 
-    # If the Pokémon represents a specific form, use that form by default
-    form = attr.pop('form', pokemon.form_name)
+    if 'form' in attr and attr['form']:
+        forms = [f for f in pokemon.forms if f.form_identifier == attr['form']]
+        if forms:
+            form = forms[0]
+        else:
+            form = pokemon.default_form
+    else:
+        form = pokemon.default_form
 
     # Content defaults to the name of the Pokémon
     if not content:
-        if form:
-            content = u'{0} {1}'.format(form, pokemon.name)
-        else:
-            content = pokemon.name
+        content = pokemon.name
 
     url_kwargs = {}
-    if form and not form == pokemon.normal_form.form_name:
+    if form.form_identifier:
         # Don't want a ?form=None, or a ?form=default on Pokémon whose forms
         # aren't just flavor
-        url_kwargs['form'] = form.lower()
+        url_kwargs['form'] = form.form_identifier
 
     action = 'pokemon'
-    if to_flavor or (form and not pokemon.unique_form):
-        # If a Pokémon's forms are flavor-only, then a form link only makes
+    if to_flavor or not form.is_default:
+        # For non-default (flavor-only) forms, then a form link only makes
         # sense if it's to a flavor page
         action = 'pokemon_flavor'
 
     return h.HTML.a(
         content,
         href=url(controller='dex', action=action,
-                       name=pokemon.name.lower(), **url_kwargs),
+                       name=pokemon.species.name.lower(), **url_kwargs),
         **attr
         )
 
@@ -431,8 +456,8 @@ def evolution_description(evolution, _=_):
         chunks.append(
             _(u"Evolve {from_pokemon} ({to_pokemon} will consume "
             u"a Poké Ball and appear in a free party slot)").format(
-                from_pokemon=evolution.evolved_pokemon.parent_pokemon.full_name,
-                to_pokemon=evolution.evolved_pokemon.full_name))
+                from_pokemon=evolution.evolved_species.parent_species.name,
+                to_pokemon=evolution.evolved_species.name))
     else:
         chunks.append(_(u'Do something'))
 
@@ -465,12 +490,12 @@ def evolution_description(evolution, _=_):
         else:
             op = _(u'=')
         chunks.append(_(u"when Attack {0} Defense").format(op))
-    if evolution.party_pokemon_id:
+    if evolution.party_species_id:
         chunks.append(_(u"with {0} in the party").format(
-            evolution.party_pokemon.name))
-    if evolution.trade_pokemon_id:
+            evolution.party_species.name))
+    if evolution.party_species_id:
         chunks.append(_(u"in exchange for {0}")
-            .format(evolution.trade_pokemon.name))
+            .format(evolution.party_species.name))
 
     return u', '.join(chunks)
 
@@ -529,9 +554,9 @@ def apply_pokemon_template(template, pokemon, _=_):
     """
 
     d = dict(
-        icon=pokemon_image(pokemon.form, prefix=u'icons'),
-        id=pokemon.normal_form.id,
-        name=pokemon.full_name,
+        icon=pokemon_form_image(pokemon.default_form, prefix=u'icons'),
+        id=pokemon.species.id,
+        name=pokemon.default_form.name,
 
         height=format_height_imperial(pokemon.height),
         height_ft=format_height_imperial(pokemon.height),
@@ -540,11 +565,11 @@ def apply_pokemon_template(template, pokemon, _=_):
         weight_lb=format_weight_imperial(pokemon.weight),
         weight_kg=format_weight_metric(pokemon.weight),
 
-        gender=_(gender_rate_label[pokemon.gender_rate]),
-        species=pokemon.species,
+        gender=_(gender_rate_label[pokemon.species.gender_rate]),
+        genus=pokemon.species.genus,
         base_experience=pokemon.base_experience,
-        capture_rate=pokemon.capture_rate,
-        base_happiness=pokemon.base_happiness,
+        capture_rate=pokemon.species.capture_rate,
+        base_happiness=pokemon.species.base_happiness,
     )
 
     # "Lazy" loading, to avoid hitting other tables if unnecessary.  This is
@@ -558,7 +583,7 @@ def apply_pokemon_template(template, pokemon, _=_):
         d['type2'] = types[1].name if len(types) > 1 else u''
 
     if 'egg_group' in template.template:
-        egg_groups = pokemon.egg_groups
+        egg_groups = pokemon.species.egg_groups
         d['egg_group'] = u'/'.join(group.name for group in egg_groups)
         d['egg_group1'] = egg_groups[0].name
         d['egg_group2'] = egg_groups[1].name if len(egg_groups) > 1 else u''
@@ -574,22 +599,22 @@ def apply_pokemon_template(template, pokemon, _=_):
             d['dream_ability'] = u''
 
     if 'color' in template.template:
-        d['color'] = pokemon.color
+        d['color'] = pokemon.species.color.name
 
     if 'habitat' in template.template:
-        d['habitat'] = pokemon.habitat
+        d['habitat'] = pokemon.species.habitat.name
 
     if 'shape' in template.template:
-        if pokemon.shape:
-            d['shape'] = pokemon.shape.name
+        if pokemon.species.shape:
+            d['shape'] = pokemon.species.shape.name
         else:
             d['shape'] = ''
 
     if 'hatch_counter' in template.template:
-        d['hatch_counter'] = pokemon.hatch_counter
+        d['hatch_counter'] = pokemon.species.hatch_counter
 
     if 'steps_to_hatch' in template.template:
-        d['steps_to_hatch'] = (pokemon.hatch_counter + 1) * 255
+        d['steps_to_hatch'] = (pokemon.species.hatch_counter + 1) * 255
 
     if 'stat' in template.template or \
        'hp' in template.template or \
