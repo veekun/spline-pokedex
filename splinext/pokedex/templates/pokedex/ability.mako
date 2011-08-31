@@ -119,6 +119,6 @@ ${h.h1(_('External Links'), id='links')}
     <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.ability.name.replace(' ', '_')}_%28ability%29">${_("Bulbapedia")}</a></li>
     <li><a href="http://legendarypokemon.net/dp/abilities#${c.ability.name.lower().replace(' ', '+')}">${_(u"Legendary Pokémon")}</a></li>
     <li><a href="http://serebii.net/abilitydex/${c.ability.name.lower().replace(' ', '')}.shtml">${_("Serebii.net")}</a></li>
-    <li><a href="http://smogon.com/dp/abilities/${c.ability.name.lower().replace(' ', '_')}">${_("Smogon")}</a></li>
+    <li><a href="http://smogon.com/bw/abilities/${c.ability.name.lower().replace(' ', '_')}">${_("Smogon")}</a></li>
 </ul>
 </%lib:cache_content>

@@ -474,7 +474,7 @@ ${h.h1(_('External Links'), id='links')}
 <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.move.name.replace(' ', '_')}_%28move%29">${_("Bulbapedia")}</a></li>
 <li><a href="http://www.legendarypokemon.net/attacks/${c.move.name.replace(' ', '+')}/">${_(u"Legendary Pokémon")}</a></li>
 <li><a href="http://www.psypokes.com/dex/techdex/${"%03d" % c.move.id}">${_("PsyPoke")}</a></li>
-<li><a href="http://www.serebii.net/attackdex-dp/${c.move.name.lower().replace(' ', '')}.shtml">${_("Serebii.net")}</a></li>
-<li><a href="http://www.smogon.com/dp/moves/${c.move.name.lower().replace(' ', '_')}">${_("Smogon")}</a></li>
+<li><a href="http://www.serebii.net/attackdex-bw/${c.move.name.lower().replace(' ', '')}.shtml">${_("Serebii.net")}</a></li>
+<li><a href="http://www.smogon.com/bw/moves/${c.move.name.lower().replace(' ', '_')}">${_("Smogon")}</a></li>
 </ul>
 </%lib:cache_content>

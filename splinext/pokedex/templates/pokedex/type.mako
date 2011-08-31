@@ -162,7 +162,7 @@ ${h.h1(_('External Links'), id='links')}
     <li><a href="http://www.smogon.com/dp/types/questionquestionquestion">${_("Smogon")}</a></li>
     % else:
     <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.type.name}_(type)">${_("Bulbapedia")}</a></li>
-    <li><a href="http://www.smogon.com/dp/types/${c.type.name.lower()}">${_("Smogon")}</a></li>
+    <li><a href="http://www.smogon.com/bw/types/${c.type.name.lower()}">${_("Smogon")}</a></li>
     % endif
 </ul>
 </%lib:cache_content>
