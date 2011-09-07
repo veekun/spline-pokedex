@@ -7,7 +7,6 @@ from routes import url_for as url
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 import pokedex.db
-from pokedex.db.markdown import MarkdownLinkMaker
 import pokedex.db.tables as tables
 import pokedex.lookup
 import spline.lib.markdown
@@ -19,6 +18,8 @@ from spline.lib.plugin import PluginBase, PluginLink, Priority
 from splinext.pokedex import i18n
 from spline.lib.base import BaseController
 
+
+DEFAULT_LANGUAGE = u'en'
 
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
@@ -64,12 +65,12 @@ class PokedexBaseController(BaseController):
         super(PokedexBaseController, self).__before__(action, **params)
 
         identifier_query = splinext.pokedex.db.get_by_identifier_query
+        c.game_language = identifier_query(tables.Language, DEFAULT_LANGUAGE).one()
         try:
-            c.language = identifier_query(tables.Language, c.lang or 'en').one()
+            c.language = identifier_query(tables.Language, c.lang or DEFAULT_LANGUAGE).one()
         except NoResultFound:
-            c.language = identifier_query(tables.Language, u'en').one()
+            c.language = c.game_language
 
-        c.game_language = identifier_query(tables.Language, u'en').one()
         db.pokedex_session.default_language_id = c.game_language.id
 
     def __call__(self, *args, **params):
@@ -87,22 +88,25 @@ class PokedexBaseController(BaseController):
 ### Extend markdown to turn [Eevee]{pokemon:eevee} into a link in effects and
 ### descriptions
 
+import pokedex.db.markdown
+class SplineExtension(pokedex.db.markdown.PokedexLinkExtension):
+    def object_url(self, category, obj):
+        return pokedex_helpers.make_thingy_url(obj)
+
 def after_setup_hook(config, *args, **kwargs):
     """Hook to do some housekeeping after the app starts."""
     # Connect to the database
     splinext.pokedex.db.connect(config)
-
-def before_controller_hook(*args, **kwargs):
     session = splinext.pokedex.db.pokedex_session
 
-    # Register URLs with the session
-    def object_url(category, obj):
-        return pokedex_helpers.make_thingy_url(obj)
-    session.pokedex_link_maker.object_url = object_url
+    # Extend the pokedex code's default markdown rendering
+    session.configure(markdown_extension_class=SplineExtension)
 
-    # And extend spline's markdowning
-    spline.lib.markdown.register_extension(session.pokedex_link_maker.get_extension())
+    # And extend spline's markdowning, to make it available to forums etc.
+    spline.lib.markdown.register_extension(SplineExtension(session))
 
+
+def before_controller_hook(*args, **kwargs):
     """Hook to inject suggestion-box Javascript into every page."""
     c.javascripts.append(('pokedex', 'pokedex-suggestions'))
 
