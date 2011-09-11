@@ -25,7 +25,11 @@ this_dir, _ = os.path.split(__file__)
 downloads_dir = os.path.abspath(
     os.path.join(this_dir, '../splinext/pokedex/public/downloads')
 )
-media_dir = pkg_resources.resource_filename('pokedex', 'data/media')
+# TODO this is stupid
+media_dir = os.path.abspath(
+    os.path.join(this_dir, '../../pokedex-media.git')
+)
+assert media_dir
 
 def create_downloads():
     # Gotta chdir to get the gzip header right; see Python bug 4750
