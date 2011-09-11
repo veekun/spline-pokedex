@@ -11,18 +11,14 @@ import re
 from itertools import groupby, chain, repeat
 from operator import attrgetter
 import os
+import os.path
 
-from pkg_resources import resource_exists
-from pylons import url
+from pylons import config, tmpl_context as c, url
 
 import pokedex.db.tables as tables
 import pokedex.formulae as formulae
 from pokedex.roomaji import romanize
-
 import spline.lib.helpers as h
-
-from pylons import tmpl_context as c
-
 from splinext.pokedex.i18n import NullTranslator
 
 # We can't translate at import time, but _ will mark strings as translatable
@@ -226,15 +222,23 @@ def version_icons(*versions, **kwargs):
     return version_icons
 
 def pokemon_has_media(pokemon_form, prefix, ext, use_form=True):
-    """A wrapper around resource_exists to determine whether a file exists
-    in the specified directory for the specified Pokémon form.
+    """Determine whether a file exists in the specified directory for the
+    specified Pokémon form.
     """
+    # TODO share this somewhere
+    media_dir = config.get('spline-pokedex.media_directory', None)
+    if not media_dir:
+        warnings.warn(
+            "No media_directory found; "
+            "you may want to clone pokedex-media.git")
+        return False
 
     if use_form:
         kwargs = dict(form=pokemon_form)
     else:
         kwargs = dict()
-    return resource_exists('pokedex', 'data/media/{0}'.format(
+
+    return os.path.exists(os.path.join(media_dir,
         pokemon_media_path(pokemon_form.species, prefix, ext, **kwargs)))
 
 def pokemon_media_path(pokemon_species, prefix, ext, form=None):
