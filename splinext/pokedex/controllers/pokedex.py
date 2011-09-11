@@ -364,16 +364,13 @@ class PokedexController(PokedexBaseController):
             # Get an accompanying image.  Moves get their type; abilities get
             # nothing; everything else gets the obvious corresponding icon
             image = None
-            if isinstance(row, tables.Pokemon):
-                if row.form_name:
-                    image = u"pokemon/icons/{0}-{1}.png".format(row.normal_form.id, row.form_name.lower())
-                else:
-                    image = u"pokemon/icons/{0}.png".format(row.normal_form.id)
+            if isinstance(row, tables.PokemonSpecies):
+                image = u"pokemon/icons/{0}.png".format(row.id)
             elif isinstance(row, tables.PokemonForm):
-                if row.name:
-                    image = u"pokemon/icons/{0}-{1}.png".format(row.form_base_pokemon_id, row.name.lower())
+                if row.form_identifier:
+                    image = u"pokemon/icons/{0}-{1}.png".format(row.pokemon_id, row.form_identifier)
                 else:
-                    image = u"pokemon/icons/{0}.png".format(row.form_base_pokemon_id)
+                    image = u"pokemon/icons/{0}.png".format(row.pokemon_id)
             elif isinstance(row, tables.Move):
                 image = u"types/{1}/{0}.png".format(row.type.name.lower(),
                         c.game_language.identifier)
