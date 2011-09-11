@@ -12,6 +12,7 @@ from itertools import groupby, chain, repeat
 from operator import attrgetter
 import os
 import os.path
+import warnings
 
 from pylons import config, tmpl_context as c, url
 
