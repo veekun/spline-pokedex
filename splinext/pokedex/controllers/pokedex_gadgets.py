@@ -250,7 +250,7 @@ class PokedexGadgetsController(PokedexBaseController):
 
             # Overrule a 'yes' for opposite genders if this Pokémon is a
             # genderless or single-gender species
-            if c.pokemon.gender_rate in (-1, 0, 8):
+            if c.pokemon.species.gender_rate in (-1, 0, 8):
                 c.form.twitterpating.data = False
 
             percent_hp = c.form.current_hp.data / 100
@@ -265,7 +265,7 @@ class PokedexGadgetsController(PokedexBaseController):
             def capture_chance(ball_bonus=10, **kwargs):
                 return pokedex.formulae.capture_chance(
                     percent_hp=percent_hp,
-                    capture_rate=c.pokemon.capture_rate,
+                    capture_rate=c.pokemon.species.capture_rate,
                     status_bonus=status_bonus,
                     ball_bonus=ball_bonus,
                     **kwargs
