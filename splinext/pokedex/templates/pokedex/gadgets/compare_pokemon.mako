@@ -142,7 +142,7 @@ ${h.end_form()}
     </tr>
     ${row(_(u'Weight'), weight_cell, class_='dex-compare-flavor-text')}
 
-    ${row(_(u'Species'),   species_cell,   class_='dex-compare-flavor-text')}
+    ${row(_(u'Genus'),     genus_cell,     class_='dex-compare-flavor-text')}
     ${row(_(u'Color'),     color_cell,     class_='dex-compare-flavor-text')}
     ${row(_(u'Habitat'),   habitat_cell,   class_='dex-compare-flavor-text')}
     ${row(_(u'Footprint'), footprint_cell, class_='dex-compare-flavor-text')}
@@ -314,8 +314,8 @@ ${h.pokedex.format_weight_imperial(pokemon.weight)}<br>
 ${h.pokedex.format_weight_metric(pokemon.weight)}
 </%def>
 
-<%def name="species_cell(pokemon)">${pokemon.species}</%def>
-<%def name="color_cell(pokemon)"><span class="dex-color-${pokemon.species.color}"></span> ${pokemon.species.color}</%def>
+<%def name="genus_cell(pokemon)">${pokemon.species.genus}</%def>
+<%def name="color_cell(pokemon)"><span class="dex-color-${pokemon.species.color.identifier}"></span> ${pokemon.species.color.name}</%def>
 <%def name="habitat_cell(pokemon)">
 % if pokemon.species.generation_id <= 3:
 ${h.pokedex.pokedex_img('habitats/%s.png' % h.pokedex.filename_from_name(pokemon.species.habitat.identifier), \
