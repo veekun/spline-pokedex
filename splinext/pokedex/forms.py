@@ -104,7 +104,7 @@ class StatField(fields.Field):
         if self.short_name in formdata:
             # Must be a shortened field; unshorten it and clobber the actual
             # formdata
-            values = formdata.getlist(self.short_name)[0].split(u'|')
+            values = re.split(u'[|,]', formdata.getlist(self.short_name)[0])
             try:
                 int_values = [int(value) for value in values]
                 short_data = dict(zip(self._stats, int_values))
@@ -148,7 +148,7 @@ class StatField(fields.Field):
 
     @property
     def short_data(self):
-        return u'|'.join(str(field.data) for field in self)
+        return u','.join(str(field.data) for field in self)
 
 
 class RangeQueryEvaluator(object):

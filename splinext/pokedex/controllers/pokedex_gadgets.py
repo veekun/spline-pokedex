@@ -813,6 +813,8 @@ class PokedexGadgetsController(PokedexBaseController):
 
     def stat_calculator(self):
         """Calculates, well, stats."""
+        # XXX this form handling is all pretty bad.  consider ripping it out
+        # and really thinking about how this ought to work.
         # possible TODO:
         # - more better error checking
         # - track effort gained on the fly (as well as exp for auto level up?)
@@ -857,6 +859,12 @@ class PokedexGadgetsController(PokedexBaseController):
 
         c.results = None  # XXX shim
         if not request.GET or not c.form.validate():
+            return render('/pokedex/gadgets/stat_calculator.mako')
+
+        if not c.num_data_points:
+            # Zero?  How did you manage that?
+            # XXX this doesn't actually appear in the page  :D
+            c.form.level.errors.append(u"Please enter at least one level")
             return render('/pokedex/gadgets/stat_calculator.mako')
 
         # Possible shorten and redirect
