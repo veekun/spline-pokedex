@@ -44,8 +44,8 @@
     ${object.name}
     % endif
     </a>
-    % if result.language != c.game_language.name:
-    (<img src="${h.static_uri('spline', "flags/{0}.png".format(result.iso3166))}" alt="${result.language}" title="${result.language}"> ${result.name})
+    % if result.language != c.game_language:
+    (<img src="${h.static_uri('spline', "flags/{0}.png".format(result.iso3166))}" alt="${result.language.name}" title="${result.language.name}"> ${result.name})
     % endif
 </li>
 % endfor
