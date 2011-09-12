@@ -1259,7 +1259,6 @@ class PokedexSearchController(PokedexBaseController):
 
             ids = [_.id for _ in c.results]
             for relation in eagerloads:
-                print relation
                 # Run the query again, selecting only by id this time, but
                 # eagerloading some relation
                 (db.pokedex_session.query(tables.Pokemon) \
