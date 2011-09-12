@@ -426,27 +426,27 @@ ${egg_group.name}<br>
 
 <%def name="col_stat_hp()"><col class="dex-col-stat"></%def>
 <%def name="th_stat_hp()"><th><abbr title="${_(u"Hit Points")}">${_(u"HP")}</abbr></th></%def>
-<%def name="td_stat_hp(pokemon)"><td class="stat">${pokemon.stat('HP').base_stat}</td></%def>
+<%def name="td_stat_hp(pokemon)"><td class="stat">${pokemon.stat('hp').base_stat}</td></%def>
 
 <%def name="col_stat_attack()"><col class="dex-col-stat"></%def>
 <%def name="th_stat_attack()"><th><abbr title="${_(u"Attack")}">${_(u"Atk")}</abbr></th></%def>
-<%def name="td_stat_attack(pokemon)"><td class="stat">${pokemon.stat('Attack').base_stat}</td></%def>
+<%def name="td_stat_attack(pokemon)"><td class="stat">${pokemon.stat('attack').base_stat}</td></%def>
 
 <%def name="col_stat_defense()"><col class="dex-col-stat"></%def>
 <%def name="th_stat_defense()"><th><abbr title="${_(u"Defense")}">${_(u"Def")}</abbr></th></%def>
-<%def name="td_stat_defense(pokemon)"><td class="stat">${pokemon.stat('Defense').base_stat}</td></%def>
+<%def name="td_stat_defense(pokemon)"><td class="stat">${pokemon.stat('defense').base_stat}</td></%def>
 
 <%def name="col_stat_special_attack()"><col class="dex-col-stat"></%def>
 <%def name="th_stat_special_attack()"><th><abbr title="${_(u"Special Attack")}">${_(u"SpA")}</abbr></th></%def>
-<%def name="td_stat_special_attack(pokemon)"><td class="stat">${pokemon.stat('Special Attack').base_stat}</td></%def>
+<%def name="td_stat_special_attack(pokemon)"><td class="stat">${pokemon.stat('special-attack').base_stat}</td></%def>
 
 <%def name="col_stat_special_defense()"><col class="dex-col-stat"></%def>
 <%def name="th_stat_special_defense()"><th><abbr title="${_(u"Special Defense")}">${_(u"SpD")}</abbr></th></%def>
-<%def name="td_stat_special_defense(pokemon)"><td class="stat">${pokemon.stat('Special Defense').base_stat}</td></%def>
+<%def name="td_stat_special_defense(pokemon)"><td class="stat">${pokemon.stat('special-defense').base_stat}</td></%def>
 
 <%def name="col_stat_speed()"><col class="dex-col-stat"></%def>
 <%def name="th_stat_speed()"><th><abbr title="${_(u"Speed")}">${_(u"Spd")}</abbr></th></%def>
-<%def name="td_stat_speed(pokemon)"><td class="stat">${pokemon.stat('Speed').base_stat}</td></%def>
+<%def name="td_stat_speed(pokemon)"><td class="stat">${pokemon.stat('speed').base_stat}</td></%def>
 
 <%def name="col_stat_total()"><col class="dex-col-stat"></%def>
 <%def name="th_stat_total()"><th>${_(u"Total")}</th></%def>

@@ -314,7 +314,7 @@ class PokedexGadgetsController(PokedexBaseController):
                 u'Skitty', u'Delcatty',
             )
 
-            is_skittish = c.pokemon.stat('Speed').base_stat >= 100
+            is_skittish = c.pokemon.stat('speed').base_stat >= 100
 
             c.results[u'Level Ball']  = [
                 CaptureChance(u'Your level ≤ target level',
