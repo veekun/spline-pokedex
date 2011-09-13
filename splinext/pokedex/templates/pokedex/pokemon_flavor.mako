@@ -133,7 +133,7 @@ ${h.h1(_('Main Game Portraits'), id=_('main-sprites', context='anchor'))}
         <% prefix = 'main-sprites/black-white' %>
     % endif
     <li>${h.pokedex.pokemon_link(
-            c.pokemon,
+            form.pokemon,
             h.pokedex.pokemon_form_image(form, prefix=prefix),
             to_flavor=True, form=form.form_identifier,
             class_='dex-icon-link' + (' selected' if form == c.form else ''),
