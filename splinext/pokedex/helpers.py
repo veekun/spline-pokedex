@@ -346,7 +346,7 @@ def form_flavor_link(form, content=None, **attr):
     return h.HTML.a(
         content,
         href=url(controller='dex', action='pokemon_flavor',
-                       name=form.name.lower(), **url_kwargs),
+                       name=form.species.name.lower(), **url_kwargs),
         **attr
         )
 
