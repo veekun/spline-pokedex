@@ -12,7 +12,7 @@ ${_(u"{name} flavor – Pokémon #{number}").format(name=c.form.name, number=c.f
 <ul id="breadcrumbs">
     <li><a href="${url('/dex')}">${_(u"Pokédex")}</a></li>
     <li><a href="${url(controller='dex', action='pokemon_list')}">${_(u"Pokémon")}</a></li>
-    <li>${h.pokedex.pokemon_link(c.pokemon, content=c.pokemon.species.name, form=None)}</li>
+    <li>${h.pokedex.pokemon_link(c.pokemon, content=c.pokemon.species.name)}</li>
     <li>${c.form.name} flavor</li>
 </ul>
 </%def>
@@ -132,10 +132,9 @@ ${h.h1(_('Main Game Portraits'), id=_('main-sprites', context='anchor'))}
     % else:
         <% prefix = 'main-sprites/black-white' %>
     % endif
-    <li>${h.pokedex.pokemon_link(
-            form.pokemon,
+    <li>${h.pokedex.form_flavor_link(
+            form,
             h.pokedex.pokemon_form_image(form, prefix=prefix),
-            to_flavor=True, form=form.form_identifier,
             class_='dex-icon-link' + (' selected' if form == c.form else ''),
     )}</li>
 % endfor

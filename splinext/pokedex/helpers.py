@@ -300,56 +300,55 @@ def pokemon_form_image(pokemon_form, prefix='main-sprites/black-white', **attr):
     return pokedex_img(pokemon_media_path(pokemon_form.species, prefix, ext, form=pokemon_form),
                        **attr)
 
-def pokemon_link(pokemon, content=None, to_flavor=False, **attr):
+def pokemon_link(pokemon, content=None, **attr):
     """Returns a link to a Pokémon page.
 
     `pokemon`
-        A Pokémon object.
+        A Pokemon object.
 
     `content`
         Link text (or image, or whatever).
-
-    `form`
-        A string name of an alternate form to link to.  If the form is flavor-
-        only, the link will be to the flavor page.
-
-    `to_flavor`
-        If True, the link will always be to the flavor page, regardless of
-        form.
     """
-
-    if 'form' in attr and attr['form']:
-        forms = [f for f in pokemon.forms if f.form_identifier == attr['form']]
-        if forms:
-            form = forms[0]
-        else:
-            form = pokemon.default_form
-    else:
-        form = pokemon.default_form
 
     # Content defaults to the name of the Pokémon
     if not content:
         content = pokemon.name
 
     url_kwargs = {}
-    if form.form_identifier:
-        # Don't want a ?form=None, or a ?form=default on Pokémon whose forms
-        # aren't just flavor
-        url_kwargs['form'] = form.form_identifier
-
-    action = 'pokemon'
-    if to_flavor or not form.is_default:
-        # For non-default (flavor-only) forms, then a form link only makes
-        # sense if it's to a flavor page
-        action = 'pokemon_flavor'
+    if pokemon.default_form.form_identifier:
+        # Don't want a ?form=None, or a ?form=default
+        url_kwargs['form'] = pokemon.default_form.form_identifier
 
     return h.HTML.a(
         content,
-        href=url(controller='dex', action=action,
+        href=url(controller='dex', action='pokemon',
                        name=pokemon.species.name.lower(), **url_kwargs),
         **attr
         )
 
+def form_flavor_link(form, content=None, **attr):
+    """Returns a link to a pokemon form's flavor page.
+
+    `form`
+        A PokemonForm object.
+
+    `content`
+        Link text (or image, or whatever).
+    """
+    if not content:
+        content = form.name
+
+    url_kwargs = {}
+    if form.form_identifier:
+        # Don't want a ?form=None, or a ?form=default
+        url_kwargs['form'] = form.form_identifier
+
+    return h.HTML.a(
+        content,
+        href=url(controller='dex', action='pokemon_flavor',
+                       name=form.name.lower(), **url_kwargs),
+        **attr
+        )
 
 def damage_class_icon(damage_class, _=_):
     return pokedex_img(

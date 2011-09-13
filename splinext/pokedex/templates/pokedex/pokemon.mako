@@ -7,7 +7,7 @@
 <%! from splinext.pokedex import i18n %>\
 
 <%def name="title()">\
-${_(u"{name} – Pokémon #{number}").format(name=(c.pokemon.default_form.name), number=c.pokemon.species.id)}
+${_(u"{name} – Pokémon #{number}").format(name=(c.pokemon.name), number=c.pokemon.species.id)}
 </%def>
 
 <%def name="title_in_page()">
@@ -298,7 +298,11 @@ ${h.h1(_('Evolution'))}
     if form == c.pokemon.default_form:
         link_class = link_class + ' selected'
 %>\
-    <li>${h.pokedex.pokemon_link(form.pokemon, h.pokedex.pokemon_form_image(form, 'main-sprites/black-white'), form=form.form_identifier, class_=link_class)}</li>
+    % if form.is_default:
+        <li>${h.pokedex.pokemon_link(form.pokemon, h.pokedex.pokemon_form_image(form, 'main-sprites/black-white'), class_=link_class)}</li>
+    % else:
+        <li>${h.pokedex.form_flavor_link(form, h.pokedex.pokemon_form_image(form, 'main-sprites/black-white'), class_=link_class)}</li>
+    % endif
     % endfor
 </ul>
 <p> ${c.pokemon.species.form_description} </p>

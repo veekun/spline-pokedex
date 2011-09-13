@@ -374,7 +374,7 @@ ${h.end_form()}
 
 <%def name="col_name()"><col class="dex-col-name"></%def>
 <%def name="th_name()"><th>${_(u"Name")}</th></%def>
-<%def name="td_name(pokemon)"><td class="name">${h.pokedex.pokemon_link(pokemon, pokemon.default_form.name)}</td></%def>
+<%def name="td_name(pokemon)"><td class="name">${h.pokedex.pokemon_link(pokemon, pokemon.name)}</td></%def>
 
 <%def name="col_growth_rate()"><col class="dex-col-max-exp"></%def>
 <%def name="th_growth_rate()"><th>${_(u"EXP to L100")}</th></%def>
