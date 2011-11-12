@@ -452,10 +452,9 @@ def evolution_description(evolution, _=_):
     elif evolution.trigger.identifier == u'trade':
         chunks.append(_(u'Trade'))
     elif evolution.trigger.identifier == u'use-item':
-        item_name = evolution.trigger_item.name
-        chunks.append(_(u"Use {article} {item}").format(
-            article=article(item_name, _=_),
-            item=item_name))
+        chunks.append(h.literal(_(u"Use {article} {item}")).format(
+            article=article(evolution.trigger_item.name, _=_),
+            item=item_link(evolution.trigger_item, include_icon=False)))
     elif evolution.trigger.identifier == u'shed':
         chunks.append(
             _(u"Evolve {from_pokemon} ({to_pokemon} will consume "
@@ -473,13 +472,19 @@ def evolution_description(evolution, _=_):
     if evolution.minimum_level:
         chunks.append(_(u"starting at level {0}").format(evolution.minimum_level))
     if evolution.location_id:
-        chunks.append(_(u"around {0}").format(evolution.location.name))
+        chunks.append(h.literal(_(u"around {0}")).format(
+            h.HTML.a(evolution.location.name,
+                href=url(controller='dex', action='locations',
+                         name=evolution.location.name.lower()))))
     if evolution.held_item_id:
-        chunks.append(_(u"while holding {article} {item}").format(
+        chunks.append(h.literal(_(u"while holding {article} {item}")).format(
             article=article(evolution.held_item.name),
-            item=evolution.held_item.name))
+            item=item_link(evolution.held_item, include_icon=False)))
     if evolution.known_move_id:
-        chunks.append(_(u"knowing {0}").format(evolution.known_move.name))
+        chunks.append(h.literal(_(u"knowing {0}")).format(
+            h.HTML.a(evolution.known_move.name,
+                href=url(controller='dex', action='moves',
+                         name=evolution.known_move.name.lower()))))
     if evolution.minimum_happiness:
         chunks.append(_(u"with at least {0} happiness").format(
             evolution.minimum_happiness))
@@ -495,13 +500,13 @@ def evolution_description(evolution, _=_):
             op = _(u'=')
         chunks.append(_(u"when Attack {0} Defense").format(op))
     if evolution.party_species_id:
-        chunks.append(_(u"with {0} in the party").format(
-            evolution.party_species.name))
-    if evolution.party_species_id:
-        chunks.append(_(u"in exchange for {0}")
-            .format(evolution.party_species.name))
+        chunks.append(h.literal(_(u"with {0} in the party")).format(
+            pokemon_link(evolution.party_species.default_pokemon, include_icon=False)))
+    if evolution.trade_species_id:
+        chunks.append(h.literal(_(u"in exchange for {0}")).format(
+            pokemon_link(evolution.trade_species.default_pokemon, include_icon=False)))
 
-    return u', '.join(chunks)
+    return h.literal(u', ').join(chunks)
 
 
 ### Formatting
