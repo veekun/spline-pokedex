@@ -307,11 +307,12 @@ class PokedexGadgetsController(PokedexBaseController):
             weight_class = int((c.pokemon.weight - 1) / 1024)
 
             # Ugh.
-            is_moony = c.pokemon.name in (
-                u'Nidoran♀', u'Nidorina', u'Nidoqueen',
-                u'Nidoran♂', u'Nidorino', u'Nidoking',
-                u'Clefairy', u'Clefable', u'Jigglypuff', u'Wigglytuff',
-                u'Skitty', u'Delcatty',
+            is_moony = c.pokemon.species.identifier in (
+                u'nidoran-m', u'nidorina', u'nidoqueen',
+                u'nidoran-f', u'nidorino', u'nidoking',
+                u'cleffa', u'clefairy', u'clefable',
+                u'igglybuff', u'jigglypuff', u'wigglytuff',
+                u'skitty', u'delcatty',
             )
 
             is_skittish = c.pokemon.stat('speed').base_stat >= 100
@@ -383,7 +384,7 @@ class PokedexGadgetsController(PokedexBaseController):
             c.results[u'Sport Ball']  = only(capture_chance(15))
 
             # Gen III
-            is_nettable = any(_.name in ('bug', 'water')
+            is_nettable = any(_.identifier in ('bug', 'water')
                               for _ in c.pokemon.types)
 
             c.results[u'Premier Ball'] = only(normal_chance)
@@ -904,7 +905,7 @@ class PokedexGadgetsController(PokedexBaseController):
         for stat in c.stats:
             ### Bunch of setup, per stat
             # XXX let me stop typing this, christ
-            if stat.name == u'HP':
+            if stat.identifier == u'hp':
                 func = pokedex.formulae.calculated_hp
             else:
                 func = pokedex.formulae.calculated_stat
