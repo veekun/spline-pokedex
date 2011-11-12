@@ -175,6 +175,7 @@ class PokedexPlugin(PluginBase):
                     TranslatablePluginLink(_(u'Abilities'), url(controller='dex', action='abilities_list')),
                     TranslatablePluginLink(_(u'Items'), url(controller='dex', action='items_list')),
                     TranslatablePluginLink(_(u'Natures'), url(controller='dex', action='natures_list')),
+                    TranslatablePluginLink(_(u'Locations'), url(controller='dex', action='locations_list')),
                 ]),
                 TranslatablePluginLink(_(u'Gadgets'), None, children=[
                     TranslatablePluginLink(_(u'Compare Pokémon'), url(controller='dex_gadgets', action='compare_pokemon')),
