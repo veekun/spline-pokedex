@@ -270,7 +270,7 @@ ${h.h1(_('History'))}
         % endif
         % if change.effect_id is not None:
         ## XXX as_html is more appropriate but adds <p> tags
-        Effect is: ${change.short_effect.as_text}
+        Effect is: ${change.short_effect.as_text()}
         % elif change.effect_chance is not None:
         ## If we're showing the entire effect, it'll include the effect chance
         Effect chance is ${change.effect_chance}.
