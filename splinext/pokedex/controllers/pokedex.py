@@ -877,7 +877,7 @@ class PokedexController(PokedexBaseController):
         q = db.pokedex_session.query(tables.Encounter) \
             .filter_by(pokemon=c.pokemon) \
             .options(
-                eagerload_all('condition_value_map.condition_value'),
+                eagerload_all('condition_values'),
                 eagerload_all('version'),
                 eagerload_all('slot.method'),
                 eagerload_all('location_area.location'),
@@ -1210,7 +1210,7 @@ class PokedexController(PokedexBaseController):
         # Finally, condition values associated with levels/rarity.
         q = db.pokedex_session.query(tables.Encounter) \
             .options(
-                eagerload_all('condition_value_map.condition_value'),
+                eagerload_all('condition_values'),
                 eagerload_all('version'),
                 eagerload_all('slot.method'),
                 eagerload_all('location_area.location'),
@@ -1830,7 +1830,7 @@ class PokedexController(PokedexBaseController):
         # Finally, condition values associated with levels/rarity.
         q = db.pokedex_session.query(tables.Encounter) \
             .options(
-                eagerload_all('condition_value_map.condition_value'),
+                eagerload_all('condition_values'),
                 eagerload_all('slot.method'),
                 eagerload_all('pokemon.species'),
                 eagerload('version'),
