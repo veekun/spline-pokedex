@@ -29,11 +29,10 @@ class PokedexAPIController(BaseController):
         # TODO document these!
         # TODO cache me!
         pokemon = []
-        for row in db.pokedex_session.query(tables.Pokemon):
-            pokemon.append(dict(
-                id=row.id,
-                name=row.name,
-            ))
+        import splinext.pokedex.api as api
+        from collections import defaultdict
 
+        api_query = api.APIQuery(api.pokemon_locus, db.pokedex_session)
+        results = api_query.process_query(request.GET)
         response.headers['Content-Type'] = 'application/json; charset=UTF-8'
-        return json.dumps(pokemon)
+        return json.dumps(results)

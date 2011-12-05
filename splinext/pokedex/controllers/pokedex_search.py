@@ -760,7 +760,6 @@ class PokedexSearchController(PokedexBaseController):
             grandparent_species = aliased(tables.PokemonSpecies)
 
             query = query.outerjoin(
-                # If we're a specific form, check the base form, too
                 (tables.PokemonEvolution,
                     tables.PokemonEvolution.evolved_species_id == my_species.id),
                 (parent_species, my_species.parent_species),
@@ -1541,3 +1540,9 @@ class PokedexSearchController(PokedexBaseController):
 
         ### Done.
         return render('/pokedex/search/moves.mako')
+
+    def pokemon_search2(self):
+        import splinext.pokedex.api as api
+        c.api_query = api.APIQuery(api.pokemon_locus, db.pokedex_session)
+
+        return render('/pokedex/search/pokemon2.mako')

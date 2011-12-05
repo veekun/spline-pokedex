@@ -31,6 +31,7 @@ def add_routes_hook(map, *args, **kwargs):
     # These are more specific than the general pages below, so must be first
     map.connect('/dex/moves/search', controller='dex_search', action='move_search')
     map.connect('/dex/pokemon/search', controller='dex_search', action='pokemon_search')
+    map.connect('/dex/pokemon/search2', controller='dex_search', action='pokemon_search2')
 
     map.connect('/dex/abilities/{name}', controller='dex', action='abilities')
     map.connect('/dex/items/{pocket}', controller='dex', action='item_pockets')
