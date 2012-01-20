@@ -267,6 +267,10 @@ class PokedexController(PokedexBaseController):
         'radio-off': 'radio-off.png',
         'radio-hoenn': 'radio-hoenn.png',
         'radio-sinnoh': 'radio-sinnoh.png',
+        'season-spring': 'season-spring.png',
+        'season-summer': 'season-summer.png',
+        'season-autumn': 'season-autumn.png',
+        'season-winter': 'season-winter.png',
     }
 
     def __before__(self, action, **params):
