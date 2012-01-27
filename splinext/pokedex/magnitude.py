@@ -73,6 +73,9 @@ height_units = {
     # ancient
     'cubit':            0.45,
     'royalcubit':       0.525,
+
+    # easter egg
+    'smoot':            1.70180,
 }
 height_abbrs = {
     'Å'  : u'ångström',
