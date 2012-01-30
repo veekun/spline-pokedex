@@ -16,7 +16,9 @@ from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from pylons.decorators import jsonify
 from sqlalchemy import and_, or_, not_
-from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join, joinedload, joinedload_all, subqueryload, subqueryload_all
+from sqlalchemy.orm import (aliased, contains_eager, eagerload, eagerload_all,
+        join, joinedload, joinedload_all, subqueryload, subqueryload_all,
+        lazyload)
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import exists, func
 
@@ -78,6 +80,19 @@ def _collapse_pokemon_move_columns(table, thing):
     # generations.  So we need a list of lists of lists of version groups:
     move_columns = []
 
+    # Version groups that don't support a method at all can collapse freely,
+    # e.g. Colosseum has no breeding, so its egg moves collapse with the rest
+    # of gen. III
+    # Prepare a list of group/method combinations that have some moves
+    # Note that we're using IDs, so FakeMoveMethods are counted as the real
+    # methods
+    q = db.pokedex_session.query(tables.VersionGroup.id, tables.PokemonMoveMethod.id)
+    q = q.filter(exists().where(and_(
+            tables.PokemonMove.pokemon_move_method_id == tables.PokemonMoveMethod.id,
+            tables.PokemonMove.version_group_id == tables.VersionGroup.id)))
+    q = q.options(lazyload('*'))
+    applicable_versiongroup_methods = set(q)
+
     # Only even consider versions in which this thing actually exists
     q = db.pokedex_session.query(tables.Generation) \
                        .filter(tables.Generation.id >= thing.generation_id) \
@@ -102,20 +117,39 @@ def _collapse_pokemon_move_columns(table, thing):
                 if method.name == 'Tutor':
                     continue
 
+                # If a method doesn't appear in a version group at all,
+                # it's always squashable.
+                if (version_group.id, method.id) not in applicable_versiongroup_methods:
+                    # Squashable
+                    continue
+
+                # Now look at the preceding column, and compare with the first
+                # applicable version group we find there
                 for move, version_group_data in method_list:
-                    if version_group_data.get(version_group, None) != \
-                       version_group_data.get(move_columns[-1][-1][-1], None):
-                        break
+                    data = version_group_data.get(version_group, None)
+                    for vg in move_columns[-1][-1]:
+                        if (vg.id, method.id) not in applicable_versiongroup_methods:
+                            continue
+                        if data != version_group_data.get(vg, None):
+                            # Not squashable
+                            break
+                    else:
+                        # Looks squashable so far, try next move
+                        continue
+
+                    # We broke out – not squashable
+                    break
                 else:
+                    # Looks squashable so far, try next method
                     continue
 
                 break # We broke out and didn't get to continue—not squashable
             else:
-                # Stick this version group in the previous column
+                # Squashable; stick this version group in the previous column
                 move_columns[-1][-1].append(version_group)
                 continue
 
-            # Create a new column
+            # Not squashable; create a new column
             move_columns[-1].append( [version_group] )
 
     return move_columns
