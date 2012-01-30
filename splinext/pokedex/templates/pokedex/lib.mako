@@ -1,4 +1,4 @@
-<%! from splinext.pokedex import i18n %>\
+<%! from splinext.pokedex import i18n, db %>\
 
 <%def name="pokemon_icon(pokemon)">\
 % if pokemon.is_default:
@@ -61,14 +61,25 @@ ${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons')}\
 
 
 ###### Common tables
-<%def name="pokemon_move_table_column_header(column)">
+<%def name="pokemon_move_table_column_header(column, move_method=None)">
 <th class="version">
   % if len(column) == len(column[0].generation.version_groups):
     ## If the entire gen has been collapsed into a single column, just show
     ## the gen icon instead of the messy stack of version icons
     ${h.pokedex.generation_icon(column[0].generation)}
   % else:
-    % for i, version_group in enumerate(column):
+    <%
+        if move_method:
+            # Only select version groups that support this move method
+            visible_version_groups = [vg for vg in column if
+                db.version_group_has_move_method(vg, move_method)]
+            # But if nothing is selected, put everything back
+            if not visible_version_groups:
+                visible_version_groups = column
+        else:
+            visible_version_groups = column
+    %>
+    % for i, version_group in enumerate(visible_version_groups):
     % if i != 0:
     <br>
     % endif
