@@ -105,7 +105,7 @@ def _collapse_pokemon_move_columns(table, thing):
 
                 # If a method doesn't appear in a version group at all,
                 # it's always squashable.
-                if not db.version_group_has_move_method(version_group, method):
+                if method.id not in [m.id for m in version_group.pokemon_move_methods]:
                     # Squashable
                     continue
 
@@ -114,7 +114,7 @@ def _collapse_pokemon_move_columns(table, thing):
                 for move, version_group_data in method_list:
                     data = version_group_data.get(version_group, None)
                     for vg in move_columns[-1][-1]:
-                        if not db.version_group_has_move_method(vg, method):
+                        if method.id not in [m.id for m in vg.pokemon_move_methods]:
                             continue
                         if data != version_group_data.get(vg, None):
                             # Not squashable
@@ -985,7 +985,7 @@ class PokedexController(PokedexBaseController):
         # such as for parent's egg moves.  should go away once move tables get
         # their own rendery class
         FakeMoveMethod = namedtuple('FakeMoveMethod',
-            ['id', 'name', 'description', 'pokemon'])
+            ['id', 'name', 'description', 'pokemon', 'version_groups'])
         methods_cache = {}
         def find_method(pm):
             key = pm.method, pm.pokemon
@@ -993,7 +993,8 @@ class PokedexController(PokedexBaseController):
                 methods_cache[key] = FakeMoveMethod(
                     id=pm.method.id, name=pm.method.name,
                     description=pm.method.description,
-                    pokemon=pm.pokemon)
+                    pokemon=pm.pokemon,
+                    version_groups=tuple(pm.method.version_groups))
             return methods_cache[key]
 
         for pokemon_move in q:

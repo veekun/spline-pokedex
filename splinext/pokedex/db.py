@@ -7,7 +7,7 @@ import re
 
 import pokedex.db
 from pokedex.db import tables
-from sqlalchemy.sql import exists, func
+from sqlalchemy.sql import func
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import lazyload
 from pylons import tmpl_context as c
@@ -145,28 +145,3 @@ def generation(id):
     return pokedex_session.query(tables.Generation).get(id)
 def version(name):
     return pokedex_session.query(tables.Version).filter_by(name=name).one()
-
-def version_group_has_move_method(group, method):
-    """Return true if the given VersionGroup supports the PokemonMoveMethod
-
-    i.e. if there are any pokemon that learn a move using that method
-
-    The check is done by ID so fake methods are supported
-    """
-    # XXX: Cache this better
-    try:
-        the_set = c._applicable_versiongroup_methods
-    except AttributeError:
-        # Version groups that don't support a method at all can collapse freely,
-        # e.g. Colosseum has no breeding, so its egg moves collapse with the rest
-        # of gen. III
-        # Prepare a list of group/method combinations that have some moves
-        # Note that we're using IDs, so FakeMoveMethods are counted as the real
-        # methods
-        q = pokedex_session.query(tables.VersionGroup.id, tables.PokemonMoveMethod.id)
-        q = q.filter(exists().where(and_(
-                tables.PokemonMove.pokemon_move_method_id == tables.PokemonMoveMethod.id,
-                tables.PokemonMove.version_group_id == tables.VersionGroup.id)))
-        q = q.options(lazyload('*'))
-        the_set = c._applicable_versiongroup_methods = set(q)
-    return (group.id, method.id) in the_set

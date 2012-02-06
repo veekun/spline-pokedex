@@ -72,7 +72,7 @@ ${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons')}\
         if move_method:
             # Only select version groups that support this move method
             visible_version_groups = [vg for vg in column if
-                db.version_group_has_move_method(vg, move_method)]
+                vg in move_method.version_groups]
             # But if nothing is selected, put everything back
             if not visible_version_groups:
                 visible_version_groups = column
