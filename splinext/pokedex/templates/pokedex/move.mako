@@ -234,7 +234,7 @@ ${c.move.effect}
     % elif meta.recoil and meta.recoil < 0:
     <li>
         <a href="${url(controller='dex_search', action='move_search', recoil='<0')}">
-            User absorbs ${abs(meta.healing)}% of the damage inflicted</a>
+            User absorbs ${abs(meta.recoil)}% of the damage inflicted</a>
     </li>
     % endif
     % if meta.healing and meta.healing > 0:
