@@ -16,7 +16,8 @@ from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from pylons.decorators import jsonify
 from sqlalchemy import and_, or_, not_
-from sqlalchemy.orm import aliased, contains_eager, eagerload, eagerload_all, join, joinedload, joinedload_all, subqueryload, subqueryload_all
+from sqlalchemy.orm import (aliased, contains_eager, eagerload, eagerload_all,
+        join, joinedload, joinedload_all, subqueryload, subqueryload_all)
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import exists, func
 
@@ -102,20 +103,39 @@ def _collapse_pokemon_move_columns(table, thing):
                 if method.name == 'Tutor':
                     continue
 
+                # If a method doesn't appear in a version group at all,
+                # it's always squashable.
+                if method.id not in [m.id for m in version_group.pokemon_move_methods]:
+                    # Squashable
+                    continue
+
+                # Now look at the preceding column, and compare with the first
+                # applicable version group we find there
                 for move, version_group_data in method_list:
-                    if version_group_data.get(version_group, None) != \
-                       version_group_data.get(move_columns[-1][-1][-1], None):
-                        break
+                    data = version_group_data.get(version_group, None)
+                    for vg in move_columns[-1][-1]:
+                        if method.id not in [m.id for m in vg.pokemon_move_methods]:
+                            continue
+                        if data != version_group_data.get(vg, None):
+                            # Not squashable
+                            break
+                    else:
+                        # Looks squashable so far, try next move
+                        continue
+
+                    # We broke out – not squashable
+                    break
                 else:
+                    # Looks squashable so far, try next method
                     continue
 
                 break # We broke out and didn't get to continue—not squashable
             else:
-                # Stick this version group in the previous column
+                # Squashable; stick this version group in the previous column
                 move_columns[-1][-1].append(version_group)
                 continue
 
-            # Create a new column
+            # Not squashable; create a new column
             move_columns[-1].append( [version_group] )
 
     return move_columns
@@ -965,7 +985,7 @@ class PokedexController(PokedexBaseController):
         # such as for parent's egg moves.  should go away once move tables get
         # their own rendery class
         FakeMoveMethod = namedtuple('FakeMoveMethod',
-            ['id', 'name', 'description', 'pokemon'])
+            ['id', 'name', 'description', 'pokemon', 'version_groups'])
         methods_cache = {}
         def find_method(pm):
             key = pm.method, pm.pokemon
@@ -973,7 +993,8 @@ class PokedexController(PokedexBaseController):
                 methods_cache[key] = FakeMoveMethod(
                     id=pm.method.id, name=pm.method.name,
                     description=pm.method.description,
-                    pokemon=pm.pokemon)
+                    pokemon=pm.pokemon,
+                    version_groups=tuple(pm.method.version_groups))
             return methods_cache[key]
 
         for pokemon_move in q:

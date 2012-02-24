@@ -699,5 +699,3 @@ def download_filesize(path):
             size = size / 1024.
     else:
         raise AssertionError('Serving a file of %s petabytes', size)
-    
-

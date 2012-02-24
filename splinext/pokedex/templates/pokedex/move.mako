@@ -437,7 +437,7 @@ ${h.h1(_(u'Pokémon', context='plural'))}
 %>\
     <tr class="header-row" id="${method_id}">
         % for column in columns:
-        ${dexlib.pokemon_move_table_column_header(column)}
+        ${dexlib.pokemon_move_table_column_header(column, method)}
         % endfor
         ${dexlib.pokemon_table_header()}
     </tr>

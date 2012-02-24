@@ -9,6 +9,7 @@ import pokedex.db
 from pokedex.db import tables
 from sqlalchemy.sql import func
 from sqlalchemy import and_, or_, not_
+from sqlalchemy.orm import lazyload
 from pylons import tmpl_context as c
 
 from spline.lib.base import SQLATimerProxy

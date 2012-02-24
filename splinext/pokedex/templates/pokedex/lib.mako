@@ -1,4 +1,4 @@
-<%! from splinext.pokedex import i18n %>\
+<%! from splinext.pokedex import i18n, db %>\
 
 <%def name="pokemon_icon(pokemon)">\
 % if pokemon.is_default:
@@ -61,14 +61,25 @@ ${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons')}\
 
 
 ###### Common tables
-<%def name="pokemon_move_table_column_header(column)">
+<%def name="pokemon_move_table_column_header(column, move_method=None)">
 <th class="version">
   % if len(column) == len(column[0].generation.version_groups):
     ## If the entire gen has been collapsed into a single column, just show
     ## the gen icon instead of the messy stack of version icons
     ${h.pokedex.generation_icon(column[0].generation)}
   % else:
-    % for i, version_group in enumerate(column):
+    <%
+        if move_method:
+            # Only select version groups that support this move method
+            visible_version_groups = [vg for vg in column if
+                vg in move_method.version_groups]
+            # But if nothing is selected, put everything back
+            if not visible_version_groups:
+                visible_version_groups = column
+        else:
+            visible_version_groups = column
+    %>
+    % for i, version_group in enumerate(visible_version_groups):
     % if i != 0:
     <br>
     % endif
@@ -83,46 +94,60 @@ ${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons')}\
 ## manner how a move is learned.
 ## Makes some use of c.move_tutor_version_groups, if it exists.
 ## XXX How to sort these "correctly"...?
-## XXX How to sort these "correctly"...?
 <%def name="pokemon_move_table_method_cell(column, method, version_group_data)">
-<% version_group = column[0] %>\
 % if method.name == 'Tutor' and c.move_tutor_version_groups:
-<td class="tutored">
-  ## Tutored moves never ever collapse!  Have to merge all the known values,
-  ## rather than ignoring all but the first
-  % for version_group in column:
-    % if version_group in version_group_data:
-    ${h.pokedex.version_icons(*version_group.versions)}
-    % elif version_group in c.move_tutor_version_groups:
-    <span class="no-tutor">${h.pokedex.version_icons(*version_group.versions)}</span>
-    % endif
-  % endfor
-</td>
-% elif version_group not in version_group_data:
-## Could be an empty hash, in which case it's here but has no metadata
-<td></td>
-% elif method.name == 'Level up':
-<td>
-  % if version_group_data[version_group]['level'] == 1:
-    —
-  % else:
-    ${version_group_data[version_group]['level']}
-  % endif
-</td>
-% elif method.name == 'Machine':
-<% machine_number = version_group_data[version_group]['machine'] %>\
-<td>
-  % if machine_number > 100:
-  ## HM
-    <strong>H</strong>${machine_number - 100}
-  % else:
-    ${"%02d" % machine_number}
-  % endif
-</td>
-% elif method.name == 'Egg':
-<td class="dex-moves-egg">${h.pokedex.chrome_img('egg-cropped.png', alt=u"&bull;")}</td>
+    <td class="tutored">
+    ## Tutored moves never ever collapse!  Have to merge all the known values,
+    ## rather than ignoring all but the first
+    % for version_group in column:
+        % if version_group in version_group_data:
+        ${h.pokedex.version_icons(*version_group.versions)}
+        % elif version_group in c.move_tutor_version_groups:
+        <span class="no-tutor">${h.pokedex.version_icons(*version_group.versions)}</span>
+        % endif
+    % endfor
+    </td>
 % else:
-<td>&bull;</td>
+    % for version_group in column:
+        ## Display the first thing that's not empty (in that case the pokémon
+        ## doesn't learn the move in this version_group, BUT could learn it in
+        ## another one
+        ## (e.g. Colosseum doesn't have egg moves but is grouped with Ruby)
+        % if version_group not in version_group_data:
+            <% continue %>
+        % endif
+        ## Otherwise display what we have
+        % if method.name == 'Level up':
+            <td>
+            % if version_group_data[version_group]['level'] == 1:
+                —
+            % else:
+                ${version_group_data[version_group]['level']}
+            % endif
+            </td>
+        % elif method.name == 'Machine':
+            <% machine_number = version_group_data[version_group]['machine'] %>\
+            <td>
+            % if machine_number > 100:
+            ## HM
+                <strong>H</strong>${machine_number - 100}
+            % else:
+                ${"%02d" % machine_number}
+            % endif
+            </td>
+        % elif method.name == 'Egg':
+            <td class="dex-moves-egg">${h.pokedex.chrome_img('egg-cropped.png',
+                alt=u"&bull;")}</td>
+        % else:
+            <td>&bull;</td>
+        % endif
+        ## Don't try other version groups now that we've displayed something
+        <% break %>
+    % else:
+        ## We didn't find any version group that has this move, so display an
+        ## empty cell
+        <td></td>
+    % endfor
 % endif
 </%def>
 

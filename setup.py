@@ -7,7 +7,7 @@ setup(
     install_requires = [
         'spline',
         'pokedex',
-        'SQLAlchemy>=0.6',
+        'SQLAlchemy>=0.7.5',
     ],
 
     include_package_data = True,

@@ -609,7 +609,7 @@ class PokedexGadgetsController(PokedexBaseController):
 
         # Form controls use version group
         c.version_groups = db.pokedex_session.query(tables.VersionGroup) \
-            .order_by(tables.VersionGroup.id.asc()) \
+            .order_by(tables.VersionGroup.order.asc()) \
             .options(eagerload('versions')) \
             .all()
         # Grab the version to use for moves, defaulting to the most current
