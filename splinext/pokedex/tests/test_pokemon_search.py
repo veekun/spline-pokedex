@@ -162,7 +162,7 @@ class TestPokemonSearchController(TestController):
     def test_color(self):
         """Checks searching by color."""
         self.check_search(
-            dict(color=u'Brown'),
+            dict(color=u'brown'),
             [ u'Cubone', u'Eevee', u'Feebas', u'Pidgey', u'Spinda', u'Zigzagoon' ],
                 # etc.
             'color',
@@ -403,18 +403,18 @@ class TestPokemonSearchController(TestController):
         - must have only the selected types
         """
         self.check_search(
-            dict(type_operator=u'any', type=[u'Dark', u'Steel']),
+            dict(type_operator=u'any', type=[u'dark', u'steel']),
             [ u'Houndoom', u'Magnemite', u'Murkrow', u'Steelix' ],
             'one-of some types',
         )
         self.check_search(
-            dict(type_operator=u'exact', type=[u'Dragon', u'Ground']),
+            dict(type_operator=u'exact', type=[u'dragon', u'ground']),
             [ u'Flygon', u'Gabite', u'Garchomp', u'Gible', u'Vibrava' ],
             'exact type combo',
             exact=True,
         )
         self.check_search(
-            dict(type_operator=u'only', type=[u'Ice', u'Steel']),
+            dict(type_operator=u'only', type=[u'ice', u'steel']),
             [
                 u'Mawile', u'Registeel',                        # pure steel
                 u'Glaceon', u'Glalie', u'Regice', u'Snorunt',   # pure ice

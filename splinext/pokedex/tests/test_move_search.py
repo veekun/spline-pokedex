@@ -107,7 +107,7 @@ class TestMoveSearchController(TestController):
     def test_type(self):
         u"""Checks type searching."""
         self.check_search(
-            dict(type=u'Dragon'),
+            dict(type=u'dragon'),
             [ u'Dual Chop', u'Draco Meteor', u'DragonBreath', u'Dragon Claw',
               u'Dragon Dance', u'Dragon Pulse', u'Dragon Rage', u'Dragon Rush',
               u'Dragon Tail', u'Outrage', u'Roar of Time', u'Spacial Rend',
@@ -118,7 +118,7 @@ class TestMoveSearchController(TestController):
         )
 
         self.check_search(
-            dict(type=[u'Fire', u'Electric']),
+            dict(type=[u'fire', u'electric']),
             [u'Thunder', u'ThunderShock', u'Flamethrower', u'Ember'],
             'searching for multiple types',
         )
@@ -132,7 +132,7 @@ class TestMoveSearchController(TestController):
         )
 
         self.check_search(
-            dict(damage_class=u'non-damaging', type=u'Dragon'),
+            dict(damage_class=u'non-damaging', type=u'dragon'),
             [u'Dragon Dance'],
             'more precise damage class search',
             exact=True,

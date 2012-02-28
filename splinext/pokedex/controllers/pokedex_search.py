@@ -172,7 +172,7 @@ class PokemonSearchForm(BaseSearchForm):
         'Type',
         query_factory=lambda: db.pokedex_session.query(tables.Type),
         get_label=lambda _: _.name,
-        get_pk=lambda table: table.name,
+        get_pk=lambda table: table.identifier,
         allow_blank=True,
     )
 
@@ -280,7 +280,7 @@ class PokemonSearchForm(BaseSearchForm):
             # XXX move methods need to identify themselves as "common"
             .filter(tables.PokemonMoveMethod.id <= 4),
         get_label=lambda row: row.name,
-        get_pk=lambda table: table.name.lower().replace(' ', '-'),
+        get_pk=lambda table: table.identifier,
         allow_blank=True,
     )
     move_version_group = QueryCheckboxSelectMultipleField(
@@ -309,19 +309,19 @@ class PokemonSearchForm(BaseSearchForm):
         query_factory=lambda: db.pokedex_session.query(tables.PokemonColor),
         get_label=lambda _: _.name,
         allow_blank=True,
-        get_pk=lambda table: table.name,
+        get_pk=lambda table: table.identifier,
     )
     habitat = QuerySelectField('Habitat',
         query_factory=lambda: db.pokedex_session.query(tables.PokemonHabitat),
         get_label=lambda _: _.name,
         allow_blank=True,
-        get_pk=lambda table: table.name,
+        get_pk=lambda table: table.identifier,
     )
     shape = QuerySelectField('Shape',
         query_factory=lambda: db.pokedex_session.query(tables.PokemonShape)
             .order_by(tables.PokemonShape.identifier.asc()),
         get_label=lambda _: _.name,
-        get_pk=lambda _: _.name.lower(),
+        get_pk=lambda _: _.identifier,
         allow_blank=True,
     )
 
@@ -417,7 +417,7 @@ class MoveSearchForm(BaseSearchForm):
         'Damage class',
         query_factory=lambda: db.pokedex_session.query(tables.MoveDamageClass),
         get_label=lambda _: _.name.capitalize(),
-        get_pk=lambda table: table.name,
+        get_pk=lambda table: table.identifier,
         allow_blank=True,
     )
     introduced_in = QueryCheckboxSelectMultipleField(
@@ -434,7 +434,7 @@ class MoveSearchForm(BaseSearchForm):
         query_factory=lambda: db.pokedex_session.query(tables.Type)
                               .filter(tables.Type.id != 10002),  # Shadow
         get_label=lambda _: _.name,
-        get_pk=lambda table: table.name,
+        get_pk=lambda table: table.identifier,
         allow_blank=True,
     )
 
@@ -470,7 +470,7 @@ class MoveSearchForm(BaseSearchForm):
             # XXX move methods need to identify themselves as "common"
             .filter(tables.PokemonMoveMethod.id <= 4),
         get_label=lambda row: row.name,
-        get_pk=lambda table: table.name.lower().replace(' ', '-'),
+        get_pk=lambda table: table.identifier,
         allow_blank=True,
     )
     pokemon_version_group = QueryCheckboxSelectMultipleField(
