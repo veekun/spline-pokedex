@@ -179,7 +179,13 @@ ${move_table_header()}
     ${subheader_row(method.name, 'moves:' + h.sanitize_id(method.name))}
     % for move, pokemons in h.keysort(move_pokemons, lambda k: k.name):
     <tr>
-        <th><a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a></th>
+        <th>
+            <a href="${url(controller='dex', action='moves', name=move.name.lower())}">${move.name}</a>
+            % if method.identifier == 'machine':
+            ${machine_label(move)}
+            % endif
+        </th>
+
         % for found_pokemon in c.found_pokemon:
         <td>
             % if found_pokemon.pokemon in pokemons:
@@ -333,5 +339,14 @@ ${h.pokedex.pokedex_img('shapes/%s.png' % pokemon.species.shape.identifier, alt=
 ${pokemon.species.shape.awesome_name}
 % else:
 n/a
+% endif
+</%def>
+
+## TM/HM number half-a-cell
+<%def name="machine_label(move)">
+% if c.machines[move] > 100:
+(HM${'{0:02}'.format(c.machines[move] - 100)})
+% else:
+(TM${'{0:02}'.format(c.machines[move])})
 % endif
 </%def>

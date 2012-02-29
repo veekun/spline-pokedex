@@ -810,6 +810,12 @@ class PokedexGadgetsController(PokedexBaseController):
                     c.level_moves[pokemon_move.level] \
                         [pokemon_move.pokemon].append(pokemon_move.move)
 
+            # Get TM/HM numbers for display purposes
+            c.machines = dict(
+                (machine.move, machine.machine_number)
+                for machine in c.version_group.machines
+            )
+
         return render('/pokedex/gadgets/compare_pokemon.mako')
 
     def stat_calculator(self):
