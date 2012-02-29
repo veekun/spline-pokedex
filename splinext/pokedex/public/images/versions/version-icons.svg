@@ -747,7 +747,7 @@
      x="184"
      y="52"
      id="rect3222"
-     style="fill:#000000;fill-opacity:1;stroke:none" />
+     style="fill:#7070b0;fill-opacity:1;stroke:none" />
   <rect
      width="16"
      height="8"
@@ -756,22 +756,22 @@
      id="rect3224"
      style="fill:url(#linearGradient4061);fill-opacity:1;stroke:none" />
   <text
-     x="199.81738"
-     y="64.086952"
+     x="199.56456"
+     y="65.832001"
      id="text3226"
      xml:space="preserve"
-     style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;letter-spacing:-1.65999997px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans Mono;-inkscape-font-specification:Bitstream Vera Sans Bold"><tspan
-       x="192.16602"
-       y="64.086952"
+     style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans Mono;-inkscape-font-specification:Bitstream Vera Sans Bold"><tspan
+       x="191.91319"
+       y="65.832001"
        id="tspan3228"
-       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;letter-spacing:-1.65999997px;text-anchor:middle;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold">XD</tspan></text>
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold">X</tspan></text>
   <rect
      width="16"
      height="16"
      x="160"
      y="52"
      id="rect3232"
-     style="fill:#000000;fill-opacity:1;stroke:none" />
+     style="fill:#0070b0;fill-opacity:1;stroke:none" />
   <rect
      width="16"
      height="8"
@@ -780,13 +780,13 @@
      id="rect3234"
      style="fill:url(#linearGradient4055);fill-opacity:1;stroke:none" />
   <text
-     x="173.74133"
-     y="63.993683"
+     x="173.8902"
+     y="65.605438"
      id="text3236"
      xml:space="preserve"
-     style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;letter-spacing:-1.74000001px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans Mono;-inkscape-font-specification:Bitstream Vera Sans Bold"><tspan
-       x="167.96826"
-       y="63.993683"
+     style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans Mono;-inkscape-font-specification:Bitstream Vera Sans Bold"><tspan
+       x="168.11713"
+       y="65.605438"
        id="tspan3238"
-       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;letter-spacing:-1.74000001px;text-anchor:middle;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold">Co</tspan></text>
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;font-family:Bitstream Vera Sans;-inkscape-font-specification:Bitstream Vera Sans Bold">C</tspan></text>
 </svg>
