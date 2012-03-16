@@ -1140,10 +1140,15 @@ class PokedexController(PokedexBaseController):
             Avoids calling resource_exists() multiple times per sprite.
             """
 
+            if 'animated' in directory:
+                extension = 'gif'
+            else:
+                extension = 'png'
+
             # n.b. calling dict.setdefault always evaluates the default
             if directory not in c.sprites:
                 c.sprites[directory] = pokedex_helpers.pokemon_has_media(
-                    c.form, directory, 'png')
+                    c.form, directory, extension)
             return c.sprites[directory]
         c.sprite_exists = sprite_exists
 
@@ -1153,7 +1158,7 @@ class PokedexController(PokedexBaseController):
         # Some sprite-existence shortcuts based on this information
         c.sprites['overworld'] = (c.appears_in_overworld and
             c.form.introduced_in_version_group_id <= 10)
-        c.sprites['emerald/animated'] = (c.appears_in_overworld and
+        c.sprites['main-sprites/emerald/animated'] = (c.appears_in_overworld and
             c.form.introduced_in_version_group_id <= 6)
 
         ### Sizing
