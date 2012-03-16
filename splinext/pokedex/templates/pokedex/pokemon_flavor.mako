@@ -265,7 +265,12 @@ ${h.h1(_('Main Game Portraits'), id=_('main-sprites', context='anchor'))}
     <tr class="header-row">
         <th></th>
     % if show_rusa:
-        <th colspan="2">${h.pokedex.version_icons(u'Ruby', u'Sapphire')}</th>
+        <th colspan="2">
+            ${h.pokedex.version_icons(u'Ruby', u'Sapphire')}
+            % if not show_frlg:
+                ${h.pokedex.version_icons(u'FireRed', u'LeafGreen')}
+            % endif
+        </th>
     % endif
     % if show_emerald:
         <th>${h.pokedex.version_icons(u'Emerald')}</th>
