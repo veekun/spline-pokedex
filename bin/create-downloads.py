@@ -4,6 +4,7 @@
 /dex/downloads page.
 """
 from __future__ import division
+from glob import glob
 import math
 import os, os.path
 import pkg_resources
@@ -60,6 +61,7 @@ def create_downloads():
     make_tarball('pokemon-footprints.tar.gz', ['pokemon/footprints'])
     make_tarball('pokemon-trozei.tar.gz', ['pokemon/trozei'])
     make_tarball('pokemon-icons.tar.gz', ['pokemon/icons'])
+    make_tarball('pokemon-nobunaga.tar.gz', ['pokemon/nobunaga'])
 
     # Not Pokémon at all!
     make_tarball('chrome.tar.gz', ['chrome', 'ribbons'])
@@ -254,6 +256,8 @@ def create_downloads():
     make_montage('footprints.png', 'pokemon/footprints/{0}.png', 16, 649)
     make_montage('sugimori.png', 'pokemon/sugimori/{0}.png', 96, 493,
         padding=2, filter='lanczos')
+    make_montage('nobunaga.png', 'pokemon/nobunaga/{0}.png', 128, None,
+        transparent=True)
     make_labeled_montage(
         'items.png', 'items', suffix='.png',
         sprite_size=24, horiz_padding=36, vert_padding=6,
@@ -285,13 +289,16 @@ def main_montage(filename, pattern, *args, **kwargs):
     """
     make_montage(filename, 'pokemon/main-sprites/' + pattern, *args, **kwargs)
 
-def make_montage(filename, pattern, sprite_size, pokemon,
+def make_montage(filename, pattern, sprite_size, pokemon=None,
     padding=0, filter='point', transparent=False):
 
     u"""Creates a montage in `filename` out of PNG images matching `pattern`,
     which should be a str.format pattern.  `sprite_size` is the size of each
     sprite, for calculating the dimensions of the final product, and `pokemon`
     is the number of Pokémon that should be in the resulting image.
+
+    `pokemon` being None means "all of them", for sidegames that include a
+    haphazard selection of Pokémon, e.g. Pokémon + Nobunaga's Ambition.
 
     The background will be transparent iff `transparent` is true.
     """
@@ -303,15 +310,19 @@ def make_montage(filename, pattern, sprite_size, pokemon,
         transparent_switches = ['-background', 'transparent']
 
     # Find all the files we want
-    files = [
-        os.path.join(media_dir, pattern.format(n))
-        for n in range(1, pokemon + 1)
-    ]
+    if pokemon is None:
+        files = glob(os.path.join(media_dir, pattern.format('*')))
+        files.sort(key=natural_sort_key)
+    else:
+        files = [
+            os.path.join(media_dir, pattern.format(n))
+            for n in range(1, pokemon + 1)
+        ]
 
     # Figure out the dimensions of the image.  Try to keep to the golden ratio,
     # because it rocks.
     # Thus: rows * (phi * rows) = pokemon
-    rows = int(math.ceil( (pokemon / phi) ** 0.5 ))
+    rows = int(math.ceil( (len(files) / phi) ** 0.5 ))
 
     outfile = os.path.join(downloads_dir, filename)
     subprocess.Popen(
@@ -431,6 +442,11 @@ def make_labeled_montage(filename, directory, suffix,
     subprocess.Popen(['optipng', '-quiet', outfile]).wait()
 
     print "ok"
+
+def natural_sort_key(filename):
+    groups = re.findall('\d+|\D+', filename)
+    groups = [(int(group) if group.isdigit() else group) for group in groups]
+    return groups
 
 
 if __name__ == '__main__':
