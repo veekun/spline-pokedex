@@ -129,7 +129,7 @@ def pokemon_form_query(name, form=None):
     q = q.join(tables.PokemonForm.pokemon)
     q = q.join(tables.Pokemon.species)
     q = q.join(tables.PokemonSpecies.names_local) \
-        .filter(func.lower(tables.PokemonSpecies.names_table.name) == name)
+        .filter(func.lower(tables.PokemonSpecies.names_table.name) == name.lower())
 
     if form:
         # If a form has been specified, it must match
