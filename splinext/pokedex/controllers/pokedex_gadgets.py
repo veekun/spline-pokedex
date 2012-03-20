@@ -840,9 +840,9 @@ class PokedexGadgetsController(PokedexBaseController):
                    .order_by(tables.Stat.id)
                    .all())
 
-        c.hidden_power_stats = (stat_query
-                                .order_by(tables.Stat.game_index)
-                                .all())
+        hidden_power_stats = (stat_query
+                              .order_by(tables.Stat.game_index)
+                              .all())
 
         # Make sure there are the same number of level, stat, and effort
         # fields.  Add an extra one (for more data), as long as we're not about
@@ -1010,7 +1010,7 @@ class PokedexGadgetsController(PokedexBaseController):
                 # definitely odd or definitely even.
                 for stat_id in range(first_good_bit, 6):
                     bit = (min_x >> stat_id) & 1
-                    stat = c.hidden_power_stats[stat_id]
+                    stat = hidden_power_stats[stat_id]
                     filter_genes(valid_genes[stat],
                         lambda gene: gene & 1 == bit)
 
@@ -1038,7 +1038,7 @@ class PokedexGadgetsController(PokedexBaseController):
             # bit 0, Attack to bit 1, etc.
             type_det = 0
             power_det = 0
-            for i, stat in enumerate(c.hidden_power_stats):
+            for i, stat in enumerate(hidden_power_stats):
                 stat_value, = valid_genes[stat]
                 type_det += (stat_value & 0x01) << i
                 power_det += (stat_value & 0x02) >> 1 << i
