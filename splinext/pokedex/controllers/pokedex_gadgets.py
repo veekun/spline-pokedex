@@ -1035,14 +1035,13 @@ class PokedexGadgetsController(PokedexBaseController):
         if c.exact:
             # HP uses bit 0 of each gene for the type, and bit 1 for the power.
             # These bits are used to make new six-bit numbers, where HP goes to
-            # bit 0, Attack to bit 1, etc.  Our stats are, conveniently,
-            # already in the right order
+            # bit 0, Attack to bit 1, etc.
             type_det = 0
             power_det = 0
-            for i, stat in enumerate(c.stats):
+            for i, stat in enumerate(c.hidden_power_stats):
                 stat_value, = valid_genes[stat]
                 type_det += (stat_value & 0x01) << i
-                power_det += (stat_value & 0x02) << i
+                power_det += (stat_value & 0x02) >> 1 << i
 
             # Our types are also in the correct order, except that we start
             # from 1 rather than 0, and HP skips Normal
