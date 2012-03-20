@@ -833,10 +833,16 @@ class PokedexGadgetsController(PokedexBaseController):
         # - this logic is pretty hairy; use a state object?
 
         # Add the stat-based fields
-        # XXX get rid of this stupid filter
-        c.stats = db.pokedex_session.query(tables.Stat) \
-            .filter(tables.Stat.id <= 6) \
-            .all()
+        stat_query = (db.pokedex_session.query(tables.Stat)
+                      .filter(tables.Stat.is_battle_only == False))
+
+        c.stats = (stat_query
+                   .order_by(tables.Stat.id)
+                   .all())
+
+        c.hidden_power_stats = (stat_query
+                                .order_by(tables.Stat.game_index)
+                                .all())
 
         # Make sure there are the same number of level, stat, and effort
         # fields.  Add an extra one (for more data), as long as we're not about
@@ -1004,7 +1010,7 @@ class PokedexGadgetsController(PokedexBaseController):
                 # definitely odd or definitely even.
                 for stat_id in range(first_good_bit, 6):
                     bit = (min_x >> stat_id) & 1
-                    stat = c.stats[stat_id]
+                    stat = c.hidden_power_stats[stat_id]
                     filter_genes(valid_genes[stat],
                         lambda gene: gene & 1 == bit)
 
