@@ -751,6 +751,9 @@ ${h.h1(_('Other Images'), id=_('other', context='anchor'))}
 <h2>${_("Official artwork by Ken Sugimori")}</h2>
 <p class="dex-sugimori">
     ${h.pokedex.pokemon_form_image(c.form, prefix='sugimori')}
+    % if c.sprite_exists('sugimori/female'):
+    ${h.pokedex.pokemon_form_image(c.form, prefix='sugimori/female')}
+    % endif
 </p>
 % endif
 </%lib:cache_content>
