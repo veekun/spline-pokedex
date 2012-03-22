@@ -121,7 +121,7 @@ ${h.h1(_('Essentials'))}
 ${h.h1(_(u'Pokédex Description'), id=_('pokedex', context='anchor'))}
 ${dexlib.flavor_text_list(c.pokemon.species.flavor_text, 'dex-pokemon-flavor-text')}
 
-${h.h1(_('Main Game Portraits'), id=_('main-sprites', context='anchor'))}
+${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 % if len(c.pokemon.species.forms) > 1:
 <h3>${_("Forms")}</h3>
 <ul class="inline">
