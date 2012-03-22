@@ -98,7 +98,7 @@ ${getattr(self, 'col_' + column)()}
                 # Fake!
                 tr_classes.append(u'fake-result')
 
-            evolution_chain_stack.append(result)
+            evolution_chain_stack.append(result.species)
     %>\
 
     <tr class="${u' '.join(tr_classes)}">
