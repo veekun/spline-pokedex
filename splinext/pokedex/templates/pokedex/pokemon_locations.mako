@@ -9,8 +9,8 @@
 <ul id="breadcrumbs">
     <li><a href="${url('/dex')}">${_(u"Pokédex")}</a></li>
     <li><a href="${url(controller='dex', action='pokemon_list')}">${_(u"Pokémon")}</a></li>
-    <li>${h.pokedex.pokemon_link(c.pokemon, content=c.pokemon.default_form.name)}</li>
-    <li>${_(u"%s locations") % c.pokemon.default_form.name}</li>
+    <li>${h.pokedex.pokemon_link(c.pokemon, content=c.pokemon.species.name)}</li>
+    <li>${_(u"%s locations") % c.pokemon.species.name}</li>
 </ul>
 </%def>
 

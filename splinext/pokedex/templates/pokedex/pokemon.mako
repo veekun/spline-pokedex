@@ -14,7 +14,7 @@ ${_(u"{name} – Pokémon #{number}").format(name=(c.pokemon.name), number=c.pok
 <ul id="breadcrumbs">
     <li><a href="${url('/dex')}">${_(u'Pokédex')}</a></li>
     <li><a href="${url(controller='dex', action='pokemon_list')}">${_(u'Pokémon')}</a></li>
-    <li>${c.pokemon.default_form.name}</li>
+    <li>${c.pokemon.name}</li>
 </ul>
 </%def>
 
