@@ -1152,15 +1152,6 @@ class PokedexController(PokedexBaseController):
             return c.sprites[directory]
         c.sprite_exists = sprite_exists
 
-        # Figure out if a sprite form appears in the overworld
-        c.appears_in_overworld = not c.form.is_battle_only
-
-        # Some sprite-existence shortcuts based on this information
-        c.sprites['overworld'] = (c.appears_in_overworld and
-            c.form.introduced_in_version_group_id <= 10)
-        c.sprites['main-sprites/emerald/animated'] = (c.appears_in_overworld and
-            c.form.introduced_in_version_group_id <= 6)
-
         ### Sizing
         c.trainer_height = pokedex_helpers.trainer_height
         c.trainer_weight = pokedex_helpers.trainer_weight
