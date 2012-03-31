@@ -198,7 +198,7 @@ class StatCalculatorForm(Form):
                 if not stat_field.data:
                     continue
                 for field in stat_field[0]:
-                    del sfd[field.name]
+                    sfd.pop(field.name, None)
                 sfd[stat_field_name] = [subfield.short_data for subfield in stat_field]
 
             # We always show one more set of level/stat/effort than was
