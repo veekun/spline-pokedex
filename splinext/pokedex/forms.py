@@ -34,42 +34,41 @@ class PokedexLookupField(fields.TextField):
 
     def process_formdata(self, valuelist):
         """Load the value from the incoming form."""
-        if valuelist:
-            self.raw_data = valuelist
+        if not valuelist or not valuelist[0]:
+            if self.allow_blank:
+                self.data = None
+                return
+            else:
+                raise ValidationError('Gotta pick something')
 
-            if not valuelist[0]:
-                if self.allow_blank:
-                    self.data = None
-                    return
-                else:
-                    raise ValidationError('Gotta pick something')
+        self.raw_data = valuelist
 
-            valid_types = [self.valid_type]
-            if self.valid_type == 'pokemon':
-                valid_types = ['pokemon_species', 'pokemon_form']
+        valid_types = [self.valid_type]
+        if self.valid_type == 'pokemon':
+            valid_types = ['pokemon_species', 'pokemon_form']
 
-            results = db.pokedex_lookup.lookup(
-                valuelist[0],
-                valid_types=valid_types,
-            )
+        results = db.pokedex_lookup.lookup(
+            valuelist[0],
+            valid_types=valid_types,
+        )
 
-            all_data = set()
-            for result in results:
-                obj = result.object
-                if obj.__tablename__ == 'pokemon_forms':
-                    all_data.add(obj.pokemon)
-                elif obj.__tablename__ == 'pokemon_species':
-                    all_data.add(obj.default_pokemon)
-                else:
-                    all_data.add(obj)
+        all_data = set()
+        for result in results:
+            obj = result.object
+            if obj.__tablename__ == 'pokemon_forms':
+                all_data.add(obj.pokemon)
+            elif obj.__tablename__ == 'pokemon_species':
+                all_data.add(obj.default_pokemon)
+            else:
+                all_data.add(obj)
 
-            if not all_data:
-                raise ValidationError('Nothing found')
-            if len(all_data) > 1:
-                # XXX fix this to offer alternatives somehow
-                raise ValidationError('Too vague')
+        if not all_data:
+            raise ValidationError('Nothing found')
+        if len(all_data) > 1:
+            # XXX fix this to offer alternatives somehow
+            raise ValidationError('Too vague')
 
-            self.data = all_data.pop()
+        self.data = all_data.pop()
 
     def _value(self):
         """Converts Python value back to a form value."""
