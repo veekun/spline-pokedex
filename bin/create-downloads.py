@@ -314,7 +314,7 @@ def make_montage(filename, pattern, sprite_size, pokemon=None,
         files = glob(os.path.join(media_dir, pattern.format('*')))
 
         # Filter out alternate forms to avoid duplicates
-        files = [filename for filename in files if not '-' in filename]
+        files = [name for name in files if '-' not in os.path.basename(name)]
 
         files.sort(key=natural_sort_key)
     else:
