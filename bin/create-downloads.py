@@ -61,7 +61,7 @@ def create_downloads():
     make_tarball('pokemon-footprints.tar.gz', ['pokemon/footprints'])
     make_tarball('pokemon-trozei.tar.gz', ['pokemon/trozei'])
     make_tarball('pokemon-icons.tar.gz', ['pokemon/icons'])
-    make_tarball('pokemon-nobunaga.tar.gz', ['pokemon/nobunaga'])
+    make_tarball('pokemon-conquest.tar.gz', ['pokemon/conquest'])
 
     # Not Pokémon at all!
     make_tarball('chrome.tar.gz', ['chrome', 'ribbons'])
@@ -256,7 +256,7 @@ def create_downloads():
     make_montage('footprints.png', 'pokemon/footprints/{0}.png', 16, 649)
     make_montage('sugimori.png', 'pokemon/sugimori/{0}.png', 96, 493,
         padding=2, filter='lanczos')
-    make_montage('nobunaga.png', 'pokemon/nobunaga/{0}.png', 128, None,
+    make_montage('conquest.png', 'pokemon/conquest/{0}.png', 128, None,
         transparent=True)
     make_labeled_montage(
         'items.png', 'items', suffix='.png',
@@ -298,7 +298,7 @@ def make_montage(filename, pattern, sprite_size, pokemon=None,
     is the number of Pokémon that should be in the resulting image.
 
     `pokemon` being None means "all of them", for sidegames that include a
-    haphazard selection of Pokémon, e.g. Pokémon + Nobunaga's Ambition.
+    haphazard selection of Pokémon, e.g. Pokémon Conquest.
 
     The background will be transparent iff `transparent` is true.
     """
@@ -312,6 +312,10 @@ def make_montage(filename, pattern, sprite_size, pokemon=None,
     # Find all the files we want
     if pokemon is None:
         files = glob(os.path.join(media_dir, pattern.format('*')))
+
+        # Filter out alternate forms to avoid duplicates
+        files = [filename for filename in files if not '-' in filename]
+
         files.sort(key=natural_sort_key)
     else:
         files = [

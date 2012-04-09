@@ -629,7 +629,7 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 % endif
 
 
-% if c.sprite_exists('overworld/left') or c.sprite_exists('nobunaga'):
+% if c.sprite_exists('overworld/left') or c.sprite_exists('conquest'):
 ${h.h1(_('Miscellaneous Game Art'), id=_('misc-sprites', context='anchor'))}
 
 % if c.sprite_exists('overworld/left'):
@@ -739,9 +739,9 @@ ${h.h1(_('Miscellaneous Game Art'), id=_('misc-sprites', context='anchor'))}
 </table>
 % endif
 
-% if c.sprite_exists('nobunaga'):
-${h.h2(_(u"Pokémon + Nobunaga's Ambition Portrait"), id=_('nobunaga', context='anchor'))}
-${h.pokedex.pokemon_form_image(c.form, prefix='nobunaga')}
+% if c.sprite_exists('conquest'):
+${h.h2(_(u"Pokémon Conquest Portrait"), id=_('conquest', context='anchor'))}
+${h.pokedex.pokemon_form_image(c.form, prefix='conquest')}
 % endif
 % endif  ## Show "Miscellaneous Game Art"
 
