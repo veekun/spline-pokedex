@@ -291,6 +291,8 @@ def pokemon_form_image(pokemon_form, prefix='main-sprites/black-white', **attr):
 
     if 'animated' in prefix:
         ext = 'gif'
+    elif 'dream-world' in prefix:
+        ext = 'svg'
     else:
         ext = 'png'
 

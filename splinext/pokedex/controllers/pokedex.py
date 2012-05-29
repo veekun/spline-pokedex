@@ -1142,6 +1142,8 @@ class PokedexController(PokedexBaseController):
 
             if 'animated' in directory:
                 extension = 'gif'
+            elif 'dream-world' in directory:
+                extension = 'svg'
             else:
                 extension = 'png'
 

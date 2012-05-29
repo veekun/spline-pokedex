@@ -629,7 +629,7 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 % endif
 
 
-% if c.sprite_exists('overworld/left') or c.sprite_exists('conquest'):
+% if c.sprite_exists('overworld/left') or c.sprite_exists('conquest') or c.sprite_exists('dream-world'):
 ${h.h1(_('Miscellaneous Game Art'), id=_('misc-sprites', context='anchor'))}
 
 % if c.sprite_exists('overworld/left'):
@@ -737,6 +737,14 @@ ${h.h1(_('Miscellaneous Game Art'), id=_('misc-sprites', context='anchor'))}
 </tbody>
 % endif
 </table>
+% endif
+
+% if c.sprite_exists('dream-world'):
+${h.h2(_(u"Dream World Portrait"), id=_('dream-world', context='anchor'))}
+${h.pokedex.pokemon_form_image(c.form, prefix='dream-world')}
+% if c.sprite_exists('dream-world/female'):
+${h.pokedex.pokemon_form_image(c.form, prefix='dream-world/female')}
+% endif
 % endif
 
 % if c.sprite_exists('conquest'):
