@@ -564,7 +564,7 @@ ${h.h1(_('Locations'))}
 ${h.h2(_(u'Pal Park'))}
 <dl>
 <dt>${_(u'Area')}</dt>
-<dd>${c.pokemon.species.pal_park.area}</dd>
+<dd>${c.pokemon.species.pal_park.area.name}</dd>
 
 <dt>${_(u'Score')}</dt>
 <dd>${c.pokemon.species.pal_park.base_score}</dd>
