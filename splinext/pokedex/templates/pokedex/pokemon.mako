@@ -560,6 +560,20 @@ ${h.h1(_('Locations'))}
     % endfor
 </dl>
 
+% if c.pokemon.species.pal_park:
+${h.h2(_(u'Pal Park'))}
+<dl>
+<dt>${_(u'Area')}</dt>
+<dd>${c.pokemon.species.pal_park.area.name}</dd>
+
+<dt>${_(u'Score')}</dt>
+<dd>${c.pokemon.species.pal_park.base_score}</dd>
+
+<dt>${_(u'Rate')}</dt>
+<dd>${c.pokemon.species.pal_park.rate}</dd>
+</dl>
+% endif
+
 ${h.h1(_('Moves'))}
 <p>${u' and '.join(t.name for t in c.pokemon.types)} moves get STAB, and have their type highlighted in green.</p>
 % if c.better_damage_class:
