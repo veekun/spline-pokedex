@@ -46,12 +46,25 @@ ${h.h1(_('Effect'))}
     ${c.ability.effect}
 </div>
 
+
 % if c.ability.overworld_effect:
 ${h.h2(_('Overworld'))}
 <div class="markdown">
     ${c.ability.overworld_effect}
 </div>
 % endif
+
+
+% if c.ability.changelog:
+${h.h2(_('History'))}
+<dl>
+    % for change in c.ability.changelog:
+    <dt>${_('Before %s') % h.pokedex.version_icons(*change.changed_in.versions) | n}</dt>
+    <dd class="markdown">${change.effect}</dd>
+    % endfor
+</dl>
+% endif
+
 
 % if c.moves:
 ${h.h2(_('Moves affected'), id=_('moves', context='anchor'))}
@@ -70,17 +83,6 @@ ${h.h2(_('Moves affected'), id=_('moves', context='anchor'))}
         % endfor
     </tbody>
 </table>
-% endif
-
-
-% if c.ability.changelog:
-${h.h1(_('History'))}
-<dl>
-    % for change in c.ability.changelog:
-    <dt>${_('Before %s') % h.pokedex.version_icons(*change.changed_in.versions) | n}</dt>
-    <dd class="markdown">${change.effect}</dd>
-    % endfor
-</dl>
 % endif
 
 
