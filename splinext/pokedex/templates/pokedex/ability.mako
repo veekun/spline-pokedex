@@ -46,6 +46,13 @@ ${h.h1(_('Effect'))}
     ${c.ability.effect}
 </div>
 
+% if c.ability.overworld_effect:
+${h.h2(_('Overworld'))}
+<div class="markdown">
+    ${c.ability.overworld_effect}
+</div>
+% endif
+
 % if c.moves:
 ${h.h2(_('Moves affected'), id=_('moves', context='anchor'))}
 <table class="dex-pokemon-moves striped-rows">
