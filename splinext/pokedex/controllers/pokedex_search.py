@@ -1064,15 +1064,15 @@ class PokedexSearchController(PokedexBaseController):
             # Grab the results first; needed for sorting even if the query is
             # otherwise left alone, boo
             pokemon_ids = {}
-            evolution_chain_ids = set()
-            for id, chain_id in query.values(me.id, my_species.evolution_chain_id):
-                evolution_chain_ids.add(chain_id)
+            family_ids = set()
+            for id, family_id in query.values(me.id, my_species.family_id):
+                family_ids.add(family_id)
                 pokemon_ids[id] = None
 
             # Rebuild the query
-            if c.display_mode in ('custom-table',):
+            if c.display_mode == 'custom-table':
                 query = db.pokedex_session.query(me).filter(
-                    my_species.evolution_chain_id.in_( list(evolution_chain_ids) )
+                    my_species.family_id.in_( list(family_ids) )
                 )
             else:
                 query = db.pokedex_session.query(me) \
@@ -1087,32 +1087,32 @@ class PokedexSearchController(PokedexBaseController):
             c.original_results = pokemon_ids
 
             # Pokémon should be sorted by the id number of the first form of
-            # their chain to actually appear in the results.  This is wonky,
+            # their family to actually appear in the results.  This is wonky,
             # but makes sure that fake results don't affect sorting
-            chain_sorting_alias = aliased(tables.Pokemon)
-            chain_sorting_species = aliased(tables.PokemonSpecies)
-            chain_sorting_forms = aliased(tables.PokemonForm)
-            chain_sorting_subquery = db.pokedex_session.query(
-                    chain_sorting_species.evolution_chain_id,
-                    func.min(chain_sorting_species.id).label('chain_position')
-                ).select_from(chain_sorting_alias) \
-                .filter(chain_sorting_species.id.in_(pokemon_ids)) \
-                .outerjoin((chain_sorting_species, 'species')) \
-                .outerjoin((chain_sorting_forms, 'default_form')) \
-                .group_by(chain_sorting_species.evolution_chain_id) \
+            family_sorting_alias = aliased(tables.Pokemon)
+            family_sorting_species = aliased(tables.PokemonSpecies)
+            family_sorting_forms = aliased(tables.PokemonForm)
+            family_sorting_subquery = db.pokedex_session.query(
+                    family_sorting_species.family_id,
+                    func.min(family_sorting_species.id).label('family_position')
+                ).select_from(family_sorting_alias) \
+                .filter(family_sorting_species.id.in_(pokemon_ids)) \
+                .outerjoin((family_sorting_species, 'species')) \
+                .outerjoin((family_sorting_forms, 'default_form')) \
+                .group_by(family_sorting_species.family_id) \
                 .subquery()
 
             query = query.join((
-                chain_sorting_subquery,
-                chain_sorting_subquery.c.evolution_chain_id
-                    == my_species.evolution_chain_id
+                family_sorting_subquery,
+                family_sorting_subquery.c.family_id
+                    == my_species.family_id
             ))
 
             # Sort by ID instead of name within families
             sort_clauses[0] = default_form.id.asc()
 
             sort_clauses = [
-                chain_sorting_subquery.c.chain_position,
+                family_sorting_subquery.c.family_position,
                 my_species.is_baby.desc()
             ] + sort_clauses
 

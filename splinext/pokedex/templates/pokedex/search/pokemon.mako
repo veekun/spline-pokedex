@@ -53,52 +53,50 @@ ${getattr(self, 'col_' + column)()}
 </tr>
 
 <%
-    evolution_chain_stack = []
-    last_evolution_chain_id = None
+    family_stack = []
+    last_family_id = None
 %>\
 % for result in c.results:
     <%
         tr_classes = []
         if c.original_results is not None:
-            # Evolution chain sorting.
+            # Evolution family sorting.
             # Need to make the indenting right, and take care of fake results
 
             # Indenting is kept right by keeping a running list of this
             # Pokémon's ancestry.  Luckily, except for babies, National Dex
             # order is always post-order
-            if last_evolution_chain_id == result.species.evolution_chain_id and \
-               result.species.parent_species in evolution_chain_stack:
+            if last_family_id == result.species.family_id and \
+               result.species.parent_species in family_stack:
                 # Still in the same family.  Look for this Pokémon's immediate
                 # parent somewhere in the stack, in case this is a sibling.
                 # Yes, this will die if the parent hasn't been seen
-                while evolution_chain_stack[-1] != \
-                   result.species.parent_species:
-                    evolution_chain_stack.pop()
+                while family_stack[-1] != result.species.parent_species:
+                    family_stack.pop()
 
             else:
-                # New family or new sub-chain; reset everything and show a
-                # divider
+                # New family or branch; reset everything and show a divider
                 if result.species.is_baby:
-                    evolution_chain_stack = []
+                    family_stack = []
                 else:
                     # Stub out a baby
-                    evolution_chain_stack = [None]
+                    family_stack = [None]
 
-                if last_evolution_chain_id is not None and \
-                   last_evolution_chain_id != result.species.evolution_chain_id:
+                if last_family_id is not None and \
+                   last_family_id != result.species.family_id:
                     tr_classes.append(u'chain-divider')
-                last_evolution_chain_id = result.species.evolution_chain_id
+                last_family_id = result.species.family_id
 
             # nb: babies are depth zero
             tr_classes.append(
-                u"evolution-depth-{0}".format(len(evolution_chain_stack))
+                u"evolution-depth-{0}".format(len(family_stack))
             )
 
             if result.id not in c.original_results:
                 # Fake!
                 tr_classes.append(u'fake-result')
 
-            evolution_chain_stack.append(result.species)
+            family_stack.append(result.species)
     %>\
 
     <tr class="${u' '.join(tr_classes)}">

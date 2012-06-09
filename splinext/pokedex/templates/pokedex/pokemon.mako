@@ -232,7 +232,7 @@ ${h.h1(_('Evolution'))}
 <li>
     <img src="${h.static_uri('spline', 'icons/chart--arrow.png')}" alt="${_(u"See also:")}">
     <a href="${url(controller='dex_gadgets', action='compare_pokemon',
-        pokemon=[species.name for species in c.pokemon.species.evolution_chain.species]
+        pokemon=[species.name for species in c.pokemon.species.family.species]
         )}">${_('Compare this family')}</a>
 </li>
 </ul>
@@ -277,9 +277,9 @@ ${h.h1(_('Evolution'))}
             ${h.pokedex.evolution_description(evolution, _=_)}
         </span>
         % endfor
-        % if col['species'].is_baby and c.pokemon.species.evolution_chain.baby_trigger_item:
+        % if col['species'].is_baby and c.pokemon.species.family.baby_trigger_item:
         <span class="dex-evolution-chain-method">
-            ${_(u"Either parent must hold ")} ${h.pokedex.item_link(c.pokemon.species.evolution_chain.baby_trigger_item, include_icon=False, _=_)}
+            ${_(u"Either parent must hold ")} ${h.pokedex.item_link(c.pokemon.species.family.baby_trigger_item, include_icon=False, _=_)}
         </span>
         % endif
     </td>
@@ -289,6 +289,7 @@ ${h.h1(_('Evolution'))}
 % endfor
 </tbody>
 </table>
+
 % if len(c.pokemon.species.forms) > 1:
 <h2 id="forms"> <a href="#forms" class="subtle">${_("%s Forms") % c.pokemon.species.name}</a> </h2>
 <ul class="inline">
@@ -305,8 +306,9 @@ ${h.h1(_('Evolution'))}
     % endif
     % endfor
 </ul>
-<p> ${c.pokemon.species.form_description} </p>
 % endif
+
+<p> ${c.pokemon.species.family.description} </p>
 
 ${h.h1(_('Stats'))}
 <%

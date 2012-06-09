@@ -528,7 +528,7 @@ class PokedexController(PokedexBaseController):
             pokemon_q = pokemon_q.options(
                 joinedload(tables.Pokemon.abilities, tables.Ability.prose_local),
                 joinedload(tables.Pokemon.dream_ability, tables.Ability.prose_local),
-                eagerload('species.evolution_chain.species'),
+                eagerload('species.family.species'),
                 eagerload('species.generation'),
                 eagerload('items.item'),
                 eagerload('items.version'),
@@ -679,8 +679,8 @@ class PokedexController(PokedexBaseController):
         c.evolution_table = []
         # Prefetch the evolution details
         family = db.pokedex_session.query(tables.PokemonSpecies) \
-            .filter(tables.PokemonSpecies.evolution_chain_id ==
-                    c.pokemon.species.evolution_chain_id) \
+            .filter(tables.PokemonSpecies.family_id ==
+                    c.pokemon.species.family_id) \
             .options(
                 subqueryload('evolutions'),
                 joinedload('evolutions.trigger'),
