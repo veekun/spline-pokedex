@@ -120,10 +120,10 @@ table.dex-pokemon-moves tr.evolution-depth-3 td.name { padding-left: 3em; text-a
 /* JavaScript filtering/sorting */
 .js-dex-pokemon-moves-extras { margin-bottom: 0.25em; text-align: right; }
 .js-dex-pokemon-moves-options { display: inline-block; position: relative; margin-bottom: 0.25em; }
-.js-dex-pokemon-moves-options .title { font-size: 0.8em; padding: 0.33em 0.5em; background: #cfdcf0; -moz-border-radius: 0.5em; }
+.js-dex-pokemon-moves-options .title { font-size: 0.8em; padding: 0.33em 0.5em; background: #cfdcf0; border-radius: 0.5em; }
 .js-dex-pokemon-moves-options .title img { margin-right: 0.33em; }
-.js-dex-pokemon-moves-options .body { display: none; position: absolute; right: 0; width: 32em; padding: 0.33em; border: 1px solid #668dcc; text-align: left; background: white; -moz-box-shadow: 0.125em 0.125em 0.25em rgba(0, 0, 0, 0.5); }
-.js-dex-pokemon-moves-options:hover .title { background: #3173ce; color: white; -moz-border-radius: 0; -moz-border-radius-topleft: 0.5em; -moz-border-radius-topright: 0.5em; }
+.js-dex-pokemon-moves-options .body { display: none; position: absolute; right: 0; width: 32em; padding: 0.33em; border: 1px solid #668dcc; text-align: left; background: white; box-shadow: 0.125em 0.125em 0.25em rgba(0, 0, 0, 0.5); }
+.js-dex-pokemon-moves-options:hover .title { background: #3173ce; color: white; border-radius: 0; border-top-left-radius: 0.5em; border-top-right-radius: 0.5em; }
 .js-dex-pokemon-moves-options:hover .body { display: block; }
 .js-dex-pokemon-moves-options:hover .body label { display: block; }
 table.dex-pokemon-moves tr.js-dex-pokemon-moves-controls .js-label { font-size: 0.67em; }
@@ -167,7 +167,7 @@ ul.dex-type-list li img { display: block; margin-bottom: 0.25em; }
 
 /* Size comparison -- used by Pokémon and flavor */
 .dex-size { height: 120px; padding-bottom: 2.5em /* for -value */; overflow: hidden /* new float context */}
-.dex-size img { clip: 8px; position: absolute; bottom: 0; image-rendering: -moz-crisp-edges; -ms-interpolation-mode: nearest-neighbor; }
+.dex-size img { clip: 8px; position: absolute; bottom: 0; image-rendering: optimizeSpeed; image-rendering: -moz-crisp-edges; image-rendering: -webkit-optimize-contrast; image-rendering: -o-crisp-edges; -ms-interpolation-mode: nearest-neighbor; }
 .dex-size input[type='text'] { text-align: right; }
 .dex-size .dex-size-trainer,
 .dex-size .dex-size-pokemon { display: block; position: relative; float: left; height: 100%; width: 50%; text-align: left; }
@@ -261,7 +261,7 @@ table.dex-pokemon-flavor-sprites td { vertical-align: middle /* sprites aren't a
 table.dex-pokemon-flavor-sprites td.dex-pokemon-flavor-no-sprite { text-align: center; }
 
 /* Pokémon flavor page -- RBY sprite needs doublesizin' */
-.dex-pokemon-flavor-rby-back img { width: 64px; image-rendering: -moz-crisp-edges; -ms-interpolation-mode: nearest-neighbor; }
+.dex-pokemon-flavor-rby-back img { width: 64px; image-rendering: optimizeSpeed; image-rendering: -moz-crisp-edges; image-rendering: -webkit-optimize-contrast; image-rendering: -o-crisp-edges; -ms-interpolation-mode: nearest-neighbor; }
 
 /* Pokémon flavor page -- flavor text */
 dl.dex-flavor-text dt { width: 96px /* enough for 5 versions and padding*/; }
@@ -399,7 +399,7 @@ table.dex-compare-pokemon tr.size td,
 table.dex-compare-pokemon tr.size th { height: 96px; line-height: 96px; text-align: left; vertical-align: bottom; }
 table.dex-compare-pokemon tr.size td { text-align: center; }
 table.dex-compare-pokemon tr.size th { text-align: left; }
-table.dex-compare-pokemon tr.size img { vertical-align: bottom; image-rendering: -moz-crisp-edges; -ms-interpolation-mode: nearest-neighbor; }
+table.dex-compare-pokemon tr.size img { vertical-align: bottom; image-rendering: optimizeSpeed; image-rendering: -moz-crisp-edges; image-rendering: -webkit-optimize-contrast; image-rendering: -o-crisp-edges; -ms-interpolation-mode: nearest-neighbor; }
 table.dex-compare-pokemon tr.dex-compare-list td { text-align: center; vertical-align: top; }
 table.dex-compare-pokemon tr.dex-compare-relative td { font-size: 1.5em; padding-right: 3%; text-align: right; font-weight: bold; }
 table.dex-compare-pokemon tr.dex-compare-flavor-text td { text-align: center; }
@@ -421,12 +421,12 @@ table.dex-stat-calculator td .-valid-range { font-size: 0.8em; line-height: 2em;
 p.dex-stat-calculator-protip { font-size: 0.8em; padding-left: 1em; line-height: 1.33; text-align: left; font-style: italic; color: #606060; }
 p.dex-stat-calculator-clipboard { margin-left: 4em; margin-right: 4em; padding: 0.5em 1em; font-family: monospace; background: #e8e8e8; }
 
-div.dex-stat-graph { overflow: hidden; height: 1.5em; margin: 0 0 0.33em; border: 1px solid #c0c0c0; background: white; -moz-border-radius: 2px; }
+div.dex-stat-graph { overflow: hidden; height: 1.5em; margin: 0 0 0.33em; border: 1px solid #c0c0c0; background: white; border-radius: 2px; }
 div.dex-stat-graph div.point,
 div.dex-stat-graph div.pointless { float: left; height: 1.5em; width: 0.5em; }
 div.dex-stat-graph div.point { background: #c0c0c0; }
 
-div.dex-stat-vertical-graph { width: 1.5em; margin: 0 auto; border: 1px solid #c0c0c0; background: white; -moz-border-radius: 2px; }
+div.dex-stat-vertical-graph { width: 1.5em; margin: 0 auto; border: 1px solid #c0c0c0; background: white; border-radius: 2px; }
 div.dex-stat-vertical-graph div.point,
 div.dex-stat-vertical-graph div.pointless { width: 1.5em; height: 0.5em; }
 div.dex-stat-vertical-graph div.point { background: #c0c0c0; }

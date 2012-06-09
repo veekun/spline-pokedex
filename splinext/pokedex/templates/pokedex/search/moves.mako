@@ -133,7 +133,7 @@ ${h.form(url.current(), method='GET')}
 </div>
 <div class="dex-column-2x">
     <h2>${_("Flags")}</h2>
-    <ul style="-moz-column-count: 2; -moz-column-gap: 1em;">
+    <ul style="-moz-column-count: 2; -moz-column-gap: 1em; -webkit-column-count: 2; -webkit-column-gap: 1em; column-count: 2; column-gap: 1em;">
         % for field, dummy in c.flag_fields:
         <li>${c.form[field]() | n} ${c.form[field].label() | n}</li>
         % endfor
