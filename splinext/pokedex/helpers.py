@@ -459,8 +459,7 @@ def evolution_description(evolution, _=_):
             item=item_link(evolution.trigger_item, include_icon=False)))
     elif evolution.trigger.identifier == u'shed':
         chunks.append(
-            _(u"Evolve {from_pokemon} ({to_pokemon} will consume "
-            u"a Poké Ball and appear in a free party slot)").format(
+            _(u"Evolve {from_pokemon}, with an open party slot").format(
                 from_pokemon=evolution.evolved_species.parent_species.name,
                 to_pokemon=evolution.evolved_species.name))
     else:
