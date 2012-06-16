@@ -302,6 +302,7 @@ ${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons')}\
 
 <%def name="flavor_text_list(flavor_text, classes='')">
 <%
+flavor_text = (text for text in flavor_text if text.language == c.game_language)
 obdurate = session.get('cheat_obdurate', False)
 collapse_key = h.pokedex.collapse_flavor_text_key(literal=obdurate)
 %>
