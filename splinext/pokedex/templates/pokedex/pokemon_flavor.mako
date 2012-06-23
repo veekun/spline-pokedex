@@ -551,16 +551,21 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 % endif
 
 % if c.pokemon.species.generation_id <= 5:
-<h2 id="main-sprites:gen-v"><a href="#main-sprites:gen-v" class="subtle">${h.pokedex.generation_icon(5)} ${_("Black & White")}</a></h2>
+<h2 id="main-sprites:gen-v"><a href="#main-sprites:gen-v" class="subtle">${h.pokedex.generation_icon(5)} ${_("Black & White, Black 2 & White 2")}</a></h2>
 <table class="dex-pokemon-flavor-sprites">
 <colgroup span="1"></colgroup> <!-- row headers -->
-% if c.form.introduced_in_version_group_id <= 11:
-<colgroup span="2"></colgroup> <!-- Black/White -->
+% if c.form.introduced_in_version_group_id <= 14:
+<colgroup span="2"></colgroup> <!-- Black/White 1 & 2 -->
 % endif
 <thead>
     <tr class="header-row">
         <th></th>
-        <th colspan="2">${h.pokedex.version_icons(u'Black', u'White')}</th>
+        <th colspan="2">
+            % if c.form.introduced_in_version_group_id <= 11:
+            ${h.pokedex.version_icons(u'Black', u'White')}
+            % endif
+            ${h.pokedex.version_icons(u'Black 2', u'White 2')}
+        </th>
     </tr>
 </thead>
 <tbody>
@@ -571,7 +576,7 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
             <br/> ${_("(male)")}
             % endif
         </th>
-        % if c.form.introduced_in_version_group_id <= 11:
+        % if c.form.introduced_in_version_group_id <= 14:
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/black-white')}</td>
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/black-white/back')}</td>
         % endif
@@ -583,7 +588,7 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
             <br/> ${_("(male)")}
             % endif
         </th>
-        % if c.form.introduced_in_version_group_id <= 11:
+        % if c.form.introduced_in_version_group_id <= 14:
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/black-white/shiny')}</td>
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/black-white/back/shiny')}</td>
         % endif
