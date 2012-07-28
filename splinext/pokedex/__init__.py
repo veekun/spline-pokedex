@@ -57,6 +57,21 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/dex/gadgets/stat_calculator', controller='dex_gadgets', action='stat_calculator')
     map.connect('/dex/gadgets/whos_that_pokemon', controller='dex_gadgets', action='whos_that_pokemon')
 
+    # Conquest pages; specific first, again
+    map.connect('/dex/conquest/abilities/{name}', controller='dex_conquest', action='abilities')
+    map.connect('/dex/conquest/kingdoms/{name}', controller='dex_conquest', action='kingdoms')
+    map.connect('/dex/conquest/moves/{name}', controller='dex_conquest', action='moves')
+    map.connect('/dex/conquest/pokemon/{name}', controller='dex_conquest', action='pokemon')
+    map.connect('/dex/conquest/skill/{name}', controller='dex_conquest', action='skills')
+    map.connect('/dex/conquest/warriors/{name}', controller='dex_conquest', action='warriors')
+
+    map.connect('/dex/conquest/abilities', controller='dex_conquest', action='abilities_list')
+    map.connect('/dex/conquest/kingdoms', controller='dex_conquest', action='kingdoms_list')
+    map.connect('/dex/conquest/moves', controller='dex_conquest', action='moves_list')
+    map.connect('/dex/conquest/pokemon', controller='dex_conquest', action='pokemon_list')
+    map.connect('/dex/conquest/skills', controller='dex_conquest', action='skills')
+    map.connect('/dex/conquest/warriors', controller='dex_conquest', action='warriors_list')
+
     # JSON API
     map.connect('/dex/api/pokemon', controller='dex_api', action='pokemon')
 
@@ -124,12 +139,14 @@ class PokedexPlugin(PluginBase):
         import splinext.pokedex.controllers.pokedex_api
         import splinext.pokedex.controllers.pokedex_search
         import splinext.pokedex.controllers.pokedex_gadgets
+        import splinext.pokedex.controllers.pokedex_conquest
 
         return {
             'dex': controllers.pokedex.PokedexController,
             'dex_api': controllers.pokedex_api.PokedexAPIController,
             'dex_search': controllers.pokedex_search.PokedexSearchController,
             'dex_gadgets': controllers.pokedex_gadgets.PokedexGadgetsController,
+            'dex_conquest': controllers.pokedex_conquest.PokedexConquestController,
         }
 
     def hooks(self):
