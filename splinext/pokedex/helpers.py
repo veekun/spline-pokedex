@@ -467,8 +467,8 @@ def evolution_description(evolution, _=_):
         chunks.append(_(u'Do something'))
 
     # Conditions
-    if evolution.gender:
-        chunks.append(_(u"{0}s only").format(evolution.gender))
+    if evolution.gender_id:
+        chunks.append(_(u"{0}s only").format(evolution.gender.identifier))
     if evolution.time_of_day:
         chunks.append(_(u"during the {0}").format(evolution.time_of_day))
     if evolution.minimum_level:

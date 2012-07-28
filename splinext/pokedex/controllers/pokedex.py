@@ -689,6 +689,7 @@ class PokedexController(PokedexBaseController):
                 joinedload('evolutions.location'),
                 joinedload('evolutions.known_move'),
                 joinedload('evolutions.party_species'),
+                joinedload('evolutions.gender'),
                 joinedload('parent_species'),
                 joinedload('default_form'),
             ) \
