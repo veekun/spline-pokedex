@@ -436,6 +436,12 @@ gender_rate_label = {
     8: _(u'always female'),
 }
 
+conquest_rank_label = {
+    1: 'I',
+    2: 'II',
+    3: 'III'
+}
+
 def article(noun, _=_):
     """Returns 'a' or 'an', as appropriate."""
     if noun[0].lower() in u'aeiou':
@@ -507,6 +513,42 @@ def evolution_description(evolution, _=_):
     if evolution.trade_species_id:
         chunks.append(h.literal(_(u"in exchange for {0}")).format(
             pokemon_link(evolution.trade_species.default_pokemon, include_icon=False)))
+
+    return h.literal(u', ').join(chunks)
+
+def conquest_evolution_description(evolution, _=_):
+    """Crafts a human-readable description from a `conquest_pokemon_evolution`
+    row object.
+    """
+    chunks = []
+
+    # Trigger
+    if evolution.recruiting_ko_required:
+        chunks.append('Score a KO that makes a warrior offer to join your army')
+    elif evolution.item_id is not None:
+        chunks.append('Win a battle')
+    else:
+        chunks.append('Perform any action')
+
+    # Conditions
+    if evolution.kingdom_id is not None:
+        chunks.append(h.literal(_(u'in {0}')).format(
+            h.HTML.a(evolution.kingdom.name,
+                href=url(controller='dex_conquest', action='kingdoms',
+                         name=evolution.kingdom.name.lower()))))
+    if evolution.item_id is not None:
+        chunks.append(h.literal(_(u'with {article} {item} equipped')).format(
+            article=article(evolution.item.name),
+            item=item_link(evolution.item, include_icon=False)))
+    if evolution.required_stat_id is not None:
+        chunks.append(_(u'with at least {number} {stat} afterwards').format(
+            number=evolution.minimum_stat,
+            stat=evolution.stat.name))
+    if evolution.minimum_link is not None:
+        chunks.append(_(u'with at least {0}% link afterwards').format(
+            evolution.minimum_link))
+    if evolution.warrior_gender_id is not None:
+        chunks.append(_(u'{0} warriors only').format(evolution.gender.identifier))
 
     return h.literal(u', ').join(chunks)
 
