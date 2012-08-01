@@ -220,6 +220,10 @@ class PokedexController(PokedexBaseController):
         tables.PokemonSpecies: u'Pokémon',
         tables.PokemonForm: u'Pokémon form',
         tables.Type: 'type',
+
+        tables.ConquestKingdom: u'Conquest kingdom',
+        tables.ConquestWarrior: u'Conquest warrior',
+        tables.ConquestWarriorSkill: u'Conquest warrior skill',
     }
 
     # Dict of method identifier => icon path
@@ -311,6 +315,10 @@ class PokedexController(PokedexBaseController):
             c.subpage = 'locations'
             valid_types = [u'pokemon_species', u'pokemon_forms']
             name = re.sub('(?i) locations$', '', name)
+        elif lookup.endswith(u' conquest'):
+            c.subpage = 'conquest'
+            valid_types = [u'pokemon_species', u'moves', u'abilities']
+            name = re.sub('(?i) conquest$', '', name)
 
         results = db.pokedex_lookup.lookup(name, valid_types=valid_types)
 
