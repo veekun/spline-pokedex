@@ -12,10 +12,7 @@ import pokedex.db.tables as tables
 from pylons import request, tmpl_context as c
 from pylons.controllers.util import abort
 import sqlalchemy as sqla
-from sqlalchemy.orm import aliased, eagerload, eagerload_all, joinedload, subqueryload
-import sqlalchemy.orm
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql import exists, func
 
 from spline.lib.base import render
 
@@ -176,7 +173,7 @@ class PokedexConquestController(PokedexBaseController):
             pokemon_q = db.pokemon_query(name, None)
 
             pokemon_q = pokemon_q.options(
-                eagerload('species'),
+                sqla.orm.eagerload('species'),
             )
 
             c.pokemon = pokemon_q.one()
@@ -228,11 +225,11 @@ class PokedexConquestController(PokedexBaseController):
             .filter(tables.PokemonSpecies.evolution_chain_id ==
                     c.pokemon.evolution_chain_id)
             .options(
-                subqueryload('conquest_evolution'),
-                joinedload('conquest_evolution.stat'),
-                joinedload('conquest_evolution.kingdom'),
-                joinedload('conquest_evolution.gender'),
-                joinedload('conquest_evolution.item'),
+                sqla.orm.subqueryload('conquest_evolution'),
+                sqla.orm.joinedload('conquest_evolution.stat'),
+                sqla.orm.joinedload('conquest_evolution.kingdom'),
+                sqla.orm.joinedload('conquest_evolution.gender'),
+                sqla.orm.joinedload('conquest_evolution.item'),
             )
             .all())
         # Strategy: build this table going backwards.
@@ -345,7 +342,8 @@ class PokedexConquestController(PokedexBaseController):
         # Percentile for the total
         # Need to make a derived table that fakes pokemon_id, total_stats
         stat_sum_tbl = db.pokedex_session.query(
-                func.sum(tables.ConquestPokemonStat.base_stat).label('stat_total')
+                sqla.sql.func.sum(tables.ConquestPokemonStat.base_stat)
+                .label('stat_total')
             ) \
             .filter(tables.ConquestPokemonStat.conquest_stat_id <= 4) \
             .group_by(tables.ConquestPokemonStat.pokemon_species_id) \
@@ -367,11 +365,11 @@ class PokedexConquestController(PokedexBaseController):
 
         links_q = (c.pokemon.conquest_max_links
             .options(
-                eagerload('warrior_rank'),
-                eagerload('warrior_rank.skill'),
-                eagerload('warrior_rank.warrior'),
-                eagerload('warrior_rank.warrior.types'),
-                eagerload('warrior_rank.warrior.names')
+                sqla.orm.eagerload('warrior_rank'),
+                sqla.orm.eagerload('warrior_rank.skill'),
+                sqla.orm.eagerload('warrior_rank.warrior'),
+                sqla.orm.eagerload('warrior_rank.warrior.types'),
+                sqla.orm.eagerload('warrior_rank.warrior.names')
             ))
 
         c.max_links = links_q.all()
