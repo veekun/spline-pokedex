@@ -62,14 +62,14 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/dex/conquest/kingdoms/{name}', controller='dex_conquest', action='kingdoms')
     map.connect('/dex/conquest/moves/{name}', controller='dex_conquest', action='moves')
     map.connect('/dex/conquest/pokemon/{name}', controller='dex_conquest', action='pokemon')
-    map.connect('/dex/conquest/skill/{name}', controller='dex_conquest', action='skills')
+    map.connect('/dex/conquest/skills/{name}', controller='dex_conquest', action='skills')
     map.connect('/dex/conquest/warriors/{name}', controller='dex_conquest', action='warriors')
 
     map.connect('/dex/conquest/abilities', controller='dex_conquest', action='abilities_list')
     map.connect('/dex/conquest/kingdoms', controller='dex_conquest', action='kingdoms_list')
     map.connect('/dex/conquest/moves', controller='dex_conquest', action='moves_list')
     map.connect('/dex/conquest/pokemon', controller='dex_conquest', action='pokemon_list')
-    map.connect('/dex/conquest/skills', controller='dex_conquest', action='skills')
+    map.connect('/dex/conquest/skills', controller='dex_conquest', action='skills_list')
     map.connect('/dex/conquest/warriors', controller='dex_conquest', action='warriors_list')
 
     # JSON API
