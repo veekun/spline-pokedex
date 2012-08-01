@@ -59,7 +59,11 @@ def make_thingy_url(thingy, subpage=None, controller='dex'):
        or (isinstance(thingy, tables.Ability) and thingy.effect is None)
        or subpage == 'conquest'):
         # Conquest stuff needs to go to the Conquest controller
-        action = action.replace('conquest_', '')
+        if action == 'conquest_warrior_skills':
+            action = 'skills'
+        else:
+            action = action.replace('conquest_', '')
+
         controller = 'dex_conquest'   
     elif subpage:
         action += '_' + subpage 
