@@ -95,6 +95,7 @@ table.dex-pokemon-moves td.type2 { text-align: left; }
 table.dex-pokemon-moves td.ability { font-size: 0.75em; padding: 0.25em; white-space: nowrap; }
 table.dex-pokemon-moves td.egg-group { font-size: 0.75em; padding: 0.25em; }
 table.dex-pokemon-moves td.stat { text-align: right; }
+table.dex-pokemon-moves td.stat-range { text-align: center /* Conquest - Range is always one digit and looks awkward shoved to the side */; }
 table.dex-pokemon-moves td.size { text-align: right; }
 table.dex-pokemon-moves td.color { text-align: left; }
 table.dex-pokemon-moves td.species { }
@@ -103,12 +104,14 @@ table.dex-pokemon-moves tr.better-move-type:nth-child(2n) td.type,
 table.dex-pokemon-moves tr.better-move-type:nth-child(2n) td.type2,
 table.dex-pokemon-moves tr.better-move-stat-physical:nth-child(2n) td.stat-attack,
 table.dex-pokemon-moves tr.better-move-stat-special:nth-child(2n) td.stat-special-attack,
-table.dex-pokemon-moves tr.better-move-stat:nth-child(2n) td.class { background: #afcfaf; }
+table.dex-pokemon-moves tr.better-move-stat:nth-child(2n) td.class,
+table.dex-pokemon-moves tr.perfect-link:nth-child(2n) td.max-link { background: #afcfaf; }
 table.dex-pokemon-moves tr.better-move-type:nth-child(2n+1) td.type,
 table.dex-pokemon-moves tr.better-move-type:nth-child(2n+1) td.type2,
 table.dex-pokemon-moves tr.better-move-stat-physical:nth-child(2n+1) td.stat-attack,
 table.dex-pokemon-moves tr.better-move-stat-special:nth-child(2n+1) td.stat-special-attack,
-table.dex-pokemon-moves tr.better-move-stat:nth-child(2n+1) td.class { background: #c0d8c0; }
+table.dex-pokemon-moves tr.better-move-stat:nth-child(2n+1) td.class,
+table.dex-pokemon-moves tr.perfect-link:nth-child(2n+1) td.max-link { background: #c0d8c0; }
 
 /* "Sorting" Pokémon search results by evolution chain */
 table.dex-pokemon-moves tr.fake-result td { opacity: 0.25; }
@@ -160,7 +163,10 @@ ul.inline-menu > li:last-child:after { content: none; }
 p#dex-page-name { font-size: 2em; margin: 0.12em 0; }
 #dex-pokemon-forme { font-size: 1.25em; font-weight: bold; }
 #dex-pokemon-portrait-sprite { height: 96px; width: 96px; margin: 0.33em auto; padding: 7px; line-height: 96px; vertical-align: middle; text-align: center; background: url(${h.static_uri('pokedex', 'images/sprite-frame.png')}) center center no-repeat; }
+
+.dex-warrior-portrait { min-width: 176px; margin: auto 0.33em; }
 #dex-pokemon-conquest-portrait-sprite { height: 128px; width: 128px; margin: 0.33em auto; padding: 7px; line-height: 128px; vertical-align: middle; text-align: center; background: url(${h.static_uri('pokedex', 'images/sprite-frame-conquest.png')}) center center no-repeat; }
+#dex-warrior-portrait-sprite { height: 168px; width: 176px; margin: 0.33em 0; padding: 4px 0; background: url(${h.static_uri('pokedex', 'images/sprite-frame-conquest-warrior.png')}) center center no-repeat; }
 
 /* List of types with damage (or whatever) below */
 ul.dex-type-list { overflow: hidden /* new float context */; margin-bottom: 2em; }
@@ -181,6 +187,12 @@ ul.dex-type-list li img { display: block; margin-bottom: 0.25em; }
 .dex-size .dex-size-value { position: absolute; height: 2em; margin: 0; line-height: 1; padding: 0.25em; bottom: -2.5em; }
 .dex-size .dex-size-trainer .dex-size-value { right: 0.25em; }
 .dex-size .dex-size-pokemon .dex-size-value { left: 0.25em; }
+
+/* Conquest misc. */
+table.dex-warriors td.warrior-icon { padding: 0 0.33em; }
+table.dex-warriors td.max-link { width: 3em; }
+.warrior-icon-small { border: 1px black solid; }
+.warrior-icon-big { margin: 1px auto; }
 
 
 /*** Individual pages ***/

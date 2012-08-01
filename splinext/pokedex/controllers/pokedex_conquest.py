@@ -3,7 +3,9 @@ from __future__ import absolute_import, division
 
 from collections import defaultdict
 import colorsys
+from itertools import izip
 import logging
+from random import randint
 
 import pokedex.db
 import pokedex.db.tables as tables
@@ -35,7 +37,7 @@ class PokedexConquestController(PokedexBaseController):
         abort(404)
 
     def _prev_next_id(self, thing, table, column_name):
-        """Returns a 2-tuple of the previous and next kingdom."""
+        """Returns a 2-tuple of the previous and next thing by their IDs."""
         column = getattr(table, column_name)
         thing_id = getattr(thing, column_name)
 
@@ -49,6 +51,73 @@ class PokedexConquestController(PokedexBaseController):
 
         return prev_thing, next_thing
 
+    def _prev_next_name(self, table, current, filters=[]):
+        """Figure out the previous/next thing for the navigation bar
+
+        table: the table to select from
+        current: list of the current values
+        filters: a list of filter expressions for the table
+        """
+        name_table = table.__mapper__.get_property('names').argument
+        query = (db.pokedex_session.query(table)
+                .join(name_table)
+                .filter(name_table.local_language == c.game_language)
+            )
+
+        for filter in filters:
+            query = query.filter(filter)
+
+        name_col = name_table.name
+        name_current = current.name_map[c.game_language]
+
+        lt = name_col < name_current
+        gt = name_col > name_current
+        asc = name_col.asc()
+        desc = name_col.desc()
+
+        # The previous thing is the biggest smaller, wrap around if
+        # nothing comes before
+        prev = query.filter(lt).order_by(desc).first()
+        if prev is None:
+            prev = query.order_by(desc).first()
+
+        # Similarly for next
+        next = query.filter(gt).order_by(asc).first()
+        if next is None:
+            next = query.order_by(asc).first()
+
+        return prev, next
+
+
+    def abilities(self, name):
+        try:
+            c.ability = db.get_by_name_query(tables.Ability, name).one()
+        except NoResultFound:
+            return self._not_found()
+
+        # XXX The ability might exist, but not in Conquest
+        if not c.ability.conquest_pokemon:
+            return self._not_found()
+
+        print(dir(tables.Ability.pokemon))
+
+        c.prev_ability, c.next_ability = self._prev_next_name(
+            tables.Ability, c.ability,
+            filters=[tables.Ability.conquest_pokemon.any()])
+
+        return render('/pokedex/conquest/ability.mako')
+
+    def abilities_list(self):
+        c.abilities = (db.pokedex_session.query(tables.Ability)
+            .join(tables.Ability.names_local)
+            .filter(tables.Ability.conquest_pokemon.any())
+            .order_by(tables.Ability.names_table.name.asc())
+            .all()
+        )
+
+        return render('/pokedex/conquest/ability_list.mako')
+
+
     def kingdoms(self, name):
         try:
             c.kingdom = db.get_by_name_query(tables.ConquestKingdom, name).one()
@@ -56,9 +125,51 @@ class PokedexConquestController(PokedexBaseController):
             return self._not_found()
 
         # We have pretty much nothing for kingdoms.  Yet.
-        c.prev_kingdom, c.next_kingdom = self._prev_next_id(c.kingdom, tables.ConquestKingdom, 'id')
+        c.prev_kingdom, c.next_kingdom = self._prev_next_id(
+            c.kingdom, tables.ConquestKingdom, 'id')
 
         return render('/pokedex/conquest/kingdom.mako')
+
+    def kingdoms_list(self):
+        c.kingdoms = (db.pokedex_session.query(tables.ConquestKingdom)
+            .options(
+                sqla.orm.eagerload('type')
+            )
+            .order_by(tables.ConquestKingdom.id)
+            .all()
+        )
+
+        return render('/pokedex/conquest/kingdom_list.mako')
+
+
+    def moves(self, name):
+        try:
+            c.move = db.get_by_name_query(tables.Move, name).one()
+        except NoResultFound:
+            return self._not_found()
+
+        if not c.move.conquest_pokemon:
+            return self._not_found()
+
+        ### Prev/next for header
+        c.prev_move, c.next_move = self._prev_next_name(tables.Move, c.move,
+            filters=[tables.Move.conquest_pokemon.any()])
+
+        return render('/pokedex/conquest/move.mako')
+
+    def moves_list(self):
+        c.moves = (db.pokedex_session.query(tables.Move)
+            .filter(tables.Move.conquest_pokemon.any())
+            .options(
+                sqla.orm.eagerload('type')
+            )
+            .join(tables.Move.names_local)
+            .order_by(tables.Move.names_table.name.asc())
+            .all()
+        )
+
+        return render('/pokedex/conquest/move_list.mako')
+
 
     def pokemon(self, name=None):
         try:
@@ -79,7 +190,8 @@ class PokedexConquestController(PokedexBaseController):
             return self._not_found()
 
         ### Previous and next for the header
-        c.prev_pokemon, c.next_pokemon = self._prev_next_id(c.pokemon, tables.PokemonSpecies, 'conquest_order')
+        c.prev_pokemon, c.next_pokemon = self._prev_next_id(
+            c.pokemon, tables.PokemonSpecies, 'conquest_order')
 
         ### Type efficacy
         c.type_efficacies = defaultdict(lambda: 100)
@@ -266,3 +378,115 @@ class PokedexConquestController(PokedexBaseController):
 
 
         return render('/pokedex/conquest/pokemon.mako')
+
+    def pokemon_list(self):
+        c.pokemon = (db.pokedex_session.query(tables.PokemonSpecies)
+            .filter(tables.PokemonSpecies.conquest_order != None)
+            .options(
+                sqla.orm.eagerload('conquest_abilities'),
+                sqla.orm.eagerload('conquest_move'),
+                sqla.orm.eagerload('conquest_stats'),
+                sqla.orm.eagerload('default_pokemon.types')
+            )
+            .order_by(tables.PokemonSpecies.conquest_order)
+            .all()
+        )
+
+        return render('/pokedex/conquest/pokemon_list.mako')
+
+
+    def skills(self, name):
+        try:
+            c.skill = (db.get_by_name_query(tables.ConquestWarriorSkill, name)
+                .one())
+        except NoResultFound:
+            return self._not_found()
+
+        ### Prev/next for header
+        c.prev_skill, c.next_skill = self._prev_next_name(
+            tables.ConquestWarriorSkill, c.skill)
+
+        return render('/pokedex/conquest/skill.mako')
+
+    def skills_list(self):
+        # We want to split the list up between generic skills anyone can get
+        # and the unique skills a specific warrior gets at a specific rank.
+        # The two player characters throw a wrench in that though so we just
+        # assume any skill known only by warlords is unique, which happens to
+        # work.
+        warriors_with_ranks = sqla.orm.join(tables.ConquestWarrior,
+                                            tables.ConquestWarriorRank)
+
+        generic_clause = (sqla.sql.exists(warriors_with_ranks.select())
+            .where(sqla.and_(
+                tables.ConquestWarrior.archetype_id != None,
+                tables.ConquestWarriorRank.skill_id ==
+                    tables.ConquestWarriorSkill.id))
+        )
+
+
+        c.generic_skills = (db.pokedex_session.query(tables.ConquestWarriorSkill)
+            .filter(generic_clause)
+            .join(tables.ConquestWarriorSkill.names_local)
+            .order_by(tables.ConquestWarriorSkill.names_table.name.asc())
+            .all())
+        c.unique_skills = (db.pokedex_session.query(tables.ConquestWarriorSkill)
+            .filter(~generic_clause)
+            .options(
+                sqla.orm.eagerload('warrior_ranks'),
+                sqla.orm.eagerload('warrior_ranks.warrior')
+            )
+            .join(tables.ConquestWarriorSkill.names_local)
+            .order_by(tables.ConquestWarriorSkill.names_table.name.asc())
+            .all())
+
+        # Decide randomly which player gets displayed
+        c.player_index = randint(0, 1)
+
+        return render('/pokedex/conquest/skill_list.mako')
+
+
+    def warriors(self, name):
+        try:
+            c.warrior = db.get_by_name_query(tables.ConquestWarrior, name).one()
+        except NoResultFound:
+            return self._not_found()
+
+        c.prev_warrior, c.next_warrior = self._prev_next_id(
+            c.warrior, tables.ConquestWarrior, 'id')
+
+        c.rank_count = len(c.warrior.ranks)
+
+        ### Max links
+        c.link_threshold = int(request.params.get('link', 70 if c.warrior.archetype else 90))
+        link_pokemon = (db.pokedex_session.query(tables.ConquestMaxLink.pokemon_species_id)
+            .filter(tables.ConquestMaxLink.warrior_rank_id ==
+                    c.warrior.ranks[-1].id)
+            .filter(tables.ConquestMaxLink.max_link >= c.link_threshold))
+
+        max_links = []
+        for rank in c.warrior.ranks:
+            max_links.append(rank.max_links
+                .filter(tables.ConquestMaxLink.pokemon_species_id.in_(link_pokemon))
+                .join(tables.PokemonSpecies)
+                .order_by(tables.PokemonSpecies.conquest_order)
+                .all())
+
+        c.max_links = izip(*max_links)
+
+        return render('/pokedex/conquest/warrior.mako')
+
+    def warriors_list(self):
+        c.warriors = (db.pokedex_session.query(tables.ConquestWarrior)
+            .options(
+                sqla.orm.eagerload('ranks'),
+                sqla.orm.eagerload('ranks.skill'),
+                sqla.orm.eagerload('ranks.stats'),
+                sqla.orm.eagerload('ranks.stats.stat'),
+                sqla.orm.eagerload('types')
+            )
+            .order_by(tables.ConquestWarrior.id)
+            .all()
+        )
+
+        return render('/pokedex/conquest/warrior_list.mako')

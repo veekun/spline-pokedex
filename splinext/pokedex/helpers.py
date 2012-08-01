@@ -27,7 +27,7 @@ from splinext.pokedex.i18n import NullTranslator
 # to this:
 _ = NullTranslator()
 
-def make_thingy_url(thingy, subpage=None):
+def make_thingy_url(thingy, subpage=None, controller='dex'):
     u"""Given a thingy (Pokémon, move, type, whatever), returns a URL to it.
     """
     # Using the table name as an action directly looks kinda gross, but I can't
@@ -50,14 +50,21 @@ def make_thingy_url(thingy, subpage=None):
         action = thingy.__tablename__
         args['name'] = thingy.name.lower()
 
+
     # Items are split up by pocket
     if isinstance(thingy, tables.Item):
         args['pocket'] = thingy.pocket.identifier
 
-    if subpage:
-        action += '_' + subpage
+    if (thingy.__tablename__.startswith('conquest_')
+       or (isinstance(thingy, tables.Ability) and thingy.effect is None)
+       or subpage == 'conquest'):
+        # Conquest stuff needs to go to the Conquest controller
+        action = action.replace('conquest_', '')
+        controller = 'dex_conquest'   
+    elif subpage:
+        action += '_' + subpage 
 
-    return url(controller='dex',
+    return url(controller=controller,
                action=action,
                **args)
 

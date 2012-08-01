@@ -1,0 +1,227 @@
+<%def name="pokemon_page_header()">
+<div id="dex-header">
+    <a href="${url.current(name=c.prev_pokemon.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">
+        <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
+        <span class="sprite-icon sprite-icon-${c.prev_pokemon.id}"></span>
+        ${c.prev_pokemon.conquest_order}: ${c.prev_pokemon.name}
+    </a>
+    <a href="${url.current(name=c.next_pokemon.name.lower(), form=None)}" id="dex-header-next" class="dex-box-link">
+        ${c.next_pokemon.conquest_order}: ${c.next_pokemon.name}
+        <span class="sprite-icon sprite-icon-${c.next_pokemon.id}"></span>
+        <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
+    </a>
+    ${h.pokedex.species_image(c.pokemon, prefix='icons')}
+    <br />${c.pokemon.conquest_order}: ${c.pokemon.name}
+    <ul class="inline-menu">
+
+    </ul>
+</div>
+</%def>
+
+
+<%def name="pokemon_table_columns(link_cols=0)">
+% if link_cols:
+<colgroup span=${link_cols}></colgroup>
+% endif
+<colgroup>
+    <col class="dex-col-icon">
+    <col class="dex-col-name">
+    <col class="dex-col-type2">
+    <col class="dex-col-ability">
+    <col class="dex-col-stat">
+    <col class="dex-col-stat">
+    <col class="dex-col-stat">
+    <col class="dex-col-stat">
+    <col class="dex-col-stat">
+    <col class="dex-col-stat-total">
+</colgroup>
+</%def>
+
+<%def name="pokemon_table_header(link_cols=0)">
+<tr class="header-row">
+    % if link_cols:
+    <th colspan="${link_cols}">Link</th>
+    % endif
+    <th></th>
+    <th>Pokémon</th>
+    <th>Type</th>
+    <th>Abilities</th>
+    <th>Range</th>
+    <th><abbr title="Hit Points">HP</abbr></th>
+    <th><abbr title="Attack">Atk</abbr></th>
+    <th><abbr title="Defense">Def</abbr></th>
+    <th><abbr title="Speed">Spd</abbr></th>
+    <th>Total</th>
+</tr>
+% if link_cols:
+<tr class="subheader-row conquest-subheader-row">
+    % for rank in range(1, link_cols + 1):
+    <th>${h.pokedex.conquest_rank_label[rank]}</th>
+    % endfor
+    % for column in range(10):
+    <th></th>
+    % endfor
+</tr>
+% endif
+</%def>
+
+<%def name="pokemon_table_row(pokemon)">
+<td class="icon"><span class="sprite-icon sprite-icon-${pokemon.id}"></span></td>
+<td><a href="${url(controller='dex_conquest', action='pokemon', name=pokemon.name.lower())}">${pokemon.name}</a></td>
+<td class="type2">
+    % for type in pokemon.default_pokemon.types:
+    ${h.pokedex.type_link(type)}
+    % endfor
+</td>
+<td class="ability">
+  % for i, ability in enumerate(pokemon.conquest_abilities):
+    % if i > 0:
+    <br />
+    % endif
+    <a href="${url(controller='dex_conquest', action='abilities', name=ability.name.lower())}">${ability.name}</a>
+  % endfor
+</td>
+% for stat in sorted(pokemon.conquest_stats, key=(lambda s: (s.stat.is_base, s.conquest_stat_id))):
+<td class="stat stat-${stat.stat.identifier}">${stat.base_stat}</td>
+% endfor
+<td>${sum(stat.base_stat for stat in pokemon.conquest_stats if stat.stat.is_base)}</td>
+</%def>
+
+
+<%def name="warrior_image(warrior_rank, dir)">
+<%
+if warrior_rank.warrior.archetype:
+    identifier = warrior_rank.warrior.archetype.identifier
+else:
+    identifier = '{0}-{1}'.format(warrior_rank.warrior.identifier, warrior_rank.rank)
+
+attr = {}
+if dir == 'small-icons':
+    attr['class'] = 'warrior-icon-small'
+elif dir == 'big-icons':
+    attr['class'] = 'warrior-icon-big'
+%>
+${h.pokedex.pokedex_img('warriors/{0}/{1}.png'.format(dir, identifier),
+                        alt=identifier, title=identifier, **attr)}
+</%def>
+
+<%def name="warrior_table_columns()">
+<colgroup>
+    <col class="dex-col-warrior-icon">
+    <col class="dex-col-name">
+    <col class="dex-col-type2">
+    <col class="dex-col-ability">
+</colgroup>
+% for stat in range(4):
+<colgroup>
+    <col class="dex-col-stat">
+    <col class="dex-col-stat">
+    <col class="dex-col-stat">
+</colgroup>
+% endfor
+</%def>
+
+<%def name="warrior_table_header(link_cols=False)">
+<thead>
+    <tr class="header-row">
+        % if link_cols:
+        <th colspan="3">Link</th>
+        % endif
+        <th colspan="2">Warrior</th>
+        <th>Specialty</th>
+        <th>Skill</th>
+        <th colspan="3">Power</th>
+        <th colspan="3">Wisdom</th>
+        <th colspan="3">Charisma</th>
+        <th colspan="3">Capacity</th>
+    </tr>
+    <tr class="subheader-row conquest-subheader-row">
+        % if link_cols:
+        <th>I</th><th>II</th><th>III</th>
+        % endif
+        <th colspan="2"></th>
+        <th></th>
+        <th>I / II / III</th>
+        % for stat in range(4):
+        <th>I</th><th>II</th><th>III</th>
+        % endfor
+    </tr>
+</thead>
+</%def>
+
+<%def name="warrior_table_row(warrior)">
+<td class="warrior-icon">${warrior_image(warrior.ranks[0], 'big-icons')}</td>
+<td><a href="${url(controller='dex_conquest', action='warriors', name=warrior.name.lower())}">${warrior.name}</a></td>
+<td class="type2">
+    % for type in warrior.types:
+    ${h.pokedex.type_link(type)}
+    % endfor
+</td>
+<td class="ability">
+    % for rank in warrior.ranks:
+    % if rank.rank > 1:
+    <br />
+    % endif
+    <a href="${url(controller='dex_conquest', action='skills', name=rank.skill.name.lower())}">${rank.skill.name}</a>
+    % endfor
+</td>
+% for stats in zip(*(rank.stats for rank in warrior.ranks)):
+${warrior_table_stat_colgroup(stats)}
+% endfor
+</%def>
+
+<%def name="warrior_table_stat_colgroup(stats)">
+% for rank_stat in stats:
+<td>${rank_stat.base_stat}</td>
+% endfor
+% for dummy_rank in range(3 - len(stats)):
+<td></td>
+% endfor
+</%def>
+
+
+<%def name="warrior_rank_table_head()">
+<colgroup>
+    <col class="dex-col-icon"/>
+    <col>
+    <col class="dex-col-name"/>
+    <col class="dex-col-type2"/>
+    <col class="dex-col-ability"/>
+    <col class="dex-col-stat"/>
+    <col class="dex-col-stat"/>
+    <col class="dex-col-stat"/>
+    <col class="dex-col-stat"/>
+</colgroup>
+
+<thead>
+    <tr class="header-row">
+        <th colspan="2">Warrior</th>
+        <th>Rank</th>
+        <th>Specialty</th>
+        <th>Skill</th>
+        <th>Power</th>
+        <th>Wisdom</th>
+        <th>Charisma</th>
+        <th>Capacity</th>
+    </tr>
+</thead>
+</%def>
+
+<%def name="warrior_rank_table_row(rank)">
+<tr>
+    <td class="warrior-icon">${warrior_image(rank, 'big-icons')}</td>
+    <td><a href="${url(controller='dex_conquest', action='warriors', name=rank.warrior.name.lower())}">${rank.warrior.name}</a></td>
+    <td>${h.pokedex.conquest_rank_label[rank.rank]}</td>
+    <td class="type2">
+        % for type in rank.warrior.types:
+        ${h.pokedex.type_link(type)}
+        % endfor
+    </td>
+    <td class="ability">
+        <a href="${url(controller='dex_conquest', action='skills', name=rank.skill.name.lower())}">${rank.skill.name}</a>
+    </td>
+    % for stat in rank.stats:
+    <td>${stat.base_stat}</td>
+    % endfor
+</tr>
+</%def>
