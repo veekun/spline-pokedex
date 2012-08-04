@@ -407,15 +407,19 @@ class PokedexConquestController(PokedexBaseController):
         return render('/pokedex/conquest/skill.mako')
 
     def skills_list(self):
+        skills = (db.pokedex_session.query(tables.ConquestWarriorSkill)
+            .join(tables.ConquestWarriorSkill.names_local)
+            .order_by(tables.ConquestWarriorSkill.names_table.name.asc()))
+
         # We want to split the list up between generic skills anyone can get
-        # and the unique skills a specific warrior gets at a specific rank.
+        # and the unique skills a specific warlord gets at a specific rank.
         # The two player characters throw a wrench in that though so we just
         # assume any skill known only by warlords is unique, which happens to
         # work.
-        warriors_with_ranks = sqla.orm.join(tables.ConquestWarrior,
-                                            tables.ConquestWarriorRank)
+        warriors_and_ranks = sqla.orm.join(tables.ConquestWarrior,
+                                           tables.ConquestWarriorRank)
 
-        generic_clause = (sqla.sql.exists(warriors_with_ranks.select())
+        generic_clause = (sqla.sql.exists(warriors_and_ranks.select())
             .where(sqla.and_(
                 tables.ConquestWarrior.archetype_id != None,
                 tables.ConquestWarriorRank.skill_id ==
@@ -423,19 +427,12 @@ class PokedexConquestController(PokedexBaseController):
         )
 
 
-        c.generic_skills = (db.pokedex_session.query(tables.ConquestWarriorSkill)
-            .filter(generic_clause)
-            .join(tables.ConquestWarriorSkill.names_local)
-            .order_by(tables.ConquestWarriorSkill.names_table.name.asc())
-            .all())
-        c.unique_skills = (db.pokedex_session.query(tables.ConquestWarriorSkill)
-            .filter(~generic_clause)
+        c.generic_skills = skills.filter(generic_clause).all()
+        c.unique_skills = (skills.filter(~generic_clause)
             .options(
                 sqla.orm.eagerload('warrior_ranks'),
                 sqla.orm.eagerload('warrior_ranks.warrior')
             )
-            .join(tables.ConquestWarriorSkill.names_local)
-            .order_by(tables.ConquestWarriorSkill.names_table.name.asc())
             .all())
 
         # Decide randomly which player gets displayed
