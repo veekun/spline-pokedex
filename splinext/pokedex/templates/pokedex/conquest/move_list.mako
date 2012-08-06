@@ -1,4 +1,5 @@
 <%inherit file="/base.mako"/>
+<%namespace name="conqlib" file="lib.mako"/>
 
 <%! from splinext.pokedex import i18n %>\
 
@@ -14,20 +15,18 @@
 
 ${h.h1(_(u'Move list'))}
 <table class="striped-rows dex-pokemon-moves">
+${conqlib.move_table_columns()}
+
 <thead>
     <tr class="header-row">
-        <th>Name</th>
-        <th>Type</th>
-        <th>Summary</th>
+        ${conqlib.move_table_header()}
     </tr>
 </thead>
 
 <tbody>
     % for move in c.moves:
     <tr>
-        <td><a href="${url(controller='dex_conquest', action='moves', name=move.name.lower())}">${move.name}</a></td>
-        <td>${h.pokedex.type_link(move.type)}</td>
-        <td class="markdown effect"><p>No effects yet.</p></td>
+        ${conqlib.move_table_row(move)}
     </tr>
     % endfor
 </tbody>

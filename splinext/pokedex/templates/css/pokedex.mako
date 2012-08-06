@@ -317,6 +317,9 @@ ul#dex-item-pockets { text-align: center; }
 ul#dex-item-pockets li { display: inline-block; }
 ul#dex-item-pockets li img { padding: 4px; }
 
+/* Conquest move page -- range diagram */
+.dex-conquest-move-range { float: right; margin-right: 1.5em; margin-left: 0.5em; }
+
 
 /*** Lists ***/
 

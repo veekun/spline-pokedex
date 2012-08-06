@@ -19,6 +19,50 @@
 </%def>
 
 
+<%def name="move_table_columns()">
+<colgroup>
+    <col class="dex-col-name">
+    <col class="dex-col-type">
+    <col class="dex-col-icon">
+    <col class="dex-col-stat">
+    <col>
+    <col class="dex-col-stat">
+    <col class="dex-col-effect">
+</colgroup>
+</%def>
+
+<%def name="move_table_header()">
+<th>Move</th>
+<th>Type</th>
+<th>Range</th>
+<th colspan="2">Power</th>
+<th>Acc</th>
+<th>Effect</th>
+</%def>
+
+<%def name="move_table_row(move)">
+<td><a href="${url(controller='dex_conquest', action='moves', name=move.name.lower())}">${move.name}</a></td>
+<td class="type">${h.pokedex.type_link(move.type)}</td>
+<td class="icon">${range_image(move)}</td>
+
+% if move.conquest_data.power:
+<td>${move.conquest_data.power}</td>
+% else:
+<td>—</td>
+% endif
+
+<td style="text-align: left">${u'★' * move.conquest_data.star_rating}</td>
+
+% if move.conquest_data.accuracy:
+<td>${move.conquest_data.accuracy}%</td>
+% else:
+<td>—</td>
+% endif
+
+<td class="markdown effect">${move.conquest_data.short_effect}</td>
+</%def>
+
+
 <%def name="pokemon_table_columns(link_cols=0)">
 % if link_cols:
 <colgroup span=${link_cols}></colgroup>
@@ -85,6 +129,20 @@
 <td class="stat stat-${stat.stat.identifier}">${stat.base_stat}</td>
 % endfor
 <td>${sum(stat.base_stat for stat in pokemon.conquest_stats if stat.stat.is_base)}</td>
+</%def>
+
+<%def name="range_image(move)">
+<%
+if move.conquest_data.move_displacement:
+    identifier = '{0}-{1}'.format(move.conquest_data.range.identifier, move.conquest_data.move_displacement.identifier)
+    title = '{0}, {1}'.format(move.conquest_data.range.name, move.conquest_data.move_displacement.name)
+else:
+    identifier = move.conquest_data.range.identifier
+    title = move.conquest_data.range.name
+%>
+
+${h.pokedex.pokedex_img('chrome/conquest-move-ranges/{0}.png'.format(identifier),
+    alt=title, title=title)}
 </%def>
 
 

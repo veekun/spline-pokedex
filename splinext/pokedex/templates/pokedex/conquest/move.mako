@@ -38,7 +38,9 @@ ${h.h1(u'Essentials')}
 
 <div class="dex-page-beside-portrait">
     <h2>${_(u'Summary')}</h2>
-    <p>No effects yet.</p>
+    <div class="markdown">
+        ${c.move.conquest_data.short_effect}
+    </div>
 
     <h2>${_(u"Damage Dealt")}</h2>
     <ul class="dex-type-list">
@@ -50,6 +52,59 @@ ${h.h1(u'Essentials')}
     </ul>
 </div>
 
+
+${h.h1(u'Effect')}
+<div class="dex-column-container">
+<div class="dex-column">
+    <h2>${_(u'Stats')}</h2>
+    <dl>
+        <dt>Power</dt>
+        <dd>${c.move.conquest_data.power or 'n/a'} ${u'★' * c.move.conquest_data.star_rating}</dd>
+    
+        <dt>Base accuracy</dt>
+        % if c.move.conquest_data.accuracy: 
+        <dd>${c.move.conquest_data.accuracy}%</dd>
+        % else:
+        <dd>n/a</dd>
+        % endif
+    
+        <dt>Effect chance</dt>
+        % if c.move.conquest_data.effect_chance:
+        <dd>${c.move.conquest_data.effect_chance}%</dd>
+        % else:
+        <dd>n/a</dd>
+        % endif
+    </dl>
+</div>
+
+<div class="dex-column">
+    <h2>Range</h2>
+    <span class="dex-conquest-move-range">${conqlib.range_image(c.move)}</span>
+
+    <ul class="classic-list dex-move-flags">
+    <li>
+        <strong>${c.move.conquest_data.range.name}</strong>
+        <div class="markdown"><p>${c.move.conquest_data.range.description}</p></div>
+    </li>
+
+    % if c.move.conquest_data.move_displacement:
+    <li>
+        <strong>${c.move.conquest_data.move_displacement.name}</strong>
+        <div class="markdown">${c.move.conquest_data.displacement}</div>
+    </li>
+    % else:
+    <li class="disabled">Movement or knockback</li>
+    % endif
+    </ul>
+</div>
+
+<div class="dex-column">
+    <h2>Flags or something</h2>
+</div>
+</div>
+
+<h2>Effect</h2>
+<div class="markdown">${c.move.conquest_data.effect}</div>
 
 ${h.h1(u'Pokémon')}
 <table class="dex-pokemon-moves striped-rows">
