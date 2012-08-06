@@ -33,7 +33,7 @@ ${h.h1(_('Essentials'))}
         ${h.pokedex.species_image(c.pokemon, prefix='conquest')}
     </div>
     <p id="dex-page-types">
-        % for type in c.pokemon.default_pokemon.types:
+        % for type in c.semiform_pokemon.types:
         ${h.pokedex.type_link(type)}
         % endfor
     </p>
@@ -211,7 +211,6 @@ ${conqlib.warrior_table_header(link_cols=True)}
 <tbody>
     % for warrior, max_links in groupby(c.max_links, key=attrgetter('warrior')):
     <% max_links = list(max_links) %>
-    % if any(l.max_link >= c.link_threshold for l in max_links):
     <tr class="${'perfect-link' if max_links[-1].max_link == 100 else ''}">
         % for i, max_link in enumerate(max_links):
         <td class="max-link">${max_link.max_link}%</td>
@@ -221,7 +220,6 @@ ${conqlib.warrior_table_header(link_cols=True)}
         % endfor
         ${conqlib.warrior_table_row(warrior)}
     </tr>
-    % endif
     % endfor
 </tbody>
 </table>

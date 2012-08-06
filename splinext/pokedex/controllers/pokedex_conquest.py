@@ -180,7 +180,7 @@ class PokedexConquestController(PokedexBaseController):
         except NoResultFound:
             return self._not_found()
 
-        c.struct_pokemon = c.pokemon
+        c.semiform_pokemon = c.pokemon
         c.pokemon = c.pokemon.species
 
         if c.pokemon.conquest_order is None:
@@ -192,7 +192,7 @@ class PokedexConquestController(PokedexBaseController):
 
         ### Type efficacy
         c.type_efficacies = defaultdict(lambda: 100)
-        for target_type in c.struct_pokemon.types:
+        for target_type in c.semiform_pokemon.types:
             for type_efficacy in target_type.target_efficacies:
                 c.type_efficacies[type_efficacy.damage_type] *= \
                     type_efficacy.damage_factor
@@ -313,6 +313,8 @@ class PokedexConquestController(PokedexBaseController):
         ### Stats
         # Conquest has a nonstandard stat, Range, which shouldn't be included
         # in the total, so we have to do things a bit differently.
+        # XXX actually do things differently instead of just fudging the same
+        #     thing to work
         c.stats = {}  # stat => { border, background, percentile }
         stat_total = 0
         total_stat_rows = db.pokedex_session.query(tables.ConquestPokemonStat) \
@@ -361,15 +363,43 @@ class PokedexConquestController(PokedexBaseController):
         }
 
         ### Max links
+        # We only want to show warriors who have a max link above a certain
+        # threshold, because there are 200 warriors and most of them won't
+        # have very good links.
         c.link_threshold = int(request.params.get('link', 70))
 
+        # However, some warriors will only be above this threshold at later
+        # ranks.  In these cases, we may as well show all ranks' links.
+        # No link ever goes down when a warrior ranks up, so we just need to
+        # check their final rank.
+
+        # First, craft a clause to filter out non-final warrior ranks.
+        ranks_sub = sqla.orm.aliased(tables.ConquestWarriorRank)
+        higher_ranks_exist = (sqla.sql.exists([1])
+            .where(sqla.and_(
+                ranks_sub.warrior_id == tables.ConquestWarriorRank.warrior_id,
+                ranks_sub.rank > tables.ConquestWarriorRank.warrior_id))
+        )
+
+        # Next, find final-rank warriors with a max link high enough.
+        worthy_warriors = (db.pokedex_session.query(tables.ConquestWarrior.id)
+            .join(tables.ConquestWarriorRank)
+            .filter(~higher_ranks_exist)
+            .join(tables.ConquestMaxLink)
+            .filter(tables.ConquestMaxLink.pokemon_species_id == c.pokemon.id)
+            .filter(tables.ConquestMaxLink.max_link >= c.link_threshold))
+
+        # Finally, find ALL the max links for these warriors!
         links_q = (c.pokemon.conquest_max_links
+            .join(tables.ConquestWarriorRank)
+            .filter(tables.ConquestWarriorRank.warrior_id.in_(worthy_warriors))
             .options(
-                sqla.orm.eagerload('warrior_rank'),
-                sqla.orm.eagerload('warrior_rank.skill'),
-                sqla.orm.eagerload('warrior_rank.warrior'),
-                sqla.orm.eagerload('warrior_rank.warrior.types'),
-                sqla.orm.eagerload('warrior_rank.warrior.names')
+                sqla.orm.joinedload('warrior_rank'),
+                sqla.orm.joinedload('warrior_rank.warrior'),
+                sqla.orm.joinedload('warrior_rank.warrior.archetype'),
+                sqla.orm.joinedload('warrior_rank.warrior.types'),
+                sqla.orm.joinedload('warrior_rank.warrior.names'),
+                sqla.orm.joinedload('warrior_rank.warrior.ranks'),
             ))
 
         c.max_links = links_q.all()
