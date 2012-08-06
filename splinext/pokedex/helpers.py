@@ -64,9 +64,9 @@ def make_thingy_url(thingy, subpage=None, controller='dex'):
         else:
             action = action.replace('conquest_', '')
 
-        controller = 'dex_conquest'   
+        controller = 'dex_conquest'
     elif subpage:
-        action += '_' + subpage 
+        action += '_' + subpage
 
     return url(controller=controller,
                action=action,

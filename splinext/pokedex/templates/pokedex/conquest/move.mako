@@ -60,14 +60,14 @@ ${h.h1(u'Effect')}
     <dl>
         <dt>Power</dt>
         <dd>${c.move.conquest_data.power or 'n/a'} ${u'★' * c.move.conquest_data.star_rating}</dd>
-    
+
         <dt>Base accuracy</dt>
-        % if c.move.conquest_data.accuracy: 
+        % if c.move.conquest_data.accuracy:
         <dd>${c.move.conquest_data.accuracy}%</dd>
         % else:
         <dd>n/a</dd>
         % endif
-    
+
         <dt>Effect chance</dt>
         % if c.move.conquest_data.effect_chance:
         <dd>${c.move.conquest_data.effect_chance}%</dd>

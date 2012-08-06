@@ -221,7 +221,7 @@ class PokedexConquestController(PokedexBaseController):
         # total of seven descendents, so it would need to span 7 rows.
         c.evolution_table = []
         # Prefetch the evolution details
-        family = (db.pokedex_session.query(tables.PokemonSpecies) 
+        family = (db.pokedex_session.query(tables.PokemonSpecies)
             .filter(tables.PokemonSpecies.evolution_chain_id ==
                     c.pokemon.evolution_chain_id)
             .options(
