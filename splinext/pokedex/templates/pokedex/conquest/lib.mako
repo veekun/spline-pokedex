@@ -207,8 +207,17 @@ ${h.pokedex.pokedex_img('warriors/{0}/{1}.png'.format(dir, identifier),
 </thead>
 </%def>
 
-<%def name="warrior_table_row(warrior)">
-<td class="warrior-icon">${warrior_image(warrior.ranks[0], 'big-icons')}</td>
+<%def name="warrior_table_row(warrior, ranks=None)">
+<%
+# For performance, if we already /have/ all the ranks, we can pass them here.
+# In particular, this is the case when creating a Pokémon's max link table,
+# because we'll have a link for every rank when we have a link at all; going
+# and getting them again would take another query for each row.
+if ranks is None:
+    ranks = warrior.ranks
+%>
+
+<td class="warrior-icon">${warrior_image(ranks[0], 'big-icons')}</td>
 <td><a href="${url(controller='dex_conquest', action='warriors', name=warrior.name.lower())}">${warrior.name}</a></td>
 <td class="type2">
     % for type in warrior.types:
@@ -216,14 +225,14 @@ ${h.pokedex.pokedex_img('warriors/{0}/{1}.png'.format(dir, identifier),
     % endfor
 </td>
 <td class="ability">
-    % for rank in warrior.ranks:
+    % for rank in ranks:
     % if rank.rank > 1:
     <br />
     % endif
     <a href="${url(controller='dex_conquest', action='skills', name=rank.skill.name.lower())}">${rank.skill.name}</a>
     % endfor
 </td>
-% for stats in zip(*(rank.stats for rank in warrior.ranks)):
+% for stats in zip(*(rank.stats for rank in ranks)):
 ${warrior_table_stat_colgroup(stats)}
 % endfor
 </%def>

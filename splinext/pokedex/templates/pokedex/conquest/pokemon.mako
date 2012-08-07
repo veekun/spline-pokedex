@@ -218,7 +218,7 @@ ${conqlib.warrior_table_header(link_cols=True)}
         % for dummy_rank in range(i, 2):
         <td class="max-link"></td>
         % endfor
-        ${conqlib.warrior_table_row(warrior)}
+        ${conqlib.warrior_table_row(warrior, ranks=[link.warrior_rank for link in max_links])}
     </tr>
     % endfor
 </tbody>

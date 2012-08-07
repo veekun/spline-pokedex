@@ -141,7 +141,14 @@ class PokedexConquestController(PokedexBaseController):
 
     def moves(self, name):
         try:
-            c.move = db.get_by_name_query(tables.Move, name).one()
+            c.move = (db.get_by_name_query(tables.Move, name)
+                .options(
+                    sqla.orm.joinedload('conquest_data'),
+                    sqla.orm.joinedload('conquest_pokemon'),
+                    sqla.orm.subqueryload('conquest_pokemon.conquest_abilities'),
+                    sqla.orm.subqueryload('conquest_pokemon.conquest_stats'),
+                )
+                .one())
         except NoResultFound:
             return self._not_found()
 
@@ -156,9 +163,10 @@ class PokedexConquestController(PokedexBaseController):
 
     def moves_list(self):
         c.moves = (db.pokedex_session.query(tables.Move)
-            .filter(tables.Move.conquest_pokemon.any())
+            .filter(tables.Move.conquest_data.has())
             .options(
-                sqla.orm.eagerload('type')
+                sqla.orm.eagerload('conquest_data'),
+                sqla.orm.eagerload('conquest_data.move_displacement'),
             )
             .join(tables.Move.names_local)
             .order_by(tables.Move.names_table.name.asc())
@@ -170,19 +178,14 @@ class PokedexConquestController(PokedexBaseController):
 
     def pokemon(self, name=None):
         try:
-            pokemon_q = db.pokemon_query(name, None)
-
-            pokemon_q = pokemon_q.options(
-                sqla.orm.eagerload('species'),
-            )
-
-            c.pokemon = pokemon_q.one()
+            c.pokemon = db.pokemon_query(name, None).one()
         except NoResultFound:
             return self._not_found()
 
         c.semiform_pokemon = c.pokemon
         c.pokemon = c.pokemon.species
 
+        # This Pokémon might exist, but not appear in Conquest
         if c.pokemon.conquest_order is None:
             return self._not_found()
 
@@ -391,15 +394,14 @@ class PokedexConquestController(PokedexBaseController):
 
         # Finally, find ALL the max links for these warriors!
         links_q = (c.pokemon.conquest_max_links
-            .join(tables.ConquestWarriorRank)
-            .filter(tables.ConquestWarriorRank.warrior_id.in_(worthy_warriors))
+            .join(ranks_sub)
+            .filter(ranks_sub.warrior_id.in_(worthy_warriors))
             .options(
                 sqla.orm.joinedload('warrior_rank'),
+                sqla.orm.subqueryload('warrior_rank.stats'),
                 sqla.orm.joinedload('warrior_rank.warrior'),
                 sqla.orm.joinedload('warrior_rank.warrior.archetype'),
-                sqla.orm.joinedload('warrior_rank.warrior.types'),
-                sqla.orm.joinedload('warrior_rank.warrior.names'),
-                sqla.orm.joinedload('warrior_rank.warrior.ranks'),
+                sqla.orm.subqueryload('warrior_rank.warrior.types'),
             ))
 
         c.max_links = links_q.all()
@@ -411,10 +413,10 @@ class PokedexConquestController(PokedexBaseController):
         c.pokemon = (db.pokedex_session.query(tables.PokemonSpecies)
             .filter(tables.PokemonSpecies.conquest_order != None)
             .options(
-                sqla.orm.eagerload('conquest_abilities'),
-                sqla.orm.eagerload('conquest_move'),
-                sqla.orm.eagerload('conquest_stats'),
-                sqla.orm.eagerload('default_pokemon.types')
+                sqla.orm.subqueryload('conquest_abilities'),
+                sqla.orm.joinedload('conquest_move'),
+                sqla.orm.subqueryload('conquest_stats'),
+                sqla.orm.subqueryload('default_pokemon.types')
             )
             .order_by(tables.PokemonSpecies.conquest_order)
             .all()
@@ -495,6 +497,11 @@ class PokedexConquestController(PokedexBaseController):
                 .filter(tables.ConquestMaxLink.pokemon_species_id.in_(link_pokemon))
                 .join(tables.PokemonSpecies)
                 .order_by(tables.PokemonSpecies.conquest_order)
+                .options(
+                    sqla.orm.joinedload('pokemon'),
+                    sqla.orm.subqueryload('pokemon.conquest_abilities'),
+                    sqla.orm.subqueryload('pokemon.conquest_stats'),
+                )
                 .all())
 
         c.max_links = izip(*max_links)
