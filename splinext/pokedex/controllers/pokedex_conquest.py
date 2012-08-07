@@ -378,7 +378,7 @@ class PokedexConquestController(PokedexBaseController):
         higher_ranks_exist = (sqla.sql.exists([1])
             .where(sqla.and_(
                 ranks_sub.warrior_id == tables.ConquestWarriorRank.warrior_id,
-                ranks_sub.rank > tables.ConquestWarriorRank.warrior_id))
+                ranks_sub.rank > tables.ConquestWarriorRank.rank))
         )
 
         # Next, find final-rank warriors with a max link high enough.
