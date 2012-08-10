@@ -130,7 +130,7 @@ class PokedexConquestController(PokedexBaseController):
     def kingdoms_list(self):
         c.kingdoms = (db.pokedex_session.query(tables.ConquestKingdom)
             .options(
-                sqla.orm.eagerload('type')
+                sqla.orm.joinedload('type')
             )
             .order_by(tables.ConquestKingdom.id)
             .all()
@@ -165,8 +165,8 @@ class PokedexConquestController(PokedexBaseController):
         c.moves = (db.pokedex_session.query(tables.Move)
             .filter(tables.Move.conquest_data.has())
             .options(
-                sqla.orm.eagerload('conquest_data'),
-                sqla.orm.eagerload('conquest_data.move_displacement'),
+                sqla.orm.joinedload('conquest_data'),
+                sqla.orm.joinedload('conquest_data.move_displacement'),
             )
             .join(tables.Move.names_local)
             .order_by(tables.Move.names_table.name.asc())
@@ -462,8 +462,8 @@ class PokedexConquestController(PokedexBaseController):
         c.generic_skills = skills.filter(generic_clause).all()
         c.unique_skills = (skills.filter(~generic_clause)
             .options(
-                sqla.orm.eagerload('warrior_ranks'),
-                sqla.orm.eagerload('warrior_ranks.warrior')
+                sqla.orm.joinedload('warrior_ranks'),
+                sqla.orm.joinedload('warrior_ranks.warrior')
             )
             .all())
 
@@ -511,11 +511,9 @@ class PokedexConquestController(PokedexBaseController):
     def warriors_list(self):
         c.warriors = (db.pokedex_session.query(tables.ConquestWarrior)
             .options(
-                sqla.orm.eagerload('ranks'),
-                sqla.orm.eagerload('ranks.skill'),
-                sqla.orm.eagerload('ranks.stats'),
-                sqla.orm.eagerload('ranks.stats.stat'),
-                sqla.orm.eagerload('types')
+                sqla.orm.subqueryload('ranks'),
+                sqla.orm.subqueryload('ranks.stats'),
+                sqla.orm.subqueryload('types')
             )
             .order_by(tables.ConquestWarrior.id)
             .all()
