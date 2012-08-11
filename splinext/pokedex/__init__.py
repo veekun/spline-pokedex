@@ -183,6 +183,13 @@ class PokedexPlugin(PluginBase):
                     TranslatablePluginLink(_(u'Pokéball performance'), url(controller='dex_gadgets', action='capture_rate')),
                     TranslatablePluginLink(_(u'Stat calculator'), url(controller='dex_gadgets', action='stat_calculator')),
                 ]),
+                TranslatablePluginLink(_(u'Conquest'), url('/dex/conquest'), children=[
+                    TranslatablePluginLink(_(u'Pokémon'), url(controller='dex_conquest', action='pokemon_list')),
+                    TranslatablePluginLink(_(u'Warriors'), url(controller='dex_conquest', action='warriors_list')),
+                    TranslatablePluginLink(_(u'Abilties'), url(controller='dex_conquest', action='abilities_list')),
+                    TranslatablePluginLink(_(u'Moves'), url(controller='dex_conquest', action='moves_list')),
+                    TranslatablePluginLink(_(u'Warrior Skills'), url(controller='dex_conquest', action='skills_list'))
+                ]),
                 TranslatablePluginLink(_(u'Etc.'), None, children=[
                     TranslatablePluginLink(_(u'Downloads'), url('/dex/downloads')),
                 ]),
