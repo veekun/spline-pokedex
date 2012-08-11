@@ -14,7 +14,7 @@
 </%def>
 
 ${h.h1(_('Warrior list'))}
-<table class="dex-pokemon-moves striped-rows">
+<table class="dex-pokemon-moves dex-warriors striped-rows">
 ${conqlib.warrior_table_columns()}
 ${conqlib.warrior_table_header()}
 
