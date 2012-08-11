@@ -392,6 +392,15 @@ class PokedexConquestController(PokedexBaseController):
             .filter(tables.ConquestMaxLink.pokemon_species_id == c.pokemon.id)
             .filter(tables.ConquestMaxLink.max_link >= c.link_threshold))
 
+        # For Froslass and Gallade, we want to filter out male and female
+        # warriors, respectively.
+        # XXX Eventually we want to figure out all impossible evolutions, and
+        #     show them, but sort them to the bottom and grey them out.
+        if c.pokemon.conquest_evolution.warrior_gender_id is not None:
+            worthy_warriors = worthy_warriors.filter(
+                tables.ConquestWarrior.gender_id ==
+                    c.pokemon.conquest_evolution.warrior_gender_id)
+
         # Finally, find ALL the max links for these warriors!
         links_q = (c.pokemon.conquest_max_links
             .join(ranks_sub)

@@ -70,6 +70,14 @@ ${h.h1(_(u'Flavor'))}
 ${h.h1(_(u'Maximum Links'), id=_(u'max-links'))}
 <p>${c.warrior.name}'s perfect links are highlighted in green.</p>
 
+<p>
+${_(u"""Note that {name} may not actually be able to obtain all these
+Pokémon.  Before setting your heart on a particular Pokémon, check its
+evolution conditions and make sure {name} can actually fulfil them.""").format(
+    name=c.warrior.name,
+)}
+</p>
+
 <p>Only show Pokémon with at least a _% link at Rank __</p>
 
 <table class="dex-pokemon-moves striped-rows">
