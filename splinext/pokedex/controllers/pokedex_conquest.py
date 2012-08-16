@@ -13,7 +13,9 @@ from pylons import request, tmpl_context as c
 from pylons.controllers.util import abort
 import sqlalchemy as sqla
 from sqlalchemy.orm.exc import NoResultFound
+import wtforms
 
+from spline.lib import helpers as h
 from spline.lib.base import render
 
 from splinext.pokedex import PokedexBaseController
@@ -27,6 +29,13 @@ def bar_color(hue, pastelness):
     """
     r, g, b = colorsys.hls_to_rgb(hue, pastelness, pastelness)
     return "#%02x%02x%02x" % (r * 256, g * 256, b * 256)
+
+class LinkThresholdForm(wtforms.Form):
+    """A form for specifying the threshold for max link tables on warrior and
+    Pokémon pages.
+    """
+
+    link = wtforms.DecimalField(places=0, rounding='ROUND_UP')
 
 class PokedexConquestController(PokedexBaseController):
     def _not_found(self):
@@ -369,7 +378,8 @@ class PokedexConquestController(PokedexBaseController):
         # We only want to show warriors who have a max link above a certain
         # threshold, because there are 200 warriors and most of them won't
         # have very good links.
-        c.link_threshold = int(request.params.get('link', 70))
+        c.link_form = LinkThresholdForm(request.params, link=70)
+        c.link_form.validate()
 
         # However, some warriors will only be above this threshold at later
         # ranks.  In these cases, we may as well show all ranks' links.
@@ -390,7 +400,7 @@ class PokedexConquestController(PokedexBaseController):
             .filter(~higher_ranks_exist)
             .join(tables.ConquestMaxLink)
             .filter(tables.ConquestMaxLink.pokemon_species_id == c.pokemon.id)
-            .filter(tables.ConquestMaxLink.max_link >= c.link_threshold))
+            .filter(tables.ConquestMaxLink.max_link >= c.link_form.link.data))
 
         # For Froslass and Gallade, we want to filter out male and female
         # warriors, respectively.
@@ -494,11 +504,15 @@ class PokedexConquestController(PokedexBaseController):
         c.rank_count = len(c.warrior.ranks)
 
         ### Max links
-        c.link_threshold = int(request.params.get('link', 70 if c.warrior.archetype else 90))
+        default_link = 70 if c.warrior.archetype else 90
+
+        c.link_form = LinkThresholdForm(request.params, link=default_link)
+        c.link_form.validate()
+
         link_pokemon = (db.pokedex_session.query(tables.ConquestMaxLink.pokemon_species_id)
             .filter(tables.ConquestMaxLink.warrior_rank_id ==
                     c.warrior.ranks[-1].id)
-            .filter(tables.ConquestMaxLink.max_link >= c.link_threshold))
+            .filter(tables.ConquestMaxLink.max_link >= c.link_form.link.data))
 
         max_links = []
         for rank in c.warrior.ranks:

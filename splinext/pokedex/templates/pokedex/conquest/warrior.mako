@@ -78,7 +78,16 @@ evolution conditions and make sure {name} can actually fulfil them.""").format(
 )}
 </p>
 
-<p>Only show Pokémon with at least a _% link at Rank __</p>
+<form id="link-threshold" method="GET" action="${url.current()}#${_(u'max-links')}">
+<p>
+    Only show Pokémon with at least a ${c.link_form.link(size=3)}% link.
+    <button type="submit">Go!</button>
+</p>
+
+% for error in c.link_form.link.errors:
+<p class="error">${error}</p>
+% endfor
+</form>
 
 <table class="dex-pokemon-moves striped-rows">
 ${conqlib.pokemon_table_columns(link_cols=c.rank_count)}

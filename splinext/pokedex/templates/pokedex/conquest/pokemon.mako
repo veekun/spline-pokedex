@@ -199,9 +199,16 @@ ${h.h1(_('Stats'))}
 
 
 ${h.h1(_(u'Warrior Links'), id=_(u'max-links'))}
-<p>Only show warriors with at least a
-<input type="text" size="3" value="${c.link_threshold}" id="dex-pokemon-conquest-link-threshold">%
-link</p>
+<form id="link-threshold" method="GET" action="${url.current()}#${_(u'max-links')}">
+<p>
+    Only show warriors with at least a ${c.link_form.link(size=3)}% link.
+    <button type="submit">Go!</button>
+</p>
+
+% for error in c.link_form.link.errors:
+<p class="error">${error}</p>
+% endfor
+</form>
 
 <table class="dex-pokemon-moves dex-warriors striped-rows">
 <colgroup span="3"></colgroup>
