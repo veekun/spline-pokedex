@@ -406,7 +406,8 @@ class PokedexConquestController(PokedexBaseController):
         # warriors, respectively.
         # XXX Eventually we want to figure out all impossible evolutions, and
         #     show them, but sort them to the bottom and grey them out.
-        if c.pokemon.conquest_evolution.warrior_gender_id is not None:
+        if (c.pokemon.conquest_evolution is not None and
+          c.pokemon.conquest_evolution.warrior_gender_id is not None):
             worthy_warriors = worthy_warriors.filter(
                 tables.ConquestWarrior.gender_id ==
                     c.pokemon.conquest_evolution.warrior_gender_id)
