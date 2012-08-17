@@ -43,9 +43,12 @@ ${h.h1(u'Essentials')}
 
 ${h.h1(u'Warriors')}
 <table class="striped-rows dex-pokemon-moves dex-warriors">
-${conqlib.warrior_rank_table_head()}
+${conqlib.warrior_table_columns()}
+${conqlib.warrior_table_header()}
 
-% for warrior in c.skill.warrior_ranks:
-${conqlib.warrior_rank_table_row(warrior)}
+% for warrior_rank in c.skill.warrior_ranks:
+<tr>
+    ${conqlib.warrior_table_row(warrior_rank.warrior, icon_rank=warrior_rank.rank)}
+</tr>
 % endfor
 </table>

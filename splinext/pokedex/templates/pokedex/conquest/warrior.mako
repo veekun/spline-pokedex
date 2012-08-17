@@ -20,15 +20,15 @@ ${_(u'{name} - Warriors - Pokémon Conquest').format(name=c.warrior.name)}
 <div id="dex-header">
     <a href="${url.current(name=c.prev_warrior.name.lower())}" id="dex-header-prev" class="dex-box-link">
         <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
-        ${conqlib.warrior_image(c.prev_warrior.ranks[0], 'small-icons')}
+        ${conqlib.warrior_image(c.prev_warrior, 'small-icons')}
         ${c.prev_warrior.name}
     </a>
     <a href="${url.current(name=c.next_warrior.name.lower())}" id="dex-header-next" class="dex-box-link">
         ${c.next_warrior.name}
-        ${conqlib.warrior_image(c.next_warrior.ranks[0], 'small-icons')}
+        ${conqlib.warrior_image(c.next_warrior, 'small-icons')}
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
-    ${conqlib.warrior_image(c.warrior.ranks[0], 'big-icons')}<br />
+    ${conqlib.warrior_image(c.warrior, 'big-icons')}<br />
     ${c.warrior.name}
 </div>
 
@@ -37,8 +37,8 @@ ${h.h1(_('Essentials'))}
 ## Portrait block
 <div class="dex-page-portrait dex-warrior-portrait">
     <p id="dex-page-name">${c.warrior.name}</p>
-    <div id="dex-warrior-portrait-sprite">
-        ${conqlib.warrior_image(c.warrior.ranks[0], 'portraits')}
+    <div class="dex-warrior-portrait-sprite">
+        ${conqlib.warrior_image(c.warrior, 'portraits')}
     </div>
     <p id="dex-page-types">
         % for type in c.warrior.types:

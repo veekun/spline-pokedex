@@ -50,14 +50,14 @@ ${h.h1(_(u'Skill list'))}
         <td class="markdown effect"><p>No effects yet.</p></td>
         <%
         if len(skill.warrior_ranks) == 2:
-            warrior = skill.warrior_ranks[c.player_index]
+            rank = skill.warrior_ranks[c.player_index]
             name = _(u'Player')
         else:
-            warrior, = skill.warrior_ranks
-            name = warrior.warrior.name
+            rank, = skill.warrior_ranks
+            name = rank.warrior.name
         %>
-        <td>${conqlib.warrior_image(warrior, 'small-icons')}</td>
-        <td><a href="${url(controller='dex_conquest', action='warriors', name=warrior.warrior.name.lower())}">${name}</a></td>
+        <td>${conqlib.warrior_image(rank.warrior, 'small-icons', rank=rank.rank)}</td>
+        <td><a href="${url(controller='dex_conquest', action='warriors', name=rank.warrior.name.lower())}">${name}</a></td>
     </tr>
     % endfor
 </tbody>

@@ -152,21 +152,33 @@ ${h.pokedex.pokedex_img('chrome/conquest-move-ranges/{0}.png'.format(identifier)
 </%def>
 
 
-<%def name="warrior_image(warrior_rank, dir)">
+<%def name="warrior_image(warrior, dir, rank=None, attr=None)">
 <%
-if warrior_rank.warrior.archetype:
-    identifier = warrior_rank.warrior.archetype.identifier
-else:
-    identifier = '{0}-{1}'.format(warrior_rank.warrior.identifier, warrior_rank.rank)
+if rank is None:
+    if warrior.identifier == 'nobunaga':
+        rank = 2
+    else:
+        rank = 1
 
-attr = {}
+if attr is None:
+    attr = {}
+
+if warrior.archetype:
+    identifier = warrior.archetype.identifier
+    attr['alt'] = attr['title'] = identifier
+else:
+    identifier = '{0}-{1}'.format(warrior.identifier, rank)
+    attr['alt'] = attr['title'] = u'Rank {rank} {name}'.format(
+        rank=h.pokedex.conquest_rank_label[rank],
+        name=warrior.name
+    )
+
 if dir == 'small-icons':
     attr['class'] = 'warrior-icon-small'
 elif dir == 'big-icons':
     attr['class'] = 'warrior-icon-big'
 %>
-${h.pokedex.pokedex_img('warriors/{0}/{1}.png'.format(dir, identifier),
-                        alt=identifier, title=identifier, **attr)}
+${h.pokedex.pokedex_img('warriors/{0}/{1}.png'.format(dir, identifier), **attr)}
 </%def>
 
 <%def name="warrior_table_columns()">
@@ -213,7 +225,7 @@ ${h.pokedex.pokedex_img('warriors/{0}/{1}.png'.format(dir, identifier),
 </thead>
 </%def>
 
-<%def name="warrior_table_row(warrior, ranks=None)">
+<%def name="warrior_table_row(warrior, icon_rank=None, ranks=None)">
 <%
 # For performance, if we already /have/ all the ranks, we can pass them here.
 # In particular, this is the case when creating a Pokémon's max link table,
@@ -223,7 +235,7 @@ if ranks is None:
     ranks = warrior.ranks
 %>
 
-<td class="warrior-icon">${warrior_image(ranks[0], 'big-icons')}</td>
+<td class="warrior-icon">${warrior_image(warrior, 'big-icons', rank=icon_rank)}</td>
 <td><a href="${url(controller='dex_conquest', action='warriors', name=warrior.name.lower())}">${warrior.name}</a></td>
 <td class="type2">
     % for type in warrior.types:
@@ -278,23 +290,4 @@ ${warrior_table_stat_colgroup(stats)}
         <th>Capacity</th>
     </tr>
 </thead>
-</%def>
-
-<%def name="warrior_rank_table_row(rank)">
-<tr>
-    <td class="warrior-icon">${warrior_image(rank, 'big-icons')}</td>
-    <td><a href="${url(controller='dex_conquest', action='warriors', name=rank.warrior.name.lower())}">${rank.warrior.name}</a></td>
-    <td>${h.pokedex.conquest_rank_label[rank.rank]}</td>
-    <td class="type2">
-        % for type in rank.warrior.types:
-        ${h.pokedex.type_link(type)}
-        % endfor
-    </td>
-    <td class="ability">
-        <a href="${url(controller='dex_conquest', action='skills', name=rank.skill.name.lower())}">${rank.skill.name}</a>
-    </td>
-    % for stat in rank.stats:
-    <td>${stat.base_stat}</td>
-    % endfor
-</tr>
 </%def>
