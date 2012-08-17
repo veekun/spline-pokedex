@@ -27,6 +27,13 @@ ${_(u'{name} - Abilities - Pokémon Conquest').format(name=c.ability.name)}
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
     ${c.ability.name}
+
+    % if c.ability.effect:
+    <ul class="inline-menu">
+        <li><a href="${url(controller='dex', action='abilities', name=c.ability.name.lower())}">Main</a></li>
+        <li>${_(u'Conquest')}</li>
+    </ul>
+    % endif
 </div>
 
 

@@ -12,8 +12,14 @@
     </a>
     ${h.pokedex.species_image(c.pokemon, prefix='icons')}
     <br />${c.pokemon.conquest_order}: ${c.pokemon.name}
-    <ul class="inline-menu">
 
+    <ul class="inline-menu">
+    % for action, label in (('pokemon', u'Pokédex'), \
+                            ('pokemon_flavor', u'Flavor'), \
+                            ('pokemon_locations', u'Locations')):
+        <li><a href="${url(controller='dex', action=action, name=c.pokemon.name.lower())}">${label}</a></li>
+    % endfor
+        <li>${_(u'Conquest')}</li>
     </ul>
 </div>
 </%def>
