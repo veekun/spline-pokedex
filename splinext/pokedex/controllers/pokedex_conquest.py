@@ -502,6 +502,50 @@ class PokedexConquestController(PokedexBaseController):
 
         c.rank_count = len(c.warrior.ranks)
 
+        ### Stats
+        # Percentiles!  Percentiles are hard.
+        stats = tables.ConquestWarriorRankStatMap
+        all_stats = sqla.orm.aliased(tables.ConquestWarriorRankStatMap)
+
+        # We need this to be a float so the percentile equation can divide by it
+        stat_count = sqla.cast(sqla.func.count(all_stats.base_stat),
+            sqla.types.FLOAT)
+
+        # Grab all of a rank's stats, and also get percentiles
+        stat_q = (db.pokedex_session.query(stats.warrior_stat_id, stats.base_stat)
+            .join(all_stats, stats.warrior_stat_id == all_stats.warrior_stat_id)
+            .group_by(stats.warrior_rank_id, stats.warrior_stat_id,
+                      stats.base_stat)
+            .order_by(stats.warrior_stat_id)
+            .add_columns(
+                sqla.func.sum(sqla.cast(stats.base_stat > all_stats.base_stat,
+                    sqla.types.INT)) / stat_count +
+                sqla.func.sum(sqla.cast(stats.base_stat == all_stats.base_stat,
+                    sqla.types.INT)) / stat_count / 2
+            )
+        )
+
+        # XXX There's probably a better way to query all the names
+        stat_names = [stat.name for stat in
+            db.pokedex_session.query(tables.ConquestWarriorStat)
+            .order_by(tables.ConquestWarriorStat.id)
+            .all()]
+
+        # Go through the query for each rank
+        c.stats = []
+        for rank in c.warrior.ranks:
+            c.stats.append([])
+            info = stat_q.filter(stats.warrior_rank_id == rank.id).all()
+
+            # We need a bit more info than what the query directly provides
+            for stat, value, percentile in info:
+                percentile = float(percentile)
+                c.stats[-1].append((
+                    stat_names[stat - 1], value, percentile,
+                    bar_color(percentile, 0.9), bar_color(percentile, 0.8)
+                ))
+
+
         ### Max links
         default_link = 70 if c.warrior.archetype else 90
 

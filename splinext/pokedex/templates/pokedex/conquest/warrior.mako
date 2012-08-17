@@ -74,6 +74,44 @@ ${h.h1(_('Essentials'))}
 </div>
 
 
+${h.h1(_(u'Stats'))}
+% for n, rank in enumerate(c.stats):
+% if c.rank_count > 1:
+<h2>${_(u'Rank {0}').format(h.pokedex.conquest_rank_label[n + 1])}</h2>
+% endif
+
+<table class="dex-pokemon-stats">  <!-- Well, sort of... -->
+<colgroup>
+    <col class="dex-col-stat-name">
+    <col class="dex-col-stat-bar">
+    <col class="dex-col-stat-pctile">
+</colgroup>
+
+<thead>
+    <tr class="header-row">
+        <th><!-- stat name --></th>
+        <th><!-- bar and value --></th>
+        <th><abbr title="${_(u"Percentile rank")}">${_(u"Pctile")}</abbr></th>
+    </tr>
+</thead>
+
+<tbody>
+% for stat, value, percentile, color, border in rank:
+    <tr class="color1">
+        <th>${stat}</th>
+        <td>
+            <div class="dex-pokemon-stats-bar-container">
+                <div class="dex-pokemon-stats-bar" style="margin-right: ${(1 - percentile) * 100}%; background-color: ${color}; border-color: ${border};">${value}</div>
+            </div>
+        </td>
+        <td class="dex-pokemon-stats-pctile">${round(percentile * 100, 1)}</td>
+    </tr>
+% endfor
+</tbody>
+</table>
+% endfor
+
+
 ${h.h1(_(u'Maximum Links'), id=_(u'max-links'))}
 <p>${c.warrior.name}'s perfect links are highlighted in green.</p>
 
