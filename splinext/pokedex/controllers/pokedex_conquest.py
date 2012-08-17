@@ -105,8 +105,6 @@ class PokedexConquestController(PokedexBaseController):
         if not c.ability.conquest_pokemon:
             return self._not_found()
 
-        print(dir(tables.Ability.pokemon))
-
         c.prev_ability, c.next_ability = self._prev_next_name(
             tables.Ability, c.ability,
             filters=[tables.Ability.conquest_pokemon.any()])

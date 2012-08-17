@@ -1,7 +1,6 @@
 <%inherit file="/base.mako"/>
 
 <%! from splinext.pokedex import i18n %>
-<% print c.prev_kingdom %>
 <%def name="title()">
 ${_(u'{name} - Kingdoms - Pokémon Conquest').format(name=c.kingdom.name)}
 </%def>
