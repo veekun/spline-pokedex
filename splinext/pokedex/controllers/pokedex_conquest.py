@@ -328,8 +328,8 @@ class PokedexConquestController(PokedexBaseController):
         c.stats = {}  # stat => { border, background, percentile }
         stat_total = 0
         total_stat_rows = db.pokedex_session.query(tables.ConquestPokemonStat) \
-                                         .filter_by(stat=c.pokemon.conquest_stats[0].stat) \
-                                         .count()
+            .filter_by(stat=c.pokemon.conquest_stats[0].stat) \
+            .count()
         for pokemon_stat in c.pokemon.conquest_stats:
             stat_info = c.stats[pokemon_stat.stat.identifier] = {}
 
@@ -340,10 +340,10 @@ class PokedexConquestController(PokedexBaseController):
 
             q = db.pokedex_session.query(tables.ConquestPokemonStat) \
                                .filter_by(stat=pokemon_stat.stat)
-            less = q.filter(tables.ConquestPokemonStat.base_stat < pokemon_stat.base_stat) \
-                    .count()
-            equal = q.filter(tables.ConquestPokemonStat.base_stat == pokemon_stat.base_stat) \
-                     .count()
+            less = q.filter(tables.ConquestPokemonStat.base_stat <
+                            pokemon_stat.base_stat).count()
+            equal = q.filter(tables.ConquestPokemonStat.base_stat ==
+                             pokemon_stat.base_stat).count()
             percentile = (less + equal * 0.5) / total_stat_rows
             stat_info['percentile'] = percentile
 
@@ -558,15 +558,18 @@ class PokedexConquestController(PokedexBaseController):
         c.link_form = LinkThresholdForm(request.params, link=default_link)
         c.link_form.validate()
 
-        link_pokemon = (db.pokedex_session.query(tables.ConquestMaxLink.pokemon_species_id)
+        link_pokemon = (
+            db.pokedex_session.query(tables.ConquestMaxLink.pokemon_species_id)
             .filter(tables.ConquestMaxLink.warrior_rank_id ==
                     c.warrior.ranks[-1].id)
-            .filter(tables.ConquestMaxLink.max_link >= c.link_form.link.data))
+            .filter(tables.ConquestMaxLink.max_link >= c.link_form.link.data)
+        )
 
         max_links = []
         for rank in c.warrior.ranks:
             max_links.append(rank.max_links
-                .filter(tables.ConquestMaxLink.pokemon_species_id.in_(link_pokemon))
+                .filter(tables.ConquestMaxLink.pokemon_species_id
+                        .in_(link_pokemon))
                 .join(tables.PokemonSpecies)
                 .order_by(tables.PokemonSpecies.conquest_order)
                 .options(
