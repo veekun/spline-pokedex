@@ -103,7 +103,7 @@
     <th><abbr title="Speed">Spd</abbr></th>
     <th>Total</th>
 </tr>
-% if link_cols:
+% if link_cols > 1:
 <tr class="subheader-row conquest-subheader-row">
     % for rank in range(1, link_cols + 1):
     <th>${h.pokedex.conquest_rank_label[rank]}</th>
