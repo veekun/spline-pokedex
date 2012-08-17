@@ -60,6 +60,11 @@ ${h.h1(_('Essentials'))}
 % endfor
 </dl>
 
+<h2>${_(u'Perfect Links')}</h2>
+% for link in c.perfect_links:
+<span class="sprite-icon sprite-icon-${link.pokemon_species_id}"></span>\
+% endfor
+
 % if c.rank_count > 1:
 <h2>${_(u'Warrior Transformation')}</h2>
 <dl>

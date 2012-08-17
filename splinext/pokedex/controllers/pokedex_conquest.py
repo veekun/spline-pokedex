@@ -502,6 +502,12 @@ class PokedexConquestController(PokedexBaseController):
 
         c.rank_count = len(c.warrior.ranks)
 
+        c.perfect_links = (c.warrior.ranks[-1].max_links
+            .filter_by(max_link=100)
+            .join(tables.PokemonSpecies)
+            .order_by(tables.PokemonSpecies.conquest_order)
+            .all())
+
         ### Stats
         # Percentiles!  Percentiles are hard.
         stats = tables.ConquestWarriorRankStatMap
