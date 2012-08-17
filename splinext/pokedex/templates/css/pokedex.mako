@@ -317,6 +317,18 @@ ul#dex-item-pockets { text-align: center; }
 ul#dex-item-pockets li { display: inline-block; }
 ul#dex-item-pockets li img { padding: 4px; }
 
+/* Conquest Pokémon page -- move dl */
+dl.dex-conquest-pokemon-move dt { float: none; clear: none; width: auto; text-align: right; margin-left: 1em; margin-right: 0; display: inline-block; vertical-align: middle; }
+dl.dex-conquest-pokemon-move dd { padding-left: 0; display: inline-block; vertical-align: middle;}
+dl.dex-conquest-pokemon-move dd:after { display: none; }
+dl.dex-conquest-pokemon-move dt.dex-cpm-name,
+dl.dex-conquest-pokemon-move dt.dex-cpm-type,
+dl.dex-conquest-pokemon-move dt.dex-cpm-range { display: none; }
+dd.dex-cpm-type, dd.dex-cpm-range { margin: auto 1px auto 0; }
+/* Make the name pretend to be a dt */
+dd.dex-cpm-name { width: 11.5em; text-align: right; padding-left: 0; }
+dl.dex-conquest-pokemon-move dd.dex-cpm-name:after { display: inline; content: ':'; visibility: visible; }
+
 /* Conquest move page -- range diagram */
 .dex-conquest-move-range { float: right; margin-right: 1.5em; margin-left: 0.5em; }
 

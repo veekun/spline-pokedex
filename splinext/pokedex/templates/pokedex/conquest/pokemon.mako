@@ -41,7 +41,30 @@ ${h.h1(_('Essentials'))}
 
 <div class="dex-page-beside-portrait">
 <h2>${_(u'Move')}</h2>
-${c.pokemon.conquest_move.name}
+<% move = c.pokemon.conquest_move %>
+<dl class="dex-conquest-pokemon-move">
+    <dt class="dex-cpm-name">Name</dt>
+    <dd class="dex-cpm-name"><a href="${url(controller='dex_conquest', action='moves', name=move.name.lower())}">${move.name}</a></dd>
+
+    <dt class="dex-cpm-type">Type</dt>
+    <dd class="dex-cpm-type">${h.pokedex.type_link(move.type)}</dd>
+
+    <dt class="dex-cpm-range">Range</dt>
+    <dd class="dex-cpm-range">${conqlib.range_image(move)}</dd>
+
+    <dt class="dex-cpm-power">Power</dt>
+    <dd>${move.conquest_data.power or '—'} ${u'★' * move.conquest_data.star_rating}</dd>
+
+    <dt class="dex-cpm-accuracy">Accuracy</dt>
+    % if move.conquest_data.accuracy is not None:
+    <dd>${move.conquest_data.accuracy}%</dd>
+    % else:
+    <dd>—</dd>
+    % endif
+
+    <dt class="dex-cpm-effect">Effect</dt>
+    <dd>${move.conquest_data.short_effect.as_text()}</dd>
+</dl>
 
 <h2>${_(u'Abilities')}</h2>
 <dl class="pokemon-abilities">
@@ -62,7 +85,7 @@ ${c.pokemon.conquest_move.name}
     % endfor
 </ul>
 </div>
-</div>
+
 
 ${h.h1(_('Evolution'))}
 <table class="dex-evolution-chain">
