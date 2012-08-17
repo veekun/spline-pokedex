@@ -53,7 +53,7 @@ ${h.h1(_('Essentials'))}
     <dd class="dex-cpm-range">${conqlib.range_image(move)}</dd>
 
     <dt class="dex-cpm-power">Power</dt>
-    <dd>${move.conquest_data.power or '—'} ${u'★' * move.conquest_data.star_rating}</dd>
+    <dd>${move.conquest_data.power or u'—'} ${u'★' * move.conquest_data.star_rating}</dd>
 
     <dt class="dex-cpm-accuracy">Accuracy</dt>
     % if move.conquest_data.accuracy is not None:
