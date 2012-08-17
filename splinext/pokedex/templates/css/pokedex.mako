@@ -166,7 +166,7 @@ p#dex-page-name { font-size: 2em; margin: 0.12em 0; }
 
 .dex-warrior-portrait { min-width: 176px; margin: auto 0.33em; }
 #dex-pokemon-conquest-portrait-sprite { height: 128px; width: 128px; margin: 0.33em auto; padding: 7px; line-height: 128px; vertical-align: middle; text-align: center; background: url(${h.static_uri('pokedex', 'images/sprite-frame-conquest.png')}) center center no-repeat; }
-#dex-warrior-portrait-sprite { height: 168px; width: 176px; margin: 0.33em 0; padding: 4px 0; background: url(${h.static_uri('pokedex', 'images/sprite-frame-conquest-warrior.png')}) center center no-repeat; }
+.dex-warrior-portrait-sprite { height: 168px; width: 176px; margin: 0.33em 0; padding: 4px 0; background: url(${h.static_uri('pokedex', 'images/sprite-frame-conquest-warrior.png')}) center center no-repeat; }
 
 /* List of types with damage (or whatever) below */
 ul.dex-type-list { overflow: hidden /* new float context */; margin-bottom: 2em; }
