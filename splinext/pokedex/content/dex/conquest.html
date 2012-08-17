@@ -1,0 +1,70 @@
+<%inherit file="/base.mako" />
+<%! from splinext.pokedex import i18n %>
+
+<%def name="title()">${_(u'Pokémon Conquest - Pokédex')}</%def>
+
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url('/' + _('dex'))}">${_(u"Pokédex")}</a></li>
+    <li>Conquest</li>
+</ul>
+</%def>
+
+${h.h1(_(u'Pokémon Conquest'))}
+
+<p>${_(u"""For the first time in veekun history, we* are attempting to
+investigate a spinoff game: <i>Pokémon Conquest</i>.  This may not be as
+complete as some other sites in some areas, but in the true spirit of veekun,
+virtually everything is ripped straight from the game's innards so you can be
+sure it's accurate** and everything is presented very prettily.""") | n}</p>
+
+<p>${_(u"""Here's what we have so far:""")}</p>
+
+<ul class='classic-list'>
+    <li>
+        <a href="${url(controller='dex_conquest', action='pokemon_list')}">${_(u'Pokémon')}</a>,
+        ${_(u'including stuff the game tells you, plus evolution methods, precise stats, and maximum links with warriors')}
+    </li>
+
+    <li>
+        <a href="${url(controller='dex_conquest', action='warriors_list')}">${_(u'Warriors')}</a>,
+        ${_(u'including stuff the game tells you, plus rank-up methods and maximum links with Pokémon')}
+    </li>
+
+    <li>
+        <a href="${url(controller='dex_conquest', action='moves_list')}">${_(u'Moves')}</a>,
+        ${_(u'including their stats and effects, not finished but in more detail than the game provides')}
+    </li>
+
+    <li>
+        <a href="${url(controller='dex_conquest', action='abilities_list')}">${_(u'Abilities')}</a>,
+        ${_(u'but with no information other than which Pokémon have them')}
+    </li>
+
+    <li>
+        <a href="${url(controller='dex_conquest', action='skills_list')}">${_(u'Warrior skills')}</a>,
+        ${_(u'but with no more information than abilities')}
+    </li>
+</ul>
+
+<p>${_(u"""You can also get to all these lists from the Pokédex menu.
+Everything's in the lookup, too; if you want to go straight to the Conquest
+page for something that also exists in the main series, you'll have to tack
+<code>conquest</code> on the end, e.g. <code>eevee conquest</code>.""") | n}
+</p>
+
+<p>${_(u"""The plan from here is to write effects for abilities and warrior
+skills, figure out how to rip locations for stuff, and get whatever other data
+we're probably forgetting.  Maaaaybe investigate and write in detail about
+mechanics like stats and damage and link gain, if people still care about this
+game enough when we get there.""")}</p>
+
+<hr />
+
+<p>${_(u"""* And by "we", I mean me: Zhorken.  Eevee's busy writing veekun 8
+and I'm pretty sure he hasn't even played the game.  But it's still
+<em>vee</em>kun, and leaving him out on his own site just feels weird.  I can
+feel his enormous anime critter eyes boring into my soul.""") | n}
+<br />
+${_(u"""** Just don't ask us where we got our main-series Gen III–IV tutor
+moves.""")}</p>

@@ -220,6 +220,10 @@ class PokedexController(PokedexBaseController):
         tables.PokemonSpecies: u'Pokémon',
         tables.PokemonForm: u'Pokémon form',
         tables.Type: 'type',
+
+        tables.ConquestKingdom: u'Conquest kingdom',
+        tables.ConquestWarrior: u'Conquest warrior',
+        tables.ConquestWarriorSkill: u'Conquest warrior skill',
     }
 
     # Dict of method identifier => icon path
@@ -311,6 +315,10 @@ class PokedexController(PokedexBaseController):
             c.subpage = 'locations'
             valid_types = [u'pokemon_species', u'pokemon_forms']
             name = re.sub('(?i) locations$', '', name)
+        elif lookup.endswith(u' conquest'):
+            c.subpage = 'conquest'
+            valid_types = [u'pokemon_species', u'moves', u'abilities']
+            name = re.sub('(?i) conquest$', '', name)
 
         results = db.pokedex_lookup.lookup(name, valid_types=valid_types)
 
@@ -689,6 +697,7 @@ class PokedexController(PokedexBaseController):
                 joinedload('evolutions.location'),
                 joinedload('evolutions.known_move'),
                 joinedload('evolutions.party_species'),
+                joinedload('evolutions.gender'),
                 joinedload('parent_species'),
                 joinedload('default_form'),
             ) \
@@ -1606,6 +1615,7 @@ class PokedexController(PokedexBaseController):
     def abilities_list(sef):
         c.abilities = db.pokedex_session.query(tables.Ability) \
             .join(tables.Ability.names_local) \
+            .filter(tables.Ability.prose.any()) \
             .options(eagerload('prose.short_effect')) \
             .order_by(tables.Ability.generation_id.asc(),
                 tables.Ability.names_table.name.asc()) \
@@ -1614,7 +1624,10 @@ class PokedexController(PokedexBaseController):
 
     def abilities(self, name):
         try:
-            c.ability = db.get_by_name_query(tables.Ability, name).one()
+            # Make sure that any ability we get has a main-series effect
+            c.ability = (db.get_by_name_query(tables.Ability, name)
+                .filter(tables.Ability.prose.any())
+                .one())
         except NoResultFound:
             return self._not_found()
 
@@ -1622,6 +1635,7 @@ class PokedexController(PokedexBaseController):
         c.prev_ability, c.next_ability = self._prev_next(
                 table=tables.Ability,
                 current=c.ability,
+                filters=[tables.Ability.prose.any()],
             )
 
         return self.cache_content(

@@ -23,6 +23,13 @@
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
     ${c.ability.name}
+
+    % if c.ability.conquest_pokemon:
+    <ul class="inline-menu">
+        <li>Main</li>
+        <li><a href="${url(controller='dex_conquest', action='abilities', name=c.ability.name.lower())}">Conquest</a></li>
+    </ul>
+    % endif
 </div>
 
 

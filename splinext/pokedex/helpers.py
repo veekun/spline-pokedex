@@ -27,7 +27,7 @@ from splinext.pokedex.i18n import NullTranslator
 # to this:
 _ = NullTranslator()
 
-def make_thingy_url(thingy, subpage=None):
+def make_thingy_url(thingy, subpage=None, controller='dex'):
     u"""Given a thingy (Pokémon, move, type, whatever), returns a URL to it.
     """
     # Using the table name as an action directly looks kinda gross, but I can't
@@ -50,14 +50,25 @@ def make_thingy_url(thingy, subpage=None):
         action = thingy.__tablename__
         args['name'] = thingy.name.lower()
 
+
     # Items are split up by pocket
     if isinstance(thingy, tables.Item):
         args['pocket'] = thingy.pocket.identifier
 
-    if subpage:
+    if (thingy.__tablename__.startswith('conquest_')
+       or (isinstance(thingy, tables.Ability) and thingy.effect is None)
+       or subpage == 'conquest'):
+        # Conquest stuff needs to go to the Conquest controller
+        if action == 'conquest_warrior_skills':
+            action = 'skills'
+        else:
+            action = action.replace('conquest_', '')
+
+        controller = 'dex_conquest'
+    elif subpage:
         action += '_' + subpage
 
-    return url(controller='dex',
+    return url(controller=controller,
                action=action,
                **args)
 
@@ -436,6 +447,12 @@ gender_rate_label = {
     8: _(u'always female'),
 }
 
+conquest_rank_label = {
+    1: 'I',
+    2: 'II',
+    3: 'III'
+}
+
 def article(noun, _=_):
     """Returns 'a' or 'an', as appropriate."""
     if noun[0].lower() in u'aeiou':
@@ -467,8 +484,8 @@ def evolution_description(evolution, _=_):
         chunks.append(_(u'Do something'))
 
     # Conditions
-    if evolution.gender:
-        chunks.append(_(u"{0}s only").format(evolution.gender))
+    if evolution.gender_id:
+        chunks.append(_(u"{0}s only").format(evolution.gender.identifier))
     if evolution.time_of_day:
         chunks.append(_(u"during the {0}").format(evolution.time_of_day))
     if evolution.minimum_level:
@@ -509,6 +526,110 @@ def evolution_description(evolution, _=_):
             pokemon_link(evolution.trade_species.default_pokemon, include_icon=False)))
 
     return h.literal(u', ').join(chunks)
+
+def conquest_evolution_description(evolution, _=_):
+    """Crafts a human-readable description from a `conquest_pokemon_evolution`
+    row object.
+    """
+    chunks = []
+
+    # Trigger
+    if evolution.recruiting_ko_required:
+        chunks.append('Score a KO that makes a warrior offer to join your army')
+    elif evolution.item_id is not None:
+        chunks.append('Win a battle')
+    else:
+        chunks.append('Perform any action')
+
+    # Conditions
+    if evolution.kingdom_id is not None:
+        chunks.append(h.literal(_(u'in {0}')).format(
+            h.HTML.a(evolution.kingdom.name,
+                href=url(controller='dex_conquest', action='kingdoms',
+                         name=evolution.kingdom.name.lower()))))
+    if evolution.item_id is not None:
+        chunks.append(h.literal(_(u'with {article} {item} equipped')).format(
+            article=article(evolution.item.name),
+            item=item_link(evolution.item, include_icon=False)))
+    if evolution.required_stat_id is not None:
+        chunks.append(_(u'with at least {number} {stat} afterwards').format(
+            number=evolution.minimum_stat,
+            stat=evolution.stat.name))
+    if evolution.minimum_link is not None:
+        chunks.append(_(u'with at least {0}% link afterwards').format(
+            evolution.minimum_link))
+    if evolution.warrior_gender_id is not None:
+        chunks.append(_(u'{0} warriors only').format(evolution.gender.identifier))
+
+    return h.literal(u', ').join(chunks)
+
+def conquest_transformation_description(tform, _=_):
+    """Crafts a human-readable description from a
+    `conquest_warrior_transformation' row object.
+    """
+    # Dumb tricks for saving characters; this has a lot of big awkward lines
+    def link(thing):
+        return h.HTML.a(thing.name, href=make_thingy_url(thing,
+            controller='dex_conquest'))
+    lit = h.literal
+
+    chunks = []
+
+    # Triggers
+    if tform.is_automatic:
+        chunks.append(_(u'Automatically happens in-story'))
+    elif tform.required_link is not None:
+        if tform.pokemon[0].identifier == 'eevee':
+            pokemon = lit(_(u'{0} or any of its evolutions')).format(
+                link(tform.pokemon[0]))
+        else:
+            pokemon = lit(_(u' or ')).join(link(p) for p in tform.pokemon)
+
+        chunks.append(lit(_(u'Reach at least {link}% link with {pokemon}'))
+            .format(link=tform.required_link, pokemon=pokemon))
+
+    # Conditions
+    if tform.completed_episode_id is not None:
+        warrior = tform.completed_episode.warriors[0]
+        if warrior != tform.warrior_rank.warrior:
+            warrior = link(warrior)
+        else:
+            warrior = warrior.name
+
+        chunks.append(lit(_(u'after completing {warrior}\'s episode, "{name}"'))
+            .format(warrior=warrior, name=tform.completed_episode.name))
+    elif tform.current_episode_id is not None:
+        if tform.current_episode.warriors[0].identifier == 'player-m':
+            warrior = _(u'the player')
+        else:
+            warrior = tform.current_episode.warriors[0].name
+
+        chunks.append(_(u'during {warrior}\'s episode, "{name}"')
+            .format(
+                warrior=warrior,
+                name=tform.current_episode.name
+            ))
+    elif tform.distant_warrior_id is not None:
+        chunks.append(lit(_(u'with {0} in the army but not in the same kingdom '
+            u'or any adjacent kingdom')).format(link(tform.distant_warrior)))
+    elif tform.present_warriors:
+        chunks.append(h.literal(_(u'with {0} in the same kingdom'))
+            .format(lit(_(u' and ')).join(link(warrior) for warrior in
+                                          tform.present_warriors)))
+    elif tform.female_warlord_count is not None:
+        chunks.append(_(u'with at least {0} female warlords in the same kingdom')
+            .format(tform.female_warlord_count))
+    elif tform.pokemon_count is not None:
+        chunks.append(_(u'with at least {0} Pokémon in the gallery')
+            .format(tform.pokemon_count))
+    elif tform.collection_type_id is not None:
+        chunks.append(_(u'with all {0}-type Pokémon in the gallery')
+            .format(tform.type.name))
+    elif tform.warrior_count is not None:
+        chunks.append(_(u'with at least {0} warriors in the gallery')
+            .format(tform.warrior_count))
+
+    return lit(u', ').join(chunks)
 
 
 ### Formatting

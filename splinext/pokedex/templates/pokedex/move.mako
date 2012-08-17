@@ -23,6 +23,13 @@
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
     ${c.move.name}
+
+    % if c.move.conquest_data:
+    <ul class="inline-menu">
+        <li>${_(u'Main')}</li>
+        <li><a href="${url(controller='dex_conquest', action='moves', name=c.move.name.lower())}">${_(u'Conquest')}</a></li>
+    </ul>
+    % endif
 </div>
 
 <%lib:cache_content>

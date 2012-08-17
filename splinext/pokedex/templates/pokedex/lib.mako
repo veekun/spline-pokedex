@@ -34,6 +34,9 @@ ${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons')}\
         <li><a href="${url.current(action=action, form=form if action != 'pokemon_locations' else None)}">${label}</a></li>
         % endif
     % endfor
+    % if c.pokemon.species.conquest_order is not None:
+        <li><a href="${url(controller='dex_conquest', action='pokemon', name=c.pokemon.species.name.lower())}">Conquest</a></li>
+    % endif
     </ul>
 </div>
 </%def>
