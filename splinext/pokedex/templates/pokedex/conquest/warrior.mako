@@ -49,22 +49,29 @@ ${h.h1(_('Essentials'))}
 
 <div class="dex-page-beside-portrait">
 <h2>${_(u'Warrior Skills')}</h2>
-% for rank in c.warrior.ranks:
-% if c.rank_count > 1:
-<h3>Rank ${h.pokedex.conquest_rank_label[rank.rank]}</h3>
-% endif
 <dl class="pokemon-abilities">  <!-- Well sort of. -->
-    <dt><a href="${url(controller='dex_conquest', action='skills', name=rank.skill.name.lower())}">${rank.skill.name}</a></dt>
+% for rank in c.warrior.ranks:
+    % if c.rank_count > 1:
+    <dt class="dex-warrior-skill-rank">${h.pokedex.conquest_rank_label[rank.rank]}</dt>
+    % endif
+
+    <dt class="dex-warrior-skill-name"><a href="${url(controller='dex_conquest', action='skills', name=rank.skill.name.lower())}">${rank.skill.name}</a></dt>
     <dd class="markdown">No effects yet.</dd>
-</dl>
 % endfor
+</dl>
+
+% if c.rank_count > 1:
+<h2>${_(u'Warrior Transformation')}</h2>
+<dl>
+    % for rank in c.warrior.ranks:
+    % if rank.transformation:
+    <dt>${_(u'Rank {0}').format(h.pokedex.conquest_rank_label[rank.rank])}</dt>
+    <dd>${h.pokedex.conquest_transformation_description(rank.transformation)}.</dd>
+    % endif
+    % endfor
+</dl>
+% endif
 </div>
-
-
-${h.h1(_(u'Ranks'))}
-
-
-${h.h1(_(u'Flavor'))}
 
 
 ${h.h1(_(u'Maximum Links'), id=_(u'max-links'))}

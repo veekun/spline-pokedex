@@ -320,6 +320,10 @@ ul#dex-item-pockets li img { padding: 4px; }
 /* Conquest move page -- range diagram */
 .dex-conquest-move-range { float: right; margin-right: 1.5em; margin-left: 0.5em; }
 
+/* Conquest warrior page -- skill list */
+dt.dex-warrior-skill-rank { width: 2em; margin-right: 0; }
+dt.dex-warrior-skill-rank + dt.dex-warrior-skill-name { width: 9.5em; clear: none }
+
 
 /*** Lists ***/
 

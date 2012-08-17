@@ -563,6 +563,74 @@ def conquest_evolution_description(evolution, _=_):
 
     return h.literal(u', ').join(chunks)
 
+def conquest_transformation_description(tform, _=_):
+    """Crafts a human-readable description from a
+    `conquest_warrior_transformation' row object.
+    """
+    # Dumb tricks for saving characters; this has a lot of big awkward lines
+    def link(thing):
+        return h.HTML.a(thing.name, href=make_thingy_url(thing,
+            controller='dex_conquest'))
+    lit = h.literal
+
+    chunks = []
+
+    # Triggers
+    if tform.is_automatic:
+        chunks.append(_(u'Automatically happens in-story'))
+    elif tform.required_link is not None:
+        if tform.pokemon[0].identifier == 'eevee':
+            pokemon = lit(_(u'{0} or any of its evolutions')).format(
+                link(tform.pokemon[0]))
+        else:
+            pokemon = lit(_(u' or ')).join(link(p) for p in tform.pokemon)
+
+        chunks.append(lit(_(u'Reach at least {link}% link with {pokemon}'))
+            .format(link=tform.required_link, pokemon=pokemon))
+
+    # Conditions
+    if tform.completed_episode_id is not None:
+        warrior = tform.completed_episode.warriors[0]
+        if warrior != tform.warrior_rank.warrior:
+            warrior = link(warrior)
+        else:
+            warrior = warrior.name
+
+        chunks.append(lit(_(u'after completing {warrior}\'s episode, "{name}"'))
+            .format(warrior=warrior, name=tform.completed_episode.name))
+    elif tform.current_episode_id is not None:
+        if tform.current_episode.warriors[0].identifier == 'player-m':
+            warrior = _(u'the player')
+        else:
+            warrior = tform.current_episode.warriors[0].name
+
+        chunks.append(_(u'during {warrior}\'s episode, "{name}"')
+            .format(
+                warrior=warrior,
+                name=tform.current_episode.name
+            ))
+    elif tform.distant_warrior_id is not None:
+        chunks.append(lit(_(u'with {0} in the army but not in the same kingdom '
+            u'or any adjacent kingdom')).format(link(tform.distant_warrior)))
+    elif tform.present_warriors:
+        chunks.append(h.literal(_(u'with {0} in the same kingdom'))
+            .format(lit(_(u' and ')).join(link(warrior) for warrior in
+                                          tform.present_warriors)))
+    elif tform.female_warlord_count is not None:
+        chunks.append(_(u'with at least {0} female warlords in the same kingdom')
+            .format(tform.female_warlord_count))
+    elif tform.pokemon_count is not None:
+        chunks.append(_(u'with at least {0} Pokémon in the gallery')
+            .format(tform.pokemon_count))
+    elif tform.collection_type_id is not None:
+        chunks.append(_(u'with all {0}-type Pokémon in the gallery')
+            .format(tform.type.name))
+    elif tform.warrior_count is not None:
+        chunks.append(_(u'with at least {0} warriors in the gallery')
+            .format(tform.warrior_count))
+
+    return lit(u', ').join(chunks)
+
 
 ### Formatting
 
