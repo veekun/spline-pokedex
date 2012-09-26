@@ -29,6 +29,7 @@
     <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='7', sort='evolution-chain')}">${h.pokedex.generation_icon(2)} ${_(u"Johto")}</a></li>
     <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='4', sort='evolution-chain')}">${h.pokedex.generation_icon(3)} ${_(u"Hoenn")}</a></li>
     <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='6', sort='evolution-chain')}">${h.pokedex.generation_icon(4)} ${_(u"Sinnoh")}</a></li>
+    <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='9', sort='evolution-chain')}">${h.pokedex.generation_icon(5)} ${_(u"Unova")}</a></li>
 </ul>
 
 <h2>${_(u"Miscellaneous interesting lists")}</h2>
