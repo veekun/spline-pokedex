@@ -321,6 +321,7 @@ ul#dex-item-pockets li img { padding: 4px; }
 dl.dex-conquest-pokemon-move dt { float: none; clear: none; width: auto; text-align: right; margin-left: 1em; margin-right: 0; display: inline-block; vertical-align: middle; }
 dl.dex-conquest-pokemon-move dd { padding-left: 0; display: inline-block; vertical-align: middle;}
 dl.dex-conquest-pokemon-move dd:after { display: none; }
+dl.dex-conquest-pokemon-move dd p { margin: 0; }
 dl.dex-conquest-pokemon-move dt.dex-cpm-name,
 dl.dex-conquest-pokemon-move dt.dex-cpm-type,
 dl.dex-conquest-pokemon-move dt.dex-cpm-range { display: none; }
