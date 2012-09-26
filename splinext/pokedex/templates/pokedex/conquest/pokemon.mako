@@ -63,7 +63,7 @@ ${h.h1(_('Essentials'))}
     % endif
 
     <dt class="dex-cpm-effect">Effect</dt>
-    <dd>${move.conquest_data.short_effect.as_text()}</dd>
+    <dd>${move.conquest_data.short_effect}</dd>
 </dl>
 
 <h2>${_(u'Abilities')}</h2>

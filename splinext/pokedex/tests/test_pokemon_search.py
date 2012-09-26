@@ -633,9 +633,10 @@ class TestPokemonSearchController(TestController):
     def test_base_experience(self):
         """Checks searching by base experience."""
         self.check_search(
-            dict(base_experience=u'255'),
-            [ u'Arceus', u'Blissey', u'Chansey', u'Happiny' ],
+            dict(base_experience=u'608'),
+            [ u'Blissey' ],
             'base EXP',
+            exact=True,
         )
 
     def test_capture_rate(self):
