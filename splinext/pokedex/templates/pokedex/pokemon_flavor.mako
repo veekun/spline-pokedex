@@ -53,7 +53,7 @@ ${h.h1(_('Essentials'))}
         % if c.pokemon.species.generation_id <= 3:
         <dt>${_("Habitat")}</dt>
         <dd>
-            ${h.pokedex.pokedex_img('habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.species.habitat.identifier))}
+            ${h.pokedex.pokedex_img('habitats/%s.png' % c.pokemon.species.habitat.identifier)}
             ${c.pokemon.species.habitat.name}
             <a href="${url(controller='dex_search', action='pokemon_search', habitat=c.pokemon.species.habitat.identifier)}"
                 class="dex-subtle-search-link">

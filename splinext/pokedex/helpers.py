@@ -164,6 +164,7 @@ def collapse_versions(things, key):
 
 ### Images and links
 
+# XXX only used by version_icons()
 def filename_from_name(name):
     """Shorten the name of a whatever to something suitable as a filename.
 
@@ -171,17 +172,6 @@ def filename_from_name(name):
     """
     name = unicode(name)
     name = name.lower()
-
-    # TMs and HMs share sprites
-    if re.match(u'^[th]m\d{2}$', name):
-        if name[0:2] == u'tm':
-            return u'tm-normal'
-        else:
-            return u'hm-normal'
-
-    # As do data cards
-    if re.match(u'^data card \d+$', name):
-        return u'data-card'
 
     name = re.sub(u'[ _]+', u'-', name)
     name = re.sub(u'[\'.()]', u'', name)
@@ -260,7 +250,6 @@ def pokemon_media_path(pokemon_species, prefix, ext, form=None):
     if the form should be ignored, e.g. for footprints.
     """
 
-    # Leave it as None if it's null; pass it by filename_from_name otherwise
     if form:
         form_identifier = form.form_identifier
     else:
@@ -393,6 +382,17 @@ def type_link(type):
         href=url(controller='dex', action='types', name=type.identifier),
     )
 
+def item_filename(item):
+    if item.pocket.identifier == u'machines':
+        machines = item.machines
+        prefix = u'hm' if machines[-1].is_hm else u'tm'
+        filename = prefix + u'-' + machines[-1].move.type.identifier
+    elif item.identifier.startswith(u'data-card-'):
+        filename = u'data-card'
+    else:
+        filename = item.identifier
+
+    return filename
 
 def item_link(item, include_icon=True, _=_):
     """Returns a link to the requested item."""
@@ -400,18 +400,8 @@ def item_link(item, include_icon=True, _=_):
     item_name = item.name
 
     if include_icon:
-        if item.pocket.identifier == u'machines':
-            machines = item.machines
-            prefix = u'hm' if machines[-1].is_hm else u'tm'
-            filename = prefix + u'-' + machines[-1].move.type.identifier
-        elif item.identifier.startswith(u'data-card-'):
-            filename = u'data-card'
-        else:
-            filename = item.identifier
-
-        label = pokedex_img("items/%s.png" % filename,
+        label = pokedex_img("items/%s.png" % item_filename(item),
             alt=item_name, title=item_name) + ' ' + item_name
-
     else:
         label = item_name
 

@@ -471,7 +471,7 @@ ${h.h1(_('Flavor'))}
         % if c.pokemon.species.generation_id <= 3:
         <dt>${_("Habitat")} ${h.pokedex.version_icons(u'FireRed', u'LeafGreen')}</dt>
         <dd>
-            ${h.pokedex.pokedex_img('habitats/%s.png' % h.pokedex.filename_from_name(c.pokemon.species.habitat.identifier))}
+            ${h.pokedex.pokedex_img('habitats/%s.png' % c.pokemon.species.habitat.identifier)}
             ${c.pokemon.species.habitat.name}
             ${dexlib.subtle_search(action='pokemon_search', habitat=c.pokemon.species.habitat.identifier, _=_)}
         </dd>

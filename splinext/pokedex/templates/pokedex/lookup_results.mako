@@ -30,7 +30,7 @@
     % elif object.__tablename__ == 'pokemon_forms':
     ${h.pokedex.pokemon_form_image(object, prefix='icons')}
     % elif object.__tablename__ == 'items':
-    ${h.pokedex.pokedex_img("items/%s.png" % h.pokedex.filename_from_name(object.name))}
+    ${h.pokedex.pokedex_img("items/%s.png" % h.pokedex.item_filename(object))}
     % elif object.__tablename__ == 'types':
     ${h.pokedex.type_icon(object)}
     % elif object.__tablename__ == 'moves':

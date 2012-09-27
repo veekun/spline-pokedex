@@ -407,7 +407,7 @@ class PokedexController(PokedexBaseController):
                         c.game_language.identifier)
             elif isinstance(row, tables.Item):
                 image = u"items/{0}.png".format(
-                    pokedex_helpers.filename_from_name(row.name))
+                    pokedex_helpers.item_filename(row))
 
             if image:
                 meta['image'] = url(controller='dex', action='media',

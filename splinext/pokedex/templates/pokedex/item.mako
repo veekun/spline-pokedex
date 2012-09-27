@@ -21,13 +21,13 @@ ${h.h1(_('Essentials'))}
     <%
         if c.item.berry:
             sprite_path = 'items/berries'
-        if c.item.appears_underground:
+        elif c.item.appears_underground:
             sprite_path = 'items/underground'
         else:
             sprite_path = 'items'
     %>\
     <div id="dex-pokemon-portrait-sprite">
-        ${h.pokedex.pokedex_img(u"{0}/{1}.png".format(sprite_path, h.pokedex.filename_from_name(c.item.identifier)))}
+        ${h.pokedex.pokedex_img(u"{0}/{1}.png".format(sprite_path, h.pokedex.item_filename(c.item)))}
     </div>
     <p id="dex-page-types">
         <a href="${url(controller='dex', action='item_pockets', pocket=c.item.pocket.identifier)}">
