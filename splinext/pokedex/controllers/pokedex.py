@@ -1809,13 +1809,14 @@ class PokedexController(PokedexBaseController):
 
         c.location_name = c.locations[0].name
 
-        # TODO: Sort locations/areas by generation
+        # TODO: Stick the region in the url; e.g. locations/kanto/route 1
+
+        c.region_areas = defaultdict(list)
 
         # Get all the areas in any of these locations
-        c.areas = []
         for location in c.locations:
-            c.areas.extend(location.areas)
-        c.areas.sort(key=lambda area: area.name)
+            if location.areas:
+                c.region_areas[location.region].extend(location.areas)
 
         # For the most part, our data represents exactly what we're going to
         # show.  For a given area in a given game, this Pokémon is guaranteed
@@ -1835,7 +1836,9 @@ class PokedexController(PokedexBaseController):
                 eagerload_all('pokemon.species'),
                 eagerload('version'),
             ) \
-            .filter(tables.Encounter.location_area_id.in_(x.id for x in c.areas))
+            .filter(tables.Encounter.location_area_id.in_(
+                x.id for areas in c.region_areas.values() for x in areas
+            ))
 
         # area => method => pokemon => version => condition =>
         #     condition_values => encounter_bits

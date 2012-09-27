@@ -14,11 +14,17 @@
 
 <h1>${c.location_name}</h1>
 
-% for location_area in c.areas:
-% if location_area.name:
-<h2 id="area:${location_area.name}">
-    <a href="#area:${location_area.name}" class="subtle">${location_area.name}</a>
+% for region, areas in h.keysort(c.region_areas, lambda x: -x.id):
+
+<h2 id="region:${region.name}">
+    <a href="#region:${region.name}" class="subtle">${region.name}</a>
 </h2>
+
+% for location_area in sorted(areas, key=lambda x: x.name):
+% if location_area.name:
+<h3 id="area:${location_area.name}">
+    <a href="#area:${location_area.name}" class="subtle">${location_area.name}</a>
+</h3>
 % endif
 
 <table class="dex-encounters striped-rows">
@@ -124,4 +130,5 @@
     % endfor
     % endfor
 </table>
+% endfor
 % endfor
