@@ -61,9 +61,9 @@
         </th>
     </tr>
 
-    ## One row per Pokémon, sorted by name
+    ## One row per Pokémon, sorted sensibly
     % for pokemon, version_condition_encounters \
-       in h.keysort(pokemon_version_condition_encounters, lambda k: k.name):
+       in h.keysort(pokemon_version_condition_encounters, lambda k: k.order):
     <tr>
         <th class="location">
             ${h.pokedex.pokemon_link(
