@@ -52,8 +52,6 @@ pokedex.pokemon_moves = {
             var $version_colgroups = $this.find('colgroup.dex-colgroup-versions');
             var version_column_count = $version_colgroups.find('col').length;
 
-            $this.data('pokemon_moves.first_generation',
-                       pokedex.generation_ct - $version_colgroups.length + 1);
             $this.data('pokemon_moves.version_colgroups',
                        $version_colgroups);
             $this.data('pokemon_moves.version_column_count',
@@ -204,11 +202,11 @@ pokedex.pokemon_moves = {
         }
 
         // Unhide everything in the controls row
-        $controls.find('td, th').css('display', null);
+        $controls.find('td, th').css('display', '');
 
         // Unhide generation columns in ALL rows and unmark them as filtered
         var $original_rows = $( $table.data('pokemon_moves.original_rows') );
-        $original_rows.find('td, th').css('display', null);
+        $original_rows.find('td, th').css('display', '');
         $original_rows.removeData('pokemon_moves.filtered_out');
 
         // Unreduce headers with colspans
@@ -304,7 +302,7 @@ pokedex.pokemon_moves = {
         var $this = $tr.closest('table.dex-pokemon-moves');
         //
         // First unhide everything
-        $this.find('td, th').css('display', null);
+        $this.find('td, th').css('display', '');
 
         // Write out only the <colgroup> tags that appear in this generation
         var info = $td.data('pokemon_moves.colgroup_info');
