@@ -43,10 +43,10 @@
     % endif
     % endfor
 
-    ## Draw a divider to separate method, in id order.  Why not?
+    ## Draw a divider to separate method, in some reasonable order.  Why not?
     ## Include the versions header, too.
     % for method, pokemon_version_condition_encounters \
-       in h.keysort(c.grouped_encounters.get(location_area, {}), lambda k: k.id):
+       in h.keysort(c.grouped_encounters.get(location_area, {}), lambda k: k.order):
 
     <tr class="header-row">
         <th></th>
