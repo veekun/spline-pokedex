@@ -7,7 +7,7 @@
 <%def name="title_in_page()">
 <ul id="breadcrumbs">
     <li><a href="${url('/dex')}">${_(u'Pokédex')}</a></li>
-    <li>${_(u'Locations')}</li>
+    <li><a href="${url('/dex/locations')}">${_(u'Locations')}</a></li>
     <li>${c.location_name}</li>
 </ul>
 </%def>
