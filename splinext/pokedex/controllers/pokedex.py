@@ -228,12 +228,25 @@ class PokedexController(PokedexBaseController):
 
     # Dict of method identifier => icon path
     encounter_method_icons = {
-        'surf': 'surfing.png',
+        'walk': 'grass.png',
+        'dark-grass': 'dark-grass.png',
+
+        'surf': 'water.png',
+
         'old-rod': 'old-rod.png',
         'good-rod': 'good-rod.png',
         'super-rod': 'super-rod.png',
-        'walk': 'grass.png',
+
         'rock-smash': 'rock-smash.png',
+
+        # We don't have an icon for rustling grass, so just use the grass icon.
+        # We don't have an icon for fishing in water spots, so just use the
+        # water spot icon.
+        'grass-spots': 'grass.png',
+        'cave-spots': 'cave-spots.png',
+        'bridge-spots': 'bridge-spots.png',
+        'surf-spots': 'water-spots.png',
+        'super-rod-spots': 'water-spots.png',
     }
 
     # Maps condition value identifiers to representative icons
