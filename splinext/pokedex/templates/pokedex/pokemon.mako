@@ -648,15 +648,18 @@ ${h.h1(_('External Links'), id=_('links', context='header id'))}
         lp_name = 'Nidoran(f)'
         ghpd_name = 'nidoran_f'
         smogon_name = 'nidoran-f'
+        marriland_name = 'nidoranf'
     elif c.pokemon.name == u'Nidoran♂':
         lp_name = 'Nidoran(m)'
         ghpd_name = 'nidoran_m'
         smogon_name = 'nidoran-m'
+        marriland_name = 'nidoranm'
     else:
         lp_name = c.pokemon.species.name
         ghpd_name = re.sub(' ', '_', c.pokemon.species.name.lower())
         ghpd_name = re.sub('[^\w-]', '', ghpd_name)
         smogon_name = ghpd_name
+        marriland_name = c.pokemon.species.name.lower().replace(' ', '').replace('.', '')
 
     if not c.pokemon.is_default and c.pokemon.default_form.form_name:
         if c.pokemon.default_form.form_name == 'Sandy Cloak':
@@ -667,6 +670,8 @@ ${h.h1(_('External Links'), id=_('links', context='header id'))}
             smogon_name += '-s'
         else:
             smogon_name += '-' + c.pokemon.default_form.form_name[0].lower()
+
+        marriland_name += '_' + c.pokemon.default_form.form_identifier
 %>
 <ul class="classic-list">
 % if c.pokemon.species.generation_id <= 1:
@@ -680,5 +685,6 @@ ${h.h1(_('External Links'), id=_('links', context='header id'))}
 <li><a href="http://www.psypokes.com/dex/psydex/${"%03d" % c.pokemon.species.id}">${_(u"PsyPoke")}</a></li>
 <li><a href="http://www.serebii.net/pokedex-bw/${"%03d" % c.pokemon.species.id}.shtml">${_(u"Serebii.net")}</a></li>
 <li><a href="http://www.smogon.com/bw/pokemon/${smogon_name}">${_(u"Smogon")}</a></li>
+<li><a href="http://pokemon.marriland.com/black2_white2/pokedex/${marriland_name}/">${_(u"Marriland")}</a></li>
 </ul>
 </%lib:cache_content>
