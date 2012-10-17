@@ -427,9 +427,9 @@ class PokedexController(PokedexBaseController):
                 image = u"pokemon/icons/{0}.png".format(row.id)
             elif isinstance(row, tables.PokemonForm):
                 if row.form_identifier:
-                    image = u"pokemon/icons/{0}-{1}.png".format(row.pokemon_id, row.form_identifier)
+                    image = u"pokemon/icons/{0}-{1}.png".format(row.pokemon.species_id, row.form_identifier)
                 else:
-                    image = u"pokemon/icons/{0}.png".format(row.pokemon_id)
+                    image = u"pokemon/icons/{0}.png".format(row.pokemon.species_id)
             elif isinstance(row, tables.Move):
                 image = u"types/{1}/{0}.png".format(row.type.name.lower(),
                         c.game_language.identifier)
