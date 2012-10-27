@@ -64,6 +64,35 @@ ${h.h1(_('Effect'))}
 ${c.item.effect}
 </div>
 
+% if c.item.pocket.identifier == u'machines':
+${h.h1(_('Moves'))}
+<p>${_(u"These are the moves taught by {item.name} in different games.").format(item=c.item)}</p>
+<table class="dex-pokemon-moves striped-rows">
+<colgroup>
+    ## XXX These columns shouldn't be sortable
+    <col>
+    <col>
+<colgroup>
+    ${dexlib.move_table_columns()}
+<thead>
+    <tr class="header-row">
+        <th></th>
+        <th></th>
+        ${dexlib.move_table_header()}
+    </tr>
+<tbody>
+    % for generation, machines in h.pokedex.group_by_generation(c.item.machines):
+        % for versions, move in h.pokedex.collapse_versions(machines, key=lambda x: x.move):
+        <tr>
+            <td>${h.pokedex.generation_icon(generation)}</td>
+            <td>${h.pokedex.version_icons(*versions)}</td>
+            ${dexlib.move_table_row(move)}
+        </tr>
+        % endfor
+    % endfor
+</table>
+% endif
+
 % if c.item.fling_effect or c.item.berry:
 <h2>${_("Special move effects")}</h2>
 <dl>
