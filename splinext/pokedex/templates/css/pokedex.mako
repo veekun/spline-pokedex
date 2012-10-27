@@ -126,7 +126,7 @@ table.dex-pokemon-moves tr.evolution-depth-3 td.name { padding-left: 3em; text-a
 .js-dex-pokemon-moves-options { display: inline-block; position: relative; margin-bottom: 0.25em; }
 .js-dex-pokemon-moves-options .title { font-size: 0.8em; padding: 0.33em 0.5em; background: #cfdcf0; border-radius: 0.5em; }
 .js-dex-pokemon-moves-options .title img { margin-right: 0.33em; }
-.js-dex-pokemon-moves-options .body { display: none; position: absolute; right: 0; width: 32em; padding: 0.33em; border: 1px solid #668dcc; text-align: left; background: white; box-shadow: 0.125em 0.125em 0.25em rgba(0, 0, 0, 0.5); }
+.js-dex-pokemon-moves-options .body { display: none; position: absolute; right: 0; width: 16em; padding: 0.33em; border: 1px solid #668dcc; text-align: left; background: white; box-shadow: 0.125em 0.125em 0.25em rgba(0, 0, 0, 0.5); }
 .js-dex-pokemon-moves-options:hover .title { background: #3173ce; color: white; border-radius: 0; border-top-left-radius: 0.5em; border-top-right-radius: 0.5em; }
 .js-dex-pokemon-moves-options:hover .body { display: block; }
 .js-dex-pokemon-moves-options:hover .body label { display: block; }

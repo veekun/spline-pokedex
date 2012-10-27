@@ -66,12 +66,12 @@ pokedex.pokemon_moves = {
 
 
             var $controls = $('<tr class="js-dex-pokemon-moves-controls"></tr>');
+            var $last_filter_control;
 
             if ($version_colgroups.length > 1) {
                 // Create buttons for filtering by generation.
                 var vg_start = 0;
                 var vg_width = 0;
-                var $last_filter_control;
                 $version_colgroups.each(function(i) {
                     vg_width = $(this).find('col').length
 
@@ -148,38 +148,42 @@ pokedex.pokemon_moves = {
             $first_tr.before($controls);
 
             // Create a teeny options dialog
-            var $options = $(
-                '<div class="js-dex-pokemon-moves-options">'
-                + '<div class="title">'
-                    + '<img src="/static/spline/icons/gear.png" alt="">'
-                    + 'Options'
+            if ($version_colgroups.length) {
+                var $options = $(
+                    '<div class="js-dex-pokemon-moves-options">'
+                    + '<div class="title">'
+                        + '<img src="/static/spline/icons/gear.png" alt="">'
+                        + 'Options'
+                    + '</div>'
+                    + '<div class="body">'
+                        + '<label><input type="checkbox" name="autofilter">'
+                            + 'Hide old games by default</label>'
+                    + '</div>'
                 + '</div>'
-                + '<div class="body">'
-                    + '<label><input type="checkbox" name="autofilter">'
-                        + 'For tables with versions, hide old games by default</label>'
-                + '</div>'
-            + '</div>'
-            );
+                );
 
-            // Option: Auto-filtering
-            var $autofilter_cbox = $options.find('input[name="autofilter"]');
-            $autofilter_cbox.click(function() {
-                $.cookies.set('dex-rich-table-autofilter',
-                    $(this).is(':checked') ? '1' : '');
-            });
-            if ($.cookies.get('dex-rich-table-autofilter')) {
-                $autofilter_cbox.attr('checked', 'checked');
+                // Option: Auto-filtering
+                var $autofilter_cbox = $options.find('input[name="autofilter"]');
+                $autofilter_cbox.click(function() {
+                    $.cookies.set('dex-rich-table-autofilter',
+                        $(this).is(':checked') ? '1' : '');
+                });
+                if ($.cookies.get('dex-rich-table-autofilter')) {
+                    $autofilter_cbox.attr('checked', 'checked');
 
-                // Filter to only the most recent games, i.e., the last column
-                $last_filter_control.click();
+                    // Filter to only the most recent games, i.e., the last column
+                    if ($last_filter_control) {
+                        $last_filter_control.click();
+                    }
+                }
+
+                // Put the options in their own container, just before the table
+                var $extras = $('<div class="js-dex-pokemon-moves-extras"></div>');
+                $extras.append($options);
+                $this.before($extras);
+                // So the particular table can remember it
+                $this.data('pokemon-moves.$extras', $extras);
             }
-
-            // Put the options in their own container, just before the table
-            var $extras = $('<div class="js-dex-pokemon-moves-extras"></div>');
-            $extras.append($options);
-            $this.before($extras);
-            // So the particular table can remember it
-            $this.data('pokemon-moves.$extras', $extras);
         });
     },
 
