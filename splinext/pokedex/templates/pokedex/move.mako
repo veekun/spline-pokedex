@@ -449,7 +449,7 @@ ${h.h1(_(u'Pokémon', context='plural'))}
         ${dexlib.pokemon_table_header()}
     </tr>
     <tr class="subheader-row">
-        <th colspan="${len(columns) + 13}"><a href="#${method_id}" class="subtle"><strong>${method.name}</a></strong>: ${method.description}</th>
+        <th colspan="${len(columns) + 13}"><a href="#${method_id}" class="subtle"><strong>${method.name}</strong></a>: ${method.description}</th>
     </tr>
 </tbody>
 ## DATA

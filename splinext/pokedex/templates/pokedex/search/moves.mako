@@ -25,7 +25,7 @@
 
 % if not c.form.is_valid:
 ## Errors
-<p>{_("It seems you entered something bogus for:")}</p>
+<p>${_("It seems you entered something bogus for:")}</p>
 <ul class="classic-list">
     % for field_name in c.form.errors.keys():
     <li>${c.form[field_name].label.text}</li>

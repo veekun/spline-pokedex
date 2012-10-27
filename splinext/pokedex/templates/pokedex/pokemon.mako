@@ -333,7 +333,7 @@ ${h.h1(_('Stats'))}
         <th><!-- stat name --></th>
         <th><!-- bar and value --></th>
         <th><!-- percentile --></th>
-        <th><label for="dex-pokemon-stats-iv">${_("Effort")}</label></th>
+        <th><label for="dex-pokemon-stats-effort">${_("Effort")}</label></th>
         <th><input type="text" size="3" value="${default_stat_effort}" disabled="disabled" id="dex-pokemon-stats-effort"></th>
     </tr>
     <tr class="header-row">
@@ -489,7 +489,7 @@ ${h.h1(_('Flavor'))}
     <h2>${_("Height")}</h2>
     <div class="dex-size">
         <div class="dex-size-trainer">
-            ${h.pokedex.chrome_img('trainer-male.png', alt='${_("Trainer dude")}', style="height: %.2f%%" % (c.heights['trainer'] * 100))}
+            ${h.pokedex.chrome_img('trainer-male.png', alt=_("Trainer dude"), style="height: %.2f%%" % (c.heights['trainer'] * 100))}
             <p class="dex-size-value">
                 <input type="text" size="6" value="${h.pokedex.format_height_imperial(c.trainer_height)}" disabled="disabled" id="dex-pokemon-height">
             </p>
@@ -508,7 +508,7 @@ ${h.h1(_('Flavor'))}
     <h2>${_("Weight")}</h2>
     <div class="dex-size">
         <div class="dex-size-trainer">
-            ${h.pokedex.chrome_img('trainer-female.png', alt='${_("Trainer dudette")}', style="height: %.2f%%" % (c.weights['trainer'] * 100))}
+            ${h.pokedex.chrome_img('trainer-female.png', alt=_("Trainer dudette"), style="height: %.2f%%" % (c.weights['trainer'] * 100))}
             <p class="dex-size-value">
                 <input type="text" size="6" value="${h.pokedex.format_weight_imperial(c.trainer_weight)}" disabled="disabled" id="dex-pokemon-weight">
             </p>

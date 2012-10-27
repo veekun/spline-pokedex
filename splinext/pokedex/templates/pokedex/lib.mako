@@ -140,7 +140,7 @@ ${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons')}\
             </td>
         % elif method.name == 'Egg':
             <td class="dex-moves-egg">${h.pokedex.chrome_img('egg-cropped.png',
-                alt=u"&bull;")}</td>
+                alt=h.literal(u"&bull;"))}</td>
         % else:
             <td>&bull;</td>
         % endif
