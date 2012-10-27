@@ -475,7 +475,7 @@ ${h.h1(_('Flavor'))}
         % endif
 
         <dt>${_("Footprint")}</dt>
-        <dd>${h.pokedex.species_image(c.pokemon.species, prefix='footprints', use_form=False)}</dd>
+        <dd>${h.pokedex.species_image(c.pokemon.species, prefix='footprints')}</dd>
 
         <dt>${_("Shape")}</dt>
         <dd>

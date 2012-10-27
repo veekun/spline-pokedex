@@ -331,7 +331,7 @@ n/a
 % endif
 </%def>
 
-<%def name="footprint_cell(pokemon)">${h.pokedex.species_image(pokemon.species, prefix='footprints', use_form=False)}</%def>
+<%def name="footprint_cell(pokemon)">${h.pokedex.species_image(pokemon.species, prefix='footprints')}</%def>
 
 <%def name="shape_cell(pokemon)">
 % if pokemon.species.shape:

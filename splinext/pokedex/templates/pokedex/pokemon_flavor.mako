@@ -63,7 +63,7 @@ ${h.h1(_('Essentials'))}
         % endif
 
         <dt>${_("Footprint")}</dt>
-        <dd>${h.pokedex.species_image(c.pokemon.species, prefix='footprints', use_form=False)}</dd>
+        <dd>${h.pokedex.species_image(c.pokemon.species, prefix='footprints')}</dd>
 
         <dt>${_("Shape")}</dt>
         <dd>
@@ -87,7 +87,7 @@ ${h.h1(_('Essentials'))}
             </p>
         </div>
         <div class="dex-size-pokemon">
-            ${h.pokedex.pokemon_form_image(c.form, prefix='cropped', style="height: %.2f%%;" % (c.heights['pokemon'] * 100), form=c.form.name)}
+            ${h.pokedex.pokemon_form_image(c.form, prefix='cropped', style="height: %.2f%%;" % (c.heights['pokemon'] * 100))}
             <div class="js-dex-size-raw">${c.pokemon.height}</div>
             <p class="dex-size-value">
                 ${h.pokedex.format_height_imperial(c.pokemon.height)} <br/>
@@ -107,7 +107,7 @@ ${h.h1(_('Essentials'))}
             </p>
         </div>
         <div class="dex-size-pokemon">
-            ${h.pokedex.pokemon_form_image(c.form, prefix='cropped', style="height: %.2f%%;" % (c.weights['pokemon'] * 100), form=c.form.name)}
+            ${h.pokedex.pokemon_form_image(c.form, prefix='cropped', style="height: %.2f%%;" % (c.weights['pokemon'] * 100))}
             <div class="js-dex-size-raw">${c.pokemon.weight}</div>
             <p class="dex-size-value">
                 ${h.pokedex.format_weight_imperial(c.pokemon.weight)} <br/>
