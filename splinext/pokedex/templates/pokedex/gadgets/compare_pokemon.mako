@@ -66,7 +66,7 @@ ${h.form(url.current(), method='GET')}
             % if found_pokemon.pokemon:
             ${h.pokedex.pokemon_link(found_pokemon.pokemon,
                 h.pokedex.pokemon_form_image(found_pokemon.form, prefix=u'icons')
-                    + h.literal(u'<br>') + found_pokemon.pokemon.default_form.name,
+                    + h.literal(u'<br>') + found_pokemon.pokemon.name,
             )}<br>
             % endif
             <input type="text" name="pokemon" value="${found_pokemon.input}">
