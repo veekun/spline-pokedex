@@ -159,9 +159,6 @@ ${h.h1(_('Essentials'))}
         <dd>
             <span id="dex-pokemon-exp-base">${c.pokemon.base_experience}</span>
             ${dexlib.subtle_search(action='pokemon_search', base_experience=c.pokemon.base_experience, _=_)}
-            <br/>
-            <span id="dex-pokemon-exp">${h.pokedex.formulae.earned_exp(base_exp=c.pokemon.base_experience, level=100)}</span>
-            ${_(u"EXP at level")} <input type="text" size="3" value="100" id="dex-pokemon-exp-level">
         </dd>
         <dt>${_(u"Effort points")}</dt>
         <dd>
