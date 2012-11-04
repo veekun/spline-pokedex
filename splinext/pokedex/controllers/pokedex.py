@@ -552,7 +552,7 @@ class PokedexController(PokedexBaseController):
             # Need to eagerload some, uh, little stuff
             pokemon_q = pokemon_q.options(
                 joinedload(tables.Pokemon.abilities, tables.Ability.prose_local),
-                joinedload(tables.Pokemon.dream_ability, tables.Ability.prose_local),
+                joinedload(tables.Pokemon.hidden_ability, tables.Ability.prose_local),
                 eagerload('species.evolution_chain.species'),
                 eagerload('species.generation'),
                 eagerload('items.item'),
@@ -1462,7 +1462,7 @@ class PokedexController(PokedexBaseController):
 
                 # Pokémon table stuff
                 subqueryload('pokemon.abilities'),
-                subqueryload('pokemon.dream_ability'),
+                subqueryload('pokemon.hidden_ability'),
                 subqueryload('pokemon.species'),
                 subqueryload('pokemon.species.egg_groups'),
                 subqueryload('pokemon.stats'),
@@ -1619,7 +1619,7 @@ class PokedexController(PokedexBaseController):
                 # Pokémon stuff
                 subqueryload('pokemon'),
                 joinedload('pokemon.abilities'),
-                joinedload('pokemon.dream_ability'),
+                joinedload('pokemon.hidden_ability'),
                 joinedload('pokemon.species'),
                 subqueryload('pokemon.species.egg_groups'),
                 joinedload('pokemon.types'),
@@ -1674,7 +1674,7 @@ class PokedexController(PokedexBaseController):
 
                 # Pokémon stuff
                 subqueryload(tables.Ability.pokemon),
-                subqueryload(tables.Ability.dream_pokemon),
+                subqueryload(tables.Ability.hidden_pokemon),
                 subqueryload(tables.Ability.all_pokemon),
                 subqueryload(tables.Ability.all_pokemon, tables.Pokemon.abilities),
                 subqueryload(tables.Ability.all_pokemon, tables.Pokemon.species, tables.PokemonSpecies.egg_groups),
@@ -1686,18 +1686,18 @@ class PokedexController(PokedexBaseController):
 
         c.method_labels = {
             'Normal': u'May be found normally on Pokémon.',
-            'Dream': u'Found on Dream World Pokémon and a few Pokémon from '
-                     u'specific in-game encounters.',
+            'Hidden': u'Found on Pokémon from the Dream World and Dream Radar, '
+                      u'as well as a few Pokémon from specific in-game encounters.',
         }
 
-        dream_pokemon = [pokemon for pokemon in c.ability.dream_pokemon if
-                         pokemon not in c.ability.pokemon]
+        hidden_pokemon = [pokemon for pokemon in c.ability.hidden_pokemon if
+                          pokemon not in c.ability.pokemon]
 
         c.pokemon = []
         if c.ability.pokemon:
             c.pokemon.append(('Normal', c.ability.pokemon))
-        if dream_pokemon:
-            c.pokemon.append(('Dream', dream_pokemon))
+        if hidden_pokemon:
+            c.pokemon.append(('Hidden', hidden_pokemon))
 
         move_flag = None
         if c.ability.name == 'Soundproof':

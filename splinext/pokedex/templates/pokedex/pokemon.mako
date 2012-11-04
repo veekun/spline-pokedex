@@ -50,10 +50,10 @@ ${h.h1(_('Essentials'))}
     ${_render_ability(ability, _=_)}
     % endfor
 </dl>
-% if c.pokemon.dream_ability:
-<h3>Dream Ability</h3>
+% if c.pokemon.hidden_ability:
+<h3>Hidden Ability</h3>
 <dl class="pokemon-abilities">
-    ${_render_ability(c.pokemon.dream_ability, _=_)}
+    ${_render_ability(c.pokemon.hidden_ability, _=_)}
 </dl>
 % endif
 

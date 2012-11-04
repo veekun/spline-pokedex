@@ -206,9 +206,9 @@ ${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons')}\
     % endif
     ${_pokemon_ability_link(ability)}
   % endfor
-  % if pokemon.dream_ability and pokemon.dream_ability not in pokemon.abilities:
+  % if pokemon.hidden_ability and pokemon.hidden_ability not in pokemon.abilities:
     <br />
-    <em>${_pokemon_ability_link(pokemon.dream_ability)}</em>
+    <em>${_pokemon_ability_link(pokemon.hidden_ability)}</em>
   % endif
 </td>
 <td>${h.pokedex.chrome_img('gender-rates/%d.png' % pokemon.species.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.species.gender_rate])}</td>

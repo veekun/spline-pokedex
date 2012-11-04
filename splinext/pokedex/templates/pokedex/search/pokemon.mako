@@ -332,7 +332,7 @@ ${h.form(url.current(), method='GET')}
         % for pattern in ( \
             '$icon', '$id', '$name', '$gender', \
             '$type', '$type1', '$type2', \
-            '$ability', '$ability1', '$ability2', '$dream_ability', \
+            '$ability', '$ability1', '$ability2', '$hidden_ability', \
             '$egg_group', '$egg_group1', '$egg_group2', \
             '$effort', '$stats', \
             '$hp', '$attack', '$defense', \
@@ -400,12 +400,12 @@ ${h.pokedex.type_link(type)}
 </td>\
 </%def>
 
-<%def name="col_dream_ability()"><col class="dex-col-ability"></%def>
-<%def name="th_dream_ability()"><th>Dream Ability</th></%def>
-<%def name="td_dream_ability(pokemon)">\
+<%def name="col_hidden_ability()"><col class="dex-col-ability"></%def>
+<%def name="th_hidden_ability()"><th>Hidden Ability</th></%def>
+<%def name="td_hidden_ability(pokemon)">\
 <td class="ability">
-% if pokemon.dream_ability:
-<a href="${url(controller='dex', action='abilities', name=pokemon.dream_ability.name.lower())}">${pokemon.dream_ability.name}</a><br>
+% if pokemon.hidden_ability:
+<a href="${url(controller='dex', action='abilities', name=pokemon.hidden_ability.name.lower())}">${pokemon.hidden_ability.name}</a><br>
 % endif
 </td>\
 </%def>

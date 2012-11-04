@@ -377,7 +377,7 @@ class PokemonSearchForm(BaseSearchForm):
             ('type', 'Types'),
             ('growth_rate', 'EXP to level 100'),
             ('ability', 'Abilities'),
-            ('dream_ability', 'Dream ability'),
+            ('hidden_ability', 'Hidden ability'),
             ('gender', 'Gender rate'),
             ('egg_group', 'Egg groups'),
 
@@ -1240,8 +1240,8 @@ class PokedexSearchController(PokedexBaseController):
             if 'ability' in c.display_columns:
                 eagerloads.append('abilities')
 
-            if 'dream_ability' in c.display_columns:
-                eagerloads.append('dream_ability')
+            if 'hidden_ability' in c.display_columns:
+                eagerloads.append('hidden_ability')
 
             if 'egg_group' in c.display_columns:
                 eagerloads.append('species.egg_groups')
