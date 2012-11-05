@@ -963,6 +963,11 @@ class PokedexController(PokedexBaseController):
             ancestor_ids.append(c.pokemon.id)
             q = q.filter(tables.PokemonMove.pokemon_id.in_(ancestor_ids))
 
+            # ... in a generation where this Pokémon actually exists...
+            q = q.join(tables.VersionGroup, tables.PokemonMove.version_group)
+            q = q.filter(tables.VersionGroup.generation_id >=
+                         c.pokemon.species.generation_id)
+
             # That AREN'T learnable by this Pokémon.  This NOT EXISTS strips
             # out moves that are also learned by a "higher-ordered" Pokémon.
             pm_outer = tables.PokemonMove
