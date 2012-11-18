@@ -3,6 +3,7 @@ from __future__ import absolute_import, division
 
 from collections import defaultdict, namedtuple
 import colorsys
+from itertools import groupby
 import json
 import logging
 import mimetypes
@@ -80,13 +81,26 @@ def _collapse_pokemon_move_columns(table, thing):
     move_columns = []
 
     # Only even consider versions in which this thing actually exists
-    q = db.pokedex_session.query(tables.Generation) \
-                       .filter(tables.Generation.id >= thing.generation_id) \
-                       .options(joinedload('version_groups')) \
-                       .order_by(tables.Generation.id.asc())
-    for generation in q:
+    q = (db.pokedex_session.query(tables.VersionGroup)
+        .order_by(tables.VersionGroup.order))
+
+    if isinstance(thing, tables.Pokemon):
+        # If a Pokémon learns no moves in a particular version group, that
+        # means it didn't exist in that group.  (n.b. Deoxys is particularly
+        # weird in that some forms appear and then briefly disappear again, so
+        # figuring out which group this form was introduced in isn't enough.)
+        q = q.filter(tables.VersionGroup.pokemon_moves.any(
+            tables.PokemonMove.pokemon_id == thing.id))
+    else:
+        # But a few moves exist but remain unused until midway through a gen,
+        # so empty columns are useful; see e.g. Kinesis, Ice Burn
+        q = q.filter(tables.VersionGroup.generation_id >= thing.generation_id)
+
+    gens = groupby(q, lambda vg: vg.generation_id)
+
+    for gen, version_groups in gens:
         move_columns.append( [] ) # A new column group for this generation
-        for i, version_group in enumerate(generation.version_groups):
+        for i, version_group in enumerate(version_groups):
             if i == 0:
                 # Can't collapse these versions anywhere!  Create a new column
                 move_columns[-1].append( [version_group] )
@@ -1134,7 +1148,7 @@ class PokedexController(PokedexBaseController):
 
         # Finally, collapse identical columns within the same generation
         c.move_columns \
-            = _collapse_pokemon_move_columns(table=c.moves, thing=c.pokemon.species)
+            = _collapse_pokemon_move_columns(table=c.moves, thing=c.pokemon)
 
         # Grab list of all the version groups with tutor moves
         c.move_tutor_version_groups = _move_tutor_version_groups(c.moves)
