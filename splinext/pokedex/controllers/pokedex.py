@@ -1719,9 +1719,9 @@ class PokedexController(PokedexBaseController):
             c.pokemon.append(('Hidden', hidden_pokemon))
 
         move_flag = None
-        if c.ability.name == 'Soundproof':
+        if c.ability.identifier == 'soundproof':
             move_flag = 'sound'
-        elif c.ability.name == 'Iron Fist':
+        elif c.ability.identifier == 'iron-fist':
             move_flag = 'punch'
 
         c.moves = None
