@@ -394,20 +394,31 @@ def item_filename(item):
 
     return filename
 
-def item_link(item, include_icon=True, _=_):
+def item_link(item, include_icon=True, include_label=True, _=_):
     """Returns a link to the requested item."""
 
     item_name = item.name
+    if item.pocket.identifier == u'machines':
+        item_name += ' ' + item.machines[-1].move.name
+
+    label_parts = []
 
     if include_icon:
-        label = pokedex_img("items/%s.png" % item_filename(item),
-            alt=item_name, title=item_name) + ' ' + item_name
+        item_icon = pokedex_img("items/%s.png" % item_filename(item),
+                                alt=item_name, title=item_name)
+        label_parts.append(item_icon)
+
+    if include_label:
+        label_parts.append(item_name)
+
+    if label_parts:
+        label = h.literal(u" ").join(label_parts)
     else:
         label = item_name
 
     return h.HTML.a(label,
         href=url(controller='dex', action='items',
-                 pocket=item.pocket.identifier, name=item_name.lower()),
+                 pocket=item.pocket.identifier, name=item.name.lower()),
     )
 
 

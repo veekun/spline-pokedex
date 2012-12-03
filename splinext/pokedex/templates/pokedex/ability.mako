@@ -2,6 +2,7 @@
 <%namespace name="lib" file="/lib.mako"/>
 <%namespace name='dexlib' file='lib.mako'/>
 <%! from splinext.pokedex import i18n %>\
+<%! import itertools %>\
 
 <%def name="title()">${_("%s - Abilities") % c.ability.name}</%def>
 
@@ -72,6 +73,37 @@ ${h.h2(_('Moves affected'), id=_('moves', context='anchor'))}
 </table>
 % endif
 
+% if c.pickup:
+${h.h2(_(u'Items'), id=_('items', context='anchor'))}
+% for versions, pickup_table in h.pokedex.collapse_versions(c.pickup, lambda x: x.table):
+<h3>${h.pokedex.version_icons(*versions)} ${u"/".join(version.name for version in versions)}</h3>
+<table class="dex-pickup-items striped-rows">
+    <colgroup>
+        <col class="dex-level">
+    % for rarity, group in itertools.groupby(pickup_table.rarities):
+    <colgroup span="${len(list(group))}">
+    % endfor
+    <thead>
+        <tr class="header-row">
+            <th></th>
+            % for rarity in pickup_table.rarities:
+            <th>${rarity}%</th>
+            % endfor
+        </tr>
+    </thead>
+    <tbody>
+        % for (min_level, max_level), items in zip(pickup_table.levels, pickup_table.item_rows):
+        <tr>
+            <th>Level ${min_level}-${max_level}</th>
+            % for item in items:
+            <td>${h.pokedex.item_link(item, include_label=False, include_icon=True)}</td>
+            % endfor
+        </tr>
+        % endfor
+    </tbody>
+</table>
+% endfor
+% endif
 
 % if c.ability.changelog:
 ${h.h1(_('History'))}
