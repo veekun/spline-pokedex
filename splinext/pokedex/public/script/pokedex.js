@@ -98,9 +98,12 @@ pokedex.pokemon_moves = {
                 });
             }
             else if ($version_colgroups.length == 1) {
-                // In the case of a single version, there's nothing to filter,
-                // but there still needs to be an empty cell above it
-                $controls.append('<td class="js-not-a-button"></td>');
+                // In the case of a single version group, there's nothing to
+                // filter, but there still needs to be an empty cell above each
+                // version
+                for (var i = 0; i < version_column_count; i++) {
+                        $controls.append('<td class="js-not-a-button"></td>');
+                }
             }
 
             // Create buttons for sorting by a column
