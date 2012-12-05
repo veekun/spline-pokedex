@@ -3,8 +3,8 @@ from __future__ import absolute_import, division
 
 from collections import defaultdict, namedtuple
 from itertools import groupby
+
 import colorsys
-from itertools import groupby
 import json
 import logging
 import mimetypes
