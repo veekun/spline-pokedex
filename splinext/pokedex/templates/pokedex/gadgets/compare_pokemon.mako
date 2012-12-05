@@ -101,6 +101,7 @@ ${h.end_form()}
 <tbody>
     ${row(_(u'Type'), type_cell, class_='dex-compare-list')}
     ${row(_(u'Abilities'), abilities_cell, class_='dex-compare-list')}
+    ${row(_(u'Hidden Ability'), hidden_ability_cell, class_='dex-compare-hidden-ability')}
 
     ${subheader_row(_(u'Breeding + Training'), 'breeding-training')}
     ${row(_(u'Egg groups'), egg_groups_cell, class_='dex-compare-list')}
@@ -271,6 +272,12 @@ ${move_table_header()}
     <li><a href="${url(controller='dex', action='abilities', name=ability.name.lower())}">${ability.name}</a></li>
     % endfor
 </ul>
+</%def>
+
+<%def name="hidden_ability_cell(pokemon)">
+% if pokemon.hidden_ability:
+<a href="${url(controller='dex', action='abilities', name=pokemon.hidden_ability.name.lower())}">${pokemon.hidden_ability.name}</a></li>
+% endif
 </%def>
 
 <%def name="egg_groups_cell(pokemon)">
