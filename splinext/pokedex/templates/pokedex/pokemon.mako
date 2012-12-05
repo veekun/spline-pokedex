@@ -229,7 +229,8 @@ ${h.h1(_('Evolution'))}
 <li>
     <img src="${h.static_uri('spline', 'icons/chart--arrow.png')}" alt="${_(u"See also:")}">
     <a href="${url(controller='dex_gadgets', action='compare_pokemon',
-        pokemon=[species.name for species in c.pokemon.species.evolution_chain.species]
+        pokemon=[pokemon.name for species in c.pokemon.species.evolution_chain.species
+                              for pokemon in species.pokemon]
         )}">${_('Compare this family')}</a>
 </li>
 </ul>
