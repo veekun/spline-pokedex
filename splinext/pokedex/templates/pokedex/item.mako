@@ -38,6 +38,10 @@ ${h.h1(_('Essentials'))}
 </div>
 
 <div class="dex-page-beside-portrait">
+<h2>${_('Summary')}</h2>
+${c.item.short_effect}
+
+<h2>${_('Stats')}</h2>
 <dl>
     <dt>${_("Cost")}</dt>
     <dd>
