@@ -1741,7 +1741,7 @@ class PokedexController(PokedexBaseController):
         VersionGroupPickupTable = namedtuple('VersionGroupPickupTable', 'version_group table')
         PickupTable = namedtuple('PickupTable', 'rarities levels item_rows')
         def make_pickup_table(pickup_items):
-            pickup_items = sorted(pickup_items, key=lambda x: (x.min_level, x.slot.slot))
+            pickup_items = sorted(pickup_items, key=lambda x: (x.min_level, x.slot))
             levels = []
             rarities = []
             item_rows = []
@@ -1749,7 +1749,7 @@ class PokedexController(PokedexBaseController):
             for level, pickup_items in groupby(pickup_items, lambda x: (x.min_level, x.max_level)):
                 if not rarities:
                     pickup_items = list(pickup_items)
-                    rarities = [x.slot.rarity for x in pickup_items]
+                    rarities = [x.rarity for x in pickup_items]
 
                 items = [x.item for x in pickup_items]
 
@@ -1763,15 +1763,13 @@ class PokedexController(PokedexBaseController):
             c.pickup = []
             q = db.pokedex_session.query(tables.PickupItem)
             q = q.options(
-                joinedload('item'),
                 joinedload_all('item.category.pocket'),
-                joinedload('slot'),
-                joinedload('slot.version_group'),
+                joinedload('version_group')
             )
 
             pickup_items = q.all()
-            pickup_items.sort(key=lambda x: x.slot.version_group.order)
-            for version_group, pickup_items in groupby(pickup_items, lambda x: x.slot.version_group):
+            pickup_items.sort(key=lambda x: x.version_group.order)
+            for version_group, pickup_items in groupby(pickup_items, lambda x: x.version_group):
                 pickup_table = make_pickup_table(pickup_items)
                 c.pickup.append(VersionGroupPickupTable(version_group, pickup_table))
 
