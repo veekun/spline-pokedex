@@ -139,7 +139,6 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
     )}</li>
 % endfor
 </ul>
-<p> ${c.pokemon.species.form_description} </p>
 % endif
 
 % if c.form.introduced_in_version_group_id <= 2:

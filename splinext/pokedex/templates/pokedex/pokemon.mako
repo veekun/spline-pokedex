@@ -302,7 +302,7 @@ ${h.h1(_('Evolution'))}
     % endif
     % endfor
 </ul>
-<p> ${c.pokemon.species.form_description} </p>
+<div class="markdown">${c.pokemon.species.form_description}</div>
 % endif
 
 ${h.h1(_('Stats'))}
