@@ -324,13 +324,16 @@ collapse_key = h.pokedex.collapse_flavor_text_key(literal=obdurate)
 </dl>
 </%def>
 
-<%def name="pokemon_cry(pokemon)">
+<%def name="pokemon_cry(pokemon_form)">
 <%
-# Shaymin (and nothing else) has different cries for its different forms
-if pokemon.species.id != 492:
-    pokemon = pokemon.species.default_pokemon
-cry_url = url(controller='dex', action='media', path=h.pokedex.pokemon_media_path(
-    pokemon, 'cries', 'ogg'))
+species = pokemon_form.species
+
+# A handful of Pokémon have separate cries for each form; most don't
+if not h.pokedex.pokemon_has_media(pokemon_form, 'cries', 'ogg'):
+    pokemon_form = None
+
+cry_url = url(controller='dex', action='media',
+    path=h.pokedex.pokemon_media_path(species, 'cries', 'ogg', pokemon_form))
 %>
 <audio src="${cry_url}" controls preload="auto" class="cry">
     <!-- Totally the best fallback -->

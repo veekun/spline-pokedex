@@ -463,7 +463,7 @@ ${h.h1(_('Flavor'))}
 
         <dt>${_("Cry")}</dt>
         <dd>
-            ${dexlib.pokemon_cry(c.pokemon)}
+            ${dexlib.pokemon_cry(c.pokemon.default_form)}
         </dd>
 
         % if c.pokemon.species.generation_id <= 3:
