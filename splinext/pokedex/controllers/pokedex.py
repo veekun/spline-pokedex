@@ -1977,6 +1977,14 @@ class PokedexController(PokedexBaseController):
             c.natures = c.natures.order_by(
                 tables.Nature.names_table.name.asc())
 
+        stat_hint_table = dict()
+        stat_hints = db.pokedex_session.query(tables.StatHint).options(joinedload(tables.StatHint.names_local))
+        for stat_hint in stat_hints:
+            subdict = stat_hint_table.setdefault(stat_hint.stat, {})
+            subdict[stat_hint.gene_mod_5] = stat_hint.message
+
+        c.stat_hints = stat_hint_table
+
         return render('/pokedex/nature_list.mako')
 
     def natures(self, name):

@@ -64,3 +64,30 @@ ${h.h1(_('Nature list'))}
 % endfor
 </tbody>
 </table>
+
+${h.h1(_('Phenotypes'))}
+
+<p>Also called "characteristics", "traits", and all manner of other things.</p>
+
+<p>Your Pokémon's phenotype tells you which of its genes is highest, and which digit that gene's value ends with.</p>
+
+<table class="dex-nature-list striped-rows">
+    <thead>
+        <tr class="header-row">
+            <th></th>
+          % for mod5 in range(5):
+            <th>Ends with ${mod5} or ${mod5 + 5}</th>
+          % endfor
+        </tr>
+    </thead>
+    <tbody>
+      % for stat, hints in sorted(c.stat_hints.items(), key=lambda kv: kv[0].id):
+        <tr>
+            <th>${stat.name}</th>
+          % for mod5 in range(5):
+            <td>${hints[mod5]}</td>
+          % endfor
+        </tr>
+      % endfor
+    </tbody>
+</table>
