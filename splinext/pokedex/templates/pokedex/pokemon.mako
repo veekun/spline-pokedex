@@ -297,9 +297,9 @@ ${h.h1(_('Evolution'))}
         link_class = link_class + ' selected'
 %>\
     % if form.is_default:
-        <li>${h.pokedex.pokemon_link(form.pokemon, h.pokedex.pokemon_form_image(form, 'main-sprites/black-white'), class_=link_class)}</li>
+        <li>${h.pokedex.pokemon_link(form.pokemon, h.pokedex.pokemon_form_image(form), class_=link_class)}</li>
     % else:
-        <li>${h.pokedex.form_flavor_link(form, h.pokedex.pokemon_form_image(form, 'main-sprites/black-white'), class_=link_class)}</li>
+        <li>${h.pokedex.form_flavor_link(form, h.pokedex.pokemon_form_image(form), class_=link_class)}</li>
     % endif
     % endfor
 </ul>

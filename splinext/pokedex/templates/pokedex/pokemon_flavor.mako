@@ -126,15 +126,9 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 <h3>${_("Forms")}</h3>
 <ul class="inline">
 % for form in c.pokemon.species.forms:
-    % if form.form_identifier == 'unknown' and c.pokemon.species.identifier == 'arceus':
-        ## No Arceus-??? in B/W
-        <% prefix = 'main-sprites/heartgold-soulsilver' %>
-    % else:
-        <% prefix = 'main-sprites/black-white' %>
-    % endif
     <li>${h.pokedex.form_flavor_link(
             form,
-            h.pokedex.pokemon_form_image(form, prefix=prefix),
+            h.pokedex.pokemon_form_image(form),
             class_='dex-icon-link' + (' selected' if form == c.form else ''),
     )}</li>
 % endfor
@@ -549,7 +543,7 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 </table>
 % endif
 
-% if c.pokemon.species.generation_id <= 5:
+% if 5 in (form_gen.generation.id for form_gen in c.form.pokemon_form_generations):
 <h2 id="main-sprites:gen-v"><a href="#main-sprites:gen-v" class="subtle">${h.pokedex.generation_icon(5)} ${_("Black & White, Black 2 & White 2")}</a></h2>
 <table class="dex-pokemon-flavor-sprites">
 <colgroup span="1"></colgroup> <!-- row headers -->

@@ -284,8 +284,19 @@ def species_image(pokemon_species, prefix='main-sprites/black-white', **attr):
     return pokedex_img(pokemon_media_path(pokemon_species, prefix, ext),
                        **attr)
 
-def pokemon_form_image(pokemon_form, prefix='main-sprites/black-white', **attr):
+def pokemon_form_image(pokemon_form, prefix=None, **attr):
     """Returns an <img> tag for a Pokémon form image."""
+
+    if prefix is None:
+        # Deal with Spiky-eared Pichu and ??? Arceus
+        gen = pokemon_form.pokemon_form_generations[-1].generation
+
+        if gen.id == 4:
+            vg = 'heartgold-soulsilver'
+        if gen.id == 5:
+            vg = 'black-white'
+
+        prefix = 'main-sprites/{0}'.format(vg)
 
     default_text = pokemon_form.name
 
