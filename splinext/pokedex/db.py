@@ -7,12 +7,11 @@ import re
 
 import pokedex.db
 from pokedex.db import tables
+import spline.lib.base
 from sqlalchemy.sql import func
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import lazyload
 from pylons import tmpl_context as c
-
-from spline.lib.base import SQLATimerProxy
 
 
 pokedex_session = None
@@ -21,11 +20,8 @@ pokedex_lookup = None
 def connect(config):
     """Instantiates the `pokedex_session` and `pokedex_lookup` objects."""
     # DB session for everyone to use.
-    # This uses the same timer proxy as the main engine, so Pokédex queries are
-    # counted towards the db time in the footer
     global pokedex_session
     prefix = 'spline-pokedex.sqlalchemy.'
-    config[prefix + 'proxy'] = config['spline._sqlalchemy_proxy']
     pokedex_session = pokedex.db.connect(
         engine_args=config, engine_prefix=prefix,
     )
