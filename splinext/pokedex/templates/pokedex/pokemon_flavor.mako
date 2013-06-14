@@ -17,10 +17,9 @@ ${_(u"{name} flavor – Pokémon #{number}").format(name=c.form.name, number=c.f
 </ul>
 </%def>
 
+<%lib:cache_content>
 ${dexlib.pokemon_page_header(icon_form=c.form)}
 
-
-<%lib:cache_content>
 ${h.h1(_('Essentials'))}
 <div class="dex-column-container">
 <div class="dex-column">

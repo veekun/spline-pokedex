@@ -18,9 +18,9 @@ ${_(u"{name} – Pokémon #{number}").format(name=(c.pokemon.name), number=c.pok
 </ul>
 </%def>
 
+<%lib:cache_content>
 ${dexlib.pokemon_page_header()}
 
-<%lib:cache_content>
 ${h.h1(_('Essentials'))}
 
 ## Portrait block

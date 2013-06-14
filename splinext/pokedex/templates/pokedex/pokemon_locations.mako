@@ -14,9 +14,8 @@
 </ul>
 </%def>
 
-${dexlib.pokemon_page_header()}
-
 <%lib:cache_content>
+${dexlib.pokemon_page_header()}
 
 ## Sort regions by the generation that introduced them
 % for region, method_area_version_condition_encounters \

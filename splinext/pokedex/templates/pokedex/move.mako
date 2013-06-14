@@ -13,6 +13,7 @@
 </ul>
 </%def>
 
+<%lib:cache_content>
 <div id="dex-header">
     <a href="${url.current(name=c.prev_move.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">
         <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
@@ -32,7 +33,6 @@
     % endif
 </div>
 
-<%lib:cache_content>
 ${h.h1(_('Essentials'))}
 
 <div class="dex-page-portrait">

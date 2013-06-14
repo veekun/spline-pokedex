@@ -568,9 +568,6 @@ class PokedexController(PokedexBaseController):
         # Some Javascript
         c.javascripts.append(('pokedex', 'pokemon'))
 
-        ### Previous and next for the header
-        c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
-
         # Let's cache this bitch
         return self.cache_content(
             key=c.pokemon.default_form.name,
@@ -579,6 +576,9 @@ class PokedexController(PokedexBaseController):
         )
 
     def _do_pokemon(self, name_plus_form):
+        ### Previous and next for the header
+        c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
+
         ### Need to eagerload some, uh, little stuff
         db.pokedex_session.query(tables.Pokemon) \
             .filter_by(id=c.pokemon.id) \
@@ -1165,9 +1165,6 @@ class PokedexController(PokedexBaseController):
 
         c.pokemon = c.form.pokemon
 
-        ### Previous and next for the header
-        c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
-
         return self.cache_content(
             key=u';'.join((c.pokemon.name, c.form.name or u'')),
             template='/pokedex/pokemon_flavor.mako',
@@ -1175,6 +1172,10 @@ class PokedexController(PokedexBaseController):
         )
 
     def _do_pokemon_flavor(self, name_plus_form):
+        ### Previous and next for the header
+        c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
+
+
         c.sprites = {}
 
         def sprite_exists(directory):
@@ -1221,9 +1222,6 @@ class PokedexController(PokedexBaseController):
         except NoResultFound:
             return self._not_found()
 
-        ### Previous and next for the header
-        c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
-
         # Cache it yo
         return self.cache_content(
             key=c.pokemon.name,
@@ -1232,6 +1230,9 @@ class PokedexController(PokedexBaseController):
         )
 
     def _do_pokemon_locations(self, name):
+        ### Previous and next for the header
+        c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
+
         # For the most part, our data represents exactly what we're going to
         # show.  For a given area in a given game, this Pokémon is guaranteed
         # to appear some x% of the time no matter what the state of the world
@@ -1342,6 +1343,13 @@ class PokedexController(PokedexBaseController):
         except NoResultFound:
             return self._not_found()
 
+        return self.cache_content(
+            key=c.move.name,
+            template='/pokedex/move.mako',
+            do_work=self._do_moves,
+        )
+
+    def _do_moves(self, name):
         ### Prev/next for header
         # Shadow moves have the prev/next Shadow move; other moves skip them
         if c.move.type_id == 10002:
@@ -1355,14 +1363,7 @@ class PokedexController(PokedexBaseController):
                 current=c.move,
             )
 
-        return self.cache_content(
-            key=c.move.name,
-            template='/pokedex/move.mako',
-            do_work=self._do_moves,
-        )
-
-    def _do_moves(self, name):
-        # Eagerload
+        ### Eagerload
         db.pokedex_session.query(tables.Move) \
             .filter_by(id=c.move.id) \
             .options(
@@ -1605,12 +1606,6 @@ class PokedexController(PokedexBaseController):
         except NoResultFound:
             return self._not_found()
 
-        ### Prev/next for header
-        c.prev_type, c.next_type = self._prev_next(
-                table=tables.Type,
-                current=c.type,
-            )
-
         return self.cache_content(
             key=c.type.name,
             template='/pokedex/type.mako',
@@ -1618,7 +1613,10 @@ class PokedexController(PokedexBaseController):
         )
 
     def _do_types(self, name):
-        # Eagerload a bit of type stuff
+        ### Prev/next for header
+        c.prev_type, c.next_type = self._prev_next(tables.Type, c.type)
+
+        ### Eagerload a bit of type stuff
         db.pokedex_session.query(tables.Type) \
             .filter_by(id=c.type.id) \
             .options(
@@ -1666,13 +1664,6 @@ class PokedexController(PokedexBaseController):
         except NoResultFound:
             return self._not_found()
 
-        ### Prev/next for header
-        c.prev_ability, c.next_ability = self._prev_next(
-                table=tables.Ability,
-                current=c.ability,
-                filters=[tables.Ability.prose.any()],
-            )
-
         return self.cache_content(
             key=c.ability.name,
             template='/pokedex/ability.mako',
@@ -1680,7 +1671,14 @@ class PokedexController(PokedexBaseController):
         )
 
     def _do_ability(self, name):
-        # Eagerload
+        ### Prev/next for header
+        c.prev_ability, c.next_ability = self._prev_next(
+            table=tables.Ability,
+            current=c.ability,
+            filters=[tables.Ability.prose.any()],
+        )
+
+        ### Eagerload
         db.pokedex_session.query(tables.Ability) \
             .filter_by(id=c.ability.id) \
             .options(
