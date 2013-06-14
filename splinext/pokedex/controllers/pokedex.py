@@ -561,27 +561,7 @@ class PokedexController(PokedexBaseController):
     def pokemon(self, name=None):
         form = request.params.get('form', None)
         try:
-            pokemon_q = db.pokemon_query(name, form)
-
-            # Need to eagerload some, uh, little stuff
-            pokemon_q = pokemon_q.options(
-                joinedload(tables.Pokemon.abilities, tables.Ability.prose_local),
-                joinedload(tables.Pokemon.hidden_ability, tables.Ability.prose_local),
-                eagerload('species.evolution_chain.species'),
-                eagerload('species.generation'),
-                eagerload('items.item'),
-                eagerload('items.version'),
-                eagerload('species'),
-                eagerload('species.color'),
-                eagerload('species.habitat'),
-                eagerload('species.shape'),
-                eagerload('species.egg_groups'),
-                subqueryload_all('stats.stat'),
-                subqueryload_all('types.target_efficacies.damage_type'),
-            )
-
-            # Alright, execute
-            c.pokemon = pokemon_q.one()
+            c.pokemon = db.pokemon_query(name, form).one()
         except NoResultFound:
             return self._not_found()
 
@@ -599,6 +579,25 @@ class PokedexController(PokedexBaseController):
         )
 
     def _do_pokemon(self, name_plus_form):
+        ### Need to eagerload some, uh, little stuff
+        db.pokedex_session.query(tables.Pokemon) \
+            .filter_by(id=c.pokemon.id) \
+            .options(
+                joinedload(tables.Pokemon.abilities, tables.Ability.prose_local),
+                joinedload(tables.Pokemon.hidden_ability, tables.Ability.prose_local),
+                eagerload('species.evolution_chain.species'),
+                eagerload('species.generation'),
+                eagerload('items.item'),
+                eagerload('items.version'),
+                eagerload('species'),
+                eagerload('species.color'),
+                eagerload('species.habitat'),
+                eagerload('species.shape'),
+                eagerload('species.egg_groups'),
+                subqueryload_all('stats.stat'),
+                subqueryload_all('types.target_efficacies.damage_type'),
+            ) \
+            .one()
 
         ### Type efficacy
         c.type_efficacies = defaultdict(lambda: 100)
