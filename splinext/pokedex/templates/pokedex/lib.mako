@@ -4,12 +4,12 @@
 % if pokemon.is_default and pokemon.species.generation_id < 6:
 <span class="sprite-icon sprite-icon-${pokemon.species.id}"></span>\
 % else:
-<%
-kw = {}
-if not alt:
-    kw['alt'] = ''
-%>
-${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons', **kw)}\
+    <% alt_text = pokemon.species.name if alt else '' %>
+    % if pokemon.species.generation_id < 6:
+        ${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons', alt=alt_text)}\
+    % else:
+        ${h.pokedex.pokedex_img('pokemon/icons/0.png', title=pokemon.species.name, alt=alt_text)}\
+    % endif
 % endif
 </%def>
 
