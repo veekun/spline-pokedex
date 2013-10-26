@@ -558,36 +558,8 @@ class PokedexController(PokedexBaseController):
     def pokemon_list(self):
         return render('/pokedex/pokemon_list.mako')
 
-    def pokemon_construction(self, name):
-        class fake(object):
-            def __init__(self, **kw):
-                self.__dict__.update(kw)
-
-        id = 666
-        identifier = name.lower()
-        name = name.title()
-
-        species = fake(id=id, name=name, identifier=identifier, conquest_order=None)
-        pokemon = fake(name=name, is_default=True)
-        form = fake(name=name, form_identifier='', is_default=True)
-
-        pokemon.species = form.species = species
-        species.default_pokemon = form.pokemon =  pokemon
-        species.default_form = pokemon.default_form = form
-
-        c.pokemon = pokemon
-
-        c.prev_pokemon = db.pokemon_query('genesect').one()
-        c.next_pokemon = db.pokemon_query('bulbasaur').one()
-
-        return render('/pokedex/pokemon_construction.mako')
-
-
     def pokemon(self, name=None):
         form = request.params.get('form', None)
-
-        if name == u'vivillon':
-            return self.pokemon_construction(name)
 
         try:
             pokemon_q = db.pokemon_query(name, form)
@@ -614,15 +586,18 @@ class PokedexController(PokedexBaseController):
         except NoResultFound:
             return self._not_found()
 
-        # Some Javascript
-        c.javascripts.append(('pokedex', 'pokemon'))
-
         ### Previous and next for the header
         c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
 
+        if c.pokemon.species.generation_id >= 6:
+            return render('/pokedex/pokemon_construction.mako')
+
+        # Some Javascript
+        c.javascripts.append(('pokedex', 'pokemon'))
+
         # Let's cache this bitch
         return self.cache_content(
-            key=c.pokemon.default_form.name,
+            key=c.pokemon.default_form.name, # c.pokemon.name?
             template='/pokedex/pokemon.mako',
             do_work=self._do_pokemon,
         )

@@ -15,7 +15,7 @@ ${_(u"{name} – Pokémon #{number}").format(name=(c.pokemon.name), number=c.pok
 </ul>
 </%def>
 
-${dexlib.pokemon_page_header()}
+${dexlib.pokemon_page_header(subpages=False)}
 
 <h1>${_('UNDER CONSTRUCTION')}</h1>
 
@@ -30,14 +30,11 @@ Ask <a href="${url('/chat')}">on IRC</a> for write access.
 
 <p>In the meantime, try one of these other Pokédexes:
 
-<%
-    wiki_name = c.pokemon.species.name.replace(u" ", u"_")
-    pokemondb_name = c.pokemon.species.name.replace(u"é", u"e")
-%>
+<% wiki_name = c.pokemon.species.name.replace(u" ", u"_") %>
 <ul class="classic-list">
 <li><a href="http://bulbapedia.bulbagarden.net/wiki/${wiki_name}_%28Pok%C3%A9mon%29">Bulbapedia</a></li>
 <li><a href="http://www.serebii.net/pokedex-xy/${"%03d" % c.pokemon.species.id}.shtml">Serebii.net</a></li>
-<li><a href="http://pokemondb.net/pokedex/${pokemondb_name}">Pokémon Database</a>
+<li><a href="http://pokemondb.net/pokedex/${c.pokemon.species.identifier}">Pokémon Database</a>
 <li><a href="http://pokemon.wikia.com/wiki/${wiki_name}">The Pokémon Wiki</a></li>
 <li><a href="http://pokemon.gamepedia.com/${wiki_name}">Marriland Wiki</a></li>
 </ul>

@@ -1,43 +1,50 @@
 <%! from splinext.pokedex import i18n, db %>\
 
-<%def name="pokemon_icon(pokemon)">\
-% if pokemon.is_default:
+<%def name="pokemon_icon(pokemon, alt=True)">\
+% if pokemon.is_default and pokemon.species.generation_id < 6:
 <span class="sprite-icon sprite-icon-${pokemon.species.id}"></span>\
 % else:
-${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons')}\
+<%
+kw = {}
+if not alt:
+    kw['alt'] = ''
+%>
+${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons', **kw)}\
 % endif
 </%def>
 
 
-<%def name="pokemon_page_header(icon_form=None)">
+<%def name="pokemon_page_header(icon_form=None, subpages=True)">
 <div id="dex-header">
     <a href="${url.current(name=c.prev_pokemon.species.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">
         <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
-        ${pokemon_icon(c.prev_pokemon)}
+        ${pokemon_icon(c.prev_pokemon, alt="")}
         ${c.prev_pokemon.species.id}: ${c.prev_pokemon.species.name}
     </a>
     <a href="${url.current(name=c.next_pokemon.species.name.lower(), form=None)}" id="dex-header-next" class="dex-box-link">
         ${c.next_pokemon.species.id}: ${c.next_pokemon.species.name}
-        ${pokemon_icon(c.next_pokemon)}
+        ${pokemon_icon(c.next_pokemon, alt="")}
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
     ${h.pokedex.pokemon_form_image(icon_form or c.pokemon.default_form, prefix='icons')}
     <br>${c.pokemon.species.id}: ${c.pokemon.species.name}
-    <ul class="inline-menu">
-    <% form = c.pokemon.default_form.form_identifier if not c.pokemon.is_default else None %>\
-    % for action, label in (('pokemon', u'Pokédex'), \
-                            ('pokemon_flavor', u'Flavor'), \
-                            ('pokemon_locations', u'Locations')):
-        % if action == request.environ['pylons.routes_dict']['action']:
-        <li>${label}</li>
-        % else:
-        <li><a href="${url.current(action=action, form=form if action != 'pokemon_locations' else None)}">${label}</a></li>
+    % if subpage_links:
+        <ul class="inline-menu">
+        <% form = c.pokemon.default_form.form_identifier if not c.pokemon.is_default else None %>\
+        % for action, label in (('pokemon', u'Pokédex'), \
+                                ('pokemon_flavor', u'Flavor'), \
+                                ('pokemon_locations', u'Locations')):
+            % if action == request.environ['pylons.routes_dict']['action']:
+            <li>${label}</li>
+            % else:
+            <li><a href="${url.current(action=action, form=form if action != 'pokemon_locations' else None)}">${label}</a></li>
+            % endif
+        % endfor
+        % if c.pokemon.species.conquest_order is not None:
+            <li><a href="${url(controller='dex_conquest', action='pokemon', name=c.pokemon.species.name.lower())}">Conquest</a></li>
         % endif
-    % endfor
-    % if c.pokemon.species.conquest_order is not None:
-        <li><a href="${url(controller='dex_conquest', action='pokemon', name=c.pokemon.species.name.lower())}">Conquest</a></li>
+        </ul>
     % endif
-    </ul>
 </div>
 </%def>
 
