@@ -608,7 +608,10 @@ class PokedexGadgetsController(PokedexBaseController):
         c.did_anything = False
 
         # Form controls use version group
+        # We join with VGPMM to filter out version groups which we lack move
+        # data for. *coughxycough*
         c.version_groups = db.pokedex_session.query(tables.VersionGroup) \
+            .join(tables.VersionGroupPokemonMoveMethod) \
             .order_by(tables.VersionGroup.order.asc()) \
             .options(eagerload('versions')) \
             .all()
