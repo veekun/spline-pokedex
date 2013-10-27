@@ -1331,7 +1331,7 @@ class PokedexSearchController(PokedexBaseController):
         query = db.pokedex_session.query(me) \
             .join(me.names_local) \
             .join(tables.MoveEffect) \
-            .join(tables.MoveMeta)
+            .outerjoin(tables.MoveMeta)
 
         # Name
         if c.form.name.data:
