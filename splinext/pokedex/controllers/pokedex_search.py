@@ -109,6 +109,12 @@ class BaseSearchForm(Form):
             self.cleansed_data = formdata.copy()
             del self.cleansed_data['shorten']
 
+            for stat_field_name in ['stat_change']:
+                stat_field = self[stat_field_name]
+                for field in stat_field:
+                    if field.data == field.default:
+                        self.cleansed_data.pop(field.name, None)
+
             for name, field in self._fields.iteritems():
                 # Shorten: nuke anything that's a default
                 if field.data == field.default and name in self.cleansed_data:
@@ -124,6 +130,7 @@ class BaseSearchForm(Form):
 
             # Unshortening.  Fields that are missing entirely from the form
             # data need to be FILLED IN with their defaults.
+            # (XXX What? Surely wtforms takes care of this.)
             # Note that this will cheerfully fill in a multi-select field where
             # nothing was selected; it's assumed that a multi-select field with
             # a default makes no sense with nothing selected
@@ -1388,7 +1395,6 @@ class PokedexSearchController(PokedexBaseController):
         if c.form.multi_turn.data:
             query = query.filter(tables.MoveMeta.min_turns != None)
 
-        # TODO: shorten this field correctly
         for stat_field in c.form.stat_change:
             if not stat_field.data:
                 continue
