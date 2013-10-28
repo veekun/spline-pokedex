@@ -87,6 +87,7 @@ class BaseSearchForm(Form):
     # Defaults are set to match what the client will actually send if the field
     # is left blank
     shorten = fields.HiddenField(default=u'')
+    compound_field_names = []
 
     def __init__(self, formdata=None, *args, **kwargs):
         """Saves a copy of the passed form data, with default values removed,
@@ -109,7 +110,7 @@ class BaseSearchForm(Form):
             self.cleansed_data = formdata.copy()
             del self.cleansed_data['shorten']
 
-            for stat_field_name in ['stat_change']:
+            for stat_field_name in self.compound_field_names:
                 stat_field = self[stat_field_name]
                 for field in stat_field:
                     if field.data == field.default:
@@ -416,6 +417,8 @@ class PokemonSearchForm(BaseSearchForm):
     format = fields.TextField('Custom list format', default=u'$icon $name')
 
 class MoveSearchForm(BaseSearchForm):
+    compound_field_names = ['stat_change']
+
     id = RangeTextField('ID', inflator=int)
 
     # Core stuff
