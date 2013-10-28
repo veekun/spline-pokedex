@@ -1116,7 +1116,7 @@ class PokedexSearchController(PokedexBaseController):
             ))
 
             # Sort by ID instead of name within families
-            sort_clauses[0] = default_form.id.asc()
+            sort_clauses[0] = my_species.order
 
             sort_clauses = [
                 chain_sorting_subquery.c.chain_position,
