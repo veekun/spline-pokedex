@@ -311,7 +311,11 @@ class PokedexController(PokedexBaseController):
         response.headers['content-type'] = mimetype
 
         media_path = os.path.join(media_dir, path)
-        return wsgi_stream_file(open(media_path))
+        try:
+            f = open(media_path)
+        except IOError:
+            abort(404)
+        return wsgi_stream_file(f)
 
     def lookup(self):
         """Find a page in the Pokédex given a name.
