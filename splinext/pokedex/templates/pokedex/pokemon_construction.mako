@@ -21,7 +21,13 @@ ${dexlib.pokemon_page_header(subpages=False)}
 
 <img src="${h.static_uri('local', 'images/engiveer.png')}" align="right" alt="" title="I solve Pokémon problems">
 
-<p>We don't have any data about ${c.pokemon.species.name} yet. Sorry.
+<p><strong class="obnoxious">We don't know anything about
+% if c.pokemon.species.generation_id >= 6:
+${c.pokemon.species.name}
+% else:
+${c.pokemon.name}
+% endif
+yet. Sorry.</strong>
 
 <p>We can't rip data from X &amp; Y because the encryption hasn't been cracked yet.
 But fear not! We're gathering info the old-fashioned way: by hand.
