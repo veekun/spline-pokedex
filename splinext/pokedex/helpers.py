@@ -288,15 +288,13 @@ def pokemon_form_image(pokemon_form, prefix=None, **attr):
     """Returns an <img> tag for a Pokémon form image."""
 
     if prefix is None:
+        prefix = 'main-sprites/black-white'
+
         # Deal with Spiky-eared Pichu and ??? Arceus
-        gen = pokemon_form.pokemon_form_generations[-1].generation
-
-        if gen.id == 4:
-            vg = 'heartgold-soulsilver'
-        if gen.id == 5:
-            vg = 'black-white'
-
-        prefix = 'main-sprites/{0}'.format(vg)
+        if pokemon_form.pokemon_form_generations:
+            last_gen = pokemon_form.pokemon_form_generations[-1].generation_id
+            if last_gen == 4:
+                prefix = 'main-sprites/heartgold-soulsilver'
 
     default_text = pokemon_form.name
 
