@@ -424,14 +424,8 @@ ${egg_group.name}<br>
 </td>
 </%def>
 
-<%def name="td_stat(pokemon, stat_identifier)">
-<td class="stat">
-% try:
-    ${pokemon.stat(stat_identifier).base_stat}
-% except KeyError:
-    ?
-% endtry
-</td>
+<%def name="td_stat(pokemon, stat_identifier)">\
+<td class="stat">${pokemon.base_stat(stat_identifier, '?')}</td>\
 </%def>
 
 <%def name="col_stat_hp()"><col class="dex-col-stat"></%def>

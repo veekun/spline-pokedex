@@ -315,10 +315,7 @@ class PokedexGadgetsController(PokedexBaseController):
                 u'skitty', u'delcatty',
             )
 
-            try:
-                is_skittish = c.pokemon.stat('speed').base_stat >= 100
-            except KeyError:
-                is_skittish = False
+            is_skittish = c.pokemon.base_stat('speed', 0) >= 100
 
             c.results[u'Level Ball']  = [
                 CaptureChance(u'Your level ≤ target level',
@@ -739,13 +736,13 @@ class PokedexGadgetsController(PokedexBaseController):
                 (u'Capture rate',   lambda pokemon: pokemon.species.capture_rate),
             ]
             def relative_stat_factory(local_stat):
-                return lambda pokemon: pokemon.stat(local_stat).base_stat
+                return lambda pokemon: pokemon.base_stat(local_stat, 0)
             for stat in c.stats:
                 relative_things.append((stat.name, relative_stat_factory(stat)))
 
             relative_things.append((
                 u'Base stat total',
-                lambda pokemon: sum(pokemon.stat(stat).base_stat for stat in c.stats)
+                lambda pokemon: sum(pokemon.base_stat(stat, 0) for stat in c.stats)
             ))
 
             # Assemble the data
@@ -928,7 +925,10 @@ class PokedexGadgetsController(PokedexBaseController):
             else:
                 func = pokedex.formulae.calculated_stat
 
-            base_stat = pokemon.stat(stat).base_stat
+            base_stat = pokemon.base_stat(stat, 0)
+            if not base_stat:
+                valid_genes[stat] = set(range(32))
+                continue
 
             nature_mod = 1.0
             if not nature:

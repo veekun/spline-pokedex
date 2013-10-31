@@ -227,15 +227,12 @@
     ${egg_group.name}
   % endfor
 </td>
+% for stat_identifier in ['hp', 'attack', 'defense', 'special-attack', 'special-defense', 'speed']:
+    <td class="stat stat-${stat_identifier}">${pokemon.base_stat(stat_identifier, '?')}</td>
+% endfor
 % if pokemon.stats:
-    % for pokemon_stat in pokemon.stats:
-    <td class="stat stat-${pokemon_stat.stat.identifier}">${pokemon_stat.base_stat}</td>
-    % endfor
     <td>${sum((pokemon_stat.base_stat for pokemon_stat in pokemon.stats))}</td>
 % else:
-    % for _ in range(6):
-    <td class="stat">?</td>
-    % endfor
     <td>?</td>
 % endif
 </%def>

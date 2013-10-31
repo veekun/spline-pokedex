@@ -304,14 +304,13 @@ ${h.pokedex.gender_rate_label[pokemon.species.gender_rate]}
 
 <%def name="capture_rate_cell(pokemon)">${pokemon.capture_rate}</%def>
 
-<%def name="stat_cell(pokemon, stat)">${pokemon.stat(stat).base_stat}</%def>
+<%def name="stat_cell(pokemon, stat)">${pokemon.base_stat(stat, '?')}</%def>
 
 <%def name="effort_cell(pokemon)">
 <ul>
-    % for stat in c.stats:
-    <% effort = pokemon.stat(stat).effort %>\
-    % if effort:
-    <li>${effort} ${stat.name}</li>
+    % for pokemon_stat in pokemon.stats:
+    % if pokemon_stat.effort:
+    <li>${pokemon_stat.effort} ${pokemon_stat.stat.name}</li>
     % endif
     % endfor
 </ul>

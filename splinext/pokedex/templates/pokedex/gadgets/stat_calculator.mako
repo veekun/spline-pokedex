@@ -98,12 +98,12 @@ ${h.form(url.current(), method=u'GET')}
           % endif
         </th>
         % if c.results:
-        <td>${c.form.pokemon.data.stat(stat).base_stat}</td>
+        <td>${c.form.pokemon.data.base_stat(stat, u'?')}</td>
         % endif
         % for i in range(num_data_columns):
         <td>
             ${lib.literal_field(c.form.stat[i][stat], size=3, tabindex=200 + (len(c.stats) + 1) * (i * 3 + 1))}
-            % if c.results and i < c.num_data_points:
+            % if c.results and i < c.num_data_points and c.form.level[i].data in c.valid_range[stat]:
             <div class="-valid-range
                 % if c.form.nature.data and not c.form.nature.data.is_neutral:
                 % if c.form.nature.data.increased_stat == stat:
@@ -113,11 +113,11 @@ ${h.form(url.current(), method=u'GET')}
                 % endif
                 % endif
             ">
-                <% valid_range = c.valid_range[stat][ c.form.level[i].data ] %>\
-                % if len(set(valid_range)) == 1:
-                ${valid_range[0]}
+                <% min_stat, max_stat = c.valid_range[stat][ c.form.level[i].data ] %>\
+                % if min_stat == max_stat:
+                ${min_stat}
                 % else:
-                ${valid_range[0]}–${valid_range[1]}
+                ${min_stat}–${max_stat}
                 % endif
             </div>
             % endif
