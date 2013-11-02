@@ -28,7 +28,7 @@
     </a>
     ${h.pokedex.pokemon_form_image(icon_form or c.pokemon.default_form, prefix='icons')}
     <br>${c.pokemon.species.id}: ${c.pokemon.species.name}
-    % if subpage_links:
+    % if subpages:
         <ul class="inline-menu">
         <% form = c.pokemon.default_form.form_identifier if not c.pokemon.is_default else None %>\
         % for action, label in (('pokemon', u'Pokédex'), \
