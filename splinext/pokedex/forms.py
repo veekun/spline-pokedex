@@ -11,7 +11,7 @@ import splinext.pokedex.db as db
 class PokedexLookupField(fields.TextField):
     u"""Provides a lookup box for naming something in the Pokédex."""
 
-    def __init__(self, label=u'', validators=[],
+    def __init__(self, label=None, validators=None,
                  valid_type='pokemon', allow_blank=False, **kwargs):
         """`valid_type` is the type prefix to pass to lookup."""
         super(fields.TextField, self).__init__(label, validators, **kwargs)
@@ -186,7 +186,7 @@ class RangeTextField(fields.TextField):
     If `signed` is true, then input of "-foo" won't be taken to mean "0-foo",
     and "--foo" will be allowed.
     """
-    def __init__(self, label=u'', validators=[], inflator=None, signed=False,
+    def __init__(self, label=None, validators=None, inflator=None, signed=False,
         **kwargs):
 
         super(fields.TextField, self).__init__(label, validators, **kwargs)

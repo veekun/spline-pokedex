@@ -43,7 +43,9 @@ class OptionalLevelField(fields.IntegerField):
     Also overrides the usual IntegerField logic to default to an empty field.
     Defaulting to 0 means the field can't be submitted from scratch.
     """
-    def __init__(self, label=u'', validators=[], **kwargs):
+    def __init__(self, label=None, validators=None, **kwargs):
+        if validators is None:
+            validators = []
         validators.extend([
             wtforms.validators.NumberRange(min=1, max=100),
             wtforms.validators.Optional(),
