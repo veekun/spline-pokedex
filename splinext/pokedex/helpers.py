@@ -490,10 +490,11 @@ def evolution_description(evolution, _=_):
     if evolution.minimum_level:
         chunks.append(_(u"starting at level {0}").format(evolution.minimum_level))
     if evolution.location_id:
-        chunks.append(h.literal(_(u"around {0}")).format(
+        chunks.append(h.literal(_(u"around {0} ({1})")).format(
             h.HTML.a(evolution.location.name,
                 href=url(controller='dex', action='locations',
-                         name=evolution.location.name.lower()))))
+                         name=evolution.location.name.lower())),
+            evolution.location.region.name))
     if evolution.held_item_id:
         chunks.append(h.literal(_(u"while holding {article} {item}")).format(
             article=article(evolution.held_item.name),
@@ -503,12 +504,20 @@ def evolution_description(evolution, _=_):
             h.HTML.a(evolution.known_move.name,
                 href=url(controller='dex', action='moves',
                          name=evolution.known_move.name.lower()))))
+    if evolution.known_move_type_id:
+        chunks.append(h.literal(_(u'knowing a {0}-type move')).format(
+            h.HTML.a(evolution.known_move_type.name,
+                href=url(controller='dex', action='types',
+                    name=evolution.known_move_type.name.lower()))))
     if evolution.minimum_happiness:
         chunks.append(_(u"with at least {0} happiness").format(
             evolution.minimum_happiness))
     if evolution.minimum_beauty:
         chunks.append(_(u"with at least {0} beauty").format(
             evolution.minimum_beauty))
+    if evolution.minimum_affection:
+        chunks.append(_(u'with at least {0} affection in Pokémon-Amie').format(
+            evolution.minimum_affection))
     if evolution.relative_physical_stats is not None:
         if evolution.relative_physical_stats < 0:
             op = _(u'<')
@@ -520,9 +529,18 @@ def evolution_description(evolution, _=_):
     if evolution.party_species_id:
         chunks.append(h.literal(_(u"with {0} in the party")).format(
             pokemon_link(evolution.party_species.default_pokemon, include_icon=False)))
+    if evolution.party_type_id:
+        chunks.append(h.literal(_(u"with a {0}-type Pokémon in the party")).format(
+            h.HTML.a(evolution.party_type.name,
+                href=url(controller='dex', action='types',
+                    name=evolution.party_type.name.lower()))))
     if evolution.trade_species_id:
         chunks.append(h.literal(_(u"in exchange for {0}")).format(
             pokemon_link(evolution.trade_species.default_pokemon, include_icon=False)))
+    if evolution.needs_overworld_rain:
+        chunks.append(_(u'while it is raining outside of battle'))
+    if evolution.turn_upside_down:
+        chunks.append(_(u'with the 3DS turned upside-down'))
 
     return h.literal(u', ').join(chunks)
 
