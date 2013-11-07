@@ -56,7 +56,7 @@ def make_thingy_url(thingy, subpage=None, controller='dex'):
         args['pocket'] = thingy.pocket.identifier
 
     if (thingy.__tablename__.startswith('conquest_')
-       or (isinstance(thingy, tables.Ability) and thingy.effect is None)
+       or (isinstance(thingy, tables.Ability) and not thingy.is_main_series)
        or subpage == 'conquest'):
         # Conquest stuff needs to go to the Conquest controller
         if action == 'conquest_warrior_skills':
