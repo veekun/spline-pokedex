@@ -77,6 +77,7 @@ ${h.h1(_('Essentials'))}
         <dd>${h.pokedex.generation_icon(c.pokemon.species.generation, _=_)}</dd>\
 
         % for number in c.pokemon.species.dex_numbers:
+        % if number.pokedex.is_main_series:
         <dt>${number.pokedex.name}</dt>
         <dd>
             ${number.pokedex_number}
@@ -85,6 +86,7 @@ ${h.h1(_('Essentials'))}
             % endif
         </dd>
 
+        % endif
         % endfor
     </dl>
 
