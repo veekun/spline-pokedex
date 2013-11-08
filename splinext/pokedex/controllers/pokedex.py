@@ -988,7 +988,7 @@ class PokedexController(PokedexBaseController):
             # ... in a generation where this Pokémon actually exists...
             q = q.join(tables.VersionGroup, tables.PokemonMove.version_group)
             q = q.filter(tables.VersionGroup.generation_id >=
-                         c.pokemon.species.generation_id)
+                         c.pokemon.default_form.version_group.generation_id)
 
             # That AREN'T learnable by this Pokémon.  This NOT EXISTS strips
             # out moves that are also learned by a "higher-ordered" Pokémon.
