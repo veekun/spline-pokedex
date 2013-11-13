@@ -30,7 +30,7 @@ ${h.h1(_('Essentials'))}
     <p id="dex-pokemon-forme">${c.pokemon.default_form.form_name}</p>
     % endif
     <div id="dex-pokemon-portrait-sprite">
-        ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white')}
+        ${h.pokedex.pokemon_form_image(c.pokemon.default_form)}
     </div>
     <p id="dex-page-types">
         % for type in c.pokemon.types:
