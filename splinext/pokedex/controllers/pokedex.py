@@ -593,9 +593,6 @@ class PokedexController(PokedexBaseController):
         ### Previous and next for the header
         c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
 
-        if c.pokemon.species.generation_id >= 6 or c.pokemon.default_form.introduced_in_version_group_id >= 15:
-            return render('/pokedex/pokemon_construction.mako')
-
         # Some Javascript
         c.javascripts.append(('pokedex', 'pokemon'))
 
