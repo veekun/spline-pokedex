@@ -428,20 +428,27 @@ ${h.h1(_('Flavor'))}
 </div>
 <div class="dex-column">
     <h2>${_("Sprites")}</h2>
-    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white')}
-    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/shiny')}
-    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/back')}
-    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/back/shiny')}
-    % if c.pokemon.species.has_gender_differences:
-    <br/>
-    % if h.pokedex.pokemon_has_media(c.pokemon.default_form, 'main-sprites/black-white/female', 'png'):
-    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/female')}
-    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/shiny/female')}
-    % endif
-    % if h.pokedex.pokemon_has_media(c.pokemon.default_form, 'main-sprites/black-white/back/female', 'png'):
-    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/back/female')}
-    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/back/shiny/female')}
-    % endif
+    % if c.pokemon.default_form.introduced_in_version_group_id >= 15:
+      ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/x-y')}
+      % if h.pokedex.pokemon_has_media(c.pokemon.default_form, 'main-sprites/x-y/female', 'png'):
+        ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/x-y/female')}
+      % endif
+    % else:
+      ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white')}
+      ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/shiny')}
+      ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/back')}
+      ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/back/shiny')}
+      % if c.pokemon.species.has_gender_differences:
+        <br/>
+        % if h.pokedex.pokemon_has_media(c.pokemon.default_form, 'main-sprites/black-white/female', 'png'):
+          ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/female')}
+          ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/shiny/female')}
+        % endif
+        % if h.pokedex.pokemon_has_media(c.pokemon.default_form, 'main-sprites/black-white/back/female', 'png'):
+          ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/back/female')}
+          ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/black-white/back/shiny/female')}
+        % endif
+      % endif
     % endif
 </div>
 </div>
