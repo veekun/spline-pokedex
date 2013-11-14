@@ -5,7 +5,7 @@
 <span class="sprite-icon sprite-icon-${pokemon.species.id}"></span>\
 % else:
     <% alt_text = pokemon.species.name if alt else '' %>
-    % if pokemon.default_form.introduced_in_version_group_id < 15 or pokemon.identifier == 'meowstic-female':
+    % if h.pokedex.pokemon_has_media(pokemon.default_form, 'icons', 'png'):
         ${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons', alt=alt_text)}\
     % else:
         ${h.pokedex.pokedex_img('pokemon/icons/0.png', title=pokemon.species.name, alt=alt_text)}\
