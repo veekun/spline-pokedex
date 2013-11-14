@@ -62,6 +62,7 @@ def create_downloads():
     make_tarball('pokemon-trozei.tar.gz', ['pokemon/trozei'])
     make_tarball('pokemon-icons.tar.gz', ['pokemon/icons'])
     make_tarball('pokemon-conquest.tar.gz', ['pokemon/conquest'])
+    make_tarball('pokemon-dream-world.tar.gz', ['pokemon/dream-world'])
 
     # Not Pokémon at all!
     make_tarball('chrome.tar.gz', ['chrome', 'ribbons'])
