@@ -124,8 +124,12 @@ ${h.h1(_(u'Pokémon', context='plural'))}
 ${h.h1(_('External Links'), id='links')}
 <ul class="classic-list">
     <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.ability.name.replace(' ', '_')}_%28ability%29">${_("Bulbapedia")}</a></li>
+    % if c.ability.generation_id <= 4:
     <li><a href="http://legendarypokemon.net/dp/abilities#${c.ability.name.lower().replace(' ', '+')}">${_(u"Legendary Pokémon")}</a></li>
+    % endif
     <li><a href="http://serebii.net/abilitydex/${c.ability.name.lower().replace(' ', '')}.shtml">${_("Serebii.net")}</a></li>
+    % if c.ability.generation_id <= 5:
     <li><a href="http://smogon.com/bw/abilities/${c.ability.name.lower().replace(' ', '_')}">${_("Smogon")}</a></li>
+    % endif
 </ul>
 </%lib:cache_content>

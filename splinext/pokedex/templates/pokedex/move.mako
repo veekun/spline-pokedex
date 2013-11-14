@@ -479,9 +479,16 @@ ${h.h1(_('External Links'), id='links')}
 <li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/attacks/${c.move.name[0].lower()}/${c.move.name.lower().replace(' ', '_')}.htm">${_("Azure Heights")}</a></li>
 % endif
 <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.move.name.replace(' ', '_')}_%28move%29">${_("Bulbapedia")}</a></li>
+% if c.move.generation_id <= 4:
 <li><a href="http://www.legendarypokemon.net/attacks/${c.move.name.replace(' ', '+')}/">${_(u"Legendary Pokémon")}</a></li>
+% endif
+% if c.move.generation_id <= 5:
+## Psypoke's X/Y move ids don't match up with ours.
 <li><a href="http://www.psypokes.com/dex/techdex/${"%03d" % c.move.id}">${_("PsyPoke")}</a></li>
-<li><a href="http://www.serebii.net/attackdex-bw/${c.move.name.lower().replace(' ', '')}.shtml">${_("Serebii.net")}</a></li>
+% endif
+<li><a href="http://www.serebii.net/attackdex-xy/${c.move.name.lower().replace(' ', '')}.shtml">${_("Serebii.net")}</a></li>
+% if c.move.generation_id <= 5:
 <li><a href="http://www.smogon.com/bw/moves/${c.move.name.lower().replace(' ', '_')}">${_("Smogon")}</a></li>
+% endif
 </ul>
 </%lib:cache_content>
