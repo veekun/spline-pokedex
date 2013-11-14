@@ -16,7 +16,7 @@
 
 <h2>By generation</h2>
 <ul class="classic-list">
-    <li><a href="${url(controller='dex_search', action='move_search', introduced_in=['1','2','3','4','5'], sort='name')}">${_("EVERY MOVE EVER")}</a></li>
+    <li><a href="${url(controller='dex_search', action='move_search', introduced_in=['1','2','3','4','5','6'], sort='name')}">${_("EVERY MOVE EVER")}</a></li>
     <li><a href="${url(controller='dex_search', action='move_search', introduced_in='1', sort='id')}">${h.pokedex.generation_icon(1)} ${_("Red/Blue/Yellow")}</a></li>
     <li><a href="${url(controller='dex_search', action='move_search', introduced_in='2', sort='id')}">${h.pokedex.generation_icon(2)} ${_("Gold/Silver/Crystal")}</a></li>
     <li><a href="${url(controller='dex_search', action='move_search', introduced_in='3', sort='id')}">${h.pokedex.generation_icon(3)} ${_("Ruby/Sapphire/Emerald")}</a></li>

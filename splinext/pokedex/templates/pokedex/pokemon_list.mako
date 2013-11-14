@@ -16,7 +16,7 @@
 
 <h2>${_(u"By generation")}</h2>
 <ul class="classic-list">
-    <li><a href="${url(controller='dex_search', action='pokemon_search', introduced_in=['1','2','3','4','5'], sort='evolution-chain')}">${_(u"EVERY POKéMON EVER")}</a></li>
+    <li><a href="${url(controller='dex_search', action='pokemon_search', introduced_in=['1','2','3','4','5','6'], sort='evolution-chain')}">${_(u"EVERY POKéMON EVER")}</a></li>
     <li><a href="${url(controller='dex_search', action='pokemon_search', introduced_in='1', sort='evolution-chain')}">${h.pokedex.generation_icon(1)} ${_(u"Red/Blue/Yellow")}</a></li>
     <li><a href="${url(controller='dex_search', action='pokemon_search', introduced_in='2', sort='evolution-chain')}">${h.pokedex.generation_icon(2)} ${_(u"Gold/Silver/Crystal")}</a></li>
     <li><a href="${url(controller='dex_search', action='pokemon_search', introduced_in='3', sort='evolution-chain')}">${h.pokedex.generation_icon(3)} ${_(u"Ruby/Sapphire/Emerald")}</a></li>
