@@ -44,7 +44,11 @@ ${_("%s pocket - Items") % (c.item_pocket.name)}
 % for item in category.items:
 <tr>
     % if c.item_pocket.identifier == u'berries':
+    % if item.berry:
     <td>${item.berry.id}</td>
+    % else:
+    <td>?</td>
+    % endif
     % endif
     <td>${h.pokedex.item_link(item)}</td>
     <td>
