@@ -342,6 +342,7 @@ class PokemonSearchForm(BaseSearchForm):
             ('evolution-chain', 'Evolution family'),
             ('name', 'Name'),
             ('type', 'Type'),
+            ('growth-rate', 'Growth rate'),
             ('hatch-counter', 'Hatch counter/steps'),
             ('base-experience', 'Base EXP'),
             ('capture-rate', 'Capture rate'),
@@ -1156,6 +1157,11 @@ class PokedexSearchController(PokedexBaseController):
                 type_sort_clauses.append(type_alias.identifier.asc())
 
             sort_clauses = type_sort_clauses + sort_clauses
+
+        elif c.form.sort.data == 'growth-rate':
+            query = query.outerjoin(my_species.growth_rate)
+            query = query.outerjoin(tables.Experience, tables.GrowthRate.max_experience_obj)
+            sort_clauses.insert(0, tables.Experience.experience.desc())
 
         elif c.form.sort.data == 'height':
             sort_clauses.insert(0, me.height.desc())
