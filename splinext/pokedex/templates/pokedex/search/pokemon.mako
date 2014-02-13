@@ -247,6 +247,7 @@ ${h.form(url.current(), method='GET')}
         % for stat_id, field_name in c.stat_fields:
         ${lib.field('stat_' + field_name)}
         % endfor
+        ${lib.field('stat_total')}
     </dl>
 </div>
 <div class="dex-column">
@@ -255,6 +256,7 @@ ${h.form(url.current(), method='GET')}
         % for stat_id, field_name in c.stat_fields:
         ${lib.field('effort_' + field_name)}
         % endfor
+        ${lib.field('effort_total')}
     </dl>
 </div>
 <div class="dex-column">

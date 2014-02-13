@@ -311,6 +311,9 @@ class PokemonSearchForm(BaseSearchForm):
     height = RangeTextField('Height', inflator=lambda _: parse_size(_, 'height'))
     weight = RangeTextField('Weight', inflator=lambda _: parse_size(_, 'weight'))
 
+    stat_total = RangeTextField('Total', inflator=int)
+    effort_total = RangeTextField('Total', inflator=int)
+
     # Flavor
     genus = fields.TextField('Species', default=u'')
     color = QuerySelectField('Color',
@@ -638,6 +641,24 @@ class PokedexSearchController(PokedexBaseController):
 
             return new_query, stat_aliases[stat]
 
+        stat_total_subquery = None
+        def join_to_stat_total():
+            new_query = query
+            subquery = stat_total_subquery
+
+            if subquery is None:
+                alias = aliased(tables.PokemonStat)
+                subquery = db.pokedex_session.query(
+                    alias.pokemon_id,
+                    func.sum(alias.base_stat).label('stat_total'),
+                    func.sum(alias.effort).label('effort_total')
+                ).group_by(alias.pokemon_id).subquery()
+                    
+                new_query = new_query.outerjoin(subquery,
+                    me.id == subquery.c.pokemon_id)
+
+            return new_query, subquery
+
         # Same applies to a couple other tables...
         joins = []
         def join_once(relation):
@@ -963,6 +984,16 @@ class PokedexSearchController(PokedexBaseController):
                 if effort_field.data:
                     query = query.filter(effort_field.data(stat_alias.effort))
 
+        if c.form.stat_total.data:
+            query, stat_total_subquery = join_to_stat_total()
+            query = query.filter(c.form.stat_total.data(
+                stat_total_subquery.c.stat_total))
+
+        if c.form.effort_total.data:
+            query, stat_total_subquery = join_to_stat_total()
+            query = query.filter(c.form.effort_total.data(
+                stat_total_subquery.c.effort_total))
+
         if c.form.hatch_counter.data:
             query = query.filter(c.form.hatch_counter.data(my_species.hatch_counter))
 
@@ -1196,23 +1227,10 @@ class PokedexSearchController(PokedexBaseController):
             sort_clauses.insert(0, my_species.base_happiness.desc())
 
         elif c.form.sort.data == 'stat-total':
-            # Create a subquery that sums all base stats
-            stat_total = aliased(tables.PokemonStat)
-            stat_total_subquery = db.pokedex_session.query(
-                    stat_total.pokemon_id,
-                    func.sum(stat_total.base_stat).label('stat_total'),
-                ) \
-                .group_by(stat_total.pokemon_id) \
-                .subquery()
-
-            query = query.outerjoin((
-                stat_total_subquery,
-                me.id == stat_total_subquery.c.pokemon_id
-            ))
-
+            query, stat_total_subquery = join_to_stat_total()
             sort_clauses.insert(0, stat_total_subquery.c.stat_total.desc())
 
-        elif c.form.sort.data[0:5] == 'stat-':
+        elif c.form.sort.data.startswith('stat-'):
             stat_ident = c.form.sort.data[5:]
             query, stat_alias = join_to_stat(stat_ident)
             sort_clauses.insert(0, stat_alias.base_stat.desc())
