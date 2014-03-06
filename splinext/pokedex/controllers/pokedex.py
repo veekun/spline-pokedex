@@ -56,7 +56,7 @@ def _pokemon_move_method_sort_key((method, _)):
         p = -method.pokemon.order
     except AttributeError:
         p = None
-    if method.name in (u'Tutor', u'Machine'):
+    if method.identifier in (u'tutor', u'machine'):
         return method.id + 1000, p
     else:
         return method.id, p
@@ -110,7 +110,7 @@ def _collapse_pokemon_move_columns(table, thing):
                 # for now.  When we actually print the table, we'll concatenate
                 # all the tutor cells instead of just using the first one like
                 # with everything else
-                if method.name == 'Tutor':
+                if method.identifier == u'tutor':
                     continue
 
                 # If a method doesn't appear in a version group at all,
@@ -160,7 +160,7 @@ def _move_tutor_version_groups(table):
 
     move_tutor_version_groups = set()
     for method, method_list in table:
-        if method.name != 'Tutor':
+        if method.identifier != u'tutor':
             continue
         for move, version_group_data in method_list:
             move_tutor_version_groups.update(version_group_data.keys())
@@ -1031,13 +1031,14 @@ class PokedexController(PokedexBaseController):
         # such as for parent's egg moves.  should go away once move tables get
         # their own rendery class
         FakeMoveMethod = namedtuple('FakeMoveMethod',
-            ['id', 'name', 'description', 'pokemon', 'version_groups'])
+            ['id', 'name', 'identifier', 'description', 'pokemon', 'version_groups'])
         methods_cache = {}
         def find_method(pm):
             key = pm.method, pm.pokemon
             if key not in methods_cache:
                 methods_cache[key] = FakeMoveMethod(
                     id=pm.method.id, name=pm.method.name,
+                    identifier=pm.method.identifier,
                     description=pm.method.description,
                     pokemon=pm.pokemon,
                     version_groups=tuple(pm.method.version_groups))
@@ -1052,7 +1053,7 @@ class PokedexController(PokedexBaseController):
             vg_data = dict()
 
             # TMs need to know their own TM number
-            if method.name == 'Machine':
+            if method.identifier == u'machine':
                 vg_data['machine'] = pokemon_move.machine.machine_number
 
             # Find the best place to insert a row.
@@ -1065,7 +1066,7 @@ class PokedexController(PokedexBaseController):
             # a new row.  Only level-up moves have these restrictions
             lower_bound = None
             upper_bound = None
-            if method.name in ('Level up', 'Machine'):
+            if method.identifier in (u'level-up', u'machine'):
                 vg_data['sort'] = (pokemon_move.level,
                                    vg_data.get('machine', None),
                                    pokemon_move.order)
@@ -1143,7 +1144,7 @@ class PokedexController(PokedexBaseController):
 
         # Sort non-level moves by name
         for method, method_list in c.moves:
-            if method.name in ('Level up', 'Machine'):
+            if method.identifier in (u'level-up', u'machine'):
                 continue
             method_list.sort(key=lambda (move, version_group_data): move.name)
 
@@ -1497,10 +1498,10 @@ class PokedexController(PokedexBaseController):
             # Create a container for data for this method and version(s)
             vg_data = dict()
 
-            if pokemon_move.method.name == 'Level up':
+            if pokemon_move.method.identifier == u'level-up':
                 # Level-ups need to know what level
                 vg_data['level'] = pokemon_move.level
-            elif pokemon_move.method.name == 'Machine':
+            elif pokemon_move.method.identifier == u'machine':
                 # TMs need to know their own TM number
                 machine = first(lambda _: _.version_group == this_vg,
                                 c.move.machines)

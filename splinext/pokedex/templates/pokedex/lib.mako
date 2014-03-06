@@ -105,7 +105,7 @@
 ## Makes some use of c.move_tutor_version_groups, if it exists.
 ## XXX How to sort these "correctly"...?
 <%def name="pokemon_move_table_method_cell(column, method, version_group_data)">
-% if method.name == 'Tutor' and c.move_tutor_version_groups:
+% if method.identifier == u'tutor' and c.move_tutor_version_groups:
     <td class="tutored">
     ## Tutored moves never ever collapse!  Have to merge all the known values,
     ## rather than ignoring all but the first
@@ -127,7 +127,7 @@
             <% continue %>
         % endif
         ## Otherwise display what we have
-        % if method.name == 'Level up':
+        % if method.identifier == u'level-up':
             <td>
             % if version_group_data[version_group]['level'] == 1:
                 —
@@ -135,7 +135,7 @@
                 ${version_group_data[version_group]['level']}
             % endif
             </td>
-        % elif method.name == 'Machine':
+        % elif method.identifier == u'machine':
             <% machine_number = version_group_data[version_group]['machine'] %>\
             <td>
             % if machine_number > 100:
@@ -145,7 +145,7 @@
                 ${"%02d" % machine_number}
             % endif
             </td>
-        % elif method.name == 'Egg':
+        % elif method.identifier == u'egg':
             <td class="dex-moves-egg">${h.pokedex.chrome_img('egg-cropped.png',
                 alt=h.literal(u"&bull;"))}</td>
         % else:
