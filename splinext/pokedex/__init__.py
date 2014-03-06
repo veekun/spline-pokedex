@@ -10,7 +10,6 @@ import pokedex.db
 import pokedex.db.tables as tables
 import pokedex.lookup
 import spline.lib.markdown
-import splinext.pokedex.model
 import splinext.pokedex.db
 from splinext.pokedex import helpers as pokedex_helpers
 import spline.lib.helpers as h
