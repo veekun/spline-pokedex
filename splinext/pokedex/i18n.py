@@ -1,7 +1,8 @@
 # encoding: utf8
 
 from spline.i18n import BaseTranslator, NullTranslator
-from pokedex.db import markdown
+
+# NullTranslator is re-exported
 
 class Translator(BaseTranslator):
     package = 'splinext.pokedex'

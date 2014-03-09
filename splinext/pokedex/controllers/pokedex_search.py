@@ -1,31 +1,29 @@
 # encoding: utf8
 from __future__ import absolute_import, division
 
-import logging
 import re
 from string import Template
 
-from wtforms import Form, ValidationError, fields, widgets
+from wtforms import Form, fields
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 import pokedex.db.tables as tables
-from pylons import config, request, response, session, tmpl_context as c, url
-from pylons.controllers.util import abort, redirect
+from pylons import request, tmpl_context as c, url
+from pylons.controllers.util import redirect
 from sqlalchemy.orm import aliased, eagerload, eagerload_all, joinedload
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql import exists, func, and_, not_, or_
+from sqlalchemy.sql import func, and_, not_, or_
 from sqlalchemy.sql.operators import asc_op
 
-from spline.lib import helpers as h
 from spline.lib.base import render
-from spline.lib.forms import DuplicateField, MultiCheckboxField, QueryCheckboxSelectMultipleField, QueryTextField
+from spline.lib.forms import DuplicateField, MultiCheckboxField, QueryCheckboxSelectMultipleField
+import spline.lib.helpers as h
 
-from splinext.pokedex import helpers as pokedex_helpers, PokedexBaseController
+from splinext.pokedex import PokedexBaseController
 import splinext.pokedex.db as db
+import splinext.pokedex.helpers as pokedex_helpers
 from splinext.pokedex.forms import PokedexLookupField, RangeTextField, StatField
 from splinext.pokedex.magnitude import parse_size
 
-log = logging.getLogger(__name__)
 
 # XXX probably needs to live elsewhere
 default_pokemon_table_columns = [

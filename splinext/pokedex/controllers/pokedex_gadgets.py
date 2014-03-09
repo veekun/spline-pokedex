@@ -5,34 +5,28 @@ from collections import defaultdict, namedtuple
 import colorsys
 import functools
 import itertools
-import logging
 import math
 
 import wtforms.validators
-from wtforms import Form, ValidationError, fields
+from wtforms import Form, fields
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 import pokedex.db
 import pokedex.db.tables as tables
 import pokedex.formulae
-from pylons import config, request, response, session, tmpl_context as c, url
-from pylons.controllers.util import abort, redirect
-from sqlalchemy import and_, or_, not_
-from sqlalchemy.orm import aliased, eagerload, eagerload_all, join
+from pylons import request, tmpl_context as c, url
+from pylons.controllers.util import redirect
+from sqlalchemy.orm import eagerload, eagerload_all, join
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql import func
 
-from spline import model
-from spline.model import meta
-from spline.lib import helpers as h
 from spline.lib.base import render
-from spline.lib.forms import DuplicateField, QueryTextField
+from spline.lib.forms import DuplicateField
+import spline.lib.helpers as h
 
-from splinext.pokedex import helpers as pokedex_helpers, PokedexBaseController
+from splinext.pokedex import PokedexBaseController
 import splinext.pokedex.db as db
+import splinext.pokedex.helpers as pokedex_helpers
 from splinext.pokedex.forms import PokedexLookupField, StatField
-
-log = logging.getLogger(__name__)
 
 
 ### Capture rate ("Pokéball performance") stuff

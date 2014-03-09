@@ -2,13 +2,13 @@
 import os.path
 from pkg_resources import resource_filename
 
-from pylons import config, tmpl_context as c
+from pylons import tmpl_context as c
 from routes import url_for as url
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+from sqlalchemy.orm.exc import NoResultFound
 
 import pokedex.db
+import pokedex.db.markdown
 import pokedex.db.tables as tables
-import pokedex.lookup
 import spline.lib.markdown
 import splinext.pokedex.db
 from splinext.pokedex import helpers as pokedex_helpers
@@ -102,7 +102,6 @@ class PokedexBaseController(BaseController):
 ### Extend markdown to turn [Eevee]{pokemon:eevee} into a link in effects and
 ### descriptions
 
-import pokedex.db.markdown
 class SplineExtension(pokedex.db.markdown.PokedexLinkExtension):
     def object_url(self, category, obj):
         return pokedex_helpers.make_thingy_url(obj)

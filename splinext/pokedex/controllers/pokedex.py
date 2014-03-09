@@ -5,7 +5,6 @@ from collections import defaultdict, namedtuple
 import colorsys
 from itertools import groupby
 import json
-import logging
 import mimetypes
 import os.path
 import re
@@ -22,16 +21,13 @@ from sqlalchemy.orm import (aliased, contains_eager, eagerload, eagerload_all,
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import exists, func
 
-from spline import model
-from spline.model import meta
 from spline.lib.base import render
-from spline.lib import helpers as h
+import spline.lib.helpers as h
 
-from splinext.pokedex import db, helpers as pokedex_helpers, PokedexBaseController
+from splinext.pokedex import PokedexBaseController
 import splinext.pokedex.db as db
+import splinext.pokedex.helpers as pokedex_helpers
 from splinext.pokedex.magnitude import parse_size
-
-log = logging.getLogger(__name__)
 
 def bar_color(hue, pastelness):
     """Returns a color in the form #rrggbb that has the provided hue and

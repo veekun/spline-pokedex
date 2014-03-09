@@ -7,11 +7,8 @@ import re
 
 import pokedex.db
 from pokedex.db import tables
-import spline.lib.base
+import pokedex.lookup
 from sqlalchemy.sql import func
-from sqlalchemy import and_, or_, not_
-from sqlalchemy.orm import lazyload
-from pylons import tmpl_context as c
 
 
 pokedex_session = None

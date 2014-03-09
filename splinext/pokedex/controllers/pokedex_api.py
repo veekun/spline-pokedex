@@ -10,11 +10,11 @@ import pokedex.formulae
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 
-from spline.lib import helpers as h
 from spline.lib.base import BaseController, render
+import spline.lib.helpers as h
 
-from splinext.pokedex import helpers as pokedex_helpers
 import splinext.pokedex.db as db
+import splinext.pokedex.helpers as pokedex_helpers
 
 log = logging.getLogger(__name__)
 

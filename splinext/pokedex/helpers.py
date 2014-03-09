@@ -10,17 +10,18 @@ import math
 import re
 from itertools import groupby, chain, repeat
 from operator import attrgetter
-import os
 import os.path
 import warnings
 
 from pylons import config, tmpl_context as c, url
 
 import pokedex.db.tables as tables
-import pokedex.formulae as formulae
-from pokedex.roomaji import romanize
 import spline.lib.helpers as h
 from splinext.pokedex.i18n import NullTranslator
+
+# Re-exported
+import pokedex.formulae as formulae
+from pokedex.roomaji import romanize
 
 # We can't translate at import time, but _ will mark strings as translatable
 # Functions that need translation will take a "_" parameter, which defaults

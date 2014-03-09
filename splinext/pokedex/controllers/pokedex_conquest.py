@@ -4,7 +4,6 @@ from __future__ import absolute_import, division
 from collections import defaultdict
 import colorsys
 from itertools import izip
-import logging
 from random import randint
 
 import pokedex.db
@@ -15,13 +14,11 @@ import sqlalchemy as sqla
 from sqlalchemy.orm.exc import NoResultFound
 import wtforms
 
-from spline.lib import helpers as h
 from spline.lib.base import render
+import spline.lib.helpers as h
 
 from splinext.pokedex import PokedexBaseController
 import splinext.pokedex.db as db
-
-log = logging.getLogger(__name__)
 
 def bar_color(hue, pastelness):
     """Returns a color in the form #rrggbb that has the provided hue and
