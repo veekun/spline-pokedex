@@ -13,6 +13,10 @@
 </ul>
 </%def>
 
+<%def name="start_over()">
+<p><a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/eraser.png')}" alt=""> ${_("Start over")}</a></p>
+</%def>
+
 ### RESULTS ###
 ## Based pretty heavily on the Pokémon search results.  Surprise!
 ## Four possibilities here: the form wasn't submitted, the form was submitted
@@ -20,11 +24,11 @@
 ## was submitted and is good.
 
 % if c.form.was_submitted:
-<h1>${_("Results")}</h1>
-<p><a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/eraser.png')}" alt=""> ${_("Start over")}</a></p>
-
 % if not c.form.is_valid:
 ## Errors
+<h1>Results</h1>
+${start_over()}
+
 <p>${_("It seems you entered something bogus for:")}</p>
 <ul class="classic-list">
     % for field_name in c.form.errors.keys():
@@ -34,10 +38,17 @@
 
 % elif c.form.is_valid and not c.results:
 ## No results
+
+<h1>0 results</h1>
+${start_over()}
+
 <p>${_("Nothing found.")}</p>
 
 % elif c.form.is_valid:
 ## Got something
+
+<h1>${len(c.results)} results</h1>
+${start_over()}
 
 ## Display.  Could be one of several options...
 % if c.display_mode == 'custom-table':

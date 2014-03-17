@@ -1042,6 +1042,8 @@ class PokedexSearchController(PokedexBaseController):
         c.display_mode = c.form.display.data
         c.display_columns = []
         c.original_results = None  # evolution chain thing
+        c.species_count = None
+        c.total_count = None
 
         if c.display_mode == 'smart-table':
             # Based on the standard table, but a little more clever.  For
@@ -1115,10 +1117,15 @@ class PokedexSearchController(PokedexBaseController):
             # Grab the results first; needed for sorting even if the query is
             # otherwise left alone, boo
             pokemon_ids = {}
+            species_ids = set()  # For result count
             evolution_chain_ids = set()
             for id, chain_id in query.values(me.id, my_species.evolution_chain_id):
                 evolution_chain_ids.add(chain_id)
+                species_ids.add(my_species.id)
                 pokemon_ids[id] = None
+
+            species_count = len(species_ids)
+            total_count = len(pokemon_ids.keys())
 
             # Rebuild the query
             if c.display_mode in ('custom-table',):
@@ -1261,6 +1268,10 @@ class PokedexSearchController(PokedexBaseController):
         ### Run the query!
         c.results = query.all()
 
+        # Count the results (which we've already done if we're family-sorting)
+        if c.species_count is None:
+            c.species_count = len(set(result.species_id for result in c.results))
+            c.total_count = len(c.results)
 
         ### Eagerloading
         # SQLAlchemy is guaranteed to only have one copy of a particular object

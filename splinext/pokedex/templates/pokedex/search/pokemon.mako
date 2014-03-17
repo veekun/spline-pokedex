@@ -13,17 +13,21 @@
 </ul>
 </%def>
 
+<%def name="start_over()">
+<p><a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/eraser.png')}" alt=""> ${_(u"Start over")}</a></p>
+</%def>
+
 ### RESULTS ###
 ## Four possibilities here: the form wasn't submitted, the form was submitted
 ## but was bogus, the form was submitted and there are no results, or the form
 ## was submitted and is good.
 
 % if c.form.was_submitted:
-<h1>${_(u"Results")}</h1>
-<p><a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/eraser.png')}" alt=""> ${_(u"Start over")}</a></p>
-
 % if not c.form.is_valid:
 ## Errors
+<h1>Results</h1>
+${start_over()}
+
 <p>${_(u"It seems you entered something bogus for:")}</p>
 <ul class="classic-list">
     % for field_name in c.form.errors.keys():
@@ -33,10 +37,25 @@
 
 % elif c.form.is_valid and not c.results:
 ## No results
+<h1>0 results</h1>
+${start_over()}
+
 <p>${_(u"Nothing found.")}</p>
 
 % elif c.form.is_valid:
 ## Got something
+
+<h1>\
+% if c.total_count == 1:
+1 result\
+% else:
+${c.total_count} results\
+% endif
+% if c.species_count != c.total_count:
+ (${c.species_count} species)\
+% endif
+</h1>
+${start_over()}
 
 ## Display.  Could be one of several options...
 % if c.display_mode == 'custom-table':
