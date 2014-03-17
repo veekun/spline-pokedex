@@ -441,6 +441,15 @@ class MoveSearchForm(BaseSearchForm):
         get_pk=lambda table: table.id,
         allow_blank=True,
     )
+
+    target = QuerySelectField('Target',
+        query_factory=lambda: (db.pokedex_session.query(tables.MoveTarget)
+            .filter(tables.MoveTarget.identifier != 'selected-pokemon-me-first')),
+        get_pk=lambda _: _.id,
+        get_label=lambda _: _.name,
+        allow_blank=True,
+    )
+
     similar_to = PokedexLookupField('Same effect as', valid_type='move', allow_blank=True)
 
     type = QueryCheckboxSelectMultipleField(
@@ -1375,6 +1384,10 @@ class PokedexSearchController(PokedexBaseController):
             query = query.filter(
                 me.generation_id.in_(_.id for _ in c.form.introduced_in.data)
             )
+
+        # Target
+        if c.form.target.data:
+            query = query.filter(me.target_id == c.form.target.data)
 
         # Effect
         if c.form.similar_to.data:

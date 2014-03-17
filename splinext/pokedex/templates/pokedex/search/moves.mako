@@ -129,6 +129,14 @@ ${h.form(url.current(), method='GET')}
             <p class="error">${error}</p>
             % endfor
         </dd>
+        <dt>Target</dt>
+        <dd>
+            <select id="target" name="target">
+                % for option in sorted(c.form.target, key=lambda option: option.label.text):
+                ${option()}
+                % endfor
+            </select>
+        </dd>
     </dl>
 </div>
 <div class="dex-column-2x">
