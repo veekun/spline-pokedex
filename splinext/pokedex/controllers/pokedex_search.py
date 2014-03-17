@@ -1119,13 +1119,14 @@ class PokedexSearchController(PokedexBaseController):
             pokemon_ids = {}
             species_ids = set()  # For result count
             evolution_chain_ids = set()
-            for id, chain_id in query.values(me.id, my_species.evolution_chain_id):
+            for id, chain_id, species_id in query.values(me.id,
+              my_species.evolution_chain_id, my_species.id):
                 evolution_chain_ids.add(chain_id)
-                species_ids.add(my_species.id)
+                species_ids.add(species_id)
                 pokemon_ids[id] = None
 
-            species_count = len(species_ids)
-            total_count = len(pokemon_ids.keys())
+            c.species_count = len(species_ids)
+            c.total_count = len(pokemon_ids.keys())
 
             # Rebuild the query
             if c.display_mode in ('custom-table',):
