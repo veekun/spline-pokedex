@@ -1399,7 +1399,7 @@ class PokedexSearchController(PokedexBaseController):
 
         # Target
         if c.form.target.data:
-            query = query.filter(me.target_id == c.form.target.data)
+            query = query.filter(me.target_id == c.form.target.data.id)
 
         # Effect
         if c.form.similar_to.data:
