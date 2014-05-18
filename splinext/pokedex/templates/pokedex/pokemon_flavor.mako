@@ -62,8 +62,10 @@ ${h.h1(_('Essentials'))}
         </dd>
         % endif
 
+        % if c.pokemon.species.generation_id <= 5:
         <dt>${_("Footprint")}</dt>
         <dd>${h.pokedex.species_image(c.pokemon.species, prefix='footprints')}</dd>
+        % endif
 
         <dt>${_("Shape")}</dt>
         <dd>
