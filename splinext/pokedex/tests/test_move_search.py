@@ -132,7 +132,7 @@ class TestMoveSearchController(TestController):
         )
 
         self.check_search(
-            dict(damage_class=u'non-damaging', type=u'dragon'),
+            dict(damage_class=u'status', type=u'dragon'),
             [u'Dragon Dance'],
             'more precise damage class search',
             exact=True,
