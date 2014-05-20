@@ -340,12 +340,12 @@ ${h.end_form()}
 <%def name="col_power()"><col class="dex-col-stat"></%def>
 <%def name="th_power()"><th>${_("Power")}</th></%def>
 <%def name="td_power(move)">\
-% if move.power == 0:
+% if move.power is not None:
+<td>${move.power}</td>
+% elif move.damage_class.identifier == 'status':
 <td>—</td>\
-% elif move.power == 1:
-<td>*</td>\
 % else:
-<td>${move.power}</td>\
+<td>*</td>\
 % endif
 </%def>
 

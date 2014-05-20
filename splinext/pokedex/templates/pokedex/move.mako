@@ -65,11 +65,7 @@ ${h.h1(_('Essentials'))}
     <h2>${_(u"Stats")}</h2>
     <dl>
         <dt>${_(u"Power")}</dt>
-        % if c.move.power == 0:
-        <dd>${_(u"—  (no damage)")}</dd>
-        % elif c.move.power == 1:
-        <dd>${_(u'*  (no fixed power)')}</dd>
-        % else:
+        % if c.move.power is not None:
         <dd>
             % if c.power_percentile is None:
             ${c.move.power}
@@ -77,14 +73,19 @@ ${h.h1(_('Essentials'))}
             ${_(u"{power}; percentile {perc:.1f}").format(power=c.move.power, perc=c.power_percentile * 100)}
             % endif
         </dd>
+        % elif c.move.damage_class.identifier == 'status':
+        <dd>${_(u"—  (no damage)")}</dd>
+        % else:
+        <dd>${_(u'*  (no fixed power)')}</dd>
         % endif
+
         <dt>${_(u"Accuracy")}</dt>
         <dd>
             % if c.move.accuracy is None:
             ${_(u"—  (cannot miss)")}
             % else:
             ${c.move.accuracy}%
-            % if c.move.accuracy != 100 and c.move.damage_class.identifier != 'status':
+            % if c.move.accuracy != 100 and c.move.power is not None:
             ${_(u"≈ {0:.1f} power").format(c.move.power * c.move.accuracy / 100.0)}
             % endif
             % endif

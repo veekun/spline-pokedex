@@ -281,12 +281,12 @@
     % endif
 </td>
 <td>
-    % if move.power == 0:
-    —
-    % elif move.power == 1:
-    *
-    % else:
+    % if move.power is not None:
     ${move.power}
+    % elif move.damage_class.identifier == 'status':
+    —
+    % else:
+    *
     % endif
 </td>
 <td>

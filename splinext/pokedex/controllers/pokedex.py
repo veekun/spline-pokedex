@@ -1398,11 +1398,11 @@ class PokedexController(PokedexBaseController):
             .filter_by(identifier=u'pp-up').one()
 
         ### Power percentile
-        if c.move.power in (0, 1):
+        if c.move.power is None:
             c.power_percentile = None
         else:
             q = db.pokedex_session.query(tables.Move) \
-                .filter(tables.Move.power > 1)
+                .filter(tables.Move.power.isnot(None))
             less = q.filter(tables.Move.power < c.move.power).count()
             equal = q.filter(tables.Move.power == c.move.power).count()
             c.power_percentile = (less + equal * 0.5) / q.count()
