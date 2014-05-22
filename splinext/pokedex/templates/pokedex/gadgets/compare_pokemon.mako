@@ -338,10 +338,11 @@ n/a
 </%def>
 
 <%def name="footprint_cell(pokemon)">\
-%if pokemon.species.generation_id <= 5:
+% if pokemon.species.generation_id <= 5:
 ${h.pokedex.species_image(pokemon.species, prefix='footprints')}\
 % else:
-—\
+n/a\
+% endif
 </%def>
 
 <%def name="shape_cell(pokemon)">
