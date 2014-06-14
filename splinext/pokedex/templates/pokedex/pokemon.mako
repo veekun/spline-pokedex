@@ -26,7 +26,8 @@ ${h.h1(_('Essentials'))}
 ## Portrait block
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.pokemon.species.name}</p>
-    % if len(c.pokemon.species.pokemon) > 1:
+    % if len(c.pokemon.forms) == 1 and \
+        c.pokemon.default_form.form_name is not None:
     <p id="dex-pokemon-forme">${c.pokemon.default_form.form_name}</p>
     % endif
     <div id="dex-pokemon-portrait-sprite">
