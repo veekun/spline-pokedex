@@ -325,7 +325,7 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 </table>
 % endif
 
-% if c.pokemon.species.generation_id <= 4:
+% if c.form.introduced_in_version_group_id <= 10:
 <h2 id="main-sprites:gen-iv"><a href="#main-sprites:gen-iv" class="subtle">${h.pokedex.generation_icon(4)} ${_("Diamond & Pearl, Platinum, HeartGold & SoulSilver")}</a></h2>
 <table class="dex-pokemon-flavor-sprites">
 <colgroup span="1"></colgroup> <!-- row headers -->
