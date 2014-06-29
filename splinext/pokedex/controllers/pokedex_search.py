@@ -660,7 +660,7 @@ class PokedexSearchController(PokedexBaseController):
                     func.sum(alias.base_stat).label('stat_total'),
                     func.sum(alias.effort).label('effort_total')
                 ).group_by(alias.pokemon_id).subquery()
-                    
+
                 new_query = new_query.outerjoin(subquery,
                     me.id == subquery.c.pokemon_id)
 

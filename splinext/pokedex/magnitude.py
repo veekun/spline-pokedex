@@ -300,7 +300,7 @@ def parse_size(size, height_or_weight):
             # take precedence
             if base_unit not in units and base_unit[-1] == 's':
                 base_unit = base_unit[0:-1]
-            
+
             if base_unit in units:
                 # Successful match!  Convert and we are DONE
                 result += number * units[base_unit] \
@@ -318,7 +318,7 @@ def parse_size(size, height_or_weight):
         # aware of any Pokémon that cause problems here
         for prefix, pokemon_name_chunks in possible_units:
             pokemon_name = u' '.join(pokemon_name_chunks)
-            
+
             # TODO should this allow forms?
             try:
                 pokemon = db.pokemon_query(pokemon_name).one()
@@ -328,7 +328,7 @@ def parse_size(size, height_or_weight):
                         * si_prefixes.get(prefix, 1.0)
                 done = True
                 break
-            
+
             except:
                 # Failure; just try next one
                 pass
