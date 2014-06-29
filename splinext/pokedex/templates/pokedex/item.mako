@@ -202,7 +202,7 @@ ${h.h1(_(u'Held by wild Pokémon'), id='pokemon')}
       % else:
         % for column in column_group:
         <th>
-          % for _, version_group in groupby(column, lambda version: version.version_group):
+          % for key, version_group in groupby(column, lambda version: version.version_group):
           ${h.pokedex.version_icons(*version_group)}<br />
           % endfor
         </th>
@@ -232,3 +232,9 @@ ${h.h1(_(u'Held by wild Pokémon'), id='pokemon')}
 </tbody>
 </table>
 % endif
+
+${h.h1(_(u'External Links'), id='links')}
+<ul class="classic-list">
+    <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.item.name.replace(" ", "_")}">Bulbapedia</a></li>
+    <li><a href="http://serebii.net/itemdex/${c.item.name.lower().replace(" ", "")}.shtml">Serebii.net</a></li>
+</ul>
