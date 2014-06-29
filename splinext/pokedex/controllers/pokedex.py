@@ -291,7 +291,7 @@ class PokedexController(PokedexBaseController):
     def cache_content(self, key, do_work, template):
         key += u';' + c.game_language.identifier
 
-        if session.get('cache_obdurate', False):
+        if session.get('cheat_obdurate', False):
             key += u';obdurate'
 
         return super(PokedexController, self).cache_content(key, do_work, template)
