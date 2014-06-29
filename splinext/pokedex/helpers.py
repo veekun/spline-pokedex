@@ -366,7 +366,7 @@ def form_flavor_link(form, content=None, **attr):
 
 def damage_class_icon(damage_class, _=_):
     return pokedex_img(
-        "damage-classes/%s.png" % damage_class.name,
+        "damage-classes/%s.png" % damage_class.identifier,
         alt=damage_class.name,
         title=_("%s: %s", context="damage class: description") % (
                 damage_class.name.capitalize(),

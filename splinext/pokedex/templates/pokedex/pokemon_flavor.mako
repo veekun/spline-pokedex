@@ -240,7 +240,7 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 <% show_rusa = c.form.introduced_in_version_group_id <= 5 %>\
 <% show_emerald = c.form.introduced_in_version_group_id <= 6 %>\
 <% show_frlg = (c.pokemon.species.generation_id == 1
-                or c.pokemon.name == u'Teddiursa'
+                or c.pokemon.identifier == u'teddiursa'
                 or c.form.introduced_in_version_group_id == 7) %>\
 <h2 id="main-sprites:gen-iii"><a href="#main-sprites:gen-iii" class="subtle">${h.pokedex.generation_icon(3)} ${_("Ruby & Sapphire, Emerald, FireRed & LeafGreen")}</a></h2>
 ## Deoxys is a bit of a mess.

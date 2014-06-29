@@ -45,10 +45,10 @@ ${h.h1(_('Essentials'))}
 </div>
 
 <div class="dex-page-beside-portrait">
-% if c.type.name == '???':
+% if c.type.identifier == u'unknown':
     <h2>${_('Damage Dealt/Taken')}</h2>
     <p>??? theoretically took and dealt 1× damage with every type, but there were no ??? Pokémon or damaging moves.</p>
-% elif c.type.name == 'Shadow':
+% elif c.type.identifier == u'shadow':
     <h2>${_('Damage Dealt/Taken')}</h2>
     <p>In XD, Shadow moves are super-effective against non-Shadow Pokémon and not very effective against Shadow
     Pokémon.  In Colosseum, Shadow Rush is regularly effective against everything.</p>
@@ -74,7 +74,7 @@ ${h.h1(_('Essentials'))}
 </div>
 
 ${h.h1(_(u'Pokémon'), id='pokemon')}
-% if c.type.name == '???':
+% if c.type.identifier == u'unknown':
 <%! from pokedex.db import markdown %>
 <div class="markdown">
 ${markdown.MarkdownString(_(u"""
@@ -88,7 +88,7 @@ Eggs are purely ???-type before hatching before Generation V, and are displayed 
 screen.  In Generation V, the ??? type no longer exists.
 """) % url(controller='dex', action='pokemon_flavor', name='arceus', form='???'), db.pokedex_session, c.language)}
 </div>
-% elif c.type.name == 'Shadow':
+% elif c.type.identifier == u'shadow':
 <p>Shadow Pokémon are Pokémon whose hearts have been closed in Pokémon Colosseum and Pokémon XD: Gale of Darkness.  The
 Shadow type, Shadow Pokémon, and Shadow moves are unique to those games.</p>
 
@@ -157,7 +157,7 @@ ${h.h1(_('External Links'), id='links')}
     % if c.type.generation.id <= 1:
     <li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/comp/${c.type.name}.htm">${_("Azure Heights")}</a></li>
     % endif
-    % if c.type.name == '???':
+    % if c.type.identifier == u'unknown':
     <li><a href="http://bulbapedia.bulbagarden.net/wiki/%3F%3F%3F_(type)">${_("Bulbapedia")}</a></li>
     <li><a href="http://www.smogon.com/dp/types/questionquestionquestion">${_("Smogon")}</a></li>
     % else:

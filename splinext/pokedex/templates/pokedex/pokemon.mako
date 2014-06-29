@@ -353,7 +353,7 @@ ${h.h1(_('Stats'))}
 <%
         stat_info = c.stats[pokemon_stat.stat.name]
 
-        if pokemon_stat.stat.name == 'HP':
+        if pokemon_stat.stat.identifier == 'hp':
             stat_formula = h.pokedex.formulae.calculated_hp
         else:
             stat_formula = h.pokedex.formulae.calculated_stat
@@ -587,7 +587,7 @@ ${h.h2(_(u'Pal Park'))}
 ${h.h1(_('Moves'))}
 <p>${u' and '.join(t.name for t in c.pokemon.types)} moves get STAB, and have their type highlighted in green.</p>
 % if c.better_damage_class:
-<p>${c.better_damage_class.name.capitalize()} moves better suit ${c.pokemon.species.name}'s higher ${u'Special Attack' if c.better_damage_class.name == u'special' else u'Attack'}, and have their class highlighted in green.</p>
+<p>${c.better_damage_class.name.capitalize()} moves better suit ${c.pokemon.species.name}'s higher ${u'Special Attack' if c.better_damage_class.identifier == u'special' else u'Attack'}, and have their class highlighted in green.</p>
 % endif
 <% columns = sum(c.move_columns, []) %>
 <table class="dex-pokemon-moves dex-pokemon-pokemon-moves striped-rows">
@@ -654,11 +654,11 @@ ${h.h1(_('External Links'), id=_('links', context='header id'))}
 <%
     # Some sites don't believe in Unicode URLs.  Scoff, scoff.
     # And they all do it differently.  Ugh, ugh.
-    if c.pokemon.name == u'Nidoran♀':
+    if c.pokemon.identifier == u'nidoran-f':
         lp_name = 'Nidoran(f)'
         ghpd_name = 'nidoran_f'
         smogon_name = 'nidoran-f'
-    elif c.pokemon.name == u'Nidoran♂':
+    elif c.pokemon.identifier == u'nidoran-m':
         lp_name = 'Nidoran(m)'
         ghpd_name = 'nidoran_m'
         smogon_name = 'nidoran-m'
@@ -668,15 +668,17 @@ ${h.h1(_('External Links'), id=_('links', context='header id'))}
         ghpd_name = re.sub('[^\w-]', '', ghpd_name)
         smogon_name = ghpd_name
 
-    if not c.pokemon.is_default and c.pokemon.default_form.form_name:
-        if c.pokemon.default_form.form_name == 'Sandy Cloak':
+    if not c.pokemon.is_default and c.pokemon.default_form.form_identifier:
+        if c.pokemon.default_form.form_identifier == u'sandy':
             smogon_name += '-g'
-        elif c.pokemon.default_form.form_name == 'Mow Form':
+        elif c.pokemon.default_form.form_identifier == u'trash':
+            smogon_name += '-s'
+        elif c.pokemon.default_form.form_identifier == u'mow':
             smogon_name += '-c'
-        elif c.pokemon.default_form.form_name in ('Fan Form', 'Trash Cloak'):
+        elif c.pokemon.default_form.form_identifier == u'fan':
             smogon_name += '-s'
         else:
-            smogon_name += '-' + c.pokemon.default_form.form_name[0].lower()
+            smogon_name += '-' + c.pokemon.default_form.form_identifier[0]
 %>
 <ul class="classic-list">
 % if c.pokemon.species.generation_id <= 1:

@@ -420,7 +420,7 @@ ${h.h1(_(u'Similar moves'))}
 ${h.h1(_(u'Pokémon', context='plural'))}
 % if c.move.damage_class.identifier != u'status':
 <p>${c.move.type.name} Pokémon get STAB, and have their types highlighted in green.</p>
-<p>Pokémon with higher ${u'Special Attack' if c.move.damage_class.name == u'special' else u'Attack'} are more suited to ${c.move.name}'s ${c.move.damage_class.name} damage, and have the stat highlighted in green.</p>
+<p>Pokémon with higher ${u'Special Attack' if c.move.damage_class.identifier == u'special' else u'Attack'} are more suited to ${c.move.name}'s ${c.move.damage_class.name} damage, and have the stat highlighted in green.</p>
 % endif
 <% columns = sum(c.pokemon_columns, []) %>
 <table class="dex-pokemon-moves striped-rows">
