@@ -289,7 +289,11 @@ class PokedexController(PokedexBaseController):
         c.javascripts.append(('pokedex', 'pokedex'))
 
     def cache_content(self, key, do_work, template):
-        key = key + '-' + c.game_language.identifier
+        key += u';' + c.game_language.identifier
+
+        if session.get('cache_obdurate', False):
+            key += u';obdurate'
+
         return super(PokedexController, self).cache_content(key, do_work, template)
 
     def index(self):
@@ -1172,7 +1176,7 @@ class PokedexController(PokedexBaseController):
         c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
 
         return self.cache_content(
-            key=u';'.join((c.pokemon.name, c.form.name or u'')),
+            key=c.pokemon.name + u';' + (c.form.name or u''),
             template='/pokedex/pokemon_flavor.mako',
             do_work=self._do_pokemon_flavor,
         )
