@@ -394,21 +394,20 @@ ${h.h2(h.pokedex.version_icons('HeartGold', 'SoulSilver') + u' Pokéathlon Perfo
 
 <p>${star_buffed} Minimum; ${star_base} Base; ${star_empty} Maximum</p>
 
-% for stat_set in c.pokeathlon_stats:
+% for label, stats in c.pokeathlon_stats:
 <div class="dex-pokeathlon-stats">
-    ## Label for this set of stats, if any
-    % if stat_set[0]:
-    <p>${stat_set[0]}</p>
+    % if label:
+    <p>${label}</p>
     % endif
 
     <dl>
-        % for stat in stat_set[1]:
+        % for stat in stats:
         <dt>${stat.pokeathlon_stat.name}</dt>
         <dd>${star_buffed * stat.minimum_stat}${star_base * (stat.base_stat - stat.minimum_stat)}${star_empty * (stat.maximum_stat - stat.base_stat)}</dd>
         % endfor
 
         <dt>Total</dt>
-        <dd>${sum(stat.minimum_stat for stat in stat_set[1])}/${sum(stat.base_stat for stat in stat_set[1])}/${sum(stat.maximum_stat for stat in stat_set[1])}</dd>
+        <dd>${sum(stat.minimum_stat for stat in stats)}/${sum(stat.base_stat for stat in stats)}/${sum(stat.maximum_stat for stat in stats)}</dd>
     </dl>
 </div>
 % endfor
