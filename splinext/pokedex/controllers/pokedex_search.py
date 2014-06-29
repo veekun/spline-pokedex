@@ -10,7 +10,7 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 import pokedex.db.tables as tables
 from pylons import request, tmpl_context as c, url
 from pylons.controllers.util import redirect
-from sqlalchemy.orm import aliased, eagerload, eagerload_all, joinedload
+from sqlalchemy.orm import aliased, joinedload, joinedload_all
 from sqlalchemy.sql import func, and_, not_, or_
 from sqlalchemy.sql.operators import asc_op
 
@@ -159,7 +159,7 @@ class PokemonSearchForm(BaseSearchForm):
     held_item = PokedexLookupField('Held item', valid_type='item', allow_blank=True)
     growth_rate = QuerySelectField('Growth rate',
         query_factory=lambda: db.pokedex_session.query(tables.GrowthRate) \
-            .options(eagerload('max_experience_obj')),
+            .options(joinedload('max_experience_obj')),
         get_pk=lambda _: _.max_experience,
         get_label=lambda _: """{0} ({1:n} EXP)""".format(_.name, _.max_experience),
         allow_blank=True,
@@ -259,7 +259,7 @@ class PokemonSearchForm(BaseSearchForm):
         u'In regional Pokédex',
         query_factory=lambda: db.pokedex_session.query(tables.Pokedex) \
                                   .filter(tables.Pokedex.region_id != None) \
-                                  .options(eagerload_all('region.generation')),
+                                  .options(joinedload_all('region.generation')),
         get_label=in_pokedex_label,
         get_pk=lambda table: table.id,
         allow_blank=True,
@@ -292,7 +292,7 @@ class PokemonSearchForm(BaseSearchForm):
     move_version_group = QueryCheckboxSelectMultipleField(
         'Versions',
         query_factory=lambda: db.pokedex_session.query(tables.VersionGroup) \
-                                             .options(eagerload('versions')),
+                                             .options(joinedload('versions')),
         get_label=lambda row: pokedex_helpers.version_icons(*row.versions),
         get_pk=lambda table: table.id,
         allow_blank=True,
@@ -497,7 +497,7 @@ class MoveSearchForm(BaseSearchForm):
     pokemon_version_group = QueryCheckboxSelectMultipleField(
         'Versions',
         query_factory=lambda: db.pokedex_session.query(tables.VersionGroup) \
-                                             .options(eagerload('versions')),
+                                             .options(joinedload('versions')),
         get_label=lambda row: pokedex_helpers.version_icons(*row.versions),
         get_pk=lambda table: table.id,
         allow_blank=True,
@@ -598,7 +598,7 @@ class PokedexSearchController(PokedexBaseController):
         # Rendering needs to know which version groups go with which
         # generations for the move-version-group list
         c.generations = db.pokedex_session.query(tables.Generation) \
-            .options(eagerload('version_groups')) \
+            .options(joinedload('version_groups')) \
             .order_by(tables.Generation.id.asc())
 
         # Rendering also needs an example Pokémon, to make the custom list docs
@@ -1262,7 +1262,7 @@ class PokedexSearchController(PokedexBaseController):
         query = query.order_by(*sort_clauses)
 
         # We always want the species
-        query = query.options(eagerload('species'))
+        query = query.options(joinedload('species'))
 
         ### Run the query!
         c.results = query.all()
@@ -1316,7 +1316,7 @@ class PokedexSearchController(PokedexBaseController):
                 # eagerloading some relation
                 (db.pokedex_session.query(tables.Pokemon) \
                     .filter(tables.Pokemon.id.in_(ids)) \
-                    .options(eagerload_all(relation)) \
+                    .options(joinedload_all(relation)) \
                     .all())
 
         ### Done.
@@ -1587,10 +1587,10 @@ class PokedexSearchController(PokedexBaseController):
 
         # Eagerload the obvious stuff: type and damage class
         query = query.options(
-            eagerload('type'),
-            eagerload('damage_class'),
-            eagerload('move_effect'),
-            eagerload('move_effect.prose_local'),
+            joinedload('type'),
+            joinedload('damage_class'),
+            joinedload('move_effect'),
+            joinedload('move_effect.prose_local'),
         )
 
         c.results = query.all()

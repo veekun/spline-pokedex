@@ -16,7 +16,7 @@ import pokedex.db.tables as tables
 import pokedex.formulae
 from pylons import request, tmpl_context as c, url
 from pylons.controllers.util import redirect
-from sqlalchemy.orm import eagerload, eagerload_all, join
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 
 from spline.lib.base import render
@@ -609,7 +609,7 @@ class PokedexGadgetsController(PokedexBaseController):
         c.version_groups = db.pokedex_session.query(tables.VersionGroup) \
             .join(tables.VersionGroupPokemonMoveMethod) \
             .order_by(tables.VersionGroup.order.asc()) \
-            .options(eagerload('versions')) \
+            .options(joinedload('versions')) \
             .all()
         # Grab the version to use for moves, defaulting to the most current
         try:
@@ -798,8 +798,8 @@ class PokedexGadgetsController(PokedexBaseController):
                 .filter(tables.PokemonMove.pokemon_id.in_(
                     _.id for _ in unique_pokemon)) \
                 .options(
-                    eagerload('move'),
-                    eagerload('method'),
+                    joinedload('move'),
+                    joinedload('method'),
                 )
             for pokemon_move in q:
                 c.moves[pokemon_move.method][pokemon_move.move].add(

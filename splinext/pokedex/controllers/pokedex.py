@@ -16,8 +16,8 @@ from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
 from pylons.decorators import jsonify
 from sqlalchemy import and_, or_, not_
-from sqlalchemy.orm import (aliased, contains_eager, eagerload, eagerload_all,
-        join, joinedload, joinedload_all, subqueryload, subqueryload_all)
+from sqlalchemy.orm import (aliased, contains_eager, join,
+        joinedload, joinedload_all, subqueryload, subqueryload_all)
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import exists, func
 
@@ -572,15 +572,15 @@ class PokedexController(PokedexBaseController):
             pokemon_q = pokemon_q.options(
                 joinedload(tables.Pokemon.abilities, tables.Ability.prose_local),
                 joinedload(tables.Pokemon.hidden_ability, tables.Ability.prose_local),
-                eagerload('species.evolution_chain.species'),
-                eagerload('species.generation'),
-                eagerload('items.item'),
-                eagerload('items.version'),
-                eagerload('species'),
-                eagerload('species.color'),
-                eagerload('species.habitat'),
-                eagerload('species.shape'),
-                eagerload('species.egg_groups'),
+                joinedload('species.evolution_chain.species'),
+                joinedload('species.generation'),
+                joinedload('items.item'),
+                joinedload('items.version'),
+                joinedload('species'),
+                joinedload('species.color'),
+                joinedload('species.habitat'),
+                joinedload('species.shape'),
+                joinedload('species.egg_groups'),
                 subqueryload_all('stats.stat'),
                 subqueryload_all('types.target_efficacies.damage_type'),
             )
@@ -679,7 +679,7 @@ class PokedexController(PokedexBaseController):
         version_held_items = {}
         # Preload with a list of versions so we know which ones are empty
         generations = db.pokedex_session.query(tables.Generation) \
-            .options( eagerload('versions') ) \
+            .options( joinedload('versions') ) \
             .filter(tables.Generation.id >= max(3, c.pokemon.species.generation_id))
         for generation in generations:
             version_held_items[generation] = {}
@@ -913,10 +913,10 @@ class PokedexController(PokedexBaseController):
         q = db.pokedex_session.query(tables.Encounter) \
             .filter_by(pokemon=c.pokemon) \
             .options(
-                eagerload_all('condition_values'),
-                eagerload_all('version'),
-                eagerload_all('slot.method'),
-                eagerload_all('location_area.location'),
+                joinedload_all('condition_values'),
+                joinedload_all('version'),
+                joinedload_all('slot.method'),
+                joinedload_all('location_area.location'),
             )
         for encounter in q:
             condition_values = [cv for cv in encounter.condition_values
@@ -1019,12 +1019,12 @@ class PokedexController(PokedexBaseController):
                  joinedload(
                      tables.PokemonMove.machine, tables.Machine.version_group,
                      innerjoin=False),
-                 eagerload_all('move.damage_class'),
+                 joinedload_all('move.damage_class'),
                  joinedload_all(tables.PokemonMove.move,
                      tables.Move.move_effect,
                      tables.MoveEffect.prose_local),
-                 eagerload_all('move.type'),
-                 eagerload_all('version_group'),
+                 joinedload_all('move.type'),
+                 joinedload_all('version_group'),
              ) \
             .order_by(tables.PokemonMove.level.asc(),
                       tables.Machine.machine_number.asc(),
@@ -1252,10 +1252,10 @@ class PokedexController(PokedexBaseController):
         # Finally, condition values associated with levels/rarity.
         q = db.pokedex_session.query(tables.Encounter) \
             .options(
-                eagerload_all('condition_values'),
-                eagerload_all('version'),
-                eagerload_all('slot.method'),
-                eagerload_all('location_area.location'),
+                joinedload_all('condition_values'),
+                joinedload_all('version'),
+                joinedload_all('slot.method'),
+                joinedload_all('location_area.location'),
             )\
             .filter(tables.Encounter.pokemon == c.pokemon)
 
@@ -1373,15 +1373,15 @@ class PokedexController(PokedexBaseController):
         db.pokedex_session.query(tables.Move) \
             .filter_by(id=c.move.id) \
             .options(
-                eagerload('damage_class'),
-                eagerload('type'),
+                joinedload('damage_class'),
+                joinedload('type'),
                 subqueryload('type.damage_efficacies'),
                 joinedload('type.damage_efficacies.target_type'),
-                eagerload('target'),
-                eagerload('move_effect'),
-                eagerload_all(tables.Move.contest_effect, tables.ContestEffect.prose),
-                eagerload('contest_type'),
-                #eagerload('super_contest_effect'),
+                joinedload('target'),
+                joinedload('move_effect'),
+                joinedload_all(tables.Move.contest_effect, tables.ContestEffect.prose),
+                joinedload('contest_type'),
+                #joinedload('super_contest_effect'),
                 joinedload('move_flags.flag'),
                 subqueryload_all('names'),
                 joinedload(tables.Move.flavor_text, tables.MoveFlavorText.version_group),
@@ -1420,7 +1420,7 @@ class PokedexController(PokedexBaseController):
         q = db.pokedex_session.query(tables.Generation) \
             .filter(tables.Generation.id >= c.move.generation.id) \
             .options(
-                eagerload('version_groups'),
+                joinedload('version_groups'),
             ) \
             .order_by(tables.Generation.id.asc())
         raw_machines = {}
@@ -1465,7 +1465,7 @@ class PokedexController(PokedexBaseController):
             .join(tables.Move.move_effect) \
             .filter(tables.MoveEffect.id == c.move.effect_id) \
             .filter(tables.Move.id != c.move.id) \
-            .options(eagerload('type')) \
+            .options(joinedload('type')) \
             .all()
 
         ### Pokémon
@@ -1477,13 +1477,13 @@ class PokedexController(PokedexBaseController):
         # ends up in the table, and the lowest level is the most useful
         q = db.pokedex_session.query(tables.PokemonMove) \
             .options(
-                eagerload('method'),
-                eagerload('pokemon'),
-                eagerload('version_group'),
-                eagerload('pokemon.species'),
-                eagerload('pokemon.stats.stat'),
-                eagerload('pokemon.stats.stat.damage_class'),
-                eagerload('pokemon.default_form'),
+                joinedload('method'),
+                joinedload('pokemon'),
+                joinedload('version_group'),
+                joinedload('pokemon.species'),
+                joinedload('pokemon.stats.stat'),
+                joinedload('pokemon.stats.stat.damage_class'),
+                joinedload('pokemon.default_form'),
 
                 # Pokémon table stuff
                 subqueryload('pokemon.abilities'),
@@ -1556,7 +1556,7 @@ class PokedexController(PokedexBaseController):
             .filter(tables.Type.damage_efficacies.any()) \
             .order_by(tables.Type.names_table.name) \
             .options(contains_eager(tables.Type.names_local)) \
-            .options(eagerload('damage_efficacies')) \
+            .options(joinedload('damage_efficacies')) \
             .all()
 
         if 'secondary' in request.params:
@@ -1564,7 +1564,7 @@ class PokedexController(PokedexBaseController):
                 c.secondary_type = db.get_by_name_query(
                         tables.Type, request.params['secondary'].lower()) \
                     .filter(tables.Type.damage_efficacies.any()) \
-                    .options(eagerload('target_efficacies')) \
+                    .options(joinedload('target_efficacies')) \
                     .one()
             except NoResultFound:
                 abort(404)
@@ -1658,7 +1658,7 @@ class PokedexController(PokedexBaseController):
         c.abilities = db.pokedex_session.query(tables.Ability) \
             .join(tables.Ability.names_local) \
             .filter(tables.Ability.prose.any()) \
-            .options(eagerload('prose.short_effect')) \
+            .options(joinedload('prose.short_effect')) \
             .order_by(tables.Ability.generation_id.asc(),
                 tables.Ability.names_table.name.asc()) \
             .all()
@@ -1777,7 +1777,7 @@ class PokedexController(PokedexBaseController):
         # Eagerload TM info if it's actually needed
         if c.item_pocket.identifier == u'machines':
             db.pokedex_session.query(tables.ItemPocket) \
-                .options(eagerload_all('categories.items.machines.move.type')) \
+                .options(joinedload_all('categories.items.machines.move.type')) \
                 .get(c.item_pocket.id)
 
         c.item_pockets = db.pokedex_session.query(tables.ItemPocket) \
@@ -1873,10 +1873,10 @@ class PokedexController(PokedexBaseController):
         # Finally, condition values associated with levels/rarity.
         q = db.pokedex_session.query(tables.Encounter) \
             .options(
-                eagerload_all('condition_values'),
-                eagerload_all('slot.method'),
-                eagerload_all('pokemon.species'),
-                eagerload('version'),
+                joinedload_all('condition_values'),
+                joinedload_all('slot.method'),
+                joinedload_all('pokemon.species'),
+                joinedload('version'),
             ) \
             .filter(tables.Encounter.location_area_id.in_(
                 x.id for areas in c.region_areas.values() for x in areas
