@@ -615,32 +615,22 @@ $(function() {
 
     ////// Easter egg: obdurate
     // Run through text nodes individually, so <br>s are untouched.
-    // nb: 3 is Node.TEXT_NODE
+    var zfill = function(s) {
+        return ("0000" + s).slice(-4);
+    };
     $('.dex-obdurate')
     .contents()
-    .filter(function() { return this.nodeType == 3 })
+    .filter(function() { return this.nodeType == Node.TEXT_NODE; })
     .each(function() {
         var text = this.nodeValue;
-
-        // Wrap words in these so the browser doesn't break in the middle of a
-        // "word"
-        var nobr_start = '<nobr>';
-        var nobr_end = '</nobr><wbr>';
-
-        var newtext = [ nobr_start ];
-
+        var elems = [];
         for (var i = 0; i < text.length; i++) {
-            var ch = text.substr(i, 1);
-            newtext.push('<img src="/dex/media/fonts/diamond-pearl-platinum/' + encodeURIComponent(ch) + '.png">');
-
-            if (ch == ' ') {
-                // Allow break on spaces
-                newtext.push(nobr_end);
-                newtext.push(nobr_start);
-            }
+            var u = zfill(text.charCodeAt(i).toString(16));
+            var img = new Image();
+            img.src = '/dex/media/fonts/diamond-pearl-platinum/u' + u + '.png';
+            img.alt = text.charAt(i);
+            elems.push(img);
         }
-
-        newtext.push(nobr_end);
-        $(this).replaceWith(newtext.join(''));
+        $(this).replaceWith(elems);
     });
 });
