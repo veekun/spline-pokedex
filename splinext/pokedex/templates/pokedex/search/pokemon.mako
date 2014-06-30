@@ -433,7 +433,7 @@ ${h.pokedex.type_link(type)}
 
 <%def name="col_gender()"><col class="dex-col-gender"></%def>
 <%def name="th_gender()"><th>${_(u"Gender")}</th></%def>
-<%def name="td_gender(pokemon)"><td>${h.pokedex.chrome_img('gender-rates/%d.png' % pokemon.species.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.species.gender_rate])}</td></%def>
+<%def name="td_gender(pokemon)"><td>${h.pokedex.chrome_img('gender-rates/%d.png' % pokemon.species.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.species.gender_rate], title=h.pokedex.gender_rate_label[pokemon.species.gender_rate])}</td></%def>
 
 <%def name="col_egg_group()"><col class="dex-col-egg-group"></%def>
 <%def name="th_egg_group()"><th>${_(u"Egg Group")}</th></%def>
