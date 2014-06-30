@@ -1089,15 +1089,11 @@ class PokedexSearchController(PokedexBaseController):
         ### Sorting
         # nb: the below sort ascending for words (a->z) and descending for
         # numbers (9->1), because that's how it should be, okay
-        # Default fallback sort is by name, then by form
-        # XXX: Use name, not identifier
-        sort_clauses = [my_species.identifier.asc(), default_form.order.asc(),
-                        default_form.form_identifier.asc()]
 
         if c.form.sort.data == 'id':
             # Sorting by both name and national ID is redundant, since both are
             # the same for two species.
-            sort_clauses[0] = my_species.id.asc()
+            query = query.order_by(my_species.id.asc())
 
         elif c.form.sort.data == 'evolution-chain':
             # This one is very special!  It affects sorting, but if the display
@@ -1165,13 +1161,13 @@ class PokedexSearchController(PokedexBaseController):
                     == my_species.evolution_chain_id
             ))
 
-            # Sort by ID instead of name within families
-            sort_clauses[0] = my_species.order
-
-            sort_clauses = [
-                chain_sorting_subquery.c.chain_position,
+            query = query.order_by(
+                chain_sorting_subquery.c.chain_position.asc(),
                 my_species.is_baby.desc()
-            ] + sort_clauses
+            )
+
+            # Sort by ID instead of name within families
+            query = query.order_by(my_species.order.asc())
 
         elif c.form.sort.data == 'name':
             # Name is fallback, so don't do anything
@@ -1180,7 +1176,6 @@ class PokedexSearchController(PokedexBaseController):
         elif c.form.sort.data == 'type':
             # Sort by type1, then type2.  Unfortunately, need to left-join
             # independently for each type to make this work right
-            type_sort_clauses = []
             for type_slot in [1, 2]:
                 pokemon_type_alias = aliased(tables.PokemonType)
                 type_alias = aliased(tables.Type)
@@ -1198,78 +1193,77 @@ class PokedexSearchController(PokedexBaseController):
                 if type_slot == 2:
                     # Booleans sort by false, true -- so this should be desc to
                     # put NULL first
-                    type_sort_clauses.append((type_alias.id == None).desc())
+                    query = query.order_by((type_alias.id == None).desc())
 
-                type_sort_clauses.append(type_alias.identifier.asc())
-
-            sort_clauses = type_sort_clauses + sort_clauses
+                query = query.order_by(type_alias.identifier.asc())
 
         elif c.form.sort.data == 'growth-rate':
             query = query.outerjoin(my_species.growth_rate)
             query = query.outerjoin(tables.Experience, tables.GrowthRate.max_experience_obj)
-            sort_clauses.insert(0, tables.Experience.experience.desc())
+            query = query.order_by(tables.Experience.experience.desc())
 
         elif c.form.sort.data == 'height':
-            sort_clauses.insert(0, me.height.desc())
+            query = query.order_by(me.height.desc())
 
         elif c.form.sort.data == 'weight':
-            sort_clauses.insert(0, me.weight.desc())
+            query = query.order_by(me.weight.desc())
 
         elif c.form.sort.data == 'gender':
-            sort_clauses.insert(0, my_species.gender_rate.asc())
+            query = query.order_by(my_species.gender_rate.asc())
 
         elif c.form.sort.data == 'genus':
-            sort_clauses.insert(0, my_species.names_table.genus.asc())
+            query = query.order_by(my_species.names_table.genus.asc())
 
         elif c.form.sort.data == 'color':
             query = query.outerjoin(my_species.color)
-            sort_clauses.insert(0, tables.PokemonColor.identifier.asc())
+            query = query.order_by(tables.PokemonColor.identifier.asc())
 
         elif c.form.sort.data == 'habitat':
             query = query.outerjoin(my_species.habitat)
-            sort_clauses.insert(0, tables.PokemonHabitat.identifier.asc())
+            query = query.order_by(tables.PokemonHabitat.identifier.asc())
 
         elif c.form.sort.data == 'shape':
             query = query.outerjoin(my_species.shape)
             query = query.order_by(tables.PokemonShape.identifier.asc())
 
         elif c.form.sort.data == 'hatch-counter':
-            sort_clauses.insert(0, my_species.hatch_counter.desc())
+            query = query.order_by(my_species.hatch_counter.desc())
 
         elif c.form.sort.data == 'base-experience':
-            sort_clauses.insert(0, me.base_experience.desc())
+            query = query.order_by(me.base_experience.desc())
 
         elif c.form.sort.data == 'capture-rate':
-            sort_clauses.insert(0, my_species.capture_rate.desc())
+            query = query.order_by(my_species.capture_rate.desc())
 
         elif c.form.sort.data == 'base-happiness':
-            sort_clauses.insert(0, my_species.base_happiness.desc())
+            query = query.order_by(my_species.base_happiness.desc())
 
         elif c.form.sort.data == 'stat-total':
             query, stat_total_subquery = join_to_stat_total()
-            sort_clauses.insert(0, stat_total_subquery.c.stat_total.desc())
+            query = query.order_by(stat_total_subquery.c.stat_total.desc())
 
         elif c.form.sort.data.startswith('stat-'):
             stat_ident = c.form.sort.data[5:]
             query, stat_alias = join_to_stat(stat_ident)
-            sort_clauses.insert(0, stat_alias.base_stat.desc())
+            query = query.order_by(stat_alias.base_stat.desc())
 
-        # Reverse sort
-        if c.form.sort_backwards.data:
-            for i, clause in enumerate(sort_clauses):
-                # This is some semi-black SQLA magic...
-                if clause.modifier == asc_op:
-                    sort_clauses[i] = clause.element.desc()
-                else:
-                    sort_clauses[i] = clause.element.asc()
-
-        query = query.order_by(*sort_clauses)
+        # Default fallback sort is by name, then by form
+        # XXX: Use name, not identifier
+        query = query.order_by(
+            my_species.identifier.asc(),
+            default_form.order.asc(),
+            default_form.form_identifier.asc()
+        )
 
         # We always want the species
         query = query.options(joinedload('species'))
 
         ### Run the query!
         c.results = query.all()
+
+        # Reverse sort
+        if c.form.sort_backwards.data:
+            c.results.reverse()
 
         # Count the results (which we've already done if we're family-sorting)
         if c.species_count is None:
@@ -1543,12 +1537,8 @@ class PokedexSearchController(PokedexBaseController):
         ### Sorting
         # nb: the below sort ascending for words (a->z) and descending for
         # numbers (9->1), because that's how it should be, okay
-        # Default fallback sort is by name, then by id (in case of form)
-        sort_clauses = [ me.names_table.name.asc(), me.id.asc() ]
         if c.form.sort.data == 'id':
-            sort_clauses.insert(0,
-                me.id.asc()
-            )
+            query = query.order_by(me.id.asc())
 
         elif c.form.sort.data == 'name':
             # Name is fallback, so don't do anything
@@ -1557,37 +1547,29 @@ class PokedexSearchController(PokedexBaseController):
         elif c.form.sort.data == 'type':
             # Sort by type name
             query = query.join(me.type)
-            sort_clauses.insert(0, tables.Type.identifier.asc())
+            query = query.order_by(tables.Type.identifier.asc())
 
         elif c.form.sort.data == 'class':
-            sort_clauses.insert(0, me.damage_class_id.asc())
+            query = query.order_by(me.damage_class_id.asc())
 
         elif c.form.sort.data == 'pp':
-            sort_clauses.insert(0, me.pp.desc())
+            query = query.order_by(me.pp.desc())
 
         elif c.form.sort.data == 'power':
-            sort_clauses.insert(0, me.power.desc())
+            query = query.order_by(me.power.desc())
 
         elif c.form.sort.data == 'accuracy':
-            sort_clauses.insert(0, me.accuracy.desc())
+            query = query.order_by(me.accuracy.desc())
 
         elif c.form.sort.data == 'priority':
-            sort_clauses.insert(0, tables.Move.priority.desc())
+            query = query.order_by(tables.Move.priority.desc())
 
         elif c.form.sort.data == 'effect':
             query = query.join(tables.MoveEffect.prose)
-            sort_clauses.insert(0, tables.MoveEffect.prose_table.effect.desc())
+            query = query.order_by(tables.MoveEffect.prose_table.effect.desc())
 
-        # Reverse sort
-        if c.form.sort_backwards.data:
-            for i, clause in enumerate(sort_clauses):
-                # This is some semi-black SQLA magic...
-                if clause.modifier == asc_op:
-                    sort_clauses[i] = clause.element.desc()
-                else:
-                    sort_clauses[i] = clause.element.asc()
-
-        query = query.order_by(*sort_clauses)
+        # Default fallback sort is by name, then by id (in case of form)
+        query = query.order_by(me.names_table.name.asc(), me.id.asc())
 
         # Eagerload the obvious stuff: type and damage class
         query = query.options(
@@ -1598,6 +1580,10 @@ class PokedexSearchController(PokedexBaseController):
         )
 
         c.results = query.all()
+
+        # Reverse sort
+        if c.form.sort_backwards.data:
+            c.results.reverse()
 
         ### Done.
         return render('/pokedex/search/moves.mako')
