@@ -1090,10 +1090,13 @@ class PokedexSearchController(PokedexBaseController):
         # nb: the below sort ascending for words (a->z) and descending for
         # numbers (9->1), because that's how it should be, okay
 
+        needs_fallback = True
+
         if c.form.sort.data == 'id':
             # Sorting by both name and national ID is redundant, since both are
             # the same for two species.
             query = query.order_by(my_species.id.asc())
+            needs_fallback = False
 
         elif c.form.sort.data == 'evolution-chain':
             # This one is very special!  It affects sorting, but if the display
@@ -1110,29 +1113,30 @@ class PokedexSearchController(PokedexBaseController):
 
             # Grab the results first; needed for sorting even if the query is
             # otherwise left alone, boo
-            pokemon_ids = {}
+            pokemon_ids = set()
             species_ids = set()  # For result count
             evolution_chain_ids = set()
-            for id, chain_id, species_id in query.values(me.id,
-              my_species.evolution_chain_id, my_species.id):
+            for id, chain_id, species_id in query.values(
+                    me.id, my_species.evolution_chain_id, my_species.id):
                 evolution_chain_ids.add(chain_id)
                 species_ids.add(species_id)
-                pokemon_ids[id] = None
+                pokemon_ids.add(id)
 
             c.species_count = len(species_ids)
-            c.total_count = len(pokemon_ids.keys())
+            c.total_count = len(pokemon_ids)
 
             # Rebuild the query
-            if c.display_mode in ('custom-table',):
-                query = db.pokedex_session.query(me).filter(
-                    my_species.evolution_chain_id.in_( list(evolution_chain_ids) )
+            query = db.pokedex_session.query(me)
+            if c.display_mode == 'custom-table':
+                query = query.filter(
+                    my_species.evolution_chain_id.in_(evolution_chain_ids)
                 )
             else:
-                query = db.pokedex_session.query(me) \
-                    .filter(me.id.in_(pokemon_ids.keys()))
+                query = query.filter(me.id.in_(pokemon_ids))
 
-            # Join the new query to pokemon & forms again; needed for sorting
-            query = query.join((me, my_species.pokemon))
+            # Join the new query to species & forms again; needed for sorting
+            query = query.join((my_species, me.species))
+            query = query.join(my_species.names_local)
             query = query.outerjoin((default_form, me.default_form))
 
             # Let the template know which Pokémon are actually in the original
@@ -1161,13 +1165,11 @@ class PokedexSearchController(PokedexBaseController):
                     == my_species.evolution_chain_id
             ))
 
-            query = query.order_by(
-                chain_sorting_subquery.c.chain_position.asc(),
-                my_species.is_baby.desc()
-            )
+            query = query.order_by(chain_sorting_subquery.c.chain_position.asc())
 
             # Sort by ID instead of name within families
             query = query.order_by(my_species.order.asc())
+            needs_fallback = False
 
         elif c.form.sort.data == 'name':
             # Name is fallback, so don't do anything
@@ -1247,13 +1249,13 @@ class PokedexSearchController(PokedexBaseController):
             query, stat_alias = join_to_stat(stat_ident)
             query = query.order_by(stat_alias.base_stat.desc())
 
-        # Default fallback sort is by name, then by form
-        # XXX: Use name, not identifier
-        query = query.order_by(
-            my_species.identifier.asc(),
-            default_form.order.asc(),
-            default_form.form_identifier.asc()
-        )
+        # Default fallback sort is by species name, then by form
+        if needs_fallback:
+            query = query.order_by(
+                my_species.names_table.name.asc(),
+                default_form.order.asc(),
+                default_form.form_identifier.asc()
+            )
 
         # We always want the species
         query = query.options(joinedload('species'))
