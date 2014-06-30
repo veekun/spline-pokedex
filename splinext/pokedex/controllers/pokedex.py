@@ -1175,6 +1175,9 @@ class PokedexController(PokedexBaseController):
         ### Previous and next for the header
         c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
 
+        # Some Javascript
+        c.javascripts.append(('pokedex', 'pokemon'))
+
         return self.cache_content(
             key=c.form.identifier,
             template='/pokedex/pokemon_flavor.mako',
