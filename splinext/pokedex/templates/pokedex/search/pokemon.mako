@@ -540,15 +540,15 @@ ${h.pokedex.pokedex_img('shapes/%s.png' % pokemon.species.shape.identifier, titl
 <%def name="td_steps_to_hatch(pokemon)"><td class="stat">${(pokemon.species.hatch_counter + 1) * 255}</td></%def>
 
 <%def name="col_base_experience()"><col class="dex-col-stat"></%def>
-<%def name="th_base_experience()"><th>${_(u"EXP")}</th></%def>
+<%def name="th_base_experience()"><th><abbr title="${_(u"Base experience")}">${_(u"EXP")}</abbr></th></%def>
 <%def name="td_base_experience(pokemon)"><td class="stat">${pokemon.base_experience}</td></%def>
 
 <%def name="col_capture_rate()"><col class="dex-col-stat"></%def>
-<%def name="th_capture_rate()"><th>${_(u"Cap.")}</th></%def>
+<%def name="th_capture_rate()"><th><abbr title="${_(u"Capture rate")}">${_(u"Cap.")}</abbr></th></%def>
 <%def name="td_capture_rate(pokemon)"><td class="stat">${pokemon.species.capture_rate}</td></%def>
 
 <%def name="col_base_happiness()"><col class="dex-col-stat"></%def>
-<%def name="th_base_happiness()"><th>${_(u":)")}</th></%def>
+<%def name="th_base_happiness()"><th><abbr title="${_(u"Base happiness")}">${_(u":)")}</abbr></th></%def>
 <%def name="td_base_happiness(pokemon)"><td class="stat">${pokemon.species.base_happiness}</td></%def>
 
 <%def name="col_link()"><col class="dex-col-link"></%def>
