@@ -635,7 +635,7 @@ class PokedexController(PokedexBaseController):
             c.compatible_families = [ditto]
         elif c.pokemon.species.egg_groups[0].id == 15:
             # No Eggs group
-            pass
+            c.compatible_families = []
         else:
             parent_a = aliased(tables.PokemonSpecies)
             grandparent_a = aliased(tables.PokemonSpecies)
@@ -643,23 +643,30 @@ class PokedexController(PokedexBaseController):
             q = db.pokedex_session.query(tables.PokemonSpecies)
             q = q.join(tables.PokemonEggGroup) \
                  .outerjoin((parent_a, tables.PokemonSpecies.parent_species)) \
-                 .outerjoin((grandparent_a, parent_a.parent_species)) \
-                 .filter(tables.PokemonSpecies.gender_rate != -1) \
-                 .filter(
-                    # This is a "base form" iff either:
-                    or_(
-                        # This is the root form (no parent)
-                        # (It has to be breedable too, but we're filtering by
-                        # an egg group so that's granted)
-                        parent_a.id == None,
-                        # Or this can breed and evolves from something that
-                        # can't
-                        and_(parent_a.egg_groups.any(id=15),
-                             grandparent_a.id == None),
-                    )
-                 ) \
-                 .filter(tables.PokemonEggGroup.egg_group_id.in_(egg_group_ids)) \
-                 .options(joinedload('default_form')) \
+                 .outerjoin((grandparent_a, parent_a.parent_species))
+            # This is a "base form" iff either:
+            where = or_(
+                # This is the root form (no parent)
+                # (It has to be breedable too, but we're filtering by
+                # an egg group so that's granted)
+                parent_a.id == None,
+                # Or this can breed and evolves from something that
+                # can't
+                and_(parent_a.egg_groups.any(id=15),
+                     grandparent_a.id == None),
+            )
+            # Can only breed with pokémon we share an egg group with
+            where &= tables.PokemonEggGroup.egg_group_id.in_(egg_group_ids)
+            # Can't breed with genderless pokémon
+            where &= tables.PokemonSpecies.gender_rate != -1
+            # Male-only pokémon can't breed with other male-only pokémon
+            # Female-only pokémon can't breed with other female-only pokémon
+            if c.pokemon.species.gender_rate in (0, 8):
+                where &= tables.PokemonSpecies.gender_rate != c.pokemon.species.gender_rate
+            # Ditto can breed with anything
+            where |= tables.PokemonEggGroup.egg_group_id == 13
+            q = q.filter(where)
+            q = q.options(joinedload('default_form')) \
                  .order_by(tables.PokemonSpecies.id)
             c.compatible_families = q.all()
 
