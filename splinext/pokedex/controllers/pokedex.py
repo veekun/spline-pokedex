@@ -598,12 +598,12 @@ class PokedexController(PokedexBaseController):
 
         # Let's cache this bitch
         return self.cache_content(
-            key=c.pokemon.default_form.name, # c.pokemon.name?
+            key=c.pokemon.identifier,
             template='/pokedex/pokemon.mako',
             do_work=self._do_pokemon,
         )
 
-    def _do_pokemon(self, name_plus_form):
+    def _do_pokemon(self, cache_key):
 
         ### Type efficacy
         c.type_efficacies = defaultdict(lambda: 100)
@@ -1176,12 +1176,12 @@ class PokedexController(PokedexBaseController):
         c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
 
         return self.cache_content(
-            key=c.pokemon.name + u';' + (c.form.name or u''),
+            key=c.form.identifier,
             template='/pokedex/pokemon_flavor.mako',
             do_work=self._do_pokemon_flavor,
         )
 
-    def _do_pokemon_flavor(self, name_plus_form):
+    def _do_pokemon_flavor(self, cache_key):
         c.sprites = {}
 
         def sprite_exists(directory):
@@ -1233,12 +1233,12 @@ class PokedexController(PokedexBaseController):
 
         # Cache it yo
         return self.cache_content(
-            key=c.pokemon.name,
+            key=c.pokemon.identifier,
             template='/pokedex/pokemon_locations.mako',
             do_work=self._do_pokemon_locations,
         )
 
-    def _do_pokemon_locations(self, name):
+    def _do_pokemon_locations(self, cache_key):
         # For the most part, our data represents exactly what we're going to
         # show.  For a given area in a given game, this Pokémon is guaranteed
         # to appear some x% of the time no matter what the state of the world
@@ -1363,12 +1363,12 @@ class PokedexController(PokedexBaseController):
             )
 
         return self.cache_content(
-            key=c.move.name,
+            key=c.move.identifier,
             template='/pokedex/move.mako',
             do_work=self._do_moves,
         )
 
-    def _do_moves(self, name):
+    def _do_moves(self, cache_key):
         # Eagerload
         db.pokedex_session.query(tables.Move) \
             .filter_by(id=c.move.id) \
@@ -1619,12 +1619,12 @@ class PokedexController(PokedexBaseController):
             )
 
         return self.cache_content(
-            key=c.type.name,
+            key=c.type.identifier,
             template='/pokedex/type.mako',
             do_work=self._do_types,
         )
 
-    def _do_types(self, name):
+    def _do_types(self, cache_key):
         # Eagerload a bit of type stuff
         db.pokedex_session.query(tables.Type) \
             .filter_by(id=c.type.id) \
@@ -1681,12 +1681,12 @@ class PokedexController(PokedexBaseController):
             )
 
         return self.cache_content(
-            key=c.ability.name,
+            key=c.ability.identifier,
             template='/pokedex/ability.mako',
             do_work=self._do_ability,
         )
 
-    def _do_ability(self, name):
+    def _do_ability(self, cache_key):
         # Eagerload
         db.pokedex_session.query(tables.Ability) \
             .filter_by(id=c.ability.id) \
