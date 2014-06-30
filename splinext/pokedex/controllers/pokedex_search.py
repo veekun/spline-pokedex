@@ -1153,7 +1153,7 @@ class PokedexSearchController(PokedexBaseController):
                     chain_sorting_species.evolution_chain_id,
                     func.min(chain_sorting_species.id).label('chain_position')
                 ).select_from(chain_sorting_alias) \
-                .filter(chain_sorting_species.id.in_(pokemon_ids)) \
+                .filter(chain_sorting_alias.id.in_(pokemon_ids)) \
                 .outerjoin((chain_sorting_species, chain_sorting_alias.species)) \
                 .outerjoin((chain_sorting_forms, chain_sorting_alias.default_form)) \
                 .group_by(chain_sorting_species.evolution_chain_id) \
