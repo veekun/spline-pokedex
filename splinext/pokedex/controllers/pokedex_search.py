@@ -1234,7 +1234,7 @@ class PokedexSearchController(PokedexBaseController):
             query = query.order_by(tables.PokemonShape.identifier.asc())
 
         elif c.form.sort.data == 'hatch-counter':
-            sort_clauses.insert(0, my_species.hatch_counter.asc())
+            sort_clauses.insert(0, my_species.hatch_counter.desc())
 
         elif c.form.sort.data == 'base-experience':
             sort_clauses.insert(0, me.base_experience.desc())
