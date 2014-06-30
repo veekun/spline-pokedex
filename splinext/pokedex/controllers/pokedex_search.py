@@ -1229,6 +1229,10 @@ class PokedexSearchController(PokedexBaseController):
             query = query.outerjoin(my_species.habitat)
             sort_clauses.insert(0, tables.PokemonHabitat.identifier.asc())
 
+        elif c.form.sort.data == 'shape':
+            query = query.outerjoin(my_species.shape)
+            query = query.order_by(tables.PokemonShape.identifier.asc())
+
         elif c.form.sort.data == 'hatch-counter':
             sort_clauses.insert(0, my_species.hatch_counter.asc())
 
