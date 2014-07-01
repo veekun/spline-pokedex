@@ -633,7 +633,7 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 ${h.h1(_('Miscellaneous Game Art'), id=_('misc-sprites', context='anchor'))}
 
 % if c.sprite_exists('overworld/left'):
-<% overworld_gender_differences = c.pokemon.species.has_gender_differences and c.sprite_exists('overworld/female') %>
+<% overworld_gender_differences = c.pokemon.species.has_gender_differences and c.sprite_exists('overworld/female/left') %>
 <h2> ${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')} ${_("HeartGold & SoulSilver Overworld")} </h2>
 <table class="dex-pokemon-flavor-sprites">
 % if overworld_gender_differences:
