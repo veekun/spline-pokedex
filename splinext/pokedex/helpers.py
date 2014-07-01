@@ -109,6 +109,9 @@ def render_flavor_text(flavor_text, literal=False):
                           .replace(u'-\n',      u'-') \
                           .replace(u'\n',       u' ')
 
+        # Collapse adjacent spaces and strip trailing whitespace.
+        html = u' '.join(html.split())
+
     return h.literal(html)
 
 ## Collapsing
