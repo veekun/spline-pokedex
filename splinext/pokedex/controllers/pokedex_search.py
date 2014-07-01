@@ -257,9 +257,10 @@ class PokemonSearchForm(BaseSearchForm):
     )
     in_pokedex = QueryCheckboxSelectMultipleField(
         u'In regional Pokédex',
-        query_factory=lambda: db.pokedex_session.query(tables.Pokedex) \
-                                  .filter(tables.Pokedex.region_id != None) \
-                                  .options(joinedload_all('region.generation')),
+        query_factory=lambda: db.pokedex_session.query(tables.Pokedex)
+                                  .filter(tables.Pokedex.region_id != None)
+                                  .options(joinedload_all('region.generation'))
+                                  .order_by(tables.Pokedex.id),
         get_label=in_pokedex_label,
         get_pk=lambda table: table.id,
         allow_blank=True,
