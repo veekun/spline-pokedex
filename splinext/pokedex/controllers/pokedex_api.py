@@ -5,7 +5,7 @@ import json
 import logging
 
 import pokedex.db
-import pokedex.db.tables as tables
+import pokedex.db.tables as t
 import pokedex.formulae
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
@@ -29,7 +29,7 @@ class PokedexAPIController(BaseController):
         # TODO document these!
         # TODO cache me!
         pokemon = []
-        for row in db.pokedex_session.query(tables.Pokemon):
+        for row in db.pokedex_session.query(t.Pokemon):
             pokemon.append(dict(
                 id=row.id,
                 name=row.name,

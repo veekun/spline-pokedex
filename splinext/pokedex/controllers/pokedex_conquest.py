@@ -7,7 +7,7 @@ from itertools import izip
 from random import randint
 
 import pokedex.db
-import pokedex.db.tables as tables
+import pokedex.db.tables as t
 from pylons import request, tmpl_context as c
 from pylons.controllers.util import abort
 import sqlalchemy as sqla
@@ -94,7 +94,7 @@ class PokedexConquestController(PokedexBaseController):
 
     def abilities(self, name):
         try:
-            c.ability = db.get_by_name_query(tables.Ability, name).one()
+            c.ability = db.get_by_name_query(t.Ability, name).one()
         except NoResultFound:
             return self._not_found()
 
@@ -103,16 +103,16 @@ class PokedexConquestController(PokedexBaseController):
             return self._not_found()
 
         c.prev_ability, c.next_ability = self._prev_next_name(
-            tables.Ability, c.ability,
-            filters=[tables.Ability.conquest_pokemon.any()])
+            t.Ability, c.ability,
+            filters=[t.Ability.conquest_pokemon.any()])
 
         return render('/pokedex/conquest/ability.mako')
 
     def abilities_list(self):
-        c.abilities = (db.pokedex_session.query(tables.Ability)
-            .join(tables.Ability.names_local)
-            .filter(tables.Ability.conquest_pokemon.any())
-            .order_by(tables.Ability.names_table.name.asc())
+        c.abilities = (db.pokedex_session.query(t.Ability)
+            .join(t.Ability.names_local)
+            .filter(t.Ability.conquest_pokemon.any())
+            .order_by(t.Ability.names_table.name.asc())
             .all()
         )
 
@@ -121,22 +121,22 @@ class PokedexConquestController(PokedexBaseController):
 
     def kingdoms(self, name):
         try:
-            c.kingdom = db.get_by_name_query(tables.ConquestKingdom, name).one()
+            c.kingdom = db.get_by_name_query(t.ConquestKingdom, name).one()
         except NoResultFound:
             return self._not_found()
 
         # We have pretty much nothing for kingdoms.  Yet.
         c.prev_kingdom, c.next_kingdom = self._prev_next_id(
-            c.kingdom, tables.ConquestKingdom, 'id')
+            c.kingdom, t.ConquestKingdom, 'id')
 
         return render('/pokedex/conquest/kingdom.mako')
 
     def kingdoms_list(self):
-        c.kingdoms = (db.pokedex_session.query(tables.ConquestKingdom)
+        c.kingdoms = (db.pokedex_session.query(t.ConquestKingdom)
             .options(
                 sqla.orm.joinedload('type')
             )
-            .order_by(tables.ConquestKingdom.id)
+            .order_by(t.ConquestKingdom.id)
             .all()
         )
 
@@ -145,7 +145,7 @@ class PokedexConquestController(PokedexBaseController):
 
     def moves(self, name):
         try:
-            c.move = (db.get_by_name_query(tables.Move, name)
+            c.move = (db.get_by_name_query(t.Move, name)
                 .options(
                     sqla.orm.joinedload('conquest_data'),
                     sqla.orm.joinedload('conquest_pokemon'),
@@ -160,20 +160,20 @@ class PokedexConquestController(PokedexBaseController):
             return self._not_found()
 
         ### Prev/next for header
-        c.prev_move, c.next_move = self._prev_next_name(tables.Move, c.move,
-            filters=[tables.Move.conquest_pokemon.any()])
+        c.prev_move, c.next_move = self._prev_next_name(t.Move, c.move,
+            filters=[t.Move.conquest_pokemon.any()])
 
         return render('/pokedex/conquest/move.mako')
 
     def moves_list(self):
-        c.moves = (db.pokedex_session.query(tables.Move)
-            .filter(tables.Move.conquest_data.has())
+        c.moves = (db.pokedex_session.query(t.Move)
+            .filter(t.Move.conquest_data.has())
             .options(
                 sqla.orm.joinedload('conquest_data'),
                 sqla.orm.joinedload('conquest_data.move_displacement'),
             )
-            .join(tables.Move.names_local)
-            .order_by(tables.Move.names_table.name.asc())
+            .join(t.Move.names_local)
+            .order_by(t.Move.names_table.name.asc())
             .all()
         )
 
@@ -195,7 +195,7 @@ class PokedexConquestController(PokedexBaseController):
 
         ### Previous and next for the header
         c.prev_pokemon, c.next_pokemon = self._prev_next_id(
-            c.pokemon, tables.PokemonSpecies, 'conquest_order')
+            c.pokemon, t.PokemonSpecies, 'conquest_order')
 
         ### Type efficacy
         c.type_efficacies = defaultdict(lambda: 100)
@@ -228,8 +228,8 @@ class PokedexConquestController(PokedexBaseController):
         # total of seven descendents, so it would need to span 7 rows.
         c.evolution_table = []
         # Prefetch the evolution details
-        family = (db.pokedex_session.query(tables.PokemonSpecies)
-            .filter(tables.PokemonSpecies.evolution_chain_id ==
+        family = (db.pokedex_session.query(t.PokemonSpecies)
+            .filter(t.PokemonSpecies.evolution_chain_id ==
                     c.pokemon.evolution_chain_id)
             .options(
                 sqla.orm.subqueryload('conquest_evolution'),
@@ -324,7 +324,7 @@ class PokedexConquestController(PokedexBaseController):
         #     thing to work
         c.stats = {}  # stat => { border, background, percentile }
         stat_total = 0
-        total_stat_rows = db.pokedex_session.query(tables.ConquestPokemonStat) \
+        total_stat_rows = db.pokedex_session.query(t.ConquestPokemonStat) \
             .filter_by(stat=c.pokemon.conquest_stats[0].stat) \
             .count()
         for pokemon_stat in c.pokemon.conquest_stats:
@@ -335,11 +335,11 @@ class PokedexConquestController(PokedexBaseController):
             if pokemon_stat.stat.is_base:
                 stat_total += pokemon_stat.base_stat
 
-            q = db.pokedex_session.query(tables.ConquestPokemonStat) \
+            q = db.pokedex_session.query(t.ConquestPokemonStat) \
                                .filter_by(stat=pokemon_stat.stat)
-            less = q.filter(tables.ConquestPokemonStat.base_stat <
+            less = q.filter(t.ConquestPokemonStat.base_stat <
                             pokemon_stat.base_stat).count()
-            equal = q.filter(tables.ConquestPokemonStat.base_stat ==
+            equal = q.filter(t.ConquestPokemonStat.base_stat ==
                              pokemon_stat.base_stat).count()
             percentile = (less + equal * 0.5) / total_stat_rows
             stat_info['percentile'] = percentile
@@ -351,11 +351,11 @@ class PokedexConquestController(PokedexBaseController):
         # Percentile for the total
         # Need to make a derived table that fakes pokemon_id, total_stats
         stat_sum_tbl = db.pokedex_session.query(
-                sqla.sql.func.sum(tables.ConquestPokemonStat.base_stat)
+                sqla.sql.func.sum(t.ConquestPokemonStat.base_stat)
                 .label('stat_total')
             ) \
-            .filter(tables.ConquestPokemonStat.conquest_stat_id <= 4) \
-            .group_by(tables.ConquestPokemonStat.pokemon_species_id) \
+            .filter(t.ConquestPokemonStat.conquest_stat_id <= 4) \
+            .group_by(t.ConquestPokemonStat.pokemon_species_id) \
             .subquery()
 
         q = db.pokedex_session.query(stat_sum_tbl)
@@ -382,20 +382,20 @@ class PokedexConquestController(PokedexBaseController):
         # check their final rank.
 
         # First, craft a clause to filter out non-final warrior ranks.
-        ranks_sub = sqla.orm.aliased(tables.ConquestWarriorRank)
+        ranks_sub = sqla.orm.aliased(t.ConquestWarriorRank)
         higher_ranks_exist = (sqla.sql.exists([1])
             .where(sqla.and_(
-                ranks_sub.warrior_id == tables.ConquestWarriorRank.warrior_id,
-                ranks_sub.rank > tables.ConquestWarriorRank.rank))
+                ranks_sub.warrior_id == t.ConquestWarriorRank.warrior_id,
+                ranks_sub.rank > t.ConquestWarriorRank.rank))
         )
 
         # Next, find final-rank warriors with a max link high enough.
-        worthy_warriors = (db.pokedex_session.query(tables.ConquestWarrior.id)
-            .join(tables.ConquestWarriorRank)
+        worthy_warriors = (db.pokedex_session.query(t.ConquestWarrior.id)
+            .join(t.ConquestWarriorRank)
             .filter(~higher_ranks_exist)
-            .join(tables.ConquestMaxLink)
-            .filter(tables.ConquestMaxLink.pokemon_species_id == c.pokemon.id)
-            .filter(tables.ConquestMaxLink.max_link >= c.link_form.link.data))
+            .join(t.ConquestMaxLink)
+            .filter(t.ConquestMaxLink.pokemon_species_id == c.pokemon.id)
+            .filter(t.ConquestMaxLink.max_link >= c.link_form.link.data))
 
         # For Froslass and Gallade, we want to filter out male and female
         # warriors, respectively.
@@ -404,7 +404,7 @@ class PokedexConquestController(PokedexBaseController):
         if (c.pokemon.conquest_evolution is not None and
           c.pokemon.conquest_evolution.warrior_gender_id is not None):
             worthy_warriors = worthy_warriors.filter(
-                tables.ConquestWarrior.gender_id ==
+                t.ConquestWarrior.gender_id ==
                     c.pokemon.conquest_evolution.warrior_gender_id)
 
         # Finally, find ALL the max links for these warriors!
@@ -425,15 +425,15 @@ class PokedexConquestController(PokedexBaseController):
         return render('/pokedex/conquest/pokemon.mako')
 
     def pokemon_list(self):
-        c.pokemon = (db.pokedex_session.query(tables.PokemonSpecies)
-            .filter(tables.PokemonSpecies.conquest_order != None)
+        c.pokemon = (db.pokedex_session.query(t.PokemonSpecies)
+            .filter(t.PokemonSpecies.conquest_order != None)
             .options(
                 sqla.orm.subqueryload('conquest_abilities'),
                 sqla.orm.joinedload('conquest_move'),
                 sqla.orm.subqueryload('conquest_stats'),
                 sqla.orm.subqueryload('default_pokemon.types')
             )
-            .order_by(tables.PokemonSpecies.conquest_order)
+            .order_by(t.PokemonSpecies.conquest_order)
             .all()
         )
 
@@ -442,35 +442,35 @@ class PokedexConquestController(PokedexBaseController):
 
     def skills(self, name):
         try:
-            c.skill = (db.get_by_name_query(tables.ConquestWarriorSkill, name)
+            c.skill = (db.get_by_name_query(t.ConquestWarriorSkill, name)
                 .one())
         except NoResultFound:
             return self._not_found()
 
         ### Prev/next for header
         c.prev_skill, c.next_skill = self._prev_next_name(
-            tables.ConquestWarriorSkill, c.skill)
+            t.ConquestWarriorSkill, c.skill)
 
         return render('/pokedex/conquest/skill.mako')
 
     def skills_list(self):
-        skills = (db.pokedex_session.query(tables.ConquestWarriorSkill)
-            .join(tables.ConquestWarriorSkill.names_local)
-            .order_by(tables.ConquestWarriorSkill.names_table.name.asc()))
+        skills = (db.pokedex_session.query(t.ConquestWarriorSkill)
+            .join(t.ConquestWarriorSkill.names_local)
+            .order_by(t.ConquestWarriorSkill.names_table.name.asc()))
 
         # We want to split the list up between generic skills anyone can get
         # and the unique skills a specific warlord gets at a specific rank.
         # The two player characters throw a wrench in that though so we just
         # assume any skill known only by warlords is unique, which happens to
         # work.
-        warriors_and_ranks = sqla.orm.join(tables.ConquestWarrior,
-                                           tables.ConquestWarriorRank)
+        warriors_and_ranks = sqla.orm.join(t.ConquestWarrior,
+                                           t.ConquestWarriorRank)
 
         generic_clause = (sqla.sql.exists(warriors_and_ranks.select())
             .where(sqla.and_(
-                tables.ConquestWarrior.archetype_id != None,
-                tables.ConquestWarriorRank.skill_id ==
-                    tables.ConquestWarriorSkill.id))
+                t.ConquestWarrior.archetype_id != None,
+                t.ConquestWarriorRank.skill_id ==
+                    t.ConquestWarriorSkill.id))
         )
 
 
@@ -490,25 +490,25 @@ class PokedexConquestController(PokedexBaseController):
 
     def warriors(self, name):
         try:
-            c.warrior = db.get_by_name_query(tables.ConquestWarrior, name).one()
+            c.warrior = db.get_by_name_query(t.ConquestWarrior, name).one()
         except NoResultFound:
             return self._not_found()
 
         c.prev_warrior, c.next_warrior = self._prev_next_id(
-            c.warrior, tables.ConquestWarrior, 'id')
+            c.warrior, t.ConquestWarrior, 'id')
 
         c.rank_count = len(c.warrior.ranks)
 
         c.perfect_links = (c.warrior.ranks[-1].max_links
             .filter_by(max_link=100)
-            .join(tables.PokemonSpecies)
-            .order_by(tables.PokemonSpecies.conquest_order)
+            .join(t.PokemonSpecies)
+            .order_by(t.PokemonSpecies.conquest_order)
             .all())
 
         ### Stats
         # Percentiles!  Percentiles are hard.
-        stats = tables.ConquestWarriorRankStatMap
-        all_stats = sqla.orm.aliased(tables.ConquestWarriorRankStatMap)
+        stats = t.ConquestWarriorRankStatMap
+        all_stats = sqla.orm.aliased(t.ConquestWarriorRankStatMap)
 
         # We need this to be a float so the percentile equation can divide by it
         stat_count = sqla.cast(sqla.func.count(all_stats.base_stat),
@@ -530,8 +530,8 @@ class PokedexConquestController(PokedexBaseController):
 
         # XXX There's probably a better way to query all the names
         stat_names = [stat.name for stat in
-            db.pokedex_session.query(tables.ConquestWarriorStat)
-            .order_by(tables.ConquestWarriorStat.id)
+            db.pokedex_session.query(t.ConquestWarriorStat)
+            .order_by(t.ConquestWarriorStat.id)
             .all()]
 
         # Go through the query for each rank
@@ -556,19 +556,19 @@ class PokedexConquestController(PokedexBaseController):
         c.link_form.validate()
 
         link_pokemon = (
-            db.pokedex_session.query(tables.ConquestMaxLink.pokemon_species_id)
-            .filter(tables.ConquestMaxLink.warrior_rank_id ==
+            db.pokedex_session.query(t.ConquestMaxLink.pokemon_species_id)
+            .filter(t.ConquestMaxLink.warrior_rank_id ==
                     c.warrior.ranks[-1].id)
-            .filter(tables.ConquestMaxLink.max_link >= c.link_form.link.data)
+            .filter(t.ConquestMaxLink.max_link >= c.link_form.link.data)
         )
 
         max_links = []
         for rank in c.warrior.ranks:
             max_links.append(rank.max_links
-                .filter(tables.ConquestMaxLink.pokemon_species_id
+                .filter(t.ConquestMaxLink.pokemon_species_id
                         .in_(link_pokemon))
-                .join(tables.PokemonSpecies)
-                .order_by(tables.PokemonSpecies.conquest_order)
+                .join(t.PokemonSpecies)
+                .order_by(t.PokemonSpecies.conquest_order)
                 .options(
                     sqla.orm.joinedload('pokemon'),
                     sqla.orm.subqueryload('pokemon.conquest_abilities'),
@@ -581,13 +581,13 @@ class PokedexConquestController(PokedexBaseController):
         return render('/pokedex/conquest/warrior.mako')
 
     def warriors_list(self):
-        c.warriors = (db.pokedex_session.query(tables.ConquestWarrior)
+        c.warriors = (db.pokedex_session.query(t.ConquestWarrior)
             .options(
                 sqla.orm.subqueryload('ranks'),
                 sqla.orm.subqueryload('ranks.stats'),
                 sqla.orm.subqueryload('types')
             )
-            .order_by(tables.ConquestWarrior.id)
+            .order_by(t.ConquestWarrior.id)
             .all()
         )
 

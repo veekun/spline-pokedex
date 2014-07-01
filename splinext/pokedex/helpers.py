@@ -15,7 +15,7 @@ import warnings
 
 from pylons import config, tmpl_context as c, url
 
-import pokedex.db.tables as tables
+import pokedex.db.tables as t
 import spline.lib.helpers as h
 from splinext.pokedex.i18n import NullTranslator
 
@@ -37,14 +37,14 @@ def make_thingy_url(thingy, subpage=None, controller='dex'):
     args = {}
 
     # Pokémon with forms need the form attached to the URL
-    if isinstance(thingy, tables.PokemonForm):
+    if isinstance(thingy, t.PokemonForm):
         action = 'pokemon'
         args['form'] = thingy.form_identifier.lower()
         args['name'] = thingy.pokemon.species.name.lower()
 
         if not thingy.is_default:
             subpage = 'flavor'
-    elif isinstance(thingy, tables.PokemonSpecies):
+    elif isinstance(thingy, t.PokemonSpecies):
         action = 'pokemon'
         args['name'] = thingy.name.lower()
     else:
@@ -53,11 +53,11 @@ def make_thingy_url(thingy, subpage=None, controller='dex'):
 
 
     # Items are split up by pocket
-    if isinstance(thingy, tables.Item):
+    if isinstance(thingy, t.Item):
         args['pocket'] = thingy.pocket.identifier
 
     if (thingy.__tablename__.startswith('conquest_')
-       or (isinstance(thingy, tables.Ability) and not thingy.is_main_series)
+       or (isinstance(thingy, t.Ability) and not thingy.is_main_series)
        or subpage == 'conquest'):
         # Conquest stuff needs to go to the Conquest controller
         if action == 'conquest_warrior_skills':

@@ -2,6 +2,7 @@
 <%namespace name="lib" file="/lib.mako"/>
 <%namespace name="dexlib" file="lib.mako"/>
 <%! from splinext.pokedex import i18n %>\
+<%! import pokedex.db.tables as t %>\
 
 <%def name="title()">${_("%s - Moves") % c.move.name}</%def>
 
@@ -253,7 +254,6 @@ ${c.move.effect}
 % if c.move.changelog or c.move.move_effect.changelog:
 ${h.h1(_('History'))}
 <dl>
-    <%! import pokedex.db.tables %>\
     <%
         all_changelog = (
             list(c.move.changelog) + list(c.move.move_effect.changelog))
@@ -263,7 +263,7 @@ ${h.h1(_('History'))}
     % for change in all_changelog:
     <dt>Before ${h.pokedex.version_icons(*change.changed_in.versions)}</dt>
     <dd>
-      % if isinstance(change, pokedex.db.tables.MoveChangelog):
+      % if isinstance(change, t.MoveChangelog):
         % if change.type_id is not None:
         Type is ${h.pokedex.type_link(change.type)}.
         % endif

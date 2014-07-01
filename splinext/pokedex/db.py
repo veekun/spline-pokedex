@@ -6,7 +6,7 @@ import os.path
 import re
 
 import pokedex.db
-from pokedex.db import tables
+import pokedex.db.tables as t
 import pokedex.lookup
 from sqlalchemy.sql import func
 
@@ -56,18 +56,18 @@ def pokemon_form_identifier_query(identifier, form_identifier=None):
     """Returns a query that will look for the Pokémon with the given identifier.
     """
 
-    q = get_by_identifier_query(tables.PokemonForm, form_identifier)
-    q = q.join(tables.PokemonForm.species)
-    q = q.filter(tables.Pokemon.forms.any())
+    q = get_by_identifier_query(t.PokemonForm, form_identifier)
+    q = q.join(t.PokemonForm.species)
+    q = q.filter(t.Pokemon.forms.any())
 
     if form:
         # If a form has been specified, it must match
-        q = q.join(tables.Pokemon.unique_form) \
-            .filter(tables.PokemonForm.identifier == form)
+        q = q.join(t.Pokemon.unique_form) \
+            .filter(t.PokemonForm.identifier == form)
     else:
         # If there's NOT a form, just make sure we get a form base Pokémon
         # TODO wtf is this any() for?
-        q = q.filter(tables.Pokemon.forms.any())
+        q = q.filter(t.Pokemon.forms.any())
 
     return q
 
@@ -98,18 +98,18 @@ def pokemon_query(name, form=None):
     form, if given, is a form identifier.
     """
 
-    query = pokedex_session.query(tables.Pokemon)
-    query = query.join(tables.Pokemon.species)
-    query = query.join(tables.PokemonSpecies.names_local)
-    query = query.filter(func.lower(tables.PokemonSpecies.names_table.name) == name.lower())
+    query = pokedex_session.query(t.Pokemon)
+    query = query.join(t.Pokemon.species)
+    query = query.join(t.PokemonSpecies.names_local)
+    query = query.filter(func.lower(t.PokemonSpecies.names_table.name) == name.lower())
 
     if form:
         # If a form has been specified, it must match
-        query = query.join(tables.Pokemon.forms) \
-            .filter(tables.PokemonForm.form_identifier == form)
+        query = query.join(t.Pokemon.forms) \
+            .filter(t.PokemonForm.form_identifier == form)
     else:
         # If there's NOT a form, just make sure we get a default Pokémon
-        query = query.filter(tables.Pokemon.is_default == True)
+        query = query.filter(t.Pokemon.is_default == True)
 
     return query
 
@@ -118,23 +118,23 @@ def pokemon_form_query(name, form=None):
     default form of the named Pokémon.
     """
 
-    q = pokedex_session.query(tables.PokemonForm)
-    q = q.join(tables.PokemonForm.pokemon)
-    q = q.join(tables.Pokemon.species)
-    q = q.join(tables.PokemonSpecies.names_local) \
-        .filter(func.lower(tables.PokemonSpecies.names_table.name) == name.lower())
+    q = pokedex_session.query(t.PokemonForm)
+    q = q.join(t.PokemonForm.pokemon)
+    q = q.join(t.Pokemon.species)
+    q = q.join(t.PokemonSpecies.names_local) \
+        .filter(func.lower(t.PokemonSpecies.names_table.name) == name.lower())
 
     if form:
         # If a form has been specified, it must match
-        q = q.filter(tables.PokemonForm.form_identifier == form)
+        q = q.filter(t.PokemonForm.form_identifier == form)
     else:
         # If there's NOT a form, just get the default form
-        q = q.filter(tables.Pokemon.is_default == True)
-        q = q.filter(tables.PokemonForm.is_default == True)
+        q = q.filter(t.Pokemon.is_default == True)
+        q = q.filter(t.PokemonForm.is_default == True)
 
     return q
 
 def generation(id):
-    return pokedex_session.query(tables.Generation).get(id)
+    return pokedex_session.query(t.Generation).get(id)
 def version(name):
-    return pokedex_session.query(tables.Version).filter_by(name=name).one()
+    return pokedex_session.query(t.Version).filter_by(name=name).one()

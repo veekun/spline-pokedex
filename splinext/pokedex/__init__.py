@@ -8,7 +8,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import pokedex.db
 import pokedex.db.markdown
-import pokedex.db.tables as tables
+import pokedex.db.tables as t
 import spline.lib.markdown
 import splinext.pokedex.db
 from splinext.pokedex import helpers as pokedex_helpers
@@ -79,9 +79,9 @@ class PokedexBaseController(BaseController):
         super(PokedexBaseController, self).__before__(action, **params)
 
         identifier_query = splinext.pokedex.db.get_by_identifier_query
-        c.game_language = identifier_query(tables.Language, DEFAULT_LANGUAGE).one()
+        c.game_language = identifier_query(t.Language, DEFAULT_LANGUAGE).one()
         try:
-            c.language = identifier_query(tables.Language, c.lang or DEFAULT_LANGUAGE).one()
+            c.language = identifier_query(t.Language, c.lang or DEFAULT_LANGUAGE).one()
         except NoResultFound:
             c.language = c.game_language
 

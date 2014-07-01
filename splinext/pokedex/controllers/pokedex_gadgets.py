@@ -12,7 +12,7 @@ from wtforms import Form, fields
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 import pokedex.db
-import pokedex.db.tables as tables
+import pokedex.db.tables as t
 import pokedex.formulae
 from pylons import request, tmpl_context as c, url
 from pylons.controllers.util import redirect
@@ -152,26 +152,26 @@ class ChainBreedingForm(Form):
 class StatCalculatorForm(Form):
     pokemon = PokedexLookupField(u'Pokémon', valid_type='pokemon')
     nature = QuerySelectField('Nature',
-        query_factory=lambda: db.pokedex_session.query(tables.Nature)
-            .join(tables.Nature.names_local)
-            .order_by(tables.Nature.names_table.name.asc()),
+        query_factory=lambda: db.pokedex_session.query(t.Nature)
+            .join(t.Nature.names_local)
+            .order_by(t.Nature.names_table.name.asc()),
         get_pk=lambda _: _.name.lower(),
         get_label=lambda _: _.name,
         allow_blank=True,
     )
     hint = QuerySelectField('Characteristic',
-        query_factory=lambda: db.pokedex_session.query(tables.StatHint)
-            .join(tables.StatHint.names_table)
-            .order_by(tables.StatHint.names_table.message.asc()),
+        query_factory=lambda: db.pokedex_session.query(t.StatHint)
+            .join(t.StatHint.names_table)
+            .order_by(t.StatHint.names_table.message.asc()),
         get_pk=lambda _: _.id,
         get_label=lambda _: _.message,
         allow_blank=True,
     )
     hp_type = QuerySelectField('Hidden Power type',
-        query_factory=lambda: db.pokedex_session.query(tables.Type)
-            .filter(tables.Type.id < 10000)
-            .join(tables.Type.names_local)
-            .order_by(tables.Type.names_table.name.asc()),
+        query_factory=lambda: db.pokedex_session.query(t.Type)
+            .filter(t.Type.id < 10000)
+            .join(t.Type.names_local)
+            .order_by(t.Type.names_table.name.asc()),
         get_pk=lambda _: _.id,
         get_label=lambda _: _.name,
         allow_blank=True,
@@ -458,9 +458,9 @@ class PokedexGadgetsController(PokedexBaseController):
             c.expected_attempts_oh_no = expected_attempts_oh_no
 
             # Template also needs real item objects to create links
-            pokeball_query = db.pokedex_session.query(tables.Item) \
-                .join(tables.ItemCategory, tables.ItemPocket) \
-                .filter(tables.ItemPocket.identifier == 'pokeballs')
+            pokeball_query = db.pokedex_session.query(t.Item) \
+                .join(t.ItemCategory, t.ItemPocket) \
+                .filter(t.ItemPocket.identifier == 'pokeballs')
             c.pokeballs = dict(
                 (item.name, item) for item in pokeball_query
             )
@@ -491,7 +491,7 @@ class PokedexGadgetsController(PokedexBaseController):
         # ... with Pokémon as high in the tree as possible.
 
         # TODO make this a control yo
-        version_group = db.pokedex_session.query(tables.VersionGroup).get(11)  # b/w
+        version_group = db.pokedex_session.query(t.VersionGroup).get(11)  # b/w
 
         target = c.form.pokemon.data
 
@@ -501,7 +501,7 @@ class PokedexGadgetsController(PokedexBaseController):
         # store the pokemon_moves rows per Pokémon.
         # XXX this should exclude Ditto and unbreedables
         candidates = {}
-        pokemon_moves = db.pokedex_session.query(tables.PokemonMove) \
+        pokemon_moves = db.pokedex_session.query(t.PokemonMove) \
             .filter_by(
                 move_id=c.form.moves.data.id,
                 version_group_id=version_group.id,
@@ -606,14 +606,14 @@ class PokedexGadgetsController(PokedexBaseController):
         # Form controls use version group
         # We join with VGPMM to filter out version groups which we lack move
         # data for. *coughxycough*
-        c.version_groups = db.pokedex_session.query(tables.VersionGroup) \
-            .join(tables.VersionGroupPokemonMoveMethod) \
-            .order_by(tables.VersionGroup.order.asc()) \
+        c.version_groups = db.pokedex_session.query(t.VersionGroup) \
+            .join(t.VersionGroupPokemonMoveMethod) \
+            .order_by(t.VersionGroup.order.asc()) \
             .options(joinedload('versions')) \
             .all()
         # Grab the version to use for moves, defaulting to the most current
         try:
-            c.version_group = db.pokedex_session.query(tables.VersionGroup) \
+            c.version_group = db.pokedex_session.query(t.VersionGroup) \
                 .get(request.params['version_group'])
         except (KeyError, NoResultFound):
             c.version_group = c.version_groups[-1]
@@ -654,7 +654,7 @@ class PokedexGadgetsController(PokedexBaseController):
                 c.did_anything = True
 
                 # 1.5: Deal with form matches
-                if isinstance(result, tables.PokemonForm):
+                if isinstance(result, t.PokemonForm):
                     pokemon = result.pokemon
                     form = result
                 else:
@@ -717,8 +717,8 @@ class PokedexGadgetsController(PokedexBaseController):
 
         # Setup only done if the page is actually showing
         if c.did_anything:
-            c.stats = db.pokedex_session.query(tables.Stat) \
-                .filter(~ tables.Stat.is_battle_only) \
+            c.stats = db.pokedex_session.query(t.Stat) \
+                .filter(~ t.Stat.is_battle_only) \
                 .all()
 
             # Relative numbers -- breeding and stats
@@ -793,9 +793,9 @@ class PokedexGadgetsController(PokedexBaseController):
             c.moves = defaultdict(lambda: defaultdict(set))
             # And similarly for level moves, level => pokemon => moves
             c.level_moves = defaultdict(lambda: defaultdict(list))
-            q = db.pokedex_session.query(tables.PokemonMove) \
-                .filter(tables.PokemonMove.version_group == c.version_group) \
-                .filter(tables.PokemonMove.pokemon_id.in_(
+            q = db.pokedex_session.query(t.PokemonMove) \
+                .filter(t.PokemonMove.version_group == c.version_group) \
+                .filter(t.PokemonMove.pokemon_id.in_(
                     _.id for _ in unique_pokemon)) \
                 .options(
                     joinedload('move'),
@@ -832,15 +832,15 @@ class PokedexGadgetsController(PokedexBaseController):
         # - this logic is pretty hairy; use a state object?
 
         # Add the stat-based fields
-        stat_query = (db.pokedex_session.query(tables.Stat)
-                      .filter(tables.Stat.is_battle_only == False))
+        stat_query = (db.pokedex_session.query(t.Stat)
+                      .filter(t.Stat.is_battle_only == False))
 
         c.stats = (stat_query
-                   .order_by(tables.Stat.id)
+                   .order_by(t.Stat.id)
                    .all())
 
         hidden_power_stats = (stat_query
-                              .order_by(tables.Stat.game_index)
+                              .order_by(t.Stat.game_index)
                               .all())
 
         # Make sure there are the same number of level, stat, and effort
@@ -1047,12 +1047,12 @@ class PokedexGadgetsController(PokedexBaseController):
 
             # Our types are also in the correct order, except that we start
             # from 1 rather than 0, and HP skips Normal
-            c.hidden_power_type = db.pokedex_session.query(tables.Type) \
+            c.hidden_power_type = db.pokedex_session.query(t.Type) \
                 .get(type_det * 15 // 63 + 2)
             c.hidden_power_power = power_det * 40 // 63 + 30
 
             # Used for a link
-            c.hidden_power = db.pokedex_session.query(tables.Move) \
+            c.hidden_power = db.pokedex_session.query(t.Move) \
                 .filter_by(identifier='hidden-power').one()
 
         # Turn those results into something more readable.
