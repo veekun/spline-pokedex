@@ -63,11 +63,11 @@ ${start_over()}
 ## These defs are all at the bottom of this file
 <table class="dex-pokemon-moves striped-rows">
 % for column in c.display_columns:
-${getattr(self, 'col_' + column)()}
+${getattr(self, 'col_' + column.replace('-', '_'))()}
 % endfor
 <tr class="header-row">
     % for column in c.display_columns:
-    ${getattr(self, 'th_' + column)()}
+    ${getattr(self, 'th_' + column.replace('-', '_'))()}
     % endfor
 </tr>
 
@@ -122,7 +122,7 @@ ${getattr(self, 'col_' + column)()}
 
     <tr class="${u' '.join(tr_classes)}">
         % for column in c.display_columns:
-        ${getattr(self, 'td_' + column)(result)}
+        ${getattr(self, 'td_' + column.replace('-', '_'))(result)}
         % endfor
     </tr>
 % endfor
@@ -386,8 +386,50 @@ ${h.end_form()}
 
 ### Display columns defs
 <%def name="col_id()"><col class="dex-col-id"></%def>
-<%def name="th_id()"><th>${_(u"Num")}</th></%def>
+<%def name="th_id()"><th>${_(u"#")}</th></%def>
 <%def name="td_id(pokemon)"><td>${pokemon.species.id}</td></%def>
+
+<%def name="td_dex(identifier, pokemon)"><td>
+% for dex_number in pokemon.species.dex_numbers:
+    % if dex_number.pokedex.identifier == identifier:
+        ${dex_number.pokedex_number}
+        <% return %>
+    % endif
+% endfor
+—
+</td></%def>
+
+<%def name="col_dex_kanto()"><col class="dex-col-id"></%def>
+<%def name="th_dex_kanto()"><th>${_('Kanto#')}</th></%def>
+<%def name="td_dex_kanto(pokemon)">${td_dex('kanto', pokemon)}</%def>
+
+<%def name="col_dex_johto()"><col class="dex-col-id"></%def>
+<%def name="th_dex_johto()"><th>${_('Johto#')}</th></%def>
+<%def name="td_dex_johto(pokemon)">${td_dex('updated-johto', pokemon)}</%def>
+
+<%def name="col_dex_hoenn()"><col class="dex-col-id"></%def>
+<%def name="th_dex_hoenn()"><th>${_('Hoenn#')}</th></%def>
+<%def name="td_dex_hoenn(pokemon)">${td_dex('hoenn', pokemon)}</%def>
+
+<%def name="col_dex_sinnoh()"><col class="dex-col-id"></%def>
+<%def name="th_dex_sinnoh()"><th>${_('Sinnoh#')}</th></%def>
+<%def name="td_dex_sinnoh(pokemon)">${td_dex('updated-sinnoh', pokemon)}</%def>
+
+<%def name="col_dex_unova()"><col class="dex-col-id"></%def>
+<%def name="th_dex_unova()"><th>${_('Kanto#')}</th></%def>
+<%def name="td_dex_unova(pokemon)">${td_dex('updated-unova', pokemon)}</%def>
+
+<%def name="col_dex_kalos_central()"><col class="dex-col-id"></%def>
+<%def name="th_dex_kalos_central()"><th>${_('Kalos#')}</th></%def>
+<%def name="td_dex_kalos_central(pokemon)">${td_dex('kalos-central', pokemon)}</%def>
+
+<%def name="col_dex_kalos_coastal()"><col class="dex-col-id"></%def>
+<%def name="th_dex_kalos_coastal()"><th>${_('Kalos#')}</th></%def>
+<%def name="td_dex_kalos_coastal(pokemon)">${td_dex('kalos-coastal', pokemon)}</%def>
+
+<%def name="col_dex_kalos_mountain()"><col class="dex-col-id"></%def>
+<%def name="th_dex_kalos_mountain()"><th>${_('Kalos#')}</th></%def>
+<%def name="td_dex_kalos_mountain(pokemon)">${td_dex('kalos-mountain', pokemon)}</%def>
 
 <%def name="col_icon()"><col class="dex-col-icon"></%def>
 <%def name="th_icon()"><th></th></%def>

@@ -341,6 +341,14 @@ class PokemonSearchForm(BaseSearchForm):
     sort = fields.SelectField('Sort by',
         choices=[
             ('id', 'National dex number'),
+            ('dex-kanto', 'Kanto dex number'),
+            ('dex-johto', 'Johto dex number'),
+            ('dex-hoenn', 'Hoenn dex number'),
+            ('dex-sinnoh', 'Sinnoh dex number'),
+            ('dex-unova', 'Unova dex number'),
+            ('dex-kalos-central', 'Central Kalos dex number'),
+            ('dex-kalos-coastal', 'Coastal Kalos dex number'),
+            ('dex-kalos-mountain', 'Mountain Kalos dex number'),
             ('evolution-chain', 'Evolution family'),
             ('name', 'Name'),
             ('type', 'Type'),
@@ -383,6 +391,15 @@ class PokemonSearchForm(BaseSearchForm):
         'Custom table columns',
         choices=[
             ('id', 'National ID'),
+            #('dex', 'Regional ID'),
+            ('dex-kanto', 'Kanto dex number'),
+            ('dex-johto', 'Johto dex number'),
+            ('dex-hoenn', 'Hoenn dex number'),
+            ('dex-sinnoh', 'Sinnoh dex number'),
+            ('dex-unova', 'Unova dex number'),
+            ('dex-kalos-central', 'Central Kalos dex number'),
+            ('dex-kalos-coastal', 'Coastal Kalos dex number'),
+            ('dex-kalos-mountain', 'Mountain Kalos dex number'),
             ('icon', 'Icon'),
             ('name', 'Name'),
             ('type', 'Types'),
@@ -1099,6 +1116,19 @@ class PokedexSearchController(PokedexBaseController):
             query = query.order_by(my_species.id.asc())
             needs_fallback = False
 
+        elif c.form.sort.data.startswith('dex-'):
+            dex_ident = c.form.sort.data[4:]
+            if dex_ident in (u'johto', u'sinnoh', u'unova'):
+                dex_ident = u'updated-' + dex_ident
+            query = query.join(tables.Pokedex, tables.Pokedex.identifier == dex_ident)
+            query = query.outerjoin(tables.PokemonDexNumber,
+                and_(
+                    tables.PokemonDexNumber.pokedex_id == tables.Pokedex.id,
+                    tables.PokemonDexNumber.species_id == my_species.id,
+                )
+            )
+            query = query.order_by( tables.PokemonDexNumber.pokedex_number.asc() )
+
         elif c.form.sort.data == 'evolution-chain':
             # This one is very special!  It affects sorting, but if the display
             # is a table, sorting by chain will also show other Pokémon from
@@ -1285,6 +1315,9 @@ class PokedexSearchController(PokedexBaseController):
         if c.results and c.display_mode == 'custom-table':
             eagerloads = []
 
+            if any(col.startswith('dex-') for col in c.display_columns):
+                eagerloads.append('species.dex_numbers')
+
             if 'icon' in c.display_columns:
                 eagerloads.append('default_form')
 
@@ -1300,7 +1333,7 @@ class PokedexSearchController(PokedexBaseController):
             if 'egg_group' in c.display_columns:
                 eagerloads.append('species.egg_groups')
 
-            if any(column[0:5] == 'stat_' for column in c.display_columns) \
+            if any(col.startswith('stat_') for col in c.display_columns) \
                 or 'effort' in c.display_columns:
 
                 eagerloads.append('stats.stat')
@@ -1406,7 +1439,7 @@ class PokedexSearchController(PokedexBaseController):
 
         # Type
         if c.form.type.data:
-            type_ids = [_.id for _ in c.form.type.data]
+            type_ids = [type.id for type in c.form.type.data]
             query = query.filter( me.type_id.in_(type_ids) )
 
         if not c.form.shadow_moves.data:
