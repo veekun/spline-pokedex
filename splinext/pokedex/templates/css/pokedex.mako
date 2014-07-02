@@ -282,8 +282,8 @@ dl.dex-flavor-text dt { width: 96px /* enough for 5 versions and padding*/; }
 dl.dex-flavor-text dd { padding-left: 96px; margin-left: .5em; }
 dl.dex-flavor-text dt.dex-flavor-generation { width: auto; text-align: left; margin: 0;padding: 0; }
 dl.dex-flavor-text dt.dex-flavor-generation + dd { padding-left: 32px; }
-dl.dex-pokemon-flavor-text dt { width: 64px /* enough for 3 versions and padding */; }
-dl.dex-pokemon-flavor-text dd { padding-left: 64px; }
+dl.dex-pokemon-flavor-text dt { width: 80px /* enough for 4 versions and padding */; }
+dl.dex-pokemon-flavor-text dd { padding-left: 80px; }
 
 /* Pokémon flavor page -- client-resize Sugimori art */
 p.dex-sugimori img { max-width: 100%; }
