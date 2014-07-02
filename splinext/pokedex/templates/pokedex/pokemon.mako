@@ -632,11 +632,13 @@ ${h.h1(_('Moves'))}
 <tbody>
 % for move, version_group_data in method_list:
     <tr class="\
-        % if move.type in c.pokemon.types:
-        better-move-type\
-        % endif
-        % if move.damage_class == c.better_damage_class:
-        better-move-stat\
+        % if move.damage_class.identifier != u'status':
+            % if move.type in c.pokemon.types:
+                better-move-type\
+            % endif
+            % if move.damage_class == c.better_damage_class:
+                better-move-stat\
+            % endif
         % endif
     ">
         % for column in columns:

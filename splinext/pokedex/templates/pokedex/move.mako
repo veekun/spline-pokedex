@@ -457,11 +457,13 @@ ${h.h1(_(u'Pokémon', context='plural'))}
 <tbody>
 % for pokemon, version_group_data in method_list:
     <tr class="\
-        % if c.move.damage_class.identifier != u'status' and c.move.type in pokemon.types:
-        better-move-type\
-        % endif
-        % if c.move.damage_class == c.better_damage_classes[pokemon]:
-        better-move-stat-${c.better_damage_classes[pokemon].name.lower()}\
+        % if c.move.damage_class.identifier != u'status':
+            % if c.move.type in pokemon.types:
+                better-move-type\
+            % endif
+            % if c.move.damage_class == c.better_damage_classes[pokemon]:
+                better-move-stat-${c.better_damage_classes[pokemon].identifier}\
+            % endif
         % endif
     ">
         % for column in columns:
