@@ -231,6 +231,8 @@ ${h.h1(_(u'Held by wild Pokémon'), id='pokemon')}
 % endfor
 </tbody>
 </table>
+
+<p>${_(u'%d Pokémon') % len(c.holding_pokemon)}</p>
 % endif
 
 ${h.h1(_(u'External Links'), id='links')}

@@ -98,7 +98,6 @@ ${h.h1(_(u'Pokémon'))}
 % else:
 <p>${_(u"These Pokémon are selected automatically, based on having high {histat} and low {lostat}. Don't take this as carefully-constructed tournament advice.").format(histat=c.nature.increased_stat.name, lostat=c.nature.decreased_stat.name)}</p>
 % endif
-
 <table class="dex-pokemon-moves striped-rows">
 ## Columns
 ${dexlib.pokemon_table_columns()}
@@ -115,3 +114,5 @@ ${dexlib.pokemon_table_columns()}
 </tr>
 % endfor
 </table>
+
+<p>${_(u"%d Pokémon") % len(c.pokemon)}</p>

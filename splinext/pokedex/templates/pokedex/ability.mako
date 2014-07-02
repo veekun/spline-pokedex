@@ -70,6 +70,7 @@ ${h.h2(_('Moves affected'), id=_('moves', context='anchor'))}
         % endfor
     </tbody>
 </table>
+<p>${_(u'%d move', u'%d moves', len(c.moves)) % len(c.moves)}</p>
 % endif
 
 
@@ -119,6 +120,8 @@ ${h.h1(_(u'Pokémon', context='plural'))}
     </tbody>
     % endfor
 </table>
+
+<p>${_(u'%d Pokémon') % sum(len(pokemon_list) for method, pokemon_list in c.pokemon)}</p>
 
 
 ${h.h1(_('External Links'), id='links')}

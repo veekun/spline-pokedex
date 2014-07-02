@@ -474,6 +474,9 @@ ${h.h1(_(u'Pokémon', context='plural'))}
 % endfor
 </table>
 
+<p>${_(u"%d Pokémon") % c.pokemon_count}</p>
+
+
 ${h.h1(_('External Links'), id='links')}
 <ul class="classic-list">
 % if c.move.generation.id <= 1:

@@ -1557,6 +1557,15 @@ class PokedexController(PokedexBaseController):
         # Grab list of all the version groups with tutor moves
         c.move_tutor_version_groups = _move_tutor_version_groups(c.pokemon)
 
+        # Total number of Pokémon that learn this move
+        c.pokemon_count = db.pokedex_session.query(t.Pokemon).filter(
+            t.Pokemon.id.in_(
+                db.pokedex_session.query(t.PokemonMove.pokemon_id)
+                    .filter_by(move_id=c.move.id)
+                    .subquery()
+            )
+        ).value(func.count(t.Pokemon.id))
+
         return
 
 
@@ -1740,7 +1749,7 @@ class PokedexController(PokedexBaseController):
         elif c.ability.identifier == u'iron-fist':
             move_flag = 'punch'
 
-        c.moves = None
+        c.moves = []
         if move_flag:
             c.moves = db.pokedex_session.query(t.Move) \
                 .join(t.MoveFlagMap, t.MoveFlag) \
@@ -1751,7 +1760,8 @@ class PokedexController(PokedexBaseController):
                     subqueryload('move_effect'),
                     subqueryload('type'),
                     subqueryload('damage_class')
-                )
+                ) \
+                .all()
 
         return
 

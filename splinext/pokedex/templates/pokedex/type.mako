@@ -109,6 +109,7 @@ Shadow type, Shadow Pokémon, and Shadow moves are unique to those games.</p>
         % endfor
     </tbody>
 </table>
+<p>${_(u"%d Pokémon") % len(c.type.pokemon)}</p>
 % endif
 
 ${h.h1(_('Moves'))}
@@ -128,6 +129,7 @@ ${h.h1(_('Moves'))}
         % endfor
     </tbody>
 </table>
+<p>${_(u"%d move", u"%d moves", n=len(c.type.moves)) % len(c.type.moves)}</p>
 % endif
 
 % if c.type.move_changelog:
@@ -149,6 +151,7 @@ ${h.h2(_('Formerly {0}-type moves').format(c.type.name), _('moves:former'))}
         % endfor
     </tbody>
 </table>
+<p>${_(u"%d move", u"%d moves", n=len(c.type.move_changelog)) % len(c.type.move_changelog)}</p>
 % endif
 
 
