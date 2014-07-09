@@ -620,6 +620,66 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 </table>
 % endif
 
+% if 6 in generation_ids:
+<h2 id="main-sprites:gen-vi"><a href="#main-sprites:gen-vi" class="subtle">${h.pokedex.generation_icon(6)} ${_("X & Y")}</a></h2>
+<table class="dex-pokemon-flavor-sprites">
+<colgroup span="1"></colgroup> <!-- row headers -->
+<colgroup span="2"></colgroup> <!-- X/Y -->
+<thead>
+    <tr class="header-row">
+        <th></th>
+        <th>
+            ${h.pokedex.version_icons(u'X', u'Y')}
+        </th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <th class="vertical-text">
+            ${_("Normal")}
+            % if c.pokemon.species.has_gender_differences:
+            <br/> ${_("(male)")}
+            % endif
+        </th>
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/x-y')}</td>
+    </tr>
+    % if c.sprite_exists('main-sprites/x-y/shiny'):
+    <tr>
+        <th class="vertical-text">
+            ${_("Shiny")}
+            % if c.pokemon.species.has_gender_differences:
+            <br/> ${_("(male)")}
+            % endif
+        </th>
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/x-y/shiny')}</td>
+    </tr>
+    % endif
+</tbody>
+% if c.pokemon.species.has_gender_differences:
+<tbody>
+    <tr>
+        <th class="vertical-text">${_("Normal")} <br/> ${_("(female)")}</th>
+        % if c.sprite_exists('main-sprites/x-y/female'):
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/x-y/female')}</td>
+        % else:
+        <td class="dex-pokemon-flavor-no-sprite">—</td>
+        % endif
+    </tr>
+    % if c.sprite_exists('main-sprites/x-y/shiny'):
+    <tr>
+        <th class="vertical-text">${_("Shiny")} <br/> ${_("(female)")}</th>
+        % if c.sprite_exists('main-sprites/x-y/shiny/female'):
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/x-y/shiny/female')}</td>
+        % else:
+        <td class="dex-pokemon-flavor-no-sprite">—</td>
+        % endif
+    </tr>
+    % endif
+</tbody>
+% endif
+</table>
+% endif
+
 
 % if c.sprite_exists('overworld/left') or c.sprite_exists('conquest') or c.sprite_exists('dream-world'):
 ${h.h1(_('Miscellaneous Game Art'), id=_('misc-sprites', context='anchor'))}
