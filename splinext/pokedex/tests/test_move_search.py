@@ -12,14 +12,12 @@ class TestMoveSearchController(TestController):
                                 **criteria))
 
     def check_search(self, criteria, expected, message, exact=False):
-        """Checks whether the given expected results (a list of names) are
+        """Checks whether the given expected results (a list of identifiers) are
         included in the response from a search.
 
         If exact is set to True, the search must contain exactly the given
         results.  Otherwise, the search can produce other results.
         """
-        # This was stolen from test_pokemon_search, yes.  Alas, I don't think
-        # the code is similar enough to be worth factoring out.  :(
 
         # Unless otherwise specified, the test doesn't care about display or
         # sorting, so skip all the effort the template goes through generating
@@ -29,43 +27,28 @@ class TestMoveSearchController(TestController):
 
         results = self.do_search(**criteria).tmpl_context.results
 
-        self.assert_(
-            len(results) < 460,
-            u"doesn't look like we got every single move: {0}".format(message)
-        )
+        if len(results) > 460:
+            self.fail("{0}: got way too many results")
 
-        leftover_results = []
-        leftover_expected = expected[:]
+        result_identifiers = [result.identifier for result in results]
+        result_identifiers.sort()
 
-        # Remove expected results from the 'leftover' list, and add unexpected
-        # results to the other leftover list
-        for result in results:
-            result_name = result.name
-
-            if result_name in leftover_expected:
-                leftover_expected.remove(result_name)
-            else:
-                leftover_results.append(result_name)
-
-        # The leftovers now contain no names in common
-        self.assertEquals(
-            leftover_expected, [],
-            u"all expected moves found: {0}".format(message)
-        )
+        expected = expected[:]
+        expected.sort()
 
         if exact:
-            self.assertEquals(
-                leftover_results, [],
-                u"no extra moves found: {0}".format(message)
-            )
-
+            if expected != result_identifiers:
+                self.fail("{0}: got {1}, expected {2}".format(message, result_identifiers, expected))
+        else:
+            if not set(expected).issubset(set(result_identifiers)):
+                self.fail("{0}: got {1}, expected at least {2}".format(message, result_identifiers, expected))
 
     def test_name(self):
         u"""Checks basic name searching.  Wildcards are also supported."""
 
         self.check_search(
             dict(name=u'flamethrower'),
-            [u'Flamethrower'],
+            [u'flamethrower'],
             'searching by name',
             exact=True,
         )
@@ -79,27 +62,27 @@ class TestMoveSearchController(TestController):
 
         self.check_search(
             dict(name=u'quICk AttACk'),
-            [u'Quick Attack'],
+            [u'quick-attack'],
             'case is ignored',
             exact=True,
         )
 
         self.check_search(
             dict(name=u'thunder'),
-            [ u'Thunder', u'Thunderbolt', u'Thunder Wave',
-              u'ThunderShock', u'ThunderPunch', u'Thunder Fang' ],
+            [ u'thunder', u'thunderbolt', u'thunder-wave',
+              u'thunder-shock', u'thunder-punch', u'thunder-fang' ],
             'no wildcards is treated as substring',
             exact=True,
         )
         self.check_search(
             dict(name=u'*under'),
-            [u'Thunder'],  # not ThunderShock, etc.!
+            [u'thunder'],  # not ThunderShock, etc.!
             'splat wildcard works and is not used as substring',
             exact=True,
         )
         self.check_search(
             dict(name=u'b?te'),
-            [u'Bite'],  # not Bug Bite!
+            [u'bite'],  # not Bug Bite!
             'question wildcard works and is not used as substring',
             exact=True,
         )
@@ -108,10 +91,10 @@ class TestMoveSearchController(TestController):
         u"""Checks type searching."""
         self.check_search(
             dict(type=u'dragon'),
-            [ u'Dual Chop', u'Draco Meteor', u'DragonBreath', u'Dragon Claw',
-              u'Dragon Dance', u'Dragon Pulse', u'Dragon Rage', u'Dragon Rush',
-              u'Dragon Tail', u'Outrage', u'Roar of Time', u'Spacial Rend',
-              u'Twister',
+            [ u'dual-chop', u'draco-meteor', u'dragon-breath', u'dragon-claw',
+              u'dragon-dance', u'dragon-pulse', u'dragon-rage', u'dragon-rush',
+              u'dragon-tail', u'outrage', u'roar-of-time', u'spacial-rend',
+              u'twister',
             ],
             'searching by type',
             exact=True,
@@ -119,7 +102,7 @@ class TestMoveSearchController(TestController):
 
         self.check_search(
             dict(type=[u'fire', u'electric']),
-            [u'Thunder', u'ThunderShock', u'Flamethrower', u'Ember'],
+            [u'thunder', u'thunder-shock', u'flamethrower', u'ember'],
             'searching for multiple types',
         )
 
@@ -127,13 +110,13 @@ class TestMoveSearchController(TestController):
         u"""Checks searching by damage class (physical, special, effect)."""
         self.check_search(
             dict(damage_class=u'physical'),
-            [u'Mega Punch', u'Quick Attack', u'Bite'],
+            [u'mega-punch', u'quick-attack', u'bite'],
             'very general damage class search',
         )
 
         self.check_search(
             dict(damage_class=u'status', type=u'dragon'),
-            [u'Dragon Dance'],
+            [u'dragon-dance'],
             'more precise damage class search',
             exact=True,
         )
@@ -142,7 +125,7 @@ class TestMoveSearchController(TestController):
         u"""Checks generation searching."""
         self.check_search(
             dict(introduced_in=u'1'),
-            [u'Tackle', u'Gust', u'Thunder Wave', u'Hyper Beam'],
+            [u'tackle', u'gust', u'thunder-wave', u'hyper-beam'],
             'searching by generation',
         )
 
@@ -153,14 +136,14 @@ class TestMoveSearchController(TestController):
         """
         self.check_search(
             dict(similar_to=u'icy wind'),
-            [ u'Bubble', u'BubbleBeam', u'Bulldoze', u'Constrict',
-              u'Icy Wind', u'Mud Shot', u'Rock Tomb' ],
+            [ u'bubble', u'bubble-beam', u'bulldoze', u'constrict',
+              u'icy-wind', u'mud-shot', u'rock-tomb' ],
             'searching by effect',
             exact=True,
         )
         self.check_search(
             dict(similar_to=u'splash'),
-            [u'Splash'],
+            [u'splash'],
             'searching by unique effect',
             exact=True,
         )
@@ -169,13 +152,13 @@ class TestMoveSearchController(TestController):
         u"""Checks searching by some combination of flags."""
         self.check_search(
             dict(flag_contact=u'yes'),
-            [u'Tackle', u'DoubleSlap', u'Ice Punch', u'Bite', u'Fly'],
+            [u'tackle', u'double-slap', u'ice-punch', u'bite', u'fly'],
             'flimsy search by flag',
         )
 
         self.check_search(
             dict(flag_mirror=u'no'),
-            [u'Counter', u'Curse', u'Focus Punch', u'Sunny Day'],
+            [u'counter', u'curse', u'focus-punch', u'sunny-day'],
             'better search by flag',
         )
 
@@ -194,74 +177,75 @@ class TestMoveSearchController(TestController):
         """
         self.check_search(
             dict(accuracy=u'55'),
-            [u'Sing', u'GrassWhistle', u'Supersonic'],
+            [u'sing', u'grass-whistle', u'supersonic'],
             'searching by accuracy',
             exact=True,
         )
         self.check_search(
             dict(accuracy=u'53-56'),
-            [u'Sing', u'GrassWhistle', u'Supersonic'],
+            [u'sing', u'grass-whistle', u'supersonic'],
             'searching by accuracy range',
             exact=True,
         )
 
         self.check_search(
             dict(pp=u'1'),
-            [u'Sketch'],
+            [u'sketch'],
             'searching by PP',
             exact=True,
         )
 
         self.check_search(
             dict(priority=u'-7'),  # XXX oh no what?  this looks like "<7"
-            [u'Magic Room', u'Trick Room', u'Wonder Room'],
+            [u'trick-room'],
             'searching by priority',
             exact=True,
         )
 
         self.check_search(
             dict(power=u'130'),
-            [u'Blue Flare', u'Bolt Strike', u'Hi Jump Kick'],
+            [u'blue-flare', u'bolt-strike', u'draco-meteor', u'high-jump-kick',
+             u'leaf-storm', u'overheat', u'skull-bash'],
             'searching by power',
             exact=True,
         )
 
         self.check_search(
-            dict(recoil=u'50'),
-            [u'Absorb', u'Mega Drain', u'Giga Drain'],
-            'searching by positive recoil (absorb)',
+            dict(recoil=u'-50'),
+            [u'absorb', u'mega-drain', u'giga-drain'],
+            'searching by negative recoil (drain)',
         )
         self.check_search(
-            dict(recoil=u'-50'),
-            [u'Head Smash'],
+            dict(recoil=u'50'),
+            [u'head-smash', u'light-of-ruin'],
             'searching by recoil',
             exact=True,
         )
 
         self.check_search(
             dict(healing=u'-25'),
-            [u'Struggle'],
+            [u'struggle'],
             'searching by negative healing',
             exact=True,
         )
 
         self.check_search(
             dict(ailment_chance=u'50'),
-            [u'Sacred Fire'],
+            [u'poison-fang', u'sacred-fire'],
             'searching by status ailment chance',
             exact=True,
         )
 
         self.check_search(
             dict(flinch_chance=u'100'),
-            [u'Fake Out'],
+            [u'fake-out'],
             'searching by flinch chance',
             exact=True,
         )
 
         self.check_search(
             dict(stat_chance=u'70'),
-            [u'Charge Beam'],
+            [u'charge-beam'],
             'searching by stat chance',
             exact=True,
         )
@@ -270,7 +254,7 @@ class TestMoveSearchController(TestController):
         u"""Similar to the above but for stats changes."""
         self.check_search(
             dict(stat_change_accuracy=u'1'),
-            [u'Coil', u'Hone Claws'],
+            [u'coil', u'hone-claws'],
             'searching by accuracy change',
             exact=True,
         )
@@ -286,13 +270,13 @@ class TestMoveSearchController(TestController):
         """
         self.check_search(
             dict(pokemon=u'Ditto'),
-            [u'Transform'],
+            [u'transform'],
             'simple search by pokemon',
             exact=True,
         )
         self.check_search(
             dict(pokemon=[u'Ditto', u'Unown']),
-            [u'Transform', u'Hidden Power'],
+            [u'transform', u'hidden-power'],
             'search by multiple pokemon',
             exact=True,
         )
@@ -307,16 +291,16 @@ class TestMoveSearchController(TestController):
         self.check_search(
             dict(pokemon=u'Bulbasaur',
                  pokemon_method=u'level-up',
-                 name=u'SolarBeam'),
-            [u'SolarBeam'],
-            'Bulbasaur used to learn SolarBeam...',
+                 name=u'Solar Beam'),
+            [u'solar-beam'],
+            'Bulbasaur used to learn Solar Beam...',
             exact=True,
         )
         self.check_search(
             dict(pokemon=u'Bulbasaur',
                  pokemon_method=u'level-up',
                  pokemon_version_group=[u'8', u'9', u'10'],
-                 name=u'SolarBeam'),
+                 name=u'Solar Beam'),
             [],
             '...but lost it in gen 4',
             exact=True,
@@ -325,7 +309,7 @@ class TestMoveSearchController(TestController):
         # Restrict by method
         self.check_search(
             dict(name=u'Volt Tackle', pokemon=u'Pichu'),
-            [ u'Volt Tackle' ],
+            [ u'volt-tackle' ],
             'Pichu learns Volt Tackle...',
             exact=True,
         )
@@ -343,7 +327,7 @@ class TestMoveSearchController(TestController):
             dict(pokemon=u'Venusaur',
                  pokemon_method=u'tutor',
                  pokemon_version_group=[u'7']),
-            [ u'Frenzy Plant' ],
+            [ u'frenzy-plant' ],
             'Venusaur gets elemental beam in FR',
         )
 
@@ -355,7 +339,7 @@ class TestMoveSearchController(TestController):
         """
         self.check_search(
             dict(ailment=u'ingrain'),
-            [u'Ingrain'],
+            [u'ingrain'],
             'dead simple ailment search',
             exact=True,
         )
@@ -363,7 +347,7 @@ class TestMoveSearchController(TestController):
         # Multiple ailments
         self.check_search(
             dict(ailment=[u'sleep', u'freeze']),
-            [u'Sleep Powder', u'Blizzard'],
+            [u'sleep-powder', u'blizzard'],
             'multiple ailment search',
         )
 
@@ -371,19 +355,19 @@ class TestMoveSearchController(TestController):
         """Couple boolean meta things."""
         self.check_search(
             dict(crit_rate=u'y'),
-            [u'Aeroblast', u'Air Cutter', u'Karate Chop', u'Slash'],
+            [u'aeroblast', u'air-cutter', u'karate-chop', u'slash'],
             'increased crit chance',
         )
 
         self.check_search(
             dict(multi_hit=u'y'),
-            [u'Barrage', u'Gear Grind', u'Tail Slap'],
+            [u'barrage', u'gear-grind', u'tail-slap'],
             'multi-hit',
         )
 
         self.check_search(
             dict(multi_turn=u'y'),
-            [u'Confusion', u'Psybeam', u'Telekinesis'],
+            [u'confusion', u'psybeam', u'telekinesis'],
             'multi-turn',
         )
 
