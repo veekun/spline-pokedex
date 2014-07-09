@@ -137,7 +137,9 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 </ul>
 % endif
 
-% if c.form.introduced_in_version_group_id <= 2:
+<% generation_ids = [form_gen.generation_id for form_gen in c.form.pokemon_form_generations] %>
+
+% if 1 in generation_ids:
 <h2 id="main-sprites:gen-i"><a href="#main-sprites:gen-i" class="subtle">${h.pokedex.generation_icon(1)} ${_("Red & Green, Red & Blue, Yellow")}</a></h2>
 <table class="dex-pokemon-flavor-sprites">
 <colgroup span="1"></colgroup> <!-- row headers -->
@@ -188,7 +190,7 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 </table>
 % endif
 
-% if c.form.introduced_in_version_group_id <= 4:
+% if 2 in generation_ids:
 <h2 id="main-sprites:gen-ii"><a href="#main-sprites:gen-ii" class="subtle">${h.pokedex.generation_icon(2)} ${_("Gold & Silver, Crystal")}</a></h2>
 <table class="dex-pokemon-flavor-sprites">
 <colgroup span="1"></colgroup> <!-- row headers -->
@@ -236,7 +238,7 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 </table>
 % endif
 
-% if c.form.introduced_in_version_group_id <= 7:
+% if 3 in generation_ids:
 <% show_rusa = c.form.introduced_in_version_group_id <= 5 %>\
 <% show_emerald = c.form.introduced_in_version_group_id <= 6 %>\
 <% show_frlg = (c.pokemon.species.generation_id == 1
@@ -325,7 +327,7 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 </table>
 % endif
 
-% if c.form.introduced_in_version_group_id <= 10:
+% if 4 in generation_ids:
 <h2 id="main-sprites:gen-iv"><a href="#main-sprites:gen-iv" class="subtle">${h.pokedex.generation_icon(4)} ${_("Diamond & Pearl, Platinum, HeartGold & SoulSilver")}</a></h2>
 <table class="dex-pokemon-flavor-sprites">
 <colgroup span="1"></colgroup> <!-- row headers -->
@@ -545,13 +547,11 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 </table>
 % endif
 
-% if 5 in (form_gen.generation.id for form_gen in c.form.pokemon_form_generations):
+% if 5 in generation_ids:
 <h2 id="main-sprites:gen-v"><a href="#main-sprites:gen-v" class="subtle">${h.pokedex.generation_icon(5)} ${_("Black & White, Black 2 & White 2")}</a></h2>
 <table class="dex-pokemon-flavor-sprites">
 <colgroup span="1"></colgroup> <!-- row headers -->
-% if c.form.introduced_in_version_group_id <= 14:
 <colgroup span="2"></colgroup> <!-- Black/White 1 & 2 -->
-% endif
 <thead>
     <tr class="header-row">
         <th></th>
@@ -571,10 +571,8 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
             <br/> ${_("(male)")}
             % endif
         </th>
-        % if c.form.introduced_in_version_group_id <= 14:
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/black-white')}</td>
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/black-white/back')}</td>
-        % endif
     </tr>
     <tr>
         <th class="vertical-text">
@@ -583,17 +581,14 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
             <br/> ${_("(male)")}
             % endif
         </th>
-        % if c.form.introduced_in_version_group_id <= 14:
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/black-white/shiny')}</td>
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/black-white/back/shiny')}</td>
-        % endif
     </tr>
 </tbody>
 % if c.pokemon.species.has_gender_differences:
 <tbody>
     <tr>
         <th class="vertical-text">${_("Normal")} <br/> ${_("(female)")}</th>
-        % if c.form.introduced_in_version_group_id <= 11:
         % if c.sprite_exists('main-sprites/black-white/female'):
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/black-white/female')}</td>
         % else:
@@ -605,11 +600,9 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
-        % endif
     </tr>
     <tr>
         <th class="vertical-text">${_("Shiny")} <br/> ${_("(female)")}</th>
-        % if c.form.introduced_in_version_group_id <= 11:
         % if c.sprite_exists('main-sprites/black-white/female'):
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/black-white/shiny/female')}</td>
         % else:
@@ -620,7 +613,6 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/black-white/back/shiny/female')}</td>
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
-        % endif
         % endif
     </tr>
 </tbody>
