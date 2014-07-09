@@ -681,7 +681,7 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 % endif
 
 
-% if c.sprite_exists('overworld/left') or c.sprite_exists('conquest') or c.sprite_exists('dream-world'):
+% if c.sprite_exists('overworld/left') or c.sprite_exists('conquest'):
 ${h.h1(_('Miscellaneous Game Art'), id=_('misc-sprites', context='anchor'))}
 
 % if c.sprite_exists('overworld/left'):
@@ -791,14 +791,6 @@ ${h.h1(_('Miscellaneous Game Art'), id=_('misc-sprites', context='anchor'))}
 </table>
 % endif
 
-% if c.sprite_exists('dream-world'):
-${h.h2(_(u"Dream World Portrait"), id=_('dream-world', context='anchor'))}
-${h.pokedex.pokemon_form_image(c.form, prefix='dream-world')}
-% if c.sprite_exists('dream-world/female'):
-${h.pokedex.pokemon_form_image(c.form, prefix='dream-world/female')}
-% endif
-% endif
-
 % if c.sprite_exists('conquest'):
 ${h.h2(_(u"Pokémon Conquest Portrait"), id=_('conquest', context='anchor'))}
 ${h.pokedex.pokemon_form_image(c.form, prefix='conquest')}
@@ -806,8 +798,9 @@ ${h.pokedex.pokemon_form_image(c.form, prefix='conquest')}
 % endif  ## Show "Miscellaneous Game Art"
 
 
-% if c.sprite_exists('sugimori'):
+% if c.sprite_exists('sugimori') or c.sprite_exists('dream-world') or c.sprite_exists('global-link'):
 ${h.h1(_('Other Images'), id=_('other', context='anchor'))}
+% if c.sprite_exists('sugimori'):
 <h2>${_("Official artwork by Ken Sugimori")}</h2>
 <p class="dex-sugimori">
     ${h.pokedex.pokemon_form_image(c.form, prefix='sugimori')}
@@ -816,4 +809,19 @@ ${h.h1(_('Other Images'), id=_('other', context='anchor'))}
     % endif
 </p>
 % endif
+
+% if c.sprite_exists('global-link'):
+${h.h2(_(u"Global Link artwork"), id=_('global-link', context='anchor'))}
+${h.pokedex.pokemon_form_image(c.form, prefix='global-link')}
+% endif
+
+% if c.sprite_exists('dream-world'):
+${h.h2(_(u"Dream World artwork"), id=_('dream-world', context='anchor'))}
+${h.pokedex.pokemon_form_image(c.form, prefix='dream-world')}
+% if c.sprite_exists('dream-world/female'):
+${h.pokedex.pokemon_form_image(c.form, prefix='dream-world/female')}
+% endif
+% endif
+% endif
+
 </%lib:cache_content>
