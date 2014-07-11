@@ -1,5 +1,5 @@
 # encoding: utf8
-from spline.tests import *
+from spline.tests import TestController, url
 
 class TestComparePokemonController(TestController):
     def do_request(self, *pokemon):

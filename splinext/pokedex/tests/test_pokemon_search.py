@@ -1,5 +1,5 @@
 # encoding: utf8
-from spline.tests import *
+from spline.tests import TestController, url
 
 from splinext.pokedex.controllers.pokedex_search import PokemonSearchForm
 

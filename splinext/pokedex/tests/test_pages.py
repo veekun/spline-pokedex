@@ -1,6 +1,6 @@
 # Encoding: UTF-8
 
-from spline.tests import *
+from spline.tests import SplineTest, url
 
 class TestPagesController(SplineTest):
 
