@@ -684,7 +684,7 @@ class PokedexSearchController(PokedexBaseController):
         if c.form.name.data:
             name = c.form.name.data.strip().lower()
 
-            query = query.join(default_form.names_local)
+            query = query.outerjoin(default_form.names_local)
             query = query.filter(
                 or_(
                     # Either it was a form name...
