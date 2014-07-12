@@ -442,7 +442,7 @@ class MoveSearchForm(BaseSearchForm):
 
     target = QuerySelectField('Target',
         query_factory=lambda: (db.pokedex_session.query(t.MoveTarget)
-            .filter(t.MoveTarget.identifier != 'selected-pokemon-me-first')),
+            .filter(t.MoveTarget.identifier != u'selected-pokemon-me-first')),
         get_pk=lambda _: _.id,
         get_label=lambda _: _.name,
         allow_blank=True,
