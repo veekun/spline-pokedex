@@ -162,6 +162,7 @@ ul.inline-menu > li:last-child:after { content: none; }
 .dex-page-beside-portrait:after { display: block; clear: both; content: ""; }
 p#dex-page-name { font-size: 2em; margin: 0.12em 0; }
 #dex-pokemon-forme { font-size: 1.25em; font-weight: bold; }
+#dex-pokemon-genus { font-size: 0.8em; margin: 0.31em 0; }
 #dex-pokemon-portrait-sprite { height: 200px; width: 22em; margin: -35px -3em -35px -4em; padding: 7px; line-height: 200px; vertical-align: middle; text-align: center; background: url(${h.static_uri('pokedex', 'images/sprite-frame-x-y.png')}) center center no-repeat; }
 
 .dex-warrior-portrait { min-width: 176px; margin: auto 0.33em; }
