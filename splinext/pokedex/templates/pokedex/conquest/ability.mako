@@ -28,7 +28,7 @@ ${_(u'{name} - Abilities - Pokémon Conquest').format(name=c.ability.name)}
     </a>
     ${c.ability.name}
 
-    % if c.ability.effect:
+    % if c.ability.is_main_series:
     <ul class="inline-menu">
         <li><a href="${url(controller='dex', action='abilities', name=c.ability.name.lower())}">Main</a></li>
         <li>${_(u'Conquest')}</li>

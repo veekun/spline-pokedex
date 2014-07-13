@@ -1676,7 +1676,7 @@ class PokedexController(PokedexBaseController):
     def abilities_list(sef):
         c.abilities = db.pokedex_session.query(t.Ability) \
             .join(t.Ability.names_local) \
-            .filter(t.Ability.prose.any()) \
+            .filter(t.Ability.is_main_series) \
             .options(joinedload('prose.short_effect')) \
             .order_by(t.Ability.generation_id.asc(),
                 t.Ability.names_table.name.asc()) \
@@ -1685,9 +1685,9 @@ class PokedexController(PokedexBaseController):
 
     def abilities(self, name):
         try:
-            # Make sure that any ability we get has a main-series effect
+            # Make sure that any ability we get is from the main series
             c.ability = (db.get_by_name_query(t.Ability, name)
-                .filter(t.Ability.prose.any())
+                .filter(t.Ability.is_main_series)
                 .one())
         except NoResultFound:
             return self._not_found()
@@ -1696,7 +1696,7 @@ class PokedexController(PokedexBaseController):
         c.prev_ability, c.next_ability = self._prev_next(
             table=t.Ability,
             current=c.ability,
-            filters=[t.Ability.prose.any()],
+            filters=[t.Ability.is_main_series],
         )
 
         return self.cache_content(
