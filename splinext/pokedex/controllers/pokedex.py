@@ -1367,10 +1367,10 @@ class PokedexController(PokedexBaseController):
             shadowness = t.Move.type_id != 10002
 
         c.prev_move, c.next_move = self._prev_next(
-                table=t.Move,
-                filters=[shadowness],
-                current=c.move,
-            )
+            table=t.Move,
+            filters=[shadowness],
+            current=c.move,
+        )
 
         return self.cache_content(
             key=c.move.identifier,
@@ -1633,9 +1633,9 @@ class PokedexController(PokedexBaseController):
 
         ### Prev/next for header
         c.prev_type, c.next_type = self._prev_next(
-                table=t.Type,
-                current=c.type,
-            )
+            table=t.Type,
+            current=c.type,
+        )
 
         return self.cache_content(
             key=c.type.identifier,
@@ -1694,10 +1694,10 @@ class PokedexController(PokedexBaseController):
 
         ### Prev/next for header
         c.prev_ability, c.next_ability = self._prev_next(
-                table=t.Ability,
-                current=c.ability,
-                filters=[t.Ability.prose.any()],
-            )
+            table=t.Ability,
+            current=c.ability,
+            filters=[t.Ability.prose.any()],
+        )
 
         return self.cache_content(
             key=c.ability.identifier,
