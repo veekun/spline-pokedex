@@ -14,11 +14,11 @@
 </%def>
 
 <div id="dex-header">
-    <a href="${url.current(name=c.prev_ability.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">
+    <a href="${url.current(name=c.prev_ability.name.lower())}" id="dex-header-prev" class="dex-box-link">
         <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
         ${c.prev_ability.name}
     </a>
-    <a href="${url.current(name=c.next_ability.name.lower(), form=None)}" id="dex-header-next" class="dex-box-link">
+    <a href="${url.current(name=c.next_ability.name.lower())}" id="dex-header-next" class="dex-box-link">
         ${c.next_ability.name}
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>

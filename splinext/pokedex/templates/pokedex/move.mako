@@ -15,11 +15,11 @@
 </%def>
 
 <div id="dex-header">
-    <a href="${url.current(name=c.prev_move.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">
+    <a href="${url.current(name=c.prev_move.name.lower())}" id="dex-header-prev" class="dex-box-link">
         <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
         ${c.prev_move.name}
     </a>
-    <a href="${url.current(name=c.next_move.name.lower(), form=None)}" id="dex-header-next" class="dex-box-link">
+    <a href="${url.current(name=c.next_move.name.lower())}" id="dex-header-next" class="dex-box-link">
         ${c.next_move.name}
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
