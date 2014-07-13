@@ -2019,6 +2019,12 @@ class PokedexController(PokedexBaseController):
         except NoResultFound:
             return self._not_found()
 
+        ### Prev/next for header
+        c.prev_nature, c.next_nature = self._prev_next(
+            table=t.Nature,
+            current=c.nature,
+        )
+
         # Find related natures.
         # Other neutral natures if this one is neutral; otherwise, the inverse
         # of this one

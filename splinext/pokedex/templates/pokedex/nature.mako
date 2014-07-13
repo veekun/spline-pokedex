@@ -13,6 +13,18 @@
 </ul>
 </%def>
 
+<div id="dex-header">
+    <a href="${url.current(name=c.prev_nature.name.lower())}" id="dex-header-prev" class="dex-box-link">
+        <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
+        ${c.prev_nature.name}
+    </a>
+    <a href="${url.current(name=c.next_nature.name.lower())}" id="dex-header-next" class="dex-box-link">
+        ${c.next_nature.name}
+        <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
+    </a>
+    ${c.nature.name}
+</div>
+
 ${h.h1(_('Essentials'))}
 
 <div class="dex-page-portrait">
