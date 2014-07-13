@@ -68,10 +68,7 @@
         <th class="location">
             ${h.pokedex.pokemon_link(
                 pokemon,
-                h.literal(u"""{0} {1}""".format(
-                    capture(lib.pokemon_icon, pokemon),
-                    pokemon.name,
-                )),
+                h.pokedex.pokemon_icon(pokemon) + pokemon.name,
                 class_='dex-icon-link',
             )}
         </th>

@@ -45,10 +45,10 @@ ${h.end_form()}
     % endif
 
     % if node['node'] == 'me':
-    ${dexlib.pokemon_icon(c.pokemon)}
+    ${h.pokedex.pokemon_icon(c.pokemon)}
     % else:
     % for pokemon in c.pokemon_by_egg_group[node['node']]:
-    ${dexlib.pokemon_icon(pokemon)}
+    ${h.pokedex.pokemon_icon(pokemon)}
     % endfor
     % endif
     <br>

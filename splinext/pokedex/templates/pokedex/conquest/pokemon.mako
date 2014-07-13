@@ -116,13 +116,13 @@ ${h.h1(_('Evolution'))}
     >
         % if col['species'] == c.pokemon:
         <span class="dex-evolution-chain-pokemon">
-            ${dexlib.pokemon_icon(col['species'].default_pokemon)}
+            ${h.pokedex.pokemon_icon(col['species'].default_pokemon)}
             ${col['species'].name}
         </span>
         % else:
         <a href="${url(controller='dex' if absent else 'dex_conquest', action='pokemon', name=col['species'].name.lower())}"
            class="dex-evolution-chain-pokemon">
-            ${dexlib.pokemon_icon(col['species'].default_pokemon)}
+            ${h.pokedex.pokemon_icon(col['species'].default_pokemon)}
             ${col['species'].name}
         </a>
         % endif

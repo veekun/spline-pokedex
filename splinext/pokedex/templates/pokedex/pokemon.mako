@@ -148,7 +148,7 @@ ${h.h1(_('Essentials'))}
         % for species in c.compatible_families:
         <li>${h.pokedex.pokemon_link(
             species.default_pokemon,
-            h.literal(capture(dexlib.pokemon_icon, species.default_pokemon)),
+            h.pokedex.pokemon_icon(species.default_pokemon),
             form=None,
             class_='dex-icon-link',
             title=species.name,
@@ -264,13 +264,13 @@ ${h.h1(_('Evolution'))}
     >
         % if col['species'] == c.pokemon.species:
         <span class="dex-evolution-chain-pokemon">
-            ${dexlib.pokemon_icon(col['species'].default_pokemon)}
+            ${h.pokedex.pokemon_icon(col['species'].default_pokemon)}
             ${col['species'].name}
         </span>
         % else:
         ${h.pokedex.pokemon_link(
             pokemon=col['species'].default_pokemon,
-            content=h.literal(capture(dexlib.pokemon_icon, col['species'].default_pokemon))
+            content=h.pokedex.pokemon_icon(col['species'].default_pokemon)
                    + col['species'].name,
             class_='dex-evolution-chain-pokemon',
         )}

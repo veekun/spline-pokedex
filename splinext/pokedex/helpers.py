@@ -317,6 +317,16 @@ def pokemon_form_image(pokemon_form, prefix=None, **attr):
     return pokedex_img(pokemon_media_path(pokemon_form.species, prefix, ext, form=pokemon_form),
                        **attr)
 
+def pokemon_icon(pokemon, alt=True):
+    if pokemon.is_default:
+        return h.literal('<span class="sprite-icon sprite-icon-%d"></span>' % pokemon.species.id)
+
+    alt_text = pokemon.species_name if alt else u''
+    if pokemon_has_media(pokemon.default_form, 'icons', 'png'):
+        return pokemon_form_image(pokemon.default_form, prefix='icons', alt=alt_text)
+
+    return pokedex_img('pokemon/icons/0.png', title=pokemon.species.name, alt=alt_text)
+
 def pokemon_link(pokemon, content=None, **attr):
     """Returns a link to a Pokémon page.
 

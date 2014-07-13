@@ -1,29 +1,15 @@
 <%! from splinext.pokedex import i18n, db %>\
 
-<%def name="pokemon_icon(pokemon, alt=True)">\
-% if pokemon.is_default:
-<span class="sprite-icon sprite-icon-${pokemon.species.id}"></span>\
-% else:
-    <% alt_text = pokemon.species.name if alt else '' %>
-    % if h.pokedex.pokemon_has_media(pokemon.default_form, 'icons', 'png'):
-        ${h.pokedex.pokemon_form_image(pokemon.default_form, prefix='icons', alt=alt_text)}\
-    % else:
-        ${h.pokedex.pokedex_img('pokemon/icons/0.png', title=pokemon.species.name, alt=alt_text)}\
-    % endif
-% endif
-</%def>
-
-
 <%def name="pokemon_page_header(icon_form=None, subpages=True)">
 <div id="dex-header">
     <a href="${url.current(name=c.prev_species.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">
         <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
-        ${pokemon_icon(c.prev_species.default_pokemon, alt="")}
+        ${h.pokedex.pokemon_icon(c.prev_species.default_pokemon, alt="")}
         ${c.prev_species.id}: ${c.prev_species.name}
     </a>
     <a href="${url.current(name=c.next_species.name.lower(), form=None)}" id="dex-header-next" class="dex-box-link">
         ${c.next_species.id}: ${c.next_species.name}
-        ${pokemon_icon(c.next_species.default_pokemon, alt="")}
+        ${h.pokedex.pokemon_icon(c.next_species.default_pokemon, alt="")}
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
     ${h.pokedex.pokemon_form_image(icon_form or c.pokemon.default_form, prefix='icons')}
@@ -199,7 +185,7 @@
 </%def>
 
 <%def name="pokemon_table_row(pokemon)">
-<td class="icon">${pokemon_icon(pokemon)}</td>
+<td class="icon">${h.pokedex.pokemon_icon(pokemon)}</td>
 <td>${h.pokedex.pokemon_link(pokemon)}</td>
 <td class="type2">
     % for type in pokemon.types:
