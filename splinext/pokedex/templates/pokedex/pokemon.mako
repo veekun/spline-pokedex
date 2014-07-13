@@ -687,7 +687,7 @@ ${h.h1(_('External Links'), id=_('links', context='header id'))}
 % endif
 <li><a href="http://bulbapedia.bulbagarden.net/wiki/${re.sub(' ', '_', c.pokemon.species.name)}_%28Pok%C3%A9mon%29">${_("Bulbapedia")}</a></li>
 % if c.pokemon.species.generation_id <= 2:
-<li>${h.pokedex.generation_icon(2)} <a href="http://www.pokemondungeon.com/pokedex/${ghpd_name}.shtml">${_(u"Gengar and Haunter's Pokémon Dungeon")}</a></li>
+<li>${h.pokedex.generation_icon(2)} <a href="http://www.pokemondungeon.com/Library/Pokedex/pokedex/${ghpd_name}.shtml">${_(u"Gengar and Haunter's Pokémon Dungeon")}</a></li>
 % endif
 % if c.pokemon.species.generation_id <= 4:
 <li><a href="http://www.legendarypokemon.net/pokedex/${lp_name}">${_(u"Legendary Pokémon")}</a></li>
