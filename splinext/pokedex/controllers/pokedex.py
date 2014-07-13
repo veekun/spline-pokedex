@@ -529,14 +529,14 @@ class PokedexController(PokedexBaseController):
 
         return prev, next
 
-    def _prev_next_pokemon(self, pokemon):
-        """Returns a 2-tuple of the previous and next Pokémon."""
+    def _prev_next_species(self, species):
+        """Returns a 2-tuple of the previous and next Pokémon species."""
         max_id = db.pokedex_session.query(t.PokemonSpecies).count()
-        prev_pokemon = db.pokedex_session.query(t.PokemonSpecies).get(
-            (c.pokemon.species.id - 1 - 1) % max_id + 1).default_pokemon
-        next_pokemon = db.pokedex_session.query(t.PokemonSpecies).get(
-            (c.pokemon.species.id - 1 + 1) % max_id + 1).default_pokemon
-        return prev_pokemon, next_pokemon
+        prev_species = db.pokedex_session.query(t.PokemonSpecies).get(
+            (species.id - 1 - 1) % max_id + 1)
+        next_species = db.pokedex_session.query(t.PokemonSpecies).get(
+            (species.id - 1 + 1) % max_id + 1)
+        return prev_species, next_species
 
     @jsonify
     def parse_size(self):
@@ -591,7 +591,7 @@ class PokedexController(PokedexBaseController):
             return self._not_found()
 
         ### Previous and next for the header
-        c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
+        c.prev_species, c.next_species = self._prev_next_species(c.pokemon.species)
 
         # Some Javascript
         c.javascripts.append(('pokedex', 'pokemon'))
@@ -1180,7 +1180,7 @@ class PokedexController(PokedexBaseController):
         c.pokemon = c.form.pokemon
 
         ### Previous and next for the header
-        c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
+        c.prev_species, c.next_species = self._prev_next_species(c.pokemon.species)
 
         # Some Javascript
         c.javascripts.append(('pokedex', 'pokemon'))
@@ -1239,7 +1239,7 @@ class PokedexController(PokedexBaseController):
             return self._not_found()
 
         ### Previous and next for the header
-        c.prev_pokemon, c.next_pokemon = self._prev_next_pokemon(c.pokemon)
+        c.prev_species, c.next_species = self._prev_next_species(c.pokemon.species)
 
         # Cache it yo
         return self.cache_content(

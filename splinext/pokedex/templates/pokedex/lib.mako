@@ -16,14 +16,14 @@
 
 <%def name="pokemon_page_header(icon_form=None, subpages=True)">
 <div id="dex-header">
-    <a href="${url.current(name=c.prev_pokemon.species.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">
+    <a href="${url.current(name=c.prev_species.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">
         <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
-        ${pokemon_icon(c.prev_pokemon, alt="")}
-        ${c.prev_pokemon.species.id}: ${c.prev_pokemon.species.name}
+        ${pokemon_icon(c.prev_species.default_pokemon, alt="")}
+        ${c.prev_species.id}: ${c.prev_species.name}
     </a>
-    <a href="${url.current(name=c.next_pokemon.species.name.lower(), form=None)}" id="dex-header-next" class="dex-box-link">
-        ${c.next_pokemon.species.id}: ${c.next_pokemon.species.name}
-        ${pokemon_icon(c.next_pokemon, alt="")}
+    <a href="${url.current(name=c.next_species.name.lower(), form=None)}" id="dex-header-next" class="dex-box-link">
+        ${c.next_species.id}: ${c.next_species.name}
+        ${pokemon_icon(c.next_species.default_pokemon, alt="")}
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
     ${h.pokedex.pokemon_form_image(icon_form or c.pokemon.default_form, prefix='icons')}
