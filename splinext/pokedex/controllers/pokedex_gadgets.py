@@ -1053,7 +1053,7 @@ class PokedexGadgetsController(PokedexBaseController):
 
             # Used for a link
             c.hidden_power = db.pokedex_session.query(t.Move) \
-                .filter_by(identifier='hidden-power').one()
+                .filter_by(identifier=u'hidden-power').one()
 
         # Turn those results into something more readable.
         # Template still needs valid_genes for drawing the graph

@@ -631,7 +631,7 @@ class PokedexController(PokedexBaseController):
         if c.pokemon.species.gender_rate == -1:
             # Genderless; Ditto only
             ditto = db.pokedex_session.query(t.PokemonSpecies) \
-                .filter_by(identifier='ditto').one()
+                .filter_by(identifier=u'ditto').one()
             c.compatible_families = [ditto]
         elif c.pokemon.species.egg_groups[0].id == 15:
             # No Eggs group
