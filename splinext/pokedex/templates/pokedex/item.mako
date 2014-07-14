@@ -26,7 +26,7 @@ ${h.h1(_('Essentials'))}
         else:
             sprite_path = 'items'
     %>\
-    <div id="dex-pokemon-portrait-sprite">
+    <div id="dex-item-portrait-sprite">
         ${h.pokedex.pokedex_img(u"{0}/{1}.png".format(sprite_path, h.pokedex.item_filename(c.item)))}
     </div>
     <p id="dex-page-types">

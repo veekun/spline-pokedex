@@ -165,6 +165,8 @@ p#dex-page-name { font-size: 2em; margin: 0.12em 0; }
 #dex-pokemon-genus { font-size: 0.8em; margin: 0.31em 0; }
 #dex-pokemon-portrait-sprite { height: 200px; width: 22em; margin: -35px -3em -35px -4em; padding: 7px; line-height: 200px; vertical-align: middle; text-align: center; background: url(${h.static_uri('pokedex', 'images/sprite-frame-x-y.png')}) center center no-repeat; }
 
+#dex-item-portrait-sprite { height: 96px; width: 96px; padding: 7px; margin: .33em auto; line-height: 96px; vertical-align: middle; text-align: center; background: url(${h.static_uri('pokedex', 'images/sprite-frame.png')}) center center no-repeat; }
+
 .dex-warrior-portrait { min-width: 176px; margin: auto 0.33em; }
 #dex-pokemon-conquest-portrait-sprite { height: 128px; width: 128px; margin: 0.33em auto; padding: 7px; line-height: 128px; vertical-align: middle; text-align: center; background: url(${h.static_uri('pokedex', 'images/sprite-frame-conquest.png')}) center center no-repeat; }
 .dex-warrior-portrait-sprite { height: 168px; width: 176px; margin: 0.33em 0; padding: 4px 0; background: url(${h.static_uri('pokedex', 'images/sprite-frame-conquest-warrior.png')}) center center no-repeat; }
