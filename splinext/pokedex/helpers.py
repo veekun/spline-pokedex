@@ -321,7 +321,7 @@ def pokemon_icon(pokemon, alt=True):
     if pokemon.is_default:
         return h.literal('<span class="sprite-icon sprite-icon-%d"></span>' % pokemon.species.id)
 
-    alt_text = pokemon.species_name if alt else u''
+    alt_text = pokemon.name if alt else u''
     if pokemon_has_media(pokemon.default_form, 'icons', 'png'):
         return pokemon_form_image(pokemon.default_form, prefix='icons', alt=alt_text)
 
