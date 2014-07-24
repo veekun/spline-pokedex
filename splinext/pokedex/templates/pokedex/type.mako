@@ -162,10 +162,11 @@ ${h.h1(_('External Links'), id='links')}
     % endif
     % if c.type.identifier == u'unknown':
     <li><a href="http://bulbapedia.bulbagarden.net/wiki/%3F%3F%3F_(type)">${_("Bulbapedia")}</a></li>
-    <li><a href="http://www.smogon.com/dp/types/questionquestionquestion">${_("Smogon")}</a></li>
+    % elif c.type.identifier == u'shadow':
+    <li><a href="http://bulbapedia.bulbagarden.net/wiki/Shadow_move">${_("Bulbapedia")}</a></li>
     % else:
     <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.type.name}_(type)">${_("Bulbapedia")}</a></li>
-    <li><a href="http://www.smogon.com/bw/types/${c.type.name.lower()}">${_("Smogon")}</a></li>
+    <li><a href="http://www.smogon.com/dex/xy/types/${c.type.identifier}">${_("Smogon")}</a></li>
     % endif
 </ul>
 </%lib:cache_content>

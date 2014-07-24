@@ -493,8 +493,6 @@ ${h.h1(_('External Links'), id='links')}
 <li><a href="http://www.psypokes.com/dex/techdex/${"%03d" % c.move.id}">${_("PsyPoke")}</a></li>
 % endif
 <li><a href="http://www.serebii.net/attackdex-xy/${c.move.name.lower().replace(' ', '')}.shtml">${_("Serebii.net")}</a></li>
-% if c.move.generation_id <= 5:
-<li><a href="http://www.smogon.com/bw/moves/${c.move.name.lower().replace(' ', '_')}">${_("Smogon")}</a></li>
-% endif
+<li><a href="http://www.smogon.com/dex/xy/moves/${c.move.name.lower().replace(' ', '_')}">${_("Smogon")}</a></li>
 </ul>
 </%lib:cache_content>
