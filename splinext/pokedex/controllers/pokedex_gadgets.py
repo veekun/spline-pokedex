@@ -160,9 +160,9 @@ class StatCalculatorForm(Form):
         allow_blank=True,
     )
     hint = QuerySelectField('Characteristic',
-        query_factory=lambda: db.pokedex_session.query(t.StatHint)
-            .join(t.StatHint.names_table)
-            .order_by(t.StatHint.names_table.message.asc()),
+        query_factory=lambda: db.pokedex_session.query(t.Characteristic)
+            .join(t.Characteristic.text_table)
+            .order_by(t.Characteristic.text_table.message.asc()),
         get_pk=lambda _: _.id,
         get_label=lambda _: _.message,
         allow_blank=True,

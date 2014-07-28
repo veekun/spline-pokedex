@@ -2003,13 +2003,17 @@ class PokedexController(PokedexBaseController):
             c.natures = c.natures.order_by(
                 t.Nature.names_table.name.asc())
 
-        stat_hint_table = dict()
-        stat_hints = db.pokedex_session.query(t.StatHint).options(joinedload(t.StatHint.names_local))
-        for stat_hint in stat_hints:
-            subdict = stat_hint_table.setdefault(stat_hint.stat, {})
-            subdict[stat_hint.gene_mod_5] = stat_hint.message
+        characteristic_table = dict()
+        characteristics = (
+            db.pokedex_session.query(t.Characteristic)
+            .options(joinedload(t.Characteristic.text_local))
+        )
 
-        c.stat_hints = stat_hint_table
+        for characteristic in characteristics:
+            subdict = characteristic_table.setdefault(characteristic.stat, {})
+            subdict[characteristic.gene_mod_5] = characteristic.message
+
+        c.characteristics = characteristic_table
 
         return render('/pokedex/nature_list.mako')
 
