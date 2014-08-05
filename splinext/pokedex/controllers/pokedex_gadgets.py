@@ -793,10 +793,14 @@ class PokedexGadgetsController(PokedexBaseController):
             c.moves = defaultdict(lambda: defaultdict(set))
             # And similarly for level moves, level => pokemon => moves
             c.level_moves = defaultdict(lambda: defaultdict(list))
+
+            # Get all moves — we only need to order by order since we split
+            # everything up by method/level anyway
             q = db.pokedex_session.query(t.PokemonMove) \
                 .filter(t.PokemonMove.version_group == c.version_group) \
                 .filter(t.PokemonMove.pokemon_id.in_(
                     _.id for _ in unique_pokemon)) \
+                .order_by(t.PokemonMove.order) \
                 .options(
                     joinedload('move'),
                     joinedload('method'),
