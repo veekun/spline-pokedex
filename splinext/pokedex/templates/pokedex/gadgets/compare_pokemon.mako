@@ -213,7 +213,7 @@ ${move_table_header()}
             ${h.pokedex.pokemon_link(found_pokemon.pokemon,
                 h.pokedex.pokemon_form_image(found_pokemon.form, prefix=u'icons')
                 + h.literal('<br>')
-                + found_pokemon.pokemon.default_form.name)}
+                + found_pokemon.pokemon.name)}
             % endif
         </th>
         % endfor
