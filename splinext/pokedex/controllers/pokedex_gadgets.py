@@ -574,7 +574,7 @@ class PokedexGadgetsController(PokedexBaseController):
         c.did_anything = True
         return render('/pokedex/gadgets/chain_breeding.mako')
 
-    NUM_COMPARED_POKEMON = 8
+    NUM_COMPARED_POKEMON = 9
     def _shorten_compare_pokemon(self, pokemon):
         u"""Returns a query dict for the given list of Pokémon to compare,
         shortened as much as possible.
