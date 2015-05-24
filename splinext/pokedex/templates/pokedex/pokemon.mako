@@ -692,7 +692,7 @@ ${h.h1(_('External Links'), id=_('links', context='header id'))}
 <li>${h.pokedex.generation_icon(2)} <a href="http://www.pokemondungeon.com/Library/Pokedex/pokedex/${ghpd_name}.shtml">${_(u"Gengar and Haunter's Pokémon Dungeon")}</a></li>
 % endif
 % if c.pokemon.species.generation_id <= 4:
-<li><a href="http://www.legendarypokemon.net/pokedex/${lp_name}">${_(u"Legendary Pokémon")}</a></li>
+<li>${h.pokedex.generation_icon(4)} <a href="http://www.legendarypokemon.net/pokedex/${lp_name}">${_(u"Legendary Pokémon")}</a></li>
 % endif
 <li><a href="http://www.psypokes.com/dex/psydex/${"%03d" % c.pokemon.species.id}">${_(u"PsyPoke")}</a></li>
 <li><a href="http://www.serebii.net/pokedex-xy/${"%03d" % c.pokemon.species.id}.shtml">${_(u"Serebii.net")}</a></li>

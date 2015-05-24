@@ -486,7 +486,7 @@ ${h.h1(_('External Links'), id='links')}
 % endif
 <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.move.name.replace(' ', '_')}_%28move%29">${_("Bulbapedia")}</a></li>
 % if c.move.generation_id <= 4:
-<li><a href="http://www.legendarypokemon.net/attacks/${c.move.name.replace(' ', '+')}/">${_(u"Legendary Pokémon")}</a></li>
+<li>${h.pokedex.generation_icon(4)} <a href="http://www.legendarypokemon.net/attacks/${c.move.name.replace(' ', '+')}/">${_(u"Legendary Pokémon")}</a></li>
 % endif
 % if c.move.generation_id <= 5:
 ## Psypoke's X/Y move ids don't match up with ours.
