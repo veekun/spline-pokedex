@@ -211,7 +211,7 @@ class StatCalculatorForm(Form):
             # Outright delete stuff that's left blank
             for field in ('nature', 'hint', 'hp_type'):
                 if not self[field].data:
-                    del sfd[field]
+                    sfd.pop(field, None)
 
 
 def stat_graph_chunk_color(gene):
@@ -848,11 +848,9 @@ class PokedexGadgetsController(PokedexBaseController):
                               .all())
 
         # Make sure there are the same number of level, stat, and effort
-        # fields.  Add an extra one (for more data), as long as we're not about
-        # to shorten
+        # fields.  Add an extra one, for adding more data
         num_dupes = c.num_data_points = len(request.GET.getall('level'))
-        if not request.GET.get('shorten', False):
-            num_dupes += 1
+        num_dupes += 1
         class F(StatCalculatorForm):
             level = DuplicateField(
                 fields.IntegerField(u'Level', default=100,
