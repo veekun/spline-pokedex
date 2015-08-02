@@ -767,7 +767,10 @@ def apply_pokemon_template(template, pokemon, _=_):
         d['color'] = pokemon.species.color.name
 
     if 'habitat' in template.template:
-        d['habitat'] = pokemon.species.habitat.name
+        if pokemon.species.habitat:
+            d['habitat'] = pokemon.species.habitat.name
+        else:
+            d['habitat'] = ''
 
     if 'shape' in template.template:
         if pokemon.species.shape:
