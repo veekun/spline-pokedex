@@ -373,8 +373,12 @@ class PokedexConquestController(PokedexBaseController):
         # We only want to show warriors who have a max link above a certain
         # threshold, because there are 200 warriors and most of them won't
         # have very good links.
-        c.link_form = LinkThresholdForm(request.params, link=70)
-        c.link_form.validate()
+        default_link = 70
+        c.link_form = LinkThresholdForm(request.params, link=default_link)
+        if request.params and c.link_form.validate():
+            link_threshold = c.link_form.link.data
+        else:
+            link_threshold = default_link
 
         # However, some warriors will only be above this threshold at later
         # ranks.  In these cases, we may as well show all ranks' links.
@@ -395,7 +399,7 @@ class PokedexConquestController(PokedexBaseController):
             .filter(~higher_ranks_exist)
             .join(t.ConquestMaxLink)
             .filter(t.ConquestMaxLink.pokemon_species_id == c.pokemon.id)
-            .filter(t.ConquestMaxLink.max_link >= c.link_form.link.data))
+            .filter(t.ConquestMaxLink.max_link >= link_threshold))
 
         # For Froslass and Gallade, we want to filter out male and female
         # warriors, respectively.
@@ -553,13 +557,16 @@ class PokedexConquestController(PokedexBaseController):
         default_link = 70 if c.warrior.archetype else 90
 
         c.link_form = LinkThresholdForm(request.params, link=default_link)
-        c.link_form.validate()
+        if request.params and c.link_form.validate():
+            link_threshold = c.link_form.link.data
+        else:
+            link_threshold = default_link
 
         link_pokemon = (
             db.pokedex_session.query(t.ConquestMaxLink.pokemon_species_id)
             .filter(t.ConquestMaxLink.warrior_rank_id ==
                     c.warrior.ranks[-1].id)
-            .filter(t.ConquestMaxLink.max_link >= c.link_form.link.data)
+            .filter(t.ConquestMaxLink.max_link >= link_threshold)
         )
 
         max_links = []
