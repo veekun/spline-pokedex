@@ -614,7 +614,7 @@ class PokedexGadgetsController(PokedexBaseController):
         # Grab the version to use for moves, defaulting to the most current
         try:
             c.version_group = db.pokedex_session.query(t.VersionGroup) \
-                .get(request.params['version_group'])
+                .filter_by(id=request.params['version_group']).one()
         except (KeyError, NoResultFound):
             c.version_group = c.version_groups[-1]
 
