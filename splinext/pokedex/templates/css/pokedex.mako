@@ -72,7 +72,7 @@ col.dex-col-stat-result { width: 5em; }
 col.dex-col-effort      { width: 8em; }
 col.dex-col-type        { width: 40px; /* badges are 32px wide */ }
 col.dex-col-type2       { width: 80px; }
-col.dex-col-version     { width: 3.5em; }  /* two versions (32px < 33px == 3em) plus 0.17em padding < 3.5em */
+col.dex-col-version     { width: 2.75em; }  /* two versions (32px ≈ 2.4em) plus 0.17em padding < 2.75em */
 col.dex-col-encounter-name { width: 10em; }
 col.dex-col-encounter-version { width: 12em; }
 
