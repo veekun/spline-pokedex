@@ -14,7 +14,7 @@
    width="204"
    height="140"
    id="svg2"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="version-icons.svg">
   <sodipodi:namedview
      pagecolor="#ffffff"
@@ -25,17 +25,25 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="852"
-     inkscape:window-height="723"
+     inkscape:window-width="1680"
+     inkscape:window-height="963"
      id="namedview139"
-     showgrid="false"
-     inkscape:zoom="5.2686388"
-     inkscape:cx="24.351618"
-     inkscape:cy="29.992582"
-     inkscape:window-x="245"
-     inkscape:window-y="258"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="svg2" />
+     showgrid="true"
+     inkscape:zoom="21.074555"
+     inkscape:cx="64.220408"
+     inkscape:cy="19.933285"
+     inkscape:window-x="-2"
+     inkscape:window-y="-2"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2"
+     inkscape:object-nodes="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid4532"
+       spacingx="4"
+       spacingy="4"
+       empspacing="4" />
+  </sodipodi:namedview>
   <metadata
      id="metadata123">
     <rdf:RDF>
@@ -44,12 +52,56 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <defs
      id="defs4">
+    <linearGradient
+       id="linearGradient4604">
+      <stop
+         style="stop-color:#de2eaa;stop-opacity:1"
+         offset="0"
+         id="stop4606" />
+      <stop
+         style="stop-color:#801460;stop-opacity:1"
+         offset="1"
+         id="stop4608" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4102">
+      <stop
+         id="stop4598"
+         offset="0"
+         style="stop-color:#de2e5c;stop-opacity:1;" />
+      <stop
+         id="stop4600"
+         offset="1"
+         style="stop-color:#801414;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4590">
+      <stop
+         style="stop-color:#29b6d4;stop-opacity:1"
+         offset="0"
+         id="stop4592" />
+      <stop
+         style="stop-color:#135361;stop-opacity:1"
+         offset="1"
+         id="stop4594" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4094">
+      <stop
+         id="stop4584"
+         offset="0"
+         style="stop-color:#2951d4;stop-opacity:1;" />
+      <stop
+         id="stop4586"
+         offset="1"
+         style="stop-color:#132561;stop-opacity:1;" />
+    </linearGradient>
     <linearGradient
        id="linearGradient4112">
       <stop
@@ -62,7 +114,7 @@
          id="stop4116" />
     </linearGradient>
     <linearGradient
-       id="linearGradient4102">
+       id="linearGradient4602">
       <stop
          style="stop-color:#de2e5c;stop-opacity:1;"
          offset="0"
@@ -73,7 +125,7 @@
          id="stop4106" />
     </linearGradient>
     <linearGradient
-       id="linearGradient4094">
+       id="linearGradient4588">
       <stop
          style="stop-color:#2951d4;stop-opacity:1;"
          offset="0"
@@ -359,6 +411,26 @@
        y1="125.20042"
        x2="139.94339"
        y2="129.80592"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       gradientTransform="translate(48.000001,-1.0760547e-6)"
+       inkscape:collect="always"
+       xlink:href="#linearGradient4604"
+       id="linearGradient4100-5"
+       x1="12.019149"
+       y1="125.86472"
+       x2="12.019149"
+       y2="130.04265"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       gradientTransform="translate(48.000001,-1.0760547e-6)"
+       inkscape:collect="always"
+       xlink:href="#linearGradient4590"
+       id="linearGradient4108-8"
+       x1="35.971699"
+       y1="126.05453"
+       x2="35.971699"
+       y2="130.04173"
        gradientUnits="userSpaceOnUse" />
   </defs>
   <text
@@ -1092,4 +1164,46 @@
        y="132.40154"
        id="tspan2546-1"
        style="font-size:16.19174957px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Bitstream Vera Serif;-inkscape-font-specification:Bitstream Vera Serif Bold">VI</tspan></text>
+  <rect
+     width="16"
+     height="16"
+     x="76"
+     y="120"
+     id="rect3207-5-6"
+     style="fill:url(#linearGradient4108-8);fill-opacity:1.0;stroke:none"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90" />
+  <text
+     x="79.416"
+     y="133.216"
+     id="text3209-7-9"
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;font-family:'Bitstream Vera Sans Mono';-inkscape-font-specification:'Bitstream Vera Sans Bold';fill:#ffffff;fill-opacity:1;stroke:none"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90"><tspan
+       x="79.416"
+       y="133.216"
+       id="tspan3211-6-0"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;font-family:'Bitstream Vera Sans';-inkscape-font-specification:'Bitstream Vera Sans Bold'">A</tspan></text>
+  <rect
+     width="16"
+     height="16"
+     x="52"
+     y="120"
+     id="rect3213-2-5"
+     style="fill:url(#linearGradient4100-5);fill-opacity:1.0;stroke:none"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90" />
+  <text
+     x="54.528"
+     y="133.216"
+     id="text3215-1-4"
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:18px;font-family:'Bitstream Vera Sans Mono';-inkscape-font-specification:'Bitstream Vera Sans Bold';fill:#ffffff;fill-opacity:1;stroke:none"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90"><tspan
+       x="54.528"
+       y="133.216"
+       id="tspan3217-7-9"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;font-family:'Bitstream Vera Sans';-inkscape-font-specification:'Bitstream Vera Sans Bold'">O</tspan></text>
 </svg>
