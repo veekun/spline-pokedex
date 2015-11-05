@@ -631,6 +631,9 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
         <th>
             ${h.pokedex.version_icons(u'X', u'Y')}
         </th>
+        <th>
+            ${h.pokedex.version_icons(u'Omega Ruby', u'Alpha Sapphire')}
+        </th>
     </tr>
 </thead>
 <tbody>
@@ -642,8 +645,8 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
             % endif
         </th>
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/x-y')}</td>
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/omegaruby-alphasapphire')}</td>
     </tr>
-    % if c.sprite_exists('main-sprites/x-y/shiny'):
     <tr>
         <th class="vertical-text">
             ${_("Shiny")}
@@ -651,9 +654,13 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
             <br/> ${_("(male)")}
             % endif
         </th>
+        % if c.sprite_exists('main-sprites/x-y/shiny'):
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/x-y/shiny')}</td>
+        % else:
+        <td class="dex-pokemon-flavor-no-sprite">—</td>
+        % endif
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/omegaruby-alphasapphire/shiny')}</td>
     </tr>
-    % endif
 </tbody>
 % if c.pokemon.species.has_gender_differences:
 <tbody>
@@ -664,6 +671,7 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/omegaruby-alphasapphire/female')}</td>
     </tr>
     % if c.sprite_exists('main-sprites/x-y/shiny'):
     <tr>
@@ -673,6 +681,7 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
         % else:
         <td class="dex-pokemon-flavor-no-sprite">—</td>
         % endif
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/omegaruby-alphasapphire/shiny/female')}</td>
     </tr>
     % endif
 </tbody>

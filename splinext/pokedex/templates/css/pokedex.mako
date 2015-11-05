@@ -163,7 +163,8 @@ ul.inline-menu > li:last-child:after { content: none; }
 p#dex-page-name { font-size: 2em; margin: 0.12em 0; }
 #dex-pokemon-forme { font-size: 1.25em; font-weight: bold; }
 #dex-pokemon-genus { font-size: 0.8em; margin: 0.31em 0; }
-#dex-pokemon-portrait-sprite { height: 200px; width: 22em; margin: -35px -3em -35px -4em; padding: 7px; line-height: 200px; vertical-align: middle; text-align: center; background: url(${h.static_uri('pokedex', 'images/sprite-frame-x-y.png')}) center center no-repeat; }
+## sprites are 120px, border is 7px, total size 134px
+#dex-pokemon-portrait-sprite { height: 134px; width: 134px; margin: 0.33em auto; padding: 7px; line-height: 134px; vertical-align: middle; text-align: center; background: url(${h.static_uri('pokedex', 'images/sprite-frame-oras.png')}) center center no-repeat; }
 
 #dex-item-portrait-sprite { height: 96px; width: 96px; padding: 7px; margin: .33em auto; line-height: 96px; vertical-align: middle; text-align: center; background: url(${h.static_uri('pokedex', 'images/sprite-frame.png')}) center center no-repeat; }
 
