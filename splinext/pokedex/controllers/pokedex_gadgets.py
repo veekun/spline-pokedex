@@ -1033,6 +1033,13 @@ class PokedexGadgetsController(PokedexBaseController):
             for genes in valid_genes.values():
                 filter_genes(genes, lambda gene: gene <= max_gene)
 
+            # Similarly, this gene can't possibly be lower than the minimum of
+            # any other stat.
+            for genes in valid_genes.values():
+                min_gene = min(itertools.chain(genes, (999,)))
+                filter_genes(
+                    valid_genes[hint.stat], lambda gene: gene >= min_gene)
+
         # Possibly calculate Hidden Power's type and power, if the results are
         # exact
         c.exact = all(len(genes) == 1 for genes in valid_genes.values())
