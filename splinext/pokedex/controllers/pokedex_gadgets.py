@@ -859,7 +859,7 @@ class PokedexGadgetsController(PokedexBaseController):
             )
             stat = DuplicateField(
                 StatField(c.stats, fields.IntegerField(default=0, validators=[
-                    wtforms.validators.NumberRange(min=0, max=700)])),
+                    wtforms.validators.NumberRange(min=0, max=999)])),
                 min_entries=num_dupes,
             )
             effort = DuplicateField(
