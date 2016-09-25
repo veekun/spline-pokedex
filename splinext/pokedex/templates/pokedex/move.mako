@@ -276,6 +276,12 @@ ${h.h1(_('History'))}
         % if change.pp is not None:
         Has ${change.pp} PP.
         % endif
+        % if change.priority is not None:
+        Has priority ${change.priority}.
+        % endif
+        % if change.target_id is not None:
+        Target is ${change.target.name}.
+        % endif
         % if change.effect_id is not None:
         ## XXX as_html is more appropriate but adds <p> tags
         Effect is: ${change.short_effect.as_text()}
