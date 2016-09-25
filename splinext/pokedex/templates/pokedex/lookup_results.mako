@@ -47,6 +47,9 @@
     % if result.language != c.game_language:
     (<img src="${h.static_uri('spline', "flags/{0}.png".format(result.iso3166))}" alt="${result.language.name}" title="${result.language.name}"> ${result.name})
     % endif
+    % if object.__tablename__ == 'locations' and object.region:
+    in ${object.region.name}
+    % endif
 </li>
 % endfor
 </ul>
