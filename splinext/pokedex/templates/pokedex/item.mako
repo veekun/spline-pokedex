@@ -55,7 +55,7 @@ ${c.item.short_effect}
     <dd>
         <ul class="classic-list">
             % for flag in c.item.flags:
-            <li>${flag.name}</li>
+            <li>${flag.description}</li>
             % endfor
         </ul>
     </dd>
