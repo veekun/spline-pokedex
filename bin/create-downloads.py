@@ -265,7 +265,7 @@ def create_downloads():
     )
     make_labeled_montage(
         'berries.png', 'items/berries', suffix='.png',
-        sprite_size=48, horiz_padding=4, vert_padding=4,
+        sprite_size=48, horiz_padding=36, vert_padding=4,
     )
 
 def main_tarball(filename, contents):
