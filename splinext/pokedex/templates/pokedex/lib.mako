@@ -353,7 +353,7 @@ cry_url = url(controller='dex', action='media',
         ## </dt> needs to come right after the flag or else there's space between it and the colon
         <dt>${language.name}
         <img src="${h.static_uri('spline', "flags/{0}.png".format(language.iso3166))}" alt=""></dt>
-        % if language.identifier == 'ja':
+        % if language.identifier == 'ja-Hrkt':
         <dd>${foreign_name} (${h.pokedex.romanize(foreign_name)})</dd>
         % else:
         <dd>${foreign_name}</dd>
