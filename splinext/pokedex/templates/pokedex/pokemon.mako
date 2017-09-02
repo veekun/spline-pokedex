@@ -7,7 +7,7 @@
 <%! from splinext.pokedex import i18n %>\
 
 <%def name="title()">\
-${_(u"{pokemon.name} – #{pokemon.species.id} - The {pokemon.species.genus} Pokémon").format(pokemon=c.pokemon)}
+${_(u"{pokemon.name} – #{pokemon.species.id} - {pokemon.species.genus}").format(pokemon=c.pokemon)}
 </%def>
 
 <%def name="title_in_page()">
@@ -30,7 +30,7 @@ ${h.h1(_('Essentials'))}
         c.pokemon.default_form.form_name is not None:
     <p id="dex-pokemon-forme">${c.pokemon.default_form.form_name}</p>
     % else:
-    <p id="dex-pokemon-genus">The ${c.pokemon.species.genus} Pokémon</p>
+    <p id="dex-pokemon-genus">${c.pokemon.species.genus}</p>
     % endif
     <div id="dex-pokemon-portrait-sprite">
         ${h.pokedex.pokemon_form_image(c.pokemon.default_form)}
