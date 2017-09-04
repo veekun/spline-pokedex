@@ -430,11 +430,11 @@ ${h.h1(_('Flavor'))}
 </div>
 <div class="dex-column">
     <h2>${_("Sprites")}</h2>
-    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/omegaruby-alphasapphire')}
-    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/omegaruby-alphasapphire/shiny')}
-    % if h.pokedex.pokemon_has_media(c.pokemon.default_form, 'main-sprites/omegaruby-alphasapphire/female', 'png'):
-        ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/omegaruby-alphasapphire/female')}
-        ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/omegaruby-alphasapphire/shiny/female')}
+    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/sun-moon')}
+    ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/sun-moon/shiny')}
+    % if h.pokedex.pokemon_has_media(c.pokemon.default_form, 'main-sprites/sun-moon/female', 'png'):
+        ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/sun-moon/female')}
+        ${h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix='main-sprites/sun-moon/shiny/female')}
     % endif
 </div>
 </div>
