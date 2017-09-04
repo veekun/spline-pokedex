@@ -79,7 +79,7 @@
     % if i != 0:
     <br>
     % endif
-    ${h.pokedex.version_icons(*version_group.versions)}
+    ${h.pokedex.version_group_icon(version_group)}
     % endfor
   % endif
 </th>
@@ -97,9 +97,9 @@
     ## rather than ignoring all but the first
     % for version_group in column:
         % if version_group in version_group_data:
-        ${h.pokedex.version_icons(*version_group.versions)}
+        ${h.pokedex.version_group_icon(version_group)}
         % elif version_group in c.move_tutor_version_groups:
-        <span class="no-tutor">${h.pokedex.version_icons(*version_group.versions)}</span>
+        <span class="no-tutor">${h.pokedex.version_group_icon(version_group)}</span>
         % endif
     % endfor
     </td>

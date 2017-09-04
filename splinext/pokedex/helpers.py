@@ -227,6 +227,17 @@ def version_icons(*versions, **kwargs):
 
     return version_icons
 
+def version_group_icon(version_group):
+    return version_icons(*version_group.versions)
+    # XXX this is for the combined pixely version group icons i made
+    names = ', '.join(version.name for version in version_group.versions)
+    return h.HTML.img(
+        src=h.static_uri('pokedex', 'images/versions/%s.png' % (
+            '-'.join(version.identifier for version in version_group.versions))),
+        alt=names,
+        title=names)
+
+
 def pokemon_has_media(pokemon_form, prefix, ext, use_form=True):
     """Determine whether a file exists in the specified directory for the
     specified Pokémon form.
@@ -292,7 +303,8 @@ def pokemon_form_image(pokemon_form, prefix=None, **attr):
     """Returns an <img> tag for a Pokémon form image."""
 
     if prefix is None:
-        prefix = 'main-sprites/omegaruby-alphasapphire'
+        prefix = 'main-sprites/sun-moon'
+        # FIXME what the hell is going on here
         if not pokemon_has_media(pokemon_form, prefix, 'png'):
             prefix = 'main-sprites/black-white'
 
