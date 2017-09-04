@@ -689,6 +689,56 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 </table>
 % endif
 
+% if 7 in generation_ids:
+<h2 id="main-sprites:gen-vii"><a href="#main-sprites:gen-vii" class="subtle">${h.pokedex.generation_icon(7)} ${_("Sun & Moon")}</a></h2>
+<table class="dex-pokemon-flavor-sprites">
+<colgroup span="1"></colgroup> <!-- row headers -->
+<colgroup span="1"></colgroup> <!-- Sun/Moon -->
+<thead>
+    <tr class="header-row">
+        <th></th>
+        <th>
+            ${h.pokedex.version_icons(u'Sun', u'Moon')}
+        </th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <th class="vertical-text">
+            ${_("Normal")}
+            % if c.pokemon.species.has_gender_differences:
+            <br/> ${_("(male)")}
+            % endif
+        </th>
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/sun-moon')}</td>
+    </tr>
+    <tr>
+        <th class="vertical-text">
+            ${_("Shiny")}
+            % if c.pokemon.species.has_gender_differences:
+            <br/> ${_("(male)")}
+            % endif
+        </th>
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/sun-moon/shiny')}</td>
+    </tr>
+</tbody>
+% if c.pokemon.species.has_gender_differences:
+<tbody>
+    <tr>
+        <th class="vertical-text">${_("Normal")} <br/> ${_("(female)")}</th>
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/sun-moon/female')}</td>
+    </tr>
+    % if c.sprite_exists('main-sprites/x-y/shiny'):
+    <tr>
+        <th class="vertical-text">${_("Shiny")} <br/> ${_("(female)")}</th>
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/sun-moon/shiny/female')}</td>
+    </tr>
+    % endif
+</tbody>
+% endif
+</table>
+% endif
+
 
 % if c.sprite_exists('overworld/left') or c.sprite_exists('conquest'):
 ${h.h1(_('Miscellaneous Game Art'), id=_('misc-sprites', context='anchor'))}
