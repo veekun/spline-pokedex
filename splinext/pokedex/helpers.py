@@ -303,7 +303,7 @@ def pokemon_form_image(pokemon_form, prefix=None, **attr):
     """Returns an <img> tag for a Pokémon form image."""
 
     if prefix is None:
-        prefix = 'main-sprites/sun-moon'
+        prefix = 'main-sprites/ultra-sun-ultra-moon'
         # FIXME what the hell is going on here
         if not pokemon_has_media(pokemon_form, prefix, 'png'):
             prefix = 'main-sprites/black-white'
