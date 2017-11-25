@@ -697,9 +697,10 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
 <thead>
     <tr class="header-row">
         <th></th>
-        <th>
-            ${h.pokedex.version_icons(u'Sun', u'Moon')}
-        </th>
+        % if c.sprite_exists('main-sprites/sun-moon'):
+        <th>${h.pokedex.version_icons(u'Sun', u'Moon')}</th>
+        % endif
+        <th>${h.pokedex.version_icons(u'Ultra Sun', u'Ultra Moon')}</th>
     </tr>
 </thead>
 <tbody>
@@ -710,7 +711,10 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
             <br/> ${_("(male)")}
             % endif
         </th>
+        % if c.sprite_exists('main-sprites/sun-moon'):
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/sun-moon')}</td>
+        % endif
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/ultra-sun-ultra-moon')}</td>
     </tr>
     <tr>
         <th class="vertical-text">
@@ -719,7 +723,10 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
             <br/> ${_("(male)")}
             % endif
         </th>
+        % if c.sprite_exists('main-sprites/sun-moon'):
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/sun-moon/shiny')}</td>
+        % endif
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/ultra-sun-ultra-moon/shiny')}</td>
     </tr>
 </tbody>
 % if c.pokemon.species.has_gender_differences:
@@ -727,11 +734,13 @@ ${h.h1(_('Main Game Sprites'), id=_('main-sprites', context='anchor'))}
     <tr>
         <th class="vertical-text">${_("Normal")} <br/> ${_("(female)")}</th>
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/sun-moon/female')}</td>
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/ultra-sun-ultra-moon/female')}</td>
     </tr>
     % if c.sprite_exists('main-sprites/x-y/shiny'):
     <tr>
         <th class="vertical-text">${_("Shiny")} <br/> ${_("(female)")}</th>
         <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/sun-moon/shiny/female')}</td>
+        <td>${h.pokedex.pokemon_form_image(c.form, prefix='main-sprites/ultra-sun-ultra-moon/shiny/female')}</td>
     </tr>
     % endif
 </tbody>
