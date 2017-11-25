@@ -166,7 +166,7 @@ ${h.h1(_('External Links'), id='links')}
     <li><a href="http://bulbapedia.bulbagarden.net/wiki/Shadow_move">${_("Bulbapedia")}</a></li>
     % else:
     <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.type.name}_(type)">${_("Bulbapedia")}</a></li>
-    <li><a href="http://www.smogon.com/dex/xy/types/${c.type.identifier}">${_("Smogon")}</a></li>
+    <li><a href="http://www.smogon.com/dex/sm/types/${c.type.identifier}">${_("Smogon")}</a></li>
     % endif
 </ul>
 </%lib:cache_content>

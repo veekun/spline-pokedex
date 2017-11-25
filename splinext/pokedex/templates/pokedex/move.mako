@@ -498,7 +498,7 @@ ${h.h1(_('External Links'), id='links')}
 ## Psypoke's X/Y move ids don't match up with ours.
 <li><a href="http://www.psypokes.com/dex/techdex/${"%03d" % c.move.id}">${_("PsyPoke")}</a></li>
 % endif
-<li><a href="http://www.serebii.net/attackdex-xy/${c.move.name.lower().replace(' ', '')}.shtml">${_("Serebii.net")}</a></li>
-<li><a href="http://www.smogon.com/dex/xy/moves/${c.move.name.lower().replace(' ', '_')}">${_("Smogon")}</a></li>
+<li><a href="http://www.serebii.net/attackdex-sm/${c.move.name.lower().replace(' ', '')}.shtml">${_("Serebii.net")}</a></li>
+<li><a href="http://www.smogon.com/dex/sm/moves/${c.move.name.lower().replace(' ', '_')}">${_("Smogon")}</a></li>
 </ul>
 </%lib:cache_content>

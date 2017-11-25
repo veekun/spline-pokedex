@@ -131,6 +131,6 @@ ${h.h1(_('External Links'), id='links')}
     <li>${h.pokedex.generation_icon(4)} <a href="http://legendarypokemon.net/dp/abilities#${c.ability.name.lower().replace(' ', '+')}">${_(u"Legendary Pokémon")}</a></li>
     % endif
     <li><a href="http://serebii.net/abilitydex/${c.ability.name.lower().replace(' ', '')}.shtml">${_("Serebii.net")}</a></li>
-    <li><a href="http://smogon.com/dex/xy/abilities/${c.ability.name.lower().replace(' ', '_')}">${_("Smogon")}</a></li>
+    <li><a href="http://smogon.com/dex/sm/abilities/${c.ability.name.lower().replace(' ', '_')}">${_("Smogon")}</a></li>
 </ul>
 </%lib:cache_content>
