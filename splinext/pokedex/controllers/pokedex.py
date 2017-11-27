@@ -18,7 +18,7 @@ from pylons.decorators import jsonify
 from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import (aliased, contains_eager, join,
         joinedload, joinedload_all, subqueryload, subqueryload_all)
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.sql import exists, func
 
 from spline.lib.base import render
@@ -1358,6 +1358,10 @@ class PokedexController(PokedexBaseController):
             c.move = db.get_by_name_query(t.Move, name).one()
         except NoResultFound:
             return self._not_found()
+        except MultipleResultsFound:
+            # Bad hack to fix having duplicate moves with the same name
+            # (z-moves exist as both physical and special)
+            c.move = db.get_by_name_query(t.Move, name).first()
 
         ### Prev/next for header
         # Shadow moves have the prev/next Shadow move; other moves skip them
@@ -1810,6 +1814,10 @@ class PokedexController(PokedexBaseController):
             c.item = db.get_by_name_query(t.Item, name).one()
         except NoResultFound:
             return self._not_found()
+        except MultipleResultsFound:
+            # Bad hack to fix having duplicate items with the same name (e.g.
+            # bicycles, z-crystals)
+            c.item = db.get_by_name_query(t.Item, name).first()
 
         # These are used for their item linkage
         c.growth_mulch = db.pokedex_session.query(t.Item) \
