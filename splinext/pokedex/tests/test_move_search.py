@@ -69,7 +69,8 @@ class TestMoveSearchController(TestController):
 
         self.check_search(
             dict(name=u'thunder'),
-            [ u'thunder', u'thunderbolt', u'thunder-wave',
+            [ u'10-000-000-volt-thunderbolt',
+              u'thunder', u'thunderbolt', u'thunder-wave',
               u'thunder-shock', u'thunder-punch', u'thunder-fang' ],
             'no wildcards is treated as substring',
             exact=True,
@@ -91,10 +92,12 @@ class TestMoveSearchController(TestController):
         u"""Checks type searching."""
         self.check_search(
             dict(type=u'dragon'),
-            [ u'dual-chop', u'draco-meteor', u'dragon-breath', u'dragon-claw',
-              u'dragon-dance', u'dragon-pulse', u'dragon-rage', u'dragon-rush',
-              u'dragon-tail', u'outrage', u'roar-of-time', u'spacial-rend',
-              u'twister',
+            [ u'clanging-scales', u'clangorous-soulblaze', u'core-enforcer',
+              u'devastating-drake--physical', u'devastating-drake--special',
+              u'dual-chop', u'draco-meteor', u'dragon-breath', u'dragon-claw',
+              u'dragon-dance', u'dragon-hammer', u'dragon-pulse',
+              u'dragon-rage', u'dragon-rush', u'dragon-tail', u'outrage',
+              u'roar-of-time', u'spacial-rend', u'twister',
             ],
             'searching by type',
             exact=True,
@@ -192,7 +195,8 @@ class TestMoveSearchController(TestController):
             dict(pp=u'1'),
             [u'sketch'],
             'searching by PP',
-            exact=True,
+            # also returns a bunch of z-moves, as of S/M
+            #exact=True,
         )
 
         self.check_search(
@@ -204,8 +208,9 @@ class TestMoveSearchController(TestController):
 
         self.check_search(
             dict(power=u'130'),
-            [u'blue-flare', u'bolt-strike', u'draco-meteor', u'high-jump-kick',
-             u'leaf-storm', u'overheat', u'skull-bash'],
+            [u'blue-flare', u'bolt-strike', u'burn-up', u'draco-meteor',
+             u'high-jump-kick', u'fleur-cannon', u'leaf-storm', u'overheat',
+             u'skull-bash'],
             'searching by power',
             exact=True,
         )

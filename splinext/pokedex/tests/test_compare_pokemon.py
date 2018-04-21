@@ -15,7 +15,7 @@ class TestComparePokemonController(TestController):
         should be no comparing.
         """
         res = self.do_request(u'eevee')
-        self.assertEquals(len(res.tmpl_context.found_pokemon), 8, 'correct name gives right count...')
+        self.assertEquals(len(res.tmpl_context.found_pokemon), 9, 'correct name gives right count...')
         self.assertEquals(res.tmpl_context.found_pokemon[0].pokemon.name, u'Eevee', '...and right name')
         self.assert_(res.tmpl_context.found_pokemon[1].pokemon is None, 'other slots are empty')
 
