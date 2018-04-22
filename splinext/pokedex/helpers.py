@@ -836,37 +836,39 @@ def apply_move_template(template, move):
 
     return h.literal(template.safe_substitute(d))
 
-_file_size_units = 'B KB MB GB TB'.split()
-def download_filesize(path):
-    try:
-        seen = c.seen
-    except AttributeError:
-        seen = c.seen = set()
-    if path in seen:
-        # Two download links for the same thing on one page
-        # Remove the "seen" stuff if this is ever legitimate
-        raise AssertionError('Copy/paste oversight! Two equal download links on one page')
-    seen.add(path)
-    root, me = os.path.split(__file__)
-    path = os.path.join(root, 'public', path)
-    try:
-        size = os.stat(path).st_size
-    except EnvironmentError:
-        raise EnvironmentError("Could not stat %s. Make sure to run spline-pokedex's bin/create-downloads.py script." % path)
-    def str_no_trailing_zero(num):
-        s = str(num)
-        if s.endswith('.0'):
-            s = s[:-2]
-        return s
-    for unit in _file_size_units:
-        if size < 1024:
-            if size >= 100:
-                return str(int(round(size))) + unit
-            elif size >= 10:
-                return str_no_trailing_zero(round(size, 1)) + unit
+
+class DownloadSizer(object):
+    file_size_units = 'B KB MB GB TB'.split()
+
+    def __init__(self):
+        self.seen = set()
+
+    def compute(self, path):
+        if path in self.seen:
+            # Two download links for the same thing on one page
+            # Remove the "seen" stuff if this is ever legitimate
+            raise AssertionError('Copy/paste oversight! Two equal download links on one page')
+        self.seen.add(path)
+        root, me = os.path.split(__file__)
+        path = os.path.join(root, 'public', path)
+        try:
+            size = os.stat(path).st_size
+        except EnvironmentError:
+            raise EnvironmentError("Could not stat %s. Make sure to run spline-pokedex's bin/create-downloads.py script." % path)
+        def str_no_trailing_zero(num):
+            s = str(num)
+            if s.endswith('.0'):
+                s = s[:-2]
+            return s
+        for unit in self.file_size_units:
+            if size < 1024:
+                if size >= 100:
+                    return str(int(round(size))) + unit
+                elif size >= 10:
+                    return str_no_trailing_zero(round(size, 1)) + unit
+                else:
+                    return str_no_trailing_zero(round(size, 2)) + unit
             else:
-                return str_no_trailing_zero(round(size, 2)) + unit
+                size = size / 1024.
         else:
-            size = size / 1024.
-    else:
-        raise AssertionError('Serving a file of %s petabytes', size)
+            raise AssertionError('Serving a file of %s petabytes', size)

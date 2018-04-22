@@ -10,6 +10,7 @@
 </ul>
 </%def>
 
+<% c.sizer = h.pokedex.DownloadSizer() %>
 <%def name="dl_link(path, text=None)">
 <a href="${h.static_uri('pokedex', path)}">
 %if text:
@@ -17,7 +18,7 @@ ${text}
 %else:
 ${caller.body()}
 %endif
-(${h.pokedex.download_filesize(path)})\
+(${c.sizer.compute(path)})\
 </a>\
 </%def>
 
