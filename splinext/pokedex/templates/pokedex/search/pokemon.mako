@@ -241,16 +241,40 @@ ${h.form(url.current(), method='GET')}
 </div>
 </div>
 
+## Render generation and pokedex fields ourselves so that we can we can show icons.
 <h2>${_(u"Generation")}</h2>
 <div class="dex-column-container">
 <div class="dex-column">
     <dl class="standard-form">
-        ${lib.field('introduced_in')}
+        ##${lib.field('introduced_in')}
+        <dt>${c.form.introduced_in.label()}</dt>
+        <dd>
+            <ul>
+                % for generation_option in c.form.introduced_in:
+                <li> <label>
+                    ${generation_option()}
+                    ${dexlib.generation_icon(generation_option.label.text)}
+                </label> </li>
+                % endfor
+            </ul>
+        </dd>
     </dl>
 </div>
 <div class="dex-column-2x">
     <dl class="standard-form">
-        ${lib.field('in_pokedex')}
+        ##${lib.field('in_pokedex')}
+        <dt>${c.form.in_pokedex.label()}</dt>
+        <dd>
+            <ul>
+                % for pokedex_option in c.form.in_pokedex:
+                <li> <label>
+                    ${pokedex_option()}
+                    ${dexlib.generation_icon(pokedex_option.label.text.region.generation)}
+                    ${pokedex_option.label.text.name}
+                </label> </li>
+                % endfor
+            </ul>
+        </dd>
     </dl>
 </div>
 </div>

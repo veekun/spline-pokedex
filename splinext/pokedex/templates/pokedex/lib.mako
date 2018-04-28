@@ -292,7 +292,7 @@
         % for version_group in generation.version_groups:
         <td>
             ${version_group_controls[ unicode(version_group.id) ]()}
-            ${version_group_controls[ unicode(version_group.id) ].label()}
+            ${version_group_icon(version_group_controls[ unicode(version_group.id) ].label.text)}
         </td>
         % endfor
     </tr>

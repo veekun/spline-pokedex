@@ -73,14 +73,6 @@ def ilike(column, string):
     return func.lower(column).like(string, escape='^')
 
 
-def in_pokedex_label(pokedex):
-    """[ IV ] Sinnoh"""
-
-    return """{gen_icon} {name}""".format(
-        gen_icon=pokedex_helpers.generation_icon(pokedex.region.generation),
-        name=pokedex.name,
-    )
-
 class BaseSearchForm(Form):
     # Defaults are set to match what the client will actually send if the field
     # is left blank
@@ -251,7 +243,9 @@ class PokemonSearchForm(BaseSearchForm):
     introduced_in = QueryCheckboxSelectMultipleField(
         'Introduced in',
         query_factory=lambda: db.pokedex_session.query(t.Generation),
-        get_label=lambda _: pokedex_helpers.generation_icon(_),
+        # Pass the db object through as the label "text" so that we can render icons later.
+        # XXX this is dumb
+        get_label=lambda row: row,
         get_pk=lambda table: table.id,
         allow_blank=True,
     )
@@ -260,7 +254,9 @@ class PokemonSearchForm(BaseSearchForm):
         query_factory=lambda: db.pokedex_session.query(t.Pokedex) \
                                   .filter(t.Pokedex.region_id != None) \
                                   .options(joinedload_all('region.generation')),
-        get_label=in_pokedex_label,
+        # Pass the db object through as the label "text" so that we can render icons later.
+        # XXX this is dumb
+        get_label=lambda row: row,
         get_pk=lambda table: table.id,
         allow_blank=True,
     )
@@ -293,7 +289,9 @@ class PokemonSearchForm(BaseSearchForm):
         'Versions',
         query_factory=lambda: db.pokedex_session.query(t.VersionGroup) \
                                              .options(joinedload('versions')),
-        get_label=lambda row: pokedex_helpers.version_icons(*row.versions),
+        # Pass the db object through as the label "text" so that we can render it as an icon later
+        # XXX this is dumb
+        get_label=lambda row: row,
         get_pk=lambda table: table.id,
         allow_blank=True,
     )
@@ -435,7 +433,7 @@ class MoveSearchForm(BaseSearchForm):
     introduced_in = QueryCheckboxSelectMultipleField(
         'Generation',
         query_factory=lambda: db.pokedex_session.query(t.Generation),
-        get_label=lambda _: _.name,
+        get_label=lambda row: row.name,
         get_pk=lambda table: table.id,
         allow_blank=True,
     )
@@ -498,7 +496,9 @@ class MoveSearchForm(BaseSearchForm):
         'Versions',
         query_factory=lambda: db.pokedex_session.query(t.VersionGroup) \
                                              .options(joinedload('versions')),
-        get_label=lambda row: pokedex_helpers.version_icons(*row.versions),
+        # Pass the db object through as the label "text" so that we can render it as an icon later
+        # XXX this is dumb
+        get_label=lambda row: row,
         get_pk=lambda table: table.id,
         allow_blank=True,
     )
