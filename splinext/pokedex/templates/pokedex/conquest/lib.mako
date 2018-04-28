@@ -1,3 +1,4 @@
+<%namespace name="dexlib" file="/pokedex/lib.mako" />
 <%! from splinext.pokedex import i18n %>
 
 <%def name="pokemon_page_header()">
