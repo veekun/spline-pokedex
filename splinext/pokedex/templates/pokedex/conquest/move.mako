@@ -38,7 +38,7 @@ ${_(u'{name} - Moves - Pokémon Conquest').format(name=c.move.name)}
 ${h.h1(u'Essentials')}
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.move.name}</p>
-    <p id="dex-page-types">${h.pokedex.type_link(c.move.type)}</p>
+    <p id="dex-page-types">${dexlib.type_link(c.move.type)}</p>
 </div>
 
 <div class="dex-page-beside-portrait">
@@ -51,7 +51,7 @@ ${h.h1(u'Essentials')}
     <ul class="dex-type-list">
         % for type_efficacy in sorted(c.move.type.damage_efficacies, key=lambda efficacy: efficacy.target_type.name):
         <li class="dex-damage-dealt-${type_efficacy.damage_factor}">
-            ${h.pokedex.type_link(type_efficacy.target_type)} ${h.pokedex.type_efficacy_label[type_efficacy.damage_factor]}
+            ${dexlib.type_link(type_efficacy.target_type)} ${h.pokedex.type_efficacy_label[type_efficacy.damage_factor]}
         </li>
         % endfor
     </ul>

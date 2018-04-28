@@ -26,7 +26,7 @@ ${h.h1(_(u'Kingdom list'))}
     % for kingdom in c.kingdoms:
     <tr>
         <td><a href="${url(controller='dex_conquest', action='kingdoms', name=kingdom.name.lower())}">${kingdom.name}</a></td>
-        <td>${h.pokedex.type_link(kingdom.type)}</td>
+        <td>${dexlib.type_link(kingdom.type)}</td>
     </tr>
     % endfor
 </tbody>

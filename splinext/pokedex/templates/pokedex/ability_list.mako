@@ -29,7 +29,7 @@ ${h.h1(_('Ability list'))}
     % for ability in c.abilities:
     <tr>
         <td class="number-cell">${ability.id}</td>
-        <td>${h.pokedex.generation_icon(ability.generation)}</td>
+        <td>${dexlib.generation_icon(ability.generation)}</td>
         <td><a href="${url(controller='dex', action='abilities', name=ability.name.lower())}">${ability.name}</a></td>
         <td class="markdown effect">${ability.short_effect}</td>
     </tr>

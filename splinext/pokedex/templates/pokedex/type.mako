@@ -17,13 +17,13 @@
 <div id="dex-header">
     <a href="${url.current(name=c.prev_type.name.lower())}" id="dex-header-prev" class="dex-box-link">
         <img src="${h.static_uri('spline', 'icons/control-180.png')}" alt="«">
-        ${h.pokedex.type_icon(c.prev_type)}
+        ${dexlib.type_icon(c.prev_type)}
     </a>
     <a href="${url.current(name=c.next_type.name.lower())}" id="dex-header-next" class="dex-box-link">
-        ${h.pokedex.type_icon(c.next_type)}
+        ${dexlib.type_icon(c.next_type)}
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
-    ${h.pokedex.type_icon(c.type)}
+    ${dexlib.type_icon(c.type)}
 </div>
 
 <%lib:cache_content>
@@ -32,15 +32,15 @@ ${h.h1(_('Essentials'))}
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.type.name.title()}</p>
     <p id="dex-page-types">
-        ${h.pokedex.type_icon(c.type)}
+        ${dexlib.type_icon(c.type)}
         % if c.type.damage_class is not None:
-        ${h.pokedex.damage_class_icon(c.type.damage_class)}<span style="position: absolute" class="faded">*</span>
+        ${dexlib.damage_class_icon(c.type.damage_class)}<span style="position: absolute" class="faded">*</span>
         % endif
     </p>
-    <p>${h.pokedex.generation_icon(c.type.generation)}</p>
+    <p>${dexlib.generation_icon(c.type.generation)}</p>
     % if c.type.damage_class is not None:
     <br/>
-    <p class="faded">*before ${h.pokedex.generation_icon(4)}</p>
+    <p class="faded">*before ${dexlib.generation_icon(4)}</p>
     % endif
 </div>
 
@@ -57,7 +57,7 @@ ${h.h1(_('Essentials'))}
     <ul class="dex-type-list">
         % for type_efficacy in sorted(c.type.damage_efficacies, key=lambda efficacy: efficacy.target_type.name):
         <li class="dex-damage-dealt-${type_efficacy.damage_factor}">
-             ${h.pokedex.type_link(type_efficacy.target_type)} ${h.pokedex.type_efficacy_label[type_efficacy.damage_factor]}
+             ${dexlib.type_link(type_efficacy.target_type)} ${h.pokedex.type_efficacy_label[type_efficacy.damage_factor]}
         </li>
         % endfor
     </ul>
@@ -66,7 +66,7 @@ ${h.h1(_('Essentials'))}
     <ul class="dex-type-list">
         % for type_efficacy in sorted(c.type.target_efficacies, key=lambda efficacy: efficacy.damage_type.name):
         <li class="dex-damage-taken-${type_efficacy.damage_factor}">
-             ${h.pokedex.type_link(type_efficacy.damage_type)} ${h.pokedex.type_efficacy_label[type_efficacy.damage_factor]}
+             ${dexlib.type_link(type_efficacy.damage_type)} ${h.pokedex.type_efficacy_label[type_efficacy.damage_factor]}
         </li>
         % endfor
     </ul>
@@ -146,7 +146,7 @@ ${h.h2(_('Formerly {0}-type moves').format(c.type.name), _('moves:former'))}
     <tbody>
         % for move_change in sorted(c.type.move_changelog, key=lambda c: c.move.name):
         <tr>
-            <td>${h.pokedex.version_icons(*move_change.changed_in.versions)}</td>
+            <td>${dexlib.version_icons(*move_change.changed_in.versions)}</td>
             ${dexlib.move_table_row(move_change.move)}
         % endfor
     </tbody>
@@ -158,7 +158,7 @@ ${h.h2(_('Formerly {0}-type moves').format(c.type.name), _('moves:former'))}
 ${h.h1(_('External Links'), id='links')}
 <ul class="classic-list">
     % if c.type.generation.id <= 1:
-    <li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/comp/${c.type.name}.htm">${_("Azure Heights")}</a></li>
+    <li>${dexlib.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/pokedex/comp/${c.type.name}.htm">${_("Azure Heights")}</a></li>
     % endif
     % if c.type.identifier == u'unknown':
     <li><a href="http://bulbapedia.bulbagarden.net/wiki/%3F%3F%3F_(type)">${_("Bulbapedia")}</a></li>

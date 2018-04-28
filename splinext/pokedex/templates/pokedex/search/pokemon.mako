@@ -132,7 +132,7 @@ ${getattr(self, 'col_' + column)()}
 ## Plain bulleted list with a Template.
 <ul class="dex-pokemon-search-list classic-list">
     % for result in c.results:
-    <li>${h.pokedex.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_template, result))}</li>
+    <li>${dexlib.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_template, result))}</li>
     % endfor
 </ul>
 
@@ -141,7 +141,7 @@ ${getattr(self, 'col_' + column)()}
 ## friendly to clipboards.
 <div class="dex-pokemon-search-list">
 % for result in c.results:
-${h.pokedex.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_template, result))}<br>
+${dexlib.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_template, result))}<br>
 % endfor
 </div>
 
@@ -149,7 +149,7 @@ ${h.pokedex.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_temp
 ## Grid of icons
 <ul class="inline">
     % for result in c.results:
-    <li>${h.pokedex.pokemon_link(result, h.pokedex.pokemon_form_image(result.default_form, prefix=u'icons'), class_='dex-icon-link')}</li>
+    <li>${dexlib.pokemon_link(result, dexlib.pokemon_form_image(result.default_form, prefix=u'icons'), class_='dex-icon-link')}</li>
     % endfor
 </ul>
 
@@ -157,7 +157,7 @@ ${h.pokedex.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_temp
 ## Grid of most recent sprites
 <ul class="inline">
     % for result in c.results:
-    <li>${h.pokedex.pokemon_link(result, h.pokedex.pokemon_form_image(result.default_form), class_='dex-icon-link')}</li>
+    <li>${dexlib.pokemon_link(result, dexlib.pokemon_form_image(result.default_form), class_='dex-icon-link')}</li>
     % endfor
 </ul>
 
@@ -213,7 +213,7 @@ ${h.form(url.current(), method='GET')}
     ## always sort ??? last
     % for a_field in sorted(c.form.type, key=lambda field: field.label.text):
     <li> <label>
-        ${h.pokedex.type_icon(a_field.label.text)}
+        ${dexlib.type_icon(a_field.label.text)}
         ${a_field() | n}
     </label> </li>
     % endfor
@@ -391,11 +391,11 @@ ${h.end_form()}
 
 <%def name="col_icon()"><col class="dex-col-icon"></%def>
 <%def name="th_icon()"><th></th></%def>
-<%def name="td_icon(pokemon)"><td class="icon">${h.pokedex.pokemon_icon(pokemon, alt=False)}</td></%def>
+<%def name="td_icon(pokemon)"><td class="icon">${dexlib.pokemon_icon(pokemon, alt=False)}</td></%def>
 
 <%def name="col_name()"><col class="dex-col-name"></%def>
 <%def name="th_name()"><th>${_(u"Name")}</th></%def>
-<%def name="td_name(pokemon)"><td class="name">${h.pokedex.pokemon_link(pokemon, pokemon.name)}</td></%def>
+<%def name="td_name(pokemon)"><td class="name">${dexlib.pokemon_link(pokemon, pokemon.name)}</td></%def>
 
 <%def name="col_growth_rate()"><col class="dex-col-max-exp"></%def>
 <%def name="th_growth_rate()"><th>${_(u"EXP to L100")}</th></%def>
@@ -406,7 +406,7 @@ ${h.end_form()}
 <%def name="td_type(pokemon)">\
 <td class="type2">
 % for type in pokemon.types:
-${h.pokedex.type_link(type)}
+${dexlib.type_link(type)}
 % endfor
 </td>\
 </%def>
@@ -433,7 +433,7 @@ ${h.pokedex.type_link(type)}
 
 <%def name="col_gender()"><col class="dex-col-gender"></%def>
 <%def name="th_gender()"><th>${_(u"Gender")}</th></%def>
-<%def name="td_gender(pokemon)"><td>${h.pokedex.chrome_img('gender-rates/%d.png' % pokemon.species.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.species.gender_rate], title=h.pokedex.gender_rate_label[pokemon.species.gender_rate])}</td></%def>
+<%def name="td_gender(pokemon)"><td>${dexlib.chrome_img('gender-rates/%d.png' % pokemon.species.gender_rate, alt=h.pokedex.gender_rate_label[pokemon.species.gender_rate], title=h.pokedex.gender_rate_label[pokemon.species.gender_rate])}</td></%def>
 
 <%def name="col_egg_group()"><col class="dex-col-egg-group"></%def>
 <%def name="th_egg_group()"><th>${_(u"Egg Group")}</th></%def>
@@ -527,7 +527,7 @@ ${pokemon.species.habitat.name}\
 <%def name="th_shape()"><th>${_(u"Shape")}</th></%def>
 <%def name="td_shape(pokemon)"><td class="icon">
 % if pokemon.species.shape:
-${h.pokedex.pokedex_img('shapes/%s.png' % pokemon.species.shape.identifier, title=pokemon.species.shape.awesome_name, alt='')}
+${dexlib.pokedex_img('shapes/%s.png' % pokemon.species.shape.identifier, title=pokemon.species.shape.awesome_name, alt='')}
 % endif
 </td></%def>
 
@@ -553,4 +553,4 @@ ${h.pokedex.pokedex_img('shapes/%s.png' % pokemon.species.shape.identifier, titl
 
 <%def name="col_link()"><col class="dex-col-link"></%def>
 <%def name="th_link()"><th></th></%def>
-<%def name="td_link(pokemon)"><td>${h.pokedex.pokemon_link(pokemon, h.literal("""<img src="{0}" alt="-&gt;">""".format(h.static_uri('spline', 'icons/arrow.png'))))}</td></%def>
+<%def name="td_link(pokemon)"><td>${dexlib.pokemon_link(pokemon, h.literal("""<img src="{0}" alt="-&gt;">""".format(h.static_uri('spline', 'icons/arrow.png'))))}</td></%def>

@@ -42,7 +42,7 @@ ${h.h1(_('Essentials'))}
     </div>
     <p id="dex-page-types">
         % for type in c.warrior.types:
-        ${h.pokedex.type_link(type)}
+        ${dexlib.type_link(type)}
         % endfor
     </p>
 </div>

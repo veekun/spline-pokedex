@@ -9,7 +9,7 @@
 <ul id="breadcrumbs">
     <li><a href="${url('/dex')}">${_(u"Pokédex")}</a></li>
     <li><a href="${url(controller='dex', action='pokemon_list')}">${_(u"Pokémon")}</a></li>
-    <li>${h.pokedex.pokemon_link(c.pokemon, content=c.pokemon.species.name)}</li>
+    <li>${dexlib.pokemon_link(c.pokemon, content=c.pokemon.species.name)}</li>
     <li>${_(u"%s locations") % c.pokemon.species.name}</li>
 </ul>
 </%def>
@@ -47,12 +47,12 @@ ${h.h1(region.name)}
     <tr class="header-row">
         <th></th>
         % for version in c.region_versions[region]:
-        <th>${h.pokedex.version_icons(version)} ${version.name}</th>
+        <th>${dexlib.version_icons(version)} ${version.name}</th>
         % endfor
     </tr>
     <tr class="subheader-row">
         <th colspan="100">
-            ${h.pokedex.chrome_img('encounters/' + c.encounter_method_icons.get(method.identifier, 'unknown.png'))}
+            ${dexlib.chrome_img('encounters/' + c.encounter_method_icons.get(method.identifier, 'unknown.png'))}
             ${method.name}
         </th>
     </tr>
@@ -89,7 +89,7 @@ ${h.h1(region.name)}
             <div class="dex-encounter-conditions">
                 % for condition_value in condition_values:
                 <div class="dex-encounter-icon">
-                    ${h.pokedex.chrome_img('encounters/' \
+                    ${dexlib.chrome_img('encounters/' \
                                             + c.encounter_condition_value_icons.get(condition_value.identifier, 'unknown.png'), \
                                             alt=condition_value.name, \
                                             title=condition_value.name)}

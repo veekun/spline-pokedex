@@ -54,11 +54,11 @@ ${h.h1(_('Nature list'))}
         % else:
         <td class="flavor">
             ${nature.likes_flavor.flavor}:
-            ${h.pokedex.pokedex_img("contest-types/{1}/{0}.png".format(nature.likes_flavor.identifier, c.game_language.identifier), alt=nature.likes_flavor.name)}
+            ${dexlib.pokedex_img("contest-types/{1}/{0}.png".format(nature.likes_flavor.identifier, c.game_language.identifier), alt=nature.likes_flavor.name)}
         </td>
         <td class="flavor">
             ${nature.hates_flavor.flavor}:
-            ${h.pokedex.pokedex_img("contest-types/{1}/{0}.png".format(nature.hates_flavor.identifier, c.game_language.identifier), alt=nature.hates_flavor.name)}
+            ${dexlib.pokedex_img("contest-types/{1}/{0}.png".format(nature.hates_flavor.identifier, c.game_language.identifier), alt=nature.hates_flavor.name)}
         </td>
         % endif
     </tr>

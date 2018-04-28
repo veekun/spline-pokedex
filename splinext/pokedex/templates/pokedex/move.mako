@@ -39,10 +39,10 @@ ${h.h1(_('Essentials'))}
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.move.name}</p>
     <p id="dex-page-types">
-        ${h.pokedex.type_link(c.move.type)}
-        ${h.pokedex.damage_class_icon(c.move.damage_class)}
+        ${dexlib.type_link(c.move.type)}
+        ${dexlib.damage_class_icon(c.move.damage_class)}
     </p>
-    <p>${h.pokedex.generation_icon(c.move.generation)}</p>
+    <p>${dexlib.generation_icon(c.move.generation)}</p>
 </div>
 
 <div class="dex-page-beside-portrait">
@@ -55,7 +55,7 @@ ${h.h1(_('Essentials'))}
     <ul class="dex-type-list">
         % for type_efficacy in sorted(c.move.type.damage_efficacies, key=lambda efficacy: efficacy.target_type.name):
         <li class="dex-damage-dealt-${type_efficacy.damage_factor}">
-            ${h.pokedex.type_link(type_efficacy.target_type)} ${h.pokedex.type_efficacy_label[type_efficacy.damage_factor]}
+            ${dexlib.type_link(type_efficacy.target_type)} ${h.pokedex.type_efficacy_label[type_efficacy.damage_factor]}
         </li>
         % endfor
     </ul>
@@ -93,7 +93,7 @@ ${h.h1(_('Essentials'))}
         </dd>
         <dt>${_(u"PP")}</dt>
         % if c.move.pp is not None:
-        <dd>${"{base}, up to {max} with {ppup}".format(base=c.move.pp, max=c.move.pp * 8/5, ppup=h.pokedex.item_link(c.pp_up)) | n}</dd>
+        <dd>${"{base}, up to {max} with {ppup}".format(base=c.move.pp, max=c.move.pp * 8/5, ppup=dexlib.item_link(c.pp_up)) | n}</dd>
         % else:
         <dd>${_('n/a')}</dd>
         % endif
@@ -140,12 +140,12 @@ ${h.h1(_('Essentials'))}
     <h2>${_("Machines")}</h2>
     <dl>
     % for generation, version_numbers in h.keysort(c.machines, lambda k: k.id):
-        <dt>${h.pokedex.generation_icon(generation)}</dt>
+        <dt>${dexlib.generation_icon(generation)}</dt>
         <dd>
           % for version_group, machine_number in version_numbers:
             % if version_group:
             ## Null version_group means this gen is all the same machine
-            ${h.pokedex.version_icons(*version_group.versions)}
+            ${dexlib.version_icons(*version_group.versions)}
             % endif
             % if not machine_number:
             ${_("Not a TM")}
@@ -261,11 +261,11 @@ ${h.h1(_('History'))}
     %>\
 
     % for change in all_changelog:
-    <dt>Before ${h.pokedex.version_icons(*change.changed_in.versions)}</dt>
+    <dt>Before ${dexlib.version_icons(*change.changed_in.versions)}</dt>
     <dd>
       % if isinstance(change, t.MoveChangelog):
         % if change.type_id is not None:
-        Type is ${h.pokedex.type_link(change.type)}.
+        Type is ${dexlib.type_link(change.type)}.
         % endif
         % if change.power is not None:
         Has ${change.power} power.
@@ -318,10 +318,10 @@ ${h.h1(_('Contests'))}
 
 % if c.move.contest_effect:
 <div class="dex-column">
-    <h2>${_("%s Contest") % h.pokedex.generation_icon(3) | n}</h2>
+    <h2>${_("%s Contest") % dexlib.generation_icon(3) | n}</h2>
     <dl>
         <dt>${_("Type")}</dt>
-        <dd>${h.pokedex.pokedex_img('contest-types/{1}/{0}.png'.format(c.move.contest_type.identifier, c.game_language.identifier), alt=c.move.contest_type.name)}</dd>
+        <dd>${dexlib.pokedex_img('contest-types/{1}/{0}.png'.format(c.move.contest_type.identifier, c.game_language.identifier), alt=c.move.contest_type.name)}</dd>
         <dt>${_("Appeal")}</dt>
         <dd title="${c.move.contest_effect.appeal}">${u'♡' * c.move.contest_effect.appeal}</dd>
         <dt>${_("Jam")}</dt>
@@ -359,10 +359,10 @@ ${h.h1(_('Contests'))}
 
 % if c.move.super_contest_effect:
 <div class="dex-column">
-    <h2>${h.pokedex.generation_icon(4)} Super Contest</h2>
+    <h2>${dexlib.generation_icon(4)} Super Contest</h2>
     <dl>
         <dt>${_("Type")}</dt>
-        <dd>${h.pokedex.pokedex_img('contest-types/{1}/{0}.png'.format(c.move.contest_type.identifier, c.game_language.identifier), alt=c.move.contest_type.name)}</dd>
+        <dd>${dexlib.pokedex_img('contest-types/{1}/{0}.png'.format(c.move.contest_type.identifier, c.game_language.identifier), alt=c.move.contest_type.name)}</dd>
         <dt>${_("Appeal")}</dt>
         <dd title="${c.move.super_contest_effect.appeal}">${u'♡' * c.move.super_contest_effect.appeal}</dd>
         <dt>${_("Flavor text")}</dt>
@@ -488,11 +488,11 @@ ${h.h1(_(u'Pokémon', context='plural'))}
 ${h.h1(_('External Links'), id='links')}
 <ul class="classic-list">
 % if c.move.generation.id <= 1:
-<li>${h.pokedex.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/attacks/${c.move.name[0].lower()}/${c.move.name.lower().replace(' ', '_')}.htm">${_("Azure Heights")}</a></li>
+<li>${dexlib.generation_icon(1)} <a href="http://www.math.miami.edu/~jam/azure/attacks/${c.move.name[0].lower()}/${c.move.name.lower().replace(' ', '_')}.htm">${_("Azure Heights")}</a></li>
 % endif
 <li><a href="http://bulbapedia.bulbagarden.net/wiki/${c.move.name.replace(' ', '_')}_%28move%29">${_("Bulbapedia")}</a></li>
 % if c.move.generation_id <= 4:
-<li>${h.pokedex.generation_icon(4)} <a href="http://www.legendarypokemon.net/attacks/${c.move.name.replace(' ', '+')}/">${_(u"Legendary Pokémon")}</a></li>
+<li>${dexlib.generation_icon(4)} <a href="http://www.legendarypokemon.net/attacks/${c.move.name.replace(' ', '+')}/">${_(u"Legendary Pokémon")}</a></li>
 % endif
 % if c.move.generation_id <= 5:
 ## Psypoke's X/Y move ids don't match up with ours.

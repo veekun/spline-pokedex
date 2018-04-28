@@ -49,8 +49,8 @@ ${h.form(url.current(), method=u'GET')}
     <tr class="header-row">
         <th>
             % if c.results:
-            ${h.pokedex.pokemon_link(c.pokemon, content=h.literal(u"{0}<br>{1}").format( \
-                h.pokedex.pokemon_form_image(c.pokemon.default_form, prefix=u'icons'), \
+            ${dexlib.pokemon_link(c.pokemon, content=h.literal(u"{0}<br>{1}").format( \
+                dexlib.pokemon_form_image(c.pokemon.default_form, prefix=u'icons'), \
                 c.pokemon.name))}
             % endif
         </th>
@@ -155,7 +155,7 @@ ${h.form(url.current(), method=u'GET')}
 <p>
     This ${c.form.pokemon.data.name}'s
     <a href="${url(controller='dex', action='moves', name=c.hidden_power.name.lower())}">${c.hidden_power.name}</a>
-    inflicts ${h.pokedex.type_link(c.hidden_power_type)} damage,
+    inflicts ${dexlib.type_link(c.hidden_power_type)} damage,
     with ${c.hidden_power_power} power.
 </p>
 % endif

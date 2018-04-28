@@ -116,7 +116,7 @@ ${h.form(url.current(), method='GET')}
                 % for a_field in c.form.damage_class:
                 <li> <label>
                     ${a_field() | n}
-                    ${h.pokedex.pokedex_img("damage-classes/{0}.png".format(a_field.data), alt=u'')}
+                    ${dexlib.pokedex_img("damage-classes/{0}.png".format(a_field.data), alt=u'')}
                     ${a_field.label}
                 </label> </li>
                 % endfor
@@ -131,7 +131,7 @@ ${h.form(url.current(), method='GET')}
                 % for a_field in c.form.introduced_in:
                 <li> <label>
                     ${a_field() | n}
-                    ${h.pokedex.chrome_img("versions/generation-{0}.png".format(a_field.data), alt=u'')}
+                    ${dexlib.chrome_img("versions/generation-{0}.png".format(a_field.data), alt=u'')}
                     ${a_field.label}
                 </label> </li>
                 % endfor
@@ -196,7 +196,7 @@ ${h.form(url.current(), method='GET')}
     ## always sort ??? last
     % for a_field in sorted(c.form.type, key=lambda field: field.label.text):
     <li> <label>
-        ${h.pokedex.type_icon(a_field.label.text)}
+        ${dexlib.type_icon(a_field.label.text)}
         ${a_field() | n}
     </label> </li>
     % endfor
@@ -327,11 +327,11 @@ ${h.end_form()}
 
 <%def name="col_type()"><col class="dex-col-type"></%def>
 <%def name="th_type()"><th>${_("Type")}</th></%def>
-<%def name="td_type(move)"><td>${h.pokedex.type_link(move.type)}</td></%def>
+<%def name="td_type(move)"><td>${dexlib.type_link(move.type)}</td></%def>
 
 <%def name="col_class()"><col class="dex-col-type"></%def>
 <%def name="th_class()"><th>${_("Class")}</th></%def>
-<%def name="td_class(move)"><td>${h.pokedex.damage_class_icon(move.damage_class)}</td></%def>
+<%def name="td_class(move)"><td>${dexlib.damage_class_icon(move.damage_class)}</td></%def>
 
 <%def name="col_pp()"><col class="dex-col-stat"></%def>
 <%def name="th_pp()"><th>${_("PP")}</th></%def>

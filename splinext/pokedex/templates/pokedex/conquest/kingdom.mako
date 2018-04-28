@@ -32,7 +32,7 @@ ${h.h1(_('Essentials'))}
 ## Portrait block
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.kingdom.name}</p>
-    <p id="dex-page-types">${h.pokedex.type_link(c.kingdom.type)}</p>
+    <p id="dex-page-types">${dexlib.type_link(c.kingdom.type)}</p>
 </div>
 
 <div class="dex-page-beside-portrait">
