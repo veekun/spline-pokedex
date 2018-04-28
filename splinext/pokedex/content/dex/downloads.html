@@ -1,4 +1,5 @@
 <%inherit file="/base.mako" />
+<%namespace name="dexlib" file="/pokedex/lib.mako" />
 <%! from splinext.pokedex import i18n %>\
 
 <%def name="title()">${_(u"Downloads - Pokédex")}</%def>
@@ -91,62 +92,62 @@ ${h.h2(_('Others'))}
 ${h.h1(_('Main sprite montages'))}
 <p>${_(u'Every Pokémon combined into a single large image by the <a href="http://www.imagemagick.org/script/montage.php"><code>montage</code></a> program.') | n}</p>
 <dl>
-    <dt>${h.pokedex.version_icons(u'Red (jp.)', u'Green')}</dt>
+    <dt>${dexlib.version_icons(u'Red (jp.)', u'Green')}</dt>
     <dd>
         ${dl_link('downloads/red-green.png', _(u"Game Boy"))};
         ${dl_link('downloads/red-green-sgb.png', _(u"Super Game Boy"))}
     </dd>
-    <dt>${h.pokedex.version_icons(u'Red', u'Blue')}</dt>
+    <dt>${dexlib.version_icons(u'Red', u'Blue')}</dt>
     <dd>
         ${dl_link('downloads/red-blue.png', _(u"Game Boy"))};
         ${dl_link('downloads/red-blue-sgb.png', _(u"Super Game Boy"))}
     </li>
-    <dt>${h.pokedex.version_icons(u'Yellow')}</dt>
+    <dt>${dexlib.version_icons(u'Yellow')}</dt>
     <dd>
         ${dl_link('downloads/yellow.png', _(u"Game Boy"))};
         ${dl_link('downloads/yellow-sgb.png', _(u"Super Game Boy"))};
         ${dl_link('downloads/yellow-gbc.png', _(u"Game Boy Color"))}
     </dd>
-    <dt>${h.pokedex.generation_icon(1)} back</dt>
+    <dt>${dexlib.generation_icon(1)} back</dt>
     <dd>
         ${dl_link('downloads/generation-1-back.png', _(u"Game Boy"))};
         <%self:dl_link path="downloads/red-green-blue-back-sgb.png">
-            ${h.pokedex.version_icons(u'red-jp', u'green', u'Red', u'Blue')}
+            ${dexlib.version_icons(u'red-jp', u'green', u'Red', u'Blue')}
             ${_(u"Super Game Boy")}
         </%self:dl_link>;
         <%self:dl_link path="downloads/yellow-back-sgb.png">
-            ${h.pokedex.version_icons(u'Yellow')}
+            ${dexlib.version_icons(u'Yellow')}
             ${_(u"Super Game Boy")}
         </%self:dl_link>;
         <%self:dl_link path="downloads/yellow-back-gbc.png">
-            ${h.pokedex.version_icons(u'Yellow')}
+            ${dexlib.version_icons(u'Yellow')}
             ${_(u"Game Boy Color")}
         </%self:dl_link>
     </dd>
 </dl>
 <hr>
 <dl>
-    <dt>${h.pokedex.version_icons(u'Gold')}</dt>
+    <dt>${dexlib.version_icons(u'Gold')}</dt>
     <dd>
         ${dl_link('downloads/gold.png', _(u"normal"))};
         ${dl_link('downloads/gold-shiny.png', _(u"shiny"))}
     </dd>
-    <dt>${h.pokedex.version_icons(u'Silver')}</dt>
+    <dt>${dexlib.version_icons(u'Silver')}</dt>
     <dd>
         ${dl_link('downloads/silver.png', _(u"normal"))};
         ${dl_link('downloads/silver-shiny.png', _(u"shiny"))}
     </dd>
-    <dt>${h.pokedex.version_icons(u'Crystal')}</dt>
+    <dt>${dexlib.version_icons(u'Crystal')}</dt>
     <dd>
         ${dl_link('downloads/crystal.png', _(u"normal"))};
         ${dl_link('downloads/crystal-shiny.png', _(u"shiny"))}
     </dd>
-    <dt>${_("%s back") % h.pokedex.version_icons(u'Gold', u'Silver') | n}</dt>
+    <dt>${_("%s back") % dexlib.version_icons(u'Gold', u'Silver') | n}</dt>
     <dd>
         ${dl_link('downloads/gold-silver-back.png', _(u"normal"))};
         ${dl_link('downloads/gold-silver-back-shiny.png', _(u"shiny"))}
     </dd>
-    <dt>${_("%s back") % h.pokedex.version_icons(u'Crystal') | n}</dt>
+    <dt>${_("%s back") % dexlib.version_icons(u'Crystal') | n}</dt>
     <dd>
         ${dl_link('downloads/crystal-back.png', _(u"normal"))};
         ${dl_link('downloads/crystal-back-shiny.png', _(u"shiny"))}
@@ -154,123 +155,123 @@ ${h.h1(_('Main sprite montages'))}
 </dl>
 <hr>
 <dl>
-    <dt>${h.pokedex.generation_icon(3)}</dt>
+    <dt>${dexlib.generation_icon(3)}</dt>
     <dd>
         ${dl_link('downloads/generation-3.png', _(u"normal"))};
         ${dl_link('downloads/generation-3-shiny.png', _(u"shiny"))}
     </dd>
-    <dt>${h.pokedex.version_icons(u'Emerald')}</dt>
+    <dt>${dexlib.version_icons(u'Emerald')}</dt>
     <dd>
         ${dl_link('downloads/emerald-frame2.png', _(u"frame 2"))};
         ${dl_link('downloads/emerald-frame2-shiny.png', _(u"frame 2 shiny"))}
     </dd>
-    <dt>${h.pokedex.version_icons(u'FireRed', u'LeafGreen')}</dt>
+    <dt>${dexlib.version_icons(u'FireRed', u'LeafGreen')}</dt>
     <dd>
         <%self:dl_link path="downloads/firered-leafgreen.png">
-            ${h.pokedex.generation_icon(1)} normal
+            ${dexlib.generation_icon(1)} normal
         </%self:dl_link>;
         <%self:dl_link path="downloads/firered-leafgreen-shiny.png">
-            ${h.pokedex.generation_icon(1)} shiny
+            ${dexlib.generation_icon(1)} shiny
         </%self:dl_link>
     </dd>
-    <dt>${_("%s back") % h.pokedex.generation_icon(3) | n}</dt>
+    <dt>${_("%s back") % dexlib.generation_icon(3) | n}</dt>
     <dd>
         ${dl_link('downloads/generation-3-back.png', _(u"normal"))};
         ${dl_link('downloads/generation-3-back-shiny.png', _(u"shiny"))}
     </dd>
-    <dt>${_("%s back") % h.pokedex.version_icons(u'FireRed', u'LeafGreen') | n}</dt>
+    <dt>${_("%s back") % dexlib.version_icons(u'FireRed', u'LeafGreen') | n}</dt>
     <dd>
         <%self:dl_link path="downloads/firered-leafgreen-back.png">
-            ${h.pokedex.generation_icon(1)} normal
+            ${dexlib.generation_icon(1)} normal
         </%self:dl_link>;
         <%self:dl_link path="downloads/firered-leafgreen-back-shiny.png">
-            ${h.pokedex.generation_icon(1)} shiny
+            ${dexlib.generation_icon(1)} shiny
         </%self:dl_link>
     </dd>
 </dl>
 <hr>
 <dl>
-    <dt>${h.pokedex.version_icons(u'Diamond', u'Pearl')}</dt>
+    <dt>${dexlib.version_icons(u'Diamond', u'Pearl')}</dt>
     <dd>
         ${dl_link('downloads/diamond-pearl.png', _(u"normal"))};
         ${dl_link('downloads/diamond-pearl-shiny.png', _(u"shiny"))};
         ${dl_link('downloads/diamond-pearl-frame2.png', _(u"frame 2"))};
         ${dl_link('downloads/diamond-pearl-shiny-frame2.png', _(u"shiny frame 2"))}
     </dd>
-    <dt>${h.pokedex.version_icons(u'Platinum')}</dt>
+    <dt>${dexlib.version_icons(u'Platinum')}</dt>
     <dd>
         ${dl_link('downloads/platinum.png', _(u"normal"))};
         ${dl_link('downloads/platinum-shiny.png', _(u"shiny"))};
         ${dl_link('downloads/platinum-frame2.png', _(u"frame 2"))};
         ${dl_link('downloads/platinum-shiny-frame2.png', _(u"shiny frame 2"))}
     </dd>
-    <dt>${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')}</dt>
+    <dt>${dexlib.version_icons(u'HeartGold', u'SoulSilver')}</dt>
     <dd>
         ${dl_link('downloads/heartgold-soulsilver.png', _(u"normal"))};
         ${dl_link('downloads/heartgold-soulsilver-shiny.png', _(u"shiny"))};
         ${dl_link('downloads/heartgold-soulsilver-frame2.png', _(u"frame 2"))};
         ${dl_link('downloads/heartgold-soulsilver-shiny-frame2.png', _(u"shiny frame 2"))}
     </dd>
-    <dt>${_("%s back") % h.pokedex.version_icons(u'Diamond', u'Pearl') | n}</dt>
+    <dt>${_("%s back") % dexlib.version_icons(u'Diamond', u'Pearl') | n}</dt>
     <dd>
         ${dl_link('downloads/diamond-pearl-back.png', _(u"normal"))};
         ${dl_link('downloads/diamond-pearl-back-shiny.png', _(u"shiny"))}
     </dd>
-    <dt>${_("%s back") % h.pokedex.version_icons(u'Platinum') | n}</dt>
+    <dt>${_("%s back") % dexlib.version_icons(u'Platinum') | n}</dt>
     <dd>
         ${dl_link('downloads/platinum-back.png', _(u"normal"))};
         ${dl_link('downloads/platinum-back-shiny.png', _(u"shiny"))};
         ${dl_link('downloads/platinum-back-frame2.png', _(u"frame 2"))};
         ${dl_link('downloads/platinum-back-shiny-frame2.png', _(u"shiny frame 2"))}
     </dd>
-    <dt>${_("%s back") % h.pokedex.version_icons(u'HeartGold', u'SoulSilver') | n}</dt>
+    <dt>${_("%s back") % dexlib.version_icons(u'HeartGold', u'SoulSilver') | n}</dt>
     <dd>
         ${dl_link('downloads/heartgold-soulsilver-back.png', _(u"normal"))};
         ${dl_link('downloads/heartgold-soulsilver-back-shiny.png', _(u"shiny"))};
         ${dl_link('downloads/heartgold-soulsilver-back-frame2.png', _(u"frame 2"))};
         ${dl_link('downloads/heartgold-soulsilver-back-shiny-frame2.png', _(u"shiny frame 2"))}
     </dd>
-    <dt>${_(u"%s ♂ vs ♀") % h.pokedex.generation_icon(4) | n}</dt>
+    <dt>${_(u"%s ♂ vs ♀") % dexlib.generation_icon(4) | n}</dt>
     <dd>
         <%self:dl_link path="downloads/diamond-pearl-female-diff.png">
-            ${_("%s front") % h.pokedex.version_icons(u'Diamond', u'Pearl') | n}
+            ${_("%s front") % dexlib.version_icons(u'Diamond', u'Pearl') | n}
         </%self:dl_link>;
         <%self:dl_link path="downloads/platinum-female-diff.png">
-            ${_("%s front") % h.pokedex.version_icons(u'Platinum') | n}
+            ${_("%s front") % dexlib.version_icons(u'Platinum') | n}
         </%self:dl_link>;
         <%self:dl_link path="downloads/heartgold-soulsilver-female-diff.png">
-            ${_("%s front") % h.pokedex.version_icons(u'HeartGold', u'SoulSilver') | n}
+            ${_("%s front") % dexlib.version_icons(u'HeartGold', u'SoulSilver') | n}
         </%self:dl_link>;
         <%self:dl_link path="downloads/diamond-pearl-back-female-diff.png">
-            ${_("%s back") % h.pokedex.version_icons(u'Diamond', u'Pearl') | n}
+            ${_("%s back") % dexlib.version_icons(u'Diamond', u'Pearl') | n}
         </%self:dl_link>;
         <%self:dl_link path="downloads/platinum-back-female-diff.png">
-            ${_("%s back") % h.pokedex.version_icons(u'Platinum') | n}
+            ${_("%s back") % dexlib.version_icons(u'Platinum') | n}
         </%self:dl_link>;
         <%self:dl_link path="downloads/heartgold-soulsilver-back-female-diff.png">
-            ${_("%s back") % h.pokedex.version_icons(u'HeartGold', u'SoulSilver') | n}
+            ${_("%s back") % dexlib.version_icons(u'HeartGold', u'SoulSilver') | n}
         </%self:dl_link>
     </dd>
 </dl>
 <hr>
 <dl>
-    <dt>${h.pokedex.version_icons(u'Black', u'White')}</dt>
+    <dt>${dexlib.version_icons(u'Black', u'White')}</dt>
     <dd>
         ${dl_link('downloads/black-white.png', _(u"normal"))};
         ${dl_link('downloads/black-white-shiny.png', _(u"shiny"))};
     </dd>
-    <dt>${_("%s back") % h.pokedex.version_icons(u'Black', u'White') | n}</dt>
+    <dt>${_("%s back") % dexlib.version_icons(u'Black', u'White') | n}</dt>
     <dd>
         ${dl_link('downloads/black-white-back.png', _(u"normal"))};
         ${dl_link('downloads/black-white-back-shiny.png', _(u"shiny"))};
     </dd>
-    <dt>${_(u"%s ♂ vs ♀") % h.pokedex.generation_icon(5) | n}</dt>
+    <dt>${_(u"%s ♂ vs ♀") % dexlib.generation_icon(5) | n}</dt>
     <dd>
         <%self:dl_link path="downloads/black-white-female-diff.png">
-            ${_("%s front") % h.pokedex.version_icons(u'Black', u'White') | n}
+            ${_("%s front") % dexlib.version_icons(u'Black', u'White') | n}
         </%self:dl_link>;
         <%self:dl_link path="downloads/black-white-back-female-diff.png">
-            ${_("%s back") % h.pokedex.version_icons(u'Black', u'White') | n}
+            ${_("%s back") % dexlib.version_icons(u'Black', u'White') | n}
         </%self:dl_link>
     </dd>
 </dl>
@@ -278,7 +279,7 @@ ${h.h1(_('Main sprite montages'))}
 ${h.h1('Other montages')}
 <ul class="classic-list">
     <li>
-        ${h.pokedex.version_icons(u'HeartGold', u'SoulSilver')} overworld:
+        ${dexlib.version_icons(u'HeartGold', u'SoulSilver')} overworld:
         ${dl_link('downloads/overworld-down.png', _(u"facing forwards"))};
         ${dl_link('downloads/overworld-right.png', _(u"facing right"))};
         ${dl_link('downloads/overworld-up.png', _(u"facing backwards"))};
