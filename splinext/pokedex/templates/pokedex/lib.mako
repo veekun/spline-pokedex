@@ -1,5 +1,4 @@
 <%! from splinext.pokedex import i18n, db %>\
-<%! import os, warnings %>\
 
 #### Images and links
 
@@ -64,24 +63,7 @@
 
 
 <%def name="pokemon_has_media(pokemon_form, prefix, ext, use_form=True)"><%
-    """Determine whether a file exists in the specified directory for the
-    specified Pokémon form.
-    """
-    # TODO share this somewhere
-    media_dir = config.get('spline-pokedex.media_directory', None)
-    if not media_dir:
-        warnings.warn(
-            "No media_directory found; "
-            "you may want to clone pokedex-media.git")
-        return False
-
-    if use_form:
-        kwargs = dict(form=pokemon_form)
-    else:
-        kwargs = dict()
-
-    return os.path.exists(os.path.join(media_dir,
-        h.pokedex.pokemon_media_path(pokemon_form.species, prefix, ext, **kwargs)))
+    return h.pokedex.pokemon_has_media(pokemon_form, prefix, ext, config, use_form=use_form)
 %></%def>
 
 <%def name="species_image(pokemon_species, prefix='main-sprites/black-white', **attr)"><%

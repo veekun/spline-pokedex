@@ -10,7 +10,9 @@ import math
 import re
 from itertools import groupby, chain, repeat
 from operator import attrgetter
+import os
 import os.path
+import warnings
 
 from pylons import url
 
@@ -180,6 +182,26 @@ def filename_from_name(name):
     name = re.sub(u'[ _]+', u'-', name)
     name = re.sub(u'[\'.()]', u'', name)
     return name
+
+def pokemon_has_media(pokemon_form, prefix, ext, config, use_form=True):
+    """Determine whether a file exists in the specified directory for the
+    specified Pokémon form.
+    """
+    # TODO share this somewhere
+    media_dir = config.get('spline-pokedex.media_directory', None)
+    if not media_dir:
+        warnings.warn(
+            "No media_directory found; "
+            "you may want to clone pokedex-media.git")
+        return False
+
+    if use_form:
+        kwargs = dict(form=pokemon_form)
+    else:
+        kwargs = dict()
+
+    return os.path.exists(os.path.join(media_dir,
+        pokemon_media_path(pokemon_form.species, prefix, ext, **kwargs)))
 
 def pokemon_media_path(pokemon_species, prefix, ext, form=None):
     """Returns a path to a Pokémon media file.

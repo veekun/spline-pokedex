@@ -1211,7 +1211,7 @@ class PokedexController(PokedexBaseController):
             # n.b. calling dict.setdefault always evaluates the default
             if directory not in c.sprites:
                 c.sprites[directory] = pokedex_helpers.pokemon_has_media(
-                    c.form, directory, extension)
+                    c.form, directory, extension, config)
             return c.sprites[directory]
         c.sprite_exists = sprite_exists
 
