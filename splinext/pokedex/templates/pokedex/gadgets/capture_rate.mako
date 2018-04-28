@@ -51,7 +51,7 @@ ${h.end_form()}
 <tr class="${'inactive' if not is_active else ''}">
     % if i == 0:
     <th class="item" rowspan="${len(c.results[ball])}">
-        ${h.pokedex.item_link(c.pokeballs[ball])}
+        ${dexlib.item_link(c.pokeballs[ball])}
     </th>
     % endif
 
@@ -131,7 +131,7 @@ ${h.end_form()}
 % if c.results:
 <h1>${_(u"Ball Success Rates")}</h1>
 <p>
-    ${_(u"{pokemon}'s capture rate: {rate}/255 or about {precent:.01f}%.").format(pokemon=h.pokedex.pokemon_link(c.pokemon), rate=c.pokemon.species.capture_rate, precent=1.0 * c.pokemon.species.capture_rate / 255 * 100) | n}.
+    ${_(u"{pokemon}'s capture rate: {rate}/255 or about {precent:.01f}%.").format(pokemon=dexlib.pokemon_link(c.pokemon), rate=c.pokemon.species.capture_rate, precent=1.0 * c.pokemon.species.capture_rate / 255 * 100) | n}.
 </p>
 
 <p>${_(u"Disclaimer: This is all approximate!  The game might still hate you more than these numbers indicate.")}</p>

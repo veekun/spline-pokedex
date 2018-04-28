@@ -27,11 +27,11 @@ ${h.h1(_('Essentials'))}
             sprite_path = 'items'
     %>\
     <div id="dex-item-portrait-sprite">
-        ${h.pokedex.pokedex_img(u"{0}/{1}.png".format(sprite_path, h.pokedex.item_filename(c.item)))}
+        ${dexlib.pokedex_img(u"{0}/{1}.png".format(sprite_path, h.pokedex.item_filename(c.item)))}
     </div>
     <p id="dex-page-types">
         <a href="${url(controller='dex', action='item_pockets', pocket=c.item.pocket.identifier)}">
-            ${h.pokedex.pokedex_img(u"item-pockets/{0}.png".format(c.item.pocket.identifier))}
+            ${dexlib.pokedex_img(u"item-pockets/{0}.png".format(c.item.pocket.identifier))}
             ${c.item.pocket.name}
         </a> ${_("pocket")}
     </p>
@@ -88,8 +88,8 @@ ${h.h1(_('Moves'))}
     % for generation, machines in h.pokedex.group_by_generation(c.item.machines):
         % for versions, move in h.pokedex.collapse_versions(machines, key=lambda x: x.move):
         <tr>
-            <td>${h.pokedex.generation_icon(generation)}</td>
-            <td>${h.pokedex.version_icons(*versions)}</td>
+            <td>${dexlib.generation_icon(generation)}</td>
+            <td>${dexlib.version_icons(*versions)}</td>
             ${dexlib.move_table_row(move)}
         </tr>
         % endfor
@@ -106,7 +106,7 @@ ${h.h1(_('Moves'))}
     % endif
     % if c.item.berry:
     <dt><a href="${url(controller='dex', action='moves', name='natural gift')}">${_("Natural Gift")}</a></dt>
-    <dd>${_("Inflicts regular {type} damage with {power} power").format(type=h.pokedex.type_link(c.item.berry.natural_gift_type), power=c.item.berry.natural_gift_power) | n}.</dd>
+    <dd>${_("Inflicts regular {type} damage with {power} power").format(type=dexlib.type_link(c.item.berry.natural_gift_type), power=c.item.berry.natural_gift_power) | n}.</dd>
     % endif
 </dl>
 % endif
@@ -139,9 +139,9 @@ ${h.h1(_('Berry tag'))}
             <% growth_time = c.item.berry.growth_time %>
             ${_("%s hours per stage", plural="%s hour per stage", n=growth_time) % growth_time}<br>
             ${_("%s hour total", plural="%s hours total", n=growth_time * 4) % (growth_time * 4)}<br>
-            ${h.pokedex.item_link(c.growth_mulch)}:
+            ${dexlib.item_link(c.growth_mulch)}:
                 ${_("%s/%s hours", plural="%s/%s hours", n=growth_time * 3) % (growth_time * 3 / 4, growth_time * 3)}<br>
-            ${h.pokedex.item_link(c.damp_mulch)}:
+            ${dexlib.item_link(c.damp_mulch)}:
                 ${_("%s/%s hours", plural="%s/%s hours", n=growth_time * 5) % (growth_time * 5 / 4, growth_time * 5)}
         </dd>
         <dt>${_("Soil drying rate")}</dt>
@@ -156,7 +156,7 @@ ${h.h1(_('Berry tag'))}
         <dd>
             % if berry_flavor.flavor:
             ${berry_flavor.flavor}
-            ${_("(raises %s)") % h.pokedex.pokedex_img("contest-types/{1}/{0}.png".format(berry_flavor.contest_type.identifier, c.game_language.identifier), alt=(berry_flavor.contest_type.name)) | n}
+            ${_("(raises %s)") % dexlib.pokedex_img("contest-types/{1}/{0}.png".format(berry_flavor.contest_type.identifier, c.game_language.identifier), alt=(berry_flavor.contest_type.name)) | n}
             % else:
             ${_(u"—")}
             % endif
@@ -198,12 +198,12 @@ ${h.h1(_(u'Held by wild Pokémon'), id='pokemon')}
     % for column_group in c.held_version_columns:
       ## Only print a generation icon if the whole gen is one column
       % if len(column_group) == 1:
-        <th>${h.pokedex.generation_icon(column_group[0][0].generation)}</th>
+        <th>${dexlib.generation_icon(column_group[0][0].generation)}</th>
       % else:
         % for column in column_group:
         <th>
           % for key, version_group in groupby(column, lambda version: version.version_group):
-          ${h.pokedex.version_icons(*version_group)}<br />
+          ${dexlib.version_icons(*version_group)}<br />
           % endfor
         </th>
         % endfor

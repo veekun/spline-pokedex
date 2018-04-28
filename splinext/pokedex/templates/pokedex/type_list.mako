@@ -12,7 +12,7 @@
 </%def>
 
 % if c.secondary_type:
-<p>${_(u"Showing part-%s types") % h.pokedex.type_link(c.secondary_type) | n}.</p>
+<p>${_(u"Showing part-%s types") % dexlib.type_link(c.secondary_type) | n}.</p>
 % else:
 <p>${_(u"If you like, show a secondary Pokémon type:")}</p>
 % endif
@@ -22,7 +22,7 @@
 % endif
 % for type in c.types:
     % if type != c.secondary_type:
-    <li><a href="${url.current(secondary=type.name.lower())}">${h.pokedex.type_icon(type)}</a></li>
+    <li><a href="${url.current(secondary=type.name.lower())}">${dexlib.type_icon(type)}</a></li>
     % endif
 % endfor
 </ul>
@@ -57,9 +57,9 @@ ${h.h1('Type chart')}
         <th></th>
         % for type in c.types:
         <th>
-            ${h.pokedex.type_link(type)}
+            ${dexlib.type_link(type)}
             % if c.secondary_type:
-            <br>${h.pokedex.type_link(c.secondary_type)}
+            <br>${dexlib.type_link(c.secondary_type)}
             % endif
         </th>
         % endfor
@@ -67,7 +67,7 @@ ${h.h1('Type chart')}
     </tr>
     % for type in c.types:
     <tr class="subheader-row">
-        <th>${h.pokedex.type_link(type)}</th>
+        <th>${dexlib.type_link(type)}</th>
         % for efficacy in sorted(type.damage_efficacies, key=lambda _: _.target_type.name):
         <% damage_factor = efficacy.damage_factor * c.secondary_efficacy[type] / 100 %>\
         <td class="dex-damage-dealt-${damage_factor}">

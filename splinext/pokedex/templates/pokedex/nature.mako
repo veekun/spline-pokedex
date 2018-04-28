@@ -57,9 +57,9 @@ ${h.h1(_('Essentials'))}
         <dt>${_(u"Taste preference")}</dt>
         <dd>
             ${_(u"Likes %s; good for") % c.nature.likes_flavor.flavor}
-            ${h.pokedex.pokedex_img("contest-types/{1}/{0}.png".format(c.nature.likes_flavor.identifier, c.game_language.identifier), alt=c.nature.likes_flavor.name)}<br>
+            ${dexlib.pokedex_img("contest-types/{1}/{0}.png".format(c.nature.likes_flavor.identifier, c.game_language.identifier), alt=c.nature.likes_flavor.name)}<br>
             ${_(u"Hates %s; bad for") % c.nature.hates_flavor.flavor}
-            ${h.pokedex.pokedex_img("contest-types/{1}/{0}.png".format(c.nature.hates_flavor.identifier, c.game_language.identifier), alt=c.nature.hates_flavor.name)}
+            ${dexlib.pokedex_img("contest-types/{1}/{0}.png".format(c.nature.hates_flavor.identifier, c.game_language.identifier), alt=c.nature.hates_flavor.name)}
         </dd>
     </dl>
     % endif
@@ -69,7 +69,7 @@ ${h.h1(_('Essentials'))}
 ${h.h1(_('Not-so-essentials'))}
 <div class="dex-column-container">
 <div class="dex-column">
-    <h2>${h.pokedex.version_icons('Emerald')} ${_(u"Battle Style Preferences")}</h2>
+    <h2>${dexlib.version_icons('Emerald')} ${_(u"Battle Style Preferences")}</h2>
     <p>${_(u"These only affect the Battle Palace and Verdanturf Battle Tent.")}</p>
 
     <dl>
@@ -89,7 +89,7 @@ ${h.h1(_('Not-so-essentials'))}
 </div>
 
 <div class="dex-column">
-    <h2>${h.pokedex.version_icons('HeartGold', 'SoulSilver')} ${_(u"Pokéathlon Stats")}</h2>
+    <h2>${dexlib.version_icons('HeartGold', 'SoulSilver')} ${_(u"Pokéathlon Stats")}</h2>
     <ul class="classic-list">
         % for effect in c.nature.pokeathlon_effects:
         <li>${_(u"Up to {change} {stat}").format(change=effect.max_change, stat=effect.pokeathlon_stat.name)}</li>

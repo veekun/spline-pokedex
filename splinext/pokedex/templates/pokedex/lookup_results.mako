@@ -26,16 +26,16 @@
     ${_(u"The %s") % c.table_labels[object.__class__]}
     <a href="${h.pokedex.make_thingy_url(object, subpage=c.subpage)}">
     % if object.__tablename__ == 'pokemon_species':
-    ${h.pokedex.species_image(object, prefix='icons')}
+    ${dexlib.species_image(object, prefix='icons')}
     % elif object.__tablename__ == 'pokemon_forms':
-    ${h.pokedex.pokemon_form_image(object, prefix='icons')}
+    ${dexlib.pokemon_form_image(object, prefix='icons')}
     % elif object.__tablename__ == 'items':
-    ${h.pokedex.pokedex_img("items/%s.png" % h.pokedex.item_filename(object))}
+    ${dexlib.pokedex_img("items/%s.png" % h.pokedex.item_filename(object))}
     % elif object.__tablename__ == 'types':
-    ${h.pokedex.type_icon(object)}
+    ${dexlib.type_icon(object)}
     % elif object.__tablename__ == 'moves':
-    ${h.pokedex.type_icon(object.type)}
-    ${h.pokedex.damage_class_icon(object.damage_class)}
+    ${dexlib.type_icon(object.type)}
+    ${dexlib.damage_class_icon(object.damage_class)}
     % endif
 \
     % if object.__tablename__ == 'pokemon_forms':

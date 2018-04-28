@@ -19,7 +19,7 @@
     % for pocket in c.item_pockets:
     <li>
         <a href="${url(controller='dex', action='item_pockets', pocket=pocket.identifier)}">
-            ${h.pokedex.pokedex_img(u"item-pockets/{0}.png".format(pocket.identifier))}
+            ${dexlib.pokedex_img(u"item-pockets/{0}.png".format(pocket.identifier))}
             ${pocket.name}
         </a>
     </li>

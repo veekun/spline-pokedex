@@ -12,7 +12,7 @@
         <span class="sprite-icon sprite-icon-${c.next_pokemon.id}"></span>
         <img src="${h.static_uri('spline', 'icons/control.png')}" alt="»">
     </a>
-    ${h.pokedex.species_image(c.pokemon, prefix='icons')}
+    ${dexlib.species_image(c.pokemon, prefix='icons')}
     <br />${c.pokemon.conquest_order}: ${c.pokemon.name}
 
     <ul class="inline-menu">
@@ -50,7 +50,7 @@
 
 <%def name="move_table_row(move)">
 <td><a href="${url(controller='dex_conquest', action='moves', name=move.name.lower())}">${move.name}</a></td>
-<td class="type">${h.pokedex.type_link(move.type)}</td>
+<td class="type">${dexlib.type_link(move.type)}</td>
 <td class="icon">${range_image(move)}</td>
 
 % if move.conquest_data.power:
@@ -122,7 +122,7 @@
 <td><a href="${url(controller='dex_conquest', action='pokemon', name=pokemon.name.lower())}">${pokemon.name}</a></td>
 <td class="type2">
     % for type in pokemon.default_pokemon.types:
-    ${h.pokedex.type_link(type)}
+    ${dexlib.type_link(type)}
     % endfor
 </td>
 <td class="ability">
@@ -149,7 +149,7 @@ else:
     title = move.conquest_data.range.name
 %>
 
-${h.pokedex.pokedex_img('chrome/conquest-move-ranges/{0}.png'.format(identifier),
+${dexlib.pokedex_img('chrome/conquest-move-ranges/{0}.png'.format(identifier),
     alt=title, title=title)}
 </%def>
 
@@ -180,7 +180,7 @@ if dir == 'small-icons':
 elif dir == 'big-icons':
     attr['class'] = 'warrior-icon-big'
 %>
-${h.pokedex.pokedex_img('warriors/{0}/{1}.png'.format(dir, identifier), **attr)}
+${dexlib.pokedex_img('warriors/{0}/{1}.png'.format(dir, identifier), **attr)}
 </%def>
 
 <%def name="warrior_table_columns()">
@@ -241,7 +241,7 @@ if ranks is None:
 <td><a href="${url(controller='dex_conquest', action='warriors', name=warrior.name.lower())}">${warrior.name}</a></td>
 <td class="type2">
     % for type in warrior.types:
-    ${h.pokedex.type_link(type)}
+    ${dexlib.type_link(type)}
     % endfor
 </td>
 <td class="ability">

@@ -19,7 +19,7 @@ ${_("%s pocket - Items") % (c.item_pocket.name)}
     % for pocket in c.item_pockets:
     <li>
         <a href="${url(controller='dex', action='item_pockets', pocket=pocket.identifier)}">
-            ${h.pokedex.pokedex_img("item-pockets/{1}{0}.png".format(pocket.identifier, 'selected/' if pocket == c.item_pocket else ''), title=pocket.name)}
+            ${dexlib.pokedex_img("item-pockets/{1}{0}.png".format(pocket.identifier, 'selected/' if pocket == c.item_pocket else ''), title=pocket.name)}
         </a>
     </li>
     % endfor
@@ -50,7 +50,7 @@ ${_("%s pocket - Items") % (c.item_pocket.name)}
     <td>?</td>
     % endif
     % endif
-    <td>${h.pokedex.item_link(item)}</td>
+    <td>${dexlib.item_link(item)}</td>
     <td>
         % if item.short_effect:
         ${item.short_effect}

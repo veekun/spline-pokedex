@@ -51,12 +51,12 @@
     <tr class="header-row">
         <th></th>
         % for version in c.group_versions[location_area]:
-        <th>${h.pokedex.version_icons(version)} ${version.name}</th>
+        <th>${dexlib.version_icons(version)} ${version.name}</th>
         % endfor
     </tr>
     <tr class="subheader-row">
         <th colspan="100">
-            ${h.pokedex.chrome_img('encounters/' + c.encounter_method_icons.get(method.identifier, 'unknown.png'))}
+            ${dexlib.chrome_img('encounters/' + c.encounter_method_icons.get(method.identifier, 'unknown.png'))}
             ${method.name}
         </th>
     </tr>
@@ -66,9 +66,9 @@
        in h.keysort(pokemon_version_condition_encounters, lambda k: k.order):
     <tr>
         <th class="location">
-            ${h.pokedex.pokemon_link(
+            ${dexlib.pokemon_link(
                 pokemon,
-                h.pokedex.pokemon_icon(pokemon) + pokemon.name,
+                dexlib.pokemon_icon(pokemon) + pokemon.name,
                 class_='dex-icon-link',
             )}
         </th>
@@ -92,7 +92,7 @@
             <div class="dex-encounter-conditions">
                 % for condition_value in condition_values:
                 <div class="dex-encounter-icon">
-                    ${h.pokedex.chrome_img('encounters/' \
+                    ${dexlib.chrome_img('encounters/' \
                                             + c.encounter_condition_value_icons.get(condition_value.identifier, 'unknown.png'), \
                                             alt=condition_value.name, \
                                             title=condition_value.name)}

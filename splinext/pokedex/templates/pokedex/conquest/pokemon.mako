@@ -30,11 +30,11 @@ ${h.h1(_('Essentials'))}
 <div class="dex-page-portrait">
     <p id="dex-page-name">${c.pokemon.name}</p>
     <div id="dex-pokemon-conquest-portrait-sprite">
-        ${h.pokedex.species_image(c.pokemon, prefix='conquest')}
+        ${dexlib.species_image(c.pokemon, prefix='conquest')}
     </div>
     <p id="dex-page-types">
         % for type in c.semiform_pokemon.types:
-        ${h.pokedex.type_link(type)}
+        ${dexlib.type_link(type)}
         % endfor
     </p>
 </div>
@@ -47,7 +47,7 @@ ${h.h1(_('Essentials'))}
     <dd class="dex-cpm-name"><a href="${url(controller='dex_conquest', action='moves', name=move.name.lower())}">${move.name}</a></dd>
 
     <dt class="dex-cpm-type">Type</dt>
-    <dd class="dex-cpm-type">${h.pokedex.type_link(move.type)}</dd>
+    <dd class="dex-cpm-type">${dexlib.type_link(move.type)}</dd>
 
     <dt class="dex-cpm-range">Range</dt>
     <dd class="dex-cpm-range">${conqlib.range_image(move)}</dd>
@@ -80,7 +80,7 @@ ${h.h1(_('Essentials'))}
 <ul class="dex-type-list">
     % for type, damage_factor in h.keysort(c.type_efficacies, lambda k: k.name):
     <li class="dex-damage-taken-${damage_factor}">
-        ${h.pokedex.type_link(type)} ${h.pokedex.type_efficacy_label[damage_factor]}
+        ${dexlib.type_link(type)} ${h.pokedex.type_efficacy_label[damage_factor]}
     </li>
     % endfor
 </ul>
@@ -116,13 +116,13 @@ ${h.h1(_('Evolution'))}
     >
         % if col['species'] == c.pokemon:
         <span class="dex-evolution-chain-pokemon">
-            ${h.pokedex.pokemon_icon(col['species'].default_pokemon)}
+            ${dexlib.pokemon_icon(col['species'].default_pokemon)}
             ${col['species'].name}
         </span>
         % else:
         <a href="${url(controller='dex' if absent else 'dex_conquest', action='pokemon', name=col['species'].name.lower())}"
            class="dex-evolution-chain-pokemon">
-            ${h.pokedex.pokemon_icon(col['species'].default_pokemon)}
+            ${dexlib.pokemon_icon(col['species'].default_pokemon)}
             ${col['species'].name}
         </a>
         % endif
