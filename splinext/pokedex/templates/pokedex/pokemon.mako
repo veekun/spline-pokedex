@@ -277,7 +277,7 @@ ${h.h1(_('Evolution'))}
         % endif
         % for evolution in col['species'].evolutions:
         <span class="dex-evolution-chain-method">
-            ${h.pokedex.evolution_description(evolution, _=_)}
+            ${dexlib.evolution_description(evolution)}
         </span>
         % endfor
         % if col['species'].is_baby and c.pokemon.species.evolution_chain.baby_trigger_item:
