@@ -17,6 +17,12 @@
 <p><a href="${url.current()}"><img src="${h.static_uri('spline', 'icons/eraser.png')}" alt=""> ${_(u"Start over")}</a></p>
 </%def>
 
+<%
+# Callback for apply_pokemon_template
+def get_icon(pokemon):
+    return dexlib.pokemon_form_image(pokemon.default_form, prefix=u'icons')
+%>
+
 ### RESULTS ###
 ## Four possibilities here: the form wasn't submitted, the form was submitted
 ## but was bogus, the form was submitted and there are no results, or the form
@@ -132,7 +138,7 @@ ${getattr(self, 'col_' + column)()}
 ## Plain bulleted list with a Template.
 <ul class="dex-pokemon-search-list classic-list">
     % for result in c.results:
-    <li>${dexlib.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_template, result))}</li>
+    <li>${dexlib.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_template, result, get_icon=get_icon))}</li>
     % endfor
 </ul>
 
@@ -141,7 +147,7 @@ ${getattr(self, 'col_' + column)()}
 ## friendly to clipboards.
 <div class="dex-pokemon-search-list">
 % for result in c.results:
-${dexlib.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_template, result))}<br>
+${dexlib.pokemon_link(result, h.pokedex.apply_pokemon_template(c.display_template, result, get_icon=get_icon))}<br>
 % endfor
 </div>
 
@@ -366,7 +372,7 @@ ${h.form(url.current(), method='GET')}
         <%! from string import Template %>\
         <% template = Template(pattern) %>\
         <dt><code>${pattern}</code></dt>
-        <dd>${h.pokedex.apply_pokemon_template(template, c.eevee)}</dd>
+        <dd>${h.pokedex.apply_pokemon_template(template, c.eevee, get_icon=get_icon)}</dd>
         % endfor
     </dl>
 </div>

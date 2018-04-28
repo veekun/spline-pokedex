@@ -379,7 +379,10 @@ def scale_sizes(size_dict, dimensions=1):
     return scaled_sizes
 
 
-def apply_pokemon_template(template, pokemon, _=_):
+def _no_icon(pokemon):
+    return u""
+
+def apply_pokemon_template(template, pokemon, get_icon=_no_icon, _=_):
     u"""`template` should be a string.Template object.
 
     Uses safe_substitute to inject some fields from the Pokémon into the
@@ -390,7 +393,7 @@ def apply_pokemon_template(template, pokemon, _=_):
     """
 
     d = dict(
-        icon=pokemon_form_image(pokemon.default_form, prefix=u'icons'),
+        icon=get_icon(pokemon),
         id=pokemon.species.id,
         name=pokemon.default_form.name,
 
