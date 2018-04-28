@@ -71,7 +71,7 @@ ${h.h1(_('Essentials'))}
     % for rank in c.warrior.ranks:
     % if rank.transformation:
     <dt>${_(u'Rank {0}').format(h.pokedex.conquest_rank_label[rank.rank])}</dt>
-    <dd>${h.pokedex.conquest_transformation_description(rank.transformation)}.</dd>
+    <dd>${conqlib.conquest_transformation_description(rank.transformation)}.</dd>
     % endif
     % endfor
 </dl>
