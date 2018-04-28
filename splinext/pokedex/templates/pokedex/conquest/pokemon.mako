@@ -130,7 +130,7 @@ ${h.h1(_('Evolution'))}
             % if absent:
             Not present in Pokémon Conquest
             % elif col['species'].conquest_evolution is not None:
-            ${h.pokedex.conquest_evolution_description(col['species'].conquest_evolution, _=_)}
+            ${conqlib.conquest_evolution_description(col['species'].conquest_evolution)}
             % endif
         </span>
     </td>
