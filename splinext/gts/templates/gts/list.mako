@@ -6,10 +6,10 @@
 % for savefile in c.savefiles:
 <div class="gts-pokemon">
     % if savefile.structure.ivs.is_egg:
-    ${h.pokedex.pokedex_img("heartgold-soulsilver/egg.png", class_='icon')}
+    ${h.pokedex.pokedex_img("main-sprites/heartgold-soulsilver/egg.png", class_='icon')}
     % else:
-    ${h.pokedex.pokemon_image(savefile.species_form,
-        prefix='heartgold-soulsilver/' + ('shiny/' if savefile.is_shiny else ''),
+    ${h.pokedex.pokemon_form_image(savefile.species_form,
+        prefix='main-sprites/heartgold-soulsilver' + ('/shiny' if savefile.is_shiny else ''),
         class_='icon')}
     % endif
     <div class="header">
@@ -45,7 +45,7 @@
         <span class="secret-id">/ ${"%05d" % savefile.structure.original_trainer_secret_id}</span>
     </p>
     <p>
-        ${h.pokedex.pokedex_img("items/%s.png" % h.pokedex.filename_from_name(savefile.pokeball.name),
+        ${h.pokedex.pokedex_img("items/%s.png" % h.pokedex.item_filename(savefile.pokeball),
                    alt=savefile.pokeball.name, title=savefile.pokeball.name)}
         % if savefile.structure.date_egg_received:
         Egg received on ${savefile.structure.date_egg_received} around ${savefile.egg_location.name}.
@@ -54,7 +54,7 @@
         Encountered via ${savefile.structure.encounter_type}
         and caught on ${savefile.structure.date_met}
         around 
-        ${h.pokedex.pokedex_img("versions/{0}.png".format(savefile.structure.original_version))} 
+        ${h.pokedex.version_icons(savefile.structure.original_version)}
         ${savefile.met_location.name}
         at level ${savefile.structure.met_at_level}.
         % endif
@@ -65,7 +65,7 @@
     % for region, ribbon_container in ('hoenn',  savefile.structure.hoenn_ribbons), \
                                       ('sinnoh', savefile.structure.sinnoh_ribbons), \
                                       ('sinnoh', savefile.structure.sinnoh_contest_ribbons):
-        % for ribbon in reversed(ribbon_container.__attrs__):
+        % for ribbon in reversed(ribbon_container.keys()):
         % if ribbon_container[ribbon]:
         <li>${h.pokedex.pokedex_img("ribbons/{0}/{1}.png".format(region, ribbon.replace(u'_', u'-')), alt=ribbon.replace(u'_', u' ').title(), title=ribbon.replace(u'_', u' ').title())}</li>
         % endif
@@ -199,7 +199,7 @@
         <tbody>
             % for contest_stat in ('beauty', 'cool', 'cute', 'smart', 'tough'):
             <tr>
-                <th>${h.pokedex.pokedex_img("chrome/contest/{0}.png".format(contest_stat))}</th>
+                <th>${h.pokedex.pokedex_img("contest-types/en/{0}.png".format(contest_stat))}</th>
                 <td>
                     <div class="gts-bar-container">
                         <div class="gts-bar" style="width: ${savefile.structure['contest_' + contest_stat] / 255.0 * 100}%;">&nbsp;${savefile.structure['contest_' + contest_stat]}</div>

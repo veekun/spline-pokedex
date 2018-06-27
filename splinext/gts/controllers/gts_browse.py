@@ -4,7 +4,7 @@ from __future__ import absolute_import, division
 import logging
 
 import pokedex.db
-import pokedex.db.tables as tables
+import pokedex.db.tables as t
 from pokedex.struct import SaveFilePokemon
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
@@ -25,6 +25,7 @@ class GTSBrowseController(BaseController):
 
         gts_pokemons = meta.Session.query(gts_model.GTSPokemon).all()
 
+        c.game_language = db.get_by_identifier_query(t.Language, u'en').one()
         c.savefiles = []
         for gts_pokemon in gts_pokemons:
             savefile = SaveFilePokemon(gts_pokemon.pokemon_blob)
