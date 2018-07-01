@@ -15,13 +15,15 @@ from sqlalchemy.sql import func, and_, not_, or_
 from sqlalchemy.sql.operators import asc_op
 
 from spline.lib.base import render
-from spline.lib.forms import DuplicateField, MultiCheckboxField, QueryCheckboxSelectMultipleField
 import spline.lib.helpers as h
 
 from splinext.pokedex import PokedexBaseController
 import splinext.pokedex.db as db
 import splinext.pokedex.helpers as pokedex_helpers
-from splinext.pokedex.forms import PokedexLookupField, RangeTextField, StatField
+from splinext.pokedex.forms import (
+    DuplicateField, MultiCheckboxField, PokedexLookupField,
+    QueryCheckboxSelectMultipleField, RangeTextField, StatField,
+)
 from splinext.pokedex.magnitude import parse_size
 
 

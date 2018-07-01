@@ -4,9 +4,135 @@
 import re
 
 from sqlalchemy.sql import and_, or_
-from wtforms import ValidationError, fields
+from wtforms import ValidationError, fields, widgets
+from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
+
+try:
+    from wtforms.fields.core import UnboundField
+except ImportError:
+    from wtforms.fields import UnboundField
 
 import splinext.pokedex.db as db
+
+
+class FakeMultiDict(dict):
+    def getlist(self, key):
+        return self[key]
+
+class DuplicateField(fields.Field):
+    """
+    Wraps a field that must be rendered several times.  Similar to FieldList,
+    except the fields are identical -- names are unchanged.
+
+    Do NOT use this for multi-select fields, compound fields, or subforms!
+    """
+    widget = widgets.ListWidget()
+
+    def __init__(self, unbound_field, label=None, validators=None, min_entries=0,
+                 max_entries=None, default=[], **kwargs):
+        super(DuplicateField, self).__init__(label, validators, default=default, **kwargs)
+        if self.filters:
+            raise TypeError('DuplicateField does not accept any filters. Instead, define them on the enclosed field.')
+        if validators:
+            raise TypeError('DuplicateField does not accept any validators. Instead, define them on the enclosed field.')
+        assert isinstance(unbound_field, UnboundField), 'Field must be unbound, not a field class'
+
+        self.unbound_field = unbound_field
+        self.min_entries = min_entries
+        self.max_entries = max_entries
+        self._prefix = kwargs.get('_prefix', '')
+        self._form = kwargs.get('_form', None)
+
+    def process(self, formdata, data=fields._unset_value):
+        if data is fields._unset_value or not data:
+            try:
+                data = self.default()
+            except TypeError:
+                data = self.default
+        else:
+            assert not self.max_entries or len(data) < self.max_entries, \
+                'You cannot have more than max_entries entries in this DuplicateField'
+
+        # Grab data from the incoming form
+        if formdata:
+            valuelist = formdata.getlist(self.name)
+            if self.max_entries:
+                valuelist = valuelist[0:self.max_entries]
+        else:
+            valuelist = []
+
+        # Create the subfields
+        self.entries = []
+        self.data = []
+
+        num_entries = max(self.min_entries, len(valuelist), len(data))
+        subsubfields = []
+        for i in range(num_entries):
+            subfield = self.unbound_field.bind(form=self._form, prefix=self._prefix,
+                                               name=self.short_name, id="{0}-{1}".format(self.id, i))
+
+            if i == 0:
+                if formdata and hasattr(subfield, 'subfield_names'):
+                    subsubfields = list(subfield.subfield_names)
+
+            # See if there's any form data to give the field
+            fakedata = FakeMultiDict()
+            if i < len(valuelist):
+                fakedata[subfield.name] = [valuelist[i]]
+            for name in subsubfields:
+                subvaluelist = formdata.getlist(name)
+                if i < len(subvaluelist):
+                    fakedata[name] = [subvaluelist[i]]
+
+            if i < len(data):
+                subfield.process(fakedata, data[i])
+            else:
+                subfield.process(fakedata)
+
+            if subfield.default or subfield.data != subfield.default:
+                self.data.append(subfield.data)
+
+            self.entries.append(subfield)
+
+    def validate(self, form, extra_validators=[]):
+        self.errors = []
+        success = True
+        for subfield in self.entries:
+            if not subfield.validate(form):
+                success = False
+                self.errors.append(subfield.errors)
+        return success
+
+    def __iter__(self):
+        return iter(self.entries)
+
+    def __len__(self):
+        return len(self.entries)
+
+    def __getitem__(self, index):
+        return self.entries[index]
+
+
+class MultiCheckboxField(fields.SelectMultipleField):
+    """ A multiple-select, except displays a list of checkboxes.
+
+    Iterating the field will produce subfields, allowing custom rendering of
+    the enclosed checkbox fields.
+    """
+    widget = widgets.ListWidget(prefix_label=False)
+    option_widget = widgets.CheckboxInput()
+
+
+class QueryCheckboxSelectMultipleField(QuerySelectMultipleField):
+    """
+    Works the same as a QuerySelectMultipleField, except using checkboxes
+    rather than a selectbox.
+
+    Iterating over the field yields the checkbox subfields.
+    """
+    widget = widgets.ListWidget(prefix_label=False)
+    option_widget = widgets.CheckboxInput()
+
 
 class PokedexLookupField(fields.StringField):
     u"""Provides a lookup box for naming something in the Pokédex."""

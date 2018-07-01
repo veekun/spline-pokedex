@@ -20,13 +20,12 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 
 from spline.lib.base import render
-from spline.lib.forms import DuplicateField
 import spline.lib.helpers as h
 
 from splinext.pokedex import PokedexBaseController
 import splinext.pokedex.db as db
 import splinext.pokedex.helpers as pokedex_helpers
-from splinext.pokedex.forms import PokedexLookupField, StatField
+from splinext.pokedex.forms import DuplicateField, PokedexLookupField, StatField
 
 
 ### Capture rate ("Pokéball performance") stuff
