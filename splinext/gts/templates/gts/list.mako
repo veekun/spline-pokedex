@@ -240,5 +240,7 @@
             % endfor
         </tbody>
     </table>
+
+    <!-- Binary blob: ${ savefile.as_struct.encode('hex') } -->
 </div>
 % endfor
