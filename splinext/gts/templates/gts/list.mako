@@ -16,8 +16,10 @@
         <div class="name">
             % if savefile.structure.ivs.is_nicknamed:
             “${savefile.structure.nickname}”
+            the
+            ${savefile.species.name}
             % else:
-            ${savefile.species.full_name}
+            ${savefile.species.name}
             % endif
             <span class="gender ${savefile.structure.gender}">
                 % if savefile.structure.gender == 'male':
