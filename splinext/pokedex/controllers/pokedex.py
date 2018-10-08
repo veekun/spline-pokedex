@@ -257,6 +257,9 @@ class PokedexController(PokedexBaseController):
         'bridge-spots': 'bridge-spots.png',
         'surf-spots': 'water-spots.png',
         'super-rod-spots': 'water-spots.png',
+
+        'gift': 'gift.png',
+        'gift-egg': 'egg.png',
     }
 
     # Maps condition value identifiers to representative icons
