@@ -7,6 +7,7 @@ setup(
     install_requires = [
         'spline',
         'pokedex',
+        'WTForms>=1.0',
         'SQLAlchemy>=0.7.5',
     ],
 

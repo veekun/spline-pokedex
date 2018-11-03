@@ -8,13 +8,13 @@ from wtforms import ValidationError, fields
 
 import splinext.pokedex.db as db
 
-class PokedexLookupField(fields.TextField):
+class PokedexLookupField(fields.StringField):
     u"""Provides a lookup box for naming something in the Pokédex."""
 
     def __init__(self, label=None, validators=None,
                  valid_type='pokemon', allow_blank=False, **kwargs):
         """`valid_type` is the type prefix to pass to lookup."""
-        super(fields.TextField, self).__init__(label, validators, **kwargs)
+        super(PokedexLookupField, self).__init__(label, validators, **kwargs)
 
         self.raw_data = None
         self.valid_type = valid_type
@@ -30,7 +30,7 @@ class PokedexLookupField(fields.TextField):
         else:
             kwargs['class_'] = extra_class
 
-        return super(fields.TextField, self).__call__(*args, **kwargs)
+        return super(PokedexLookupField, self).__call__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
         """Load the value from the incoming form."""
@@ -178,7 +178,7 @@ class RangeQueryEvaluator(object):
 
         return or_(*clauses)
 
-class RangeTextField(fields.TextField):
+class RangeTextField(fields.StringField):
     """Parses a string of the form 'a, b, c-e'.
 
     `inflator` converts each chunk (a, b, c, and e) to a number.  If it dies,
@@ -190,7 +190,7 @@ class RangeTextField(fields.TextField):
     def __init__(self, label=None, validators=None, inflator=None, signed=False,
         **kwargs):
 
-        super(fields.TextField, self).__init__(label, validators, **kwargs)
+        super(RangeTextField, self).__init__(label, validators, **kwargs)
 
         if not inflator:
             raise ValueError('RangeTextField requires an inflator')
@@ -204,7 +204,7 @@ class RangeTextField(fields.TextField):
         if 'size' not in kwargs:
             kwargs['size'] = u'6'
 
-        return super(fields.TextField, self).__call__(*args, **kwargs)
+        return super(RangeTextField, self).__call__(*args, **kwargs)
 
     def _make_number(self, n):
         if n == u'':
