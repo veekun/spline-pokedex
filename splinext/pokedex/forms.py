@@ -92,6 +92,7 @@ class StatField(fields.Field):
     def __init__(self, stats, unbound_field, **kwargs):
         self._stats = stats
         self._unbound_field = unbound_field
+        self._form = kwargs.get('_form', None)
 
         super(StatField, self).__init__(**kwargs)
 
@@ -112,7 +113,7 @@ class StatField(fields.Field):
                 pass
 
         for stat, name in zip(self._stats, self.subfield_names):
-            field = self._fields[stat] = self._unbound_field.bind(form=None, name=name)
+            field = self._fields[stat] = self._unbound_field.bind(form=self._form, name=name)
             field.stat = stat
             if stat in short_data:
                 field.process({}, short_data[stat])
