@@ -210,7 +210,7 @@ def version_icons(*versions, **kwargs):
     # python's argument_list syntax is kind of limited here
     _ = kwargs.get('_', globals()['_'])
     version_icons = u''
-    comma = chain([u''], repeat(u', '))
+    comma = joiner(u', ')
     for version in versions:
         # Convert version to string if necessary
         if isinstance(version, basestring):
@@ -446,6 +446,13 @@ def item_link(item, include_icon=True, _=_):
         href=url(controller='dex', action='items',
                  pocket=item.pocket.identifier, name=item_name.lower()),
     )
+
+def joiner(sep):
+    """Returns an iterator which yields sep every time except the first.
+
+    Useful for printing out a comma-separated list.
+    """
+    return chain([u''], repeat(sep))
 
 
 ### Labels
