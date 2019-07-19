@@ -1,5 +1,13 @@
 <%! from splinext.pokedex import i18n, db %>\
 
+<%def name="pokemon_has_media(pokemon_form, prefix, ext, use_form=True)"><%
+    """Determine whether a file exists in the specified directory for the specified Pokémon form.
+    Convenience wrapper around splinext.pokedex.helpers.pokemon_has_media which implicitly passes the app config.
+    """
+    return h.pokedex.pokemon_has_media(pokemon_form, prefix, ext, config, use_form=use_form)
+%></%def>
+
+
 <%def name="pokemon_page_header(icon_form=None, subpages=True)">
 <div id="dex-header">
     <a href="${url.current(name=c.prev_species.name.lower(), form=None)}" id="dex-header-prev" class="dex-box-link">
@@ -326,7 +334,7 @@ collapse_key = h.pokedex.collapse_flavor_text_key(literal=obdurate)
 species = pokemon_form.species
 
 # A handful of Pokémon have separate cries for each form; most don't
-if not h.pokedex.pokemon_has_media(pokemon_form, 'cries', 'ogg'):
+if not pokemon_has_media(pokemon_form, 'cries', 'ogg'):
     pokemon_form = None
 
 cry_url = url(controller='dex', action='media',

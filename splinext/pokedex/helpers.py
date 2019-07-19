@@ -238,7 +238,7 @@ def version_group_icon(version_group):
         title=names)
 
 
-def pokemon_has_media(pokemon_form, prefix, ext, use_form=True):
+def pokemon_has_media(pokemon_form, prefix, ext, config, use_form=True):
     """Determine whether a file exists in the specified directory for the
     specified Pokémon form.
     """
@@ -305,7 +305,7 @@ def pokemon_form_image(pokemon_form, prefix=None, **attr):
     if prefix is None:
         prefix = 'main-sprites/ultra-sun-ultra-moon'
         # FIXME what the hell is going on here
-        if not pokemon_has_media(pokemon_form, prefix, 'png'):
+        if not pokemon_has_media(pokemon_form, prefix, 'png', config):
             prefix = 'main-sprites/black-white'
 
         # Deal with Spiky-eared Pichu and ??? Arceus
@@ -334,7 +334,7 @@ def pokemon_icon(pokemon, alt=True):
         return h.literal('<span class="sprite-icon sprite-icon-%d"></span>' % pokemon.species.id)
 
     alt_text = pokemon.name if alt else u''
-    if pokemon_has_media(pokemon.default_form, 'icons', 'png'):
+    if pokemon_has_media(pokemon.default_form, 'icons', 'png', config):
         return pokemon_form_image(pokemon.default_form, prefix='icons', alt=alt_text)
 
     return pokedex_img('pokemon/icons/0.png', title=pokemon.species.name, alt=alt_text)
