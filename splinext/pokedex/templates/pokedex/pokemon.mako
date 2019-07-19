@@ -44,19 +44,19 @@ ${h.h1(_('Essentials'))}
 
 <div class="dex-page-beside-portrait">
 <h2>${_(u"Abilities")}</h2>
-<%def name="_render_ability(ability, _=_)">
+<%def name="_render_ability(ability)">
     <dt><a href="${url(controller='dex', action='abilities', name=ability.name.lower())}">${ability.name}</a></dt>
     <dd class="markdown">${ability.short_effect}</dd>
 </%def>
 <dl class="pokemon-abilities">
     % for ability in c.pokemon.abilities:
-    ${_render_ability(ability, _=_)}
+    ${_render_ability(ability)}
     % endfor
 </dl>
 % if c.pokemon.hidden_ability:
 <h3>Hidden Ability</h3>
 <dl class="pokemon-abilities">
-    ${_render_ability(c.pokemon.hidden_ability, _=_)}
+    ${_render_ability(c.pokemon.hidden_ability)}
 </dl>
 % endif
 
@@ -77,7 +77,7 @@ ${h.h1(_('Essentials'))}
     <h2>${_(u"Pokédex Numbers")}</h2>
     <dl>
         <dt>${_(u"Introduced in")}</dt>
-        <dd>${dexlib.generation_icon(c.pokemon.species.generation, _=_)}</dd>\
+        <dd>${dexlib.generation_icon(c.pokemon.species.generation)}</dd>\
 
         % for number in c.pokemon.species.dex_numbers:
         % if number.pokedex.is_main_series:
@@ -85,7 +85,7 @@ ${h.h1(_('Essentials'))}
         <dd>
             ${number.pokedex_number}
             % if number.pokedex.version_groups:
-            ${dexlib.version_icons(*[v for vg in number.pokedex.version_groups for v in vg.versions], _=_)}
+            ${dexlib.version_icons(*[v for vg in number.pokedex.version_groups for v in vg.versions])}
             % endif
         </dd>
 
@@ -103,7 +103,7 @@ ${h.h1(_('Essentials'))}
         <dd>
             ${dexlib.chrome_img('gender-rates/%d.png' % c.pokemon.species.gender_rate, alt='')}
             ${_(h.pokedex.gender_rate_label[c.pokemon.species.gender_rate])}
-            ${dexlib.subtle_search(action='pokemon_search', gender_rate=c.pokemon.species.gender_rate, _=_)}
+            ${dexlib.subtle_search(action='pokemon_search', gender_rate=c.pokemon.species.gender_rate)}
         </dd>
 
         <dt>${_(u"Egg groups")}</dt>
@@ -114,14 +114,14 @@ ${h.h1(_('Essentials'))}
                 % endfor
             </ul>
             % if len(c.pokemon.species.egg_groups) > 1:
-            ${dexlib.subtle_search(action='pokemon_search', egg_group=[group.id for group in c.pokemon.species.egg_groups], _=_)}
+            ${dexlib.subtle_search(action='pokemon_search', egg_group=[group.id for group in c.pokemon.species.egg_groups])}
             % endif
         </dd>
 
         <dt>${_(u"Hatch counter")}</dt>
         <dd>
             ${c.pokemon.species.hatch_counter}
-            ${dexlib.subtle_search(action='pokemon_search', hatch_counter=c.pokemon.species.hatch_counter, sort='evolution-chain', _=_)}
+            ${dexlib.subtle_search(action='pokemon_search', hatch_counter=c.pokemon.species.hatch_counter, sort='evolution-chain')}
         </dd>
 
         <dt>${_(u"Steps to hatch")}</dt>
@@ -163,7 +163,7 @@ ${h.h1(_('Essentials'))}
         <dt>${_(u"Base EXP")}</dt>
         <dd>
             <span id="dex-pokemon-exp-base">${c.pokemon.base_experience}</span>
-            ${dexlib.subtle_search(action='pokemon_search', base_experience=c.pokemon.base_experience, _=_)}
+            ${dexlib.subtle_search(action='pokemon_search', base_experience=c.pokemon.base_experience)}
         </dd>
         <dt>${_(u"Effort points")}</dt>
         <dd>
@@ -178,17 +178,17 @@ ${h.h1(_('Essentials'))}
         <dt>${_(u"Capture rate")}</dt>
         <dd>
             ${c.pokemon.species.capture_rate}
-            ${dexlib.subtle_search(action='pokemon_search', capture_rate=c.pokemon.species.capture_rate, _=_)}
+            ${dexlib.subtle_search(action='pokemon_search', capture_rate=c.pokemon.species.capture_rate)}
         </dd>
         <dt>${_(u"Base happiness")}</dt>
         <dd>
             ${c.pokemon.species.base_happiness}
-            ${dexlib.subtle_search(action='pokemon_search', base_happiness=c.pokemon.species.base_happiness, _=_)}
+            ${dexlib.subtle_search(action='pokemon_search', base_happiness=c.pokemon.species.base_happiness)}
         </dd>
         <dt>${_(u"Growth rate")}</dt>
         <dd>
             ${c.pokemon.species.growth_rate.name}
-            ${dexlib.subtle_search(action='pokemon_search', growth_rate=c.pokemon.species.growth_rate.max_experience, _=_)}
+            ${dexlib.subtle_search(action='pokemon_search', growth_rate=c.pokemon.species.growth_rate.max_experience)}
         </dd>
     </dl>
 
@@ -202,9 +202,9 @@ ${h.h1(_('Essentials'))}
         % if i == 0:
         <td class="versions" rowspan="${len(item_records) or 1}">
             % if len(version_dict) == 1:
-            ${dexlib.generation_icon(generation, _=_)}
+            ${dexlib.generation_icon(generation)}
             % else:
-            ${dexlib.version_icons(*versions, _=_)}
+            ${dexlib.version_icons(*versions)}
             % endif
         </td>
         % else:
@@ -215,7 +215,7 @@ ${h.h1(_('Essentials'))}
         ## Print the item and rarity.  Might be nothing
         % if i < len(item_records):
         <td class="rarity">${item_records[i][1]}%</td>
-        <td class="item">${dexlib.item_link(item_records[i][0], _=_)}</td>
+        <td class="item">${dexlib.item_link(item_records[i][0])}</td>
         % else:
         <td class="rarity"></td>
         <td class="item">${_(u"nothing")}</td>
@@ -282,7 +282,7 @@ ${h.h1(_('Evolution'))}
         % endfor
         % if col['species'].is_baby and c.pokemon.species.evolution_chain.baby_trigger_item:
         <span class="dex-evolution-chain-method">
-            ${_(u"Either parent must hold ")} ${dexlib.item_link(c.pokemon.species.evolution_chain.baby_trigger_item, include_icon=False, _=_)}
+            ${_(u"Either parent must hold ")} ${dexlib.item_link(c.pokemon.species.evolution_chain.baby_trigger_item, include_icon=False)}
         </span>
         % endif
     </td>
@@ -446,14 +446,14 @@ ${h.h1(_('Flavor'))}
         <dt>${_("Species")}</dt>
         <dd>
             ${c.pokemon.species.genus}
-            ${dexlib.subtle_search(action='pokemon_search', genus=c.pokemon.species.genus, _=_)}
+            ${dexlib.subtle_search(action='pokemon_search', genus=c.pokemon.species.genus)}
         </dd>
 
         <dt>${_("Color")}</dt>
         <dd>
             <span class="dex-color-${c.pokemon.species.color.identifier}"></span>
             ${c.pokemon.species.color.name}
-            ${dexlib.subtle_search(action='pokemon_search', color=c.pokemon.species.color.identifier, _=_)}
+            ${dexlib.subtle_search(action='pokemon_search', color=c.pokemon.species.color.identifier)}
         </dd>
 
         <dt>${_("Cry")}</dt>
@@ -466,7 +466,7 @@ ${h.h1(_('Flavor'))}
         <dd>
             ${dexlib.pokedex_img('habitats/%s.png' % c.pokemon.species.habitat.identifier)}
             ${c.pokemon.species.habitat.name}
-            ${dexlib.subtle_search(action='pokemon_search', habitat=c.pokemon.species.habitat.identifier, _=_)}
+            ${dexlib.subtle_search(action='pokemon_search', habitat=c.pokemon.species.habitat.identifier)}
         </dd>
         % endif
 
@@ -479,7 +479,7 @@ ${h.h1(_('Flavor'))}
         <dd>
             ${dexlib.pokedex_img('shapes/%s.png' % c.pokemon.species.shape.identifier, alt='', title=c.pokemon.species.shape.name)}
             ${c.pokemon.species.shape.awesome_name}
-            ${dexlib.subtle_search(action='pokemon_search', shape=c.pokemon.species.shape.identifier, _=_)}
+            ${dexlib.subtle_search(action='pokemon_search', shape=c.pokemon.species.shape.identifier)}
         </dd>
     </dl>
 </div>
@@ -531,7 +531,7 @@ ${h.h1(_('Locations'))}
 <dl class="dex-simple-encounters">
     ## Sort versions by order, which happens to be id
     % for version, method_etc in h.keysort(c.locations, lambda k: k.id):
-    <dt>${(version.name)} ${dexlib.version_icons(version, _=_)}</dt>
+    <dt>${(version.name)} ${dexlib.version_icons(version)}</dt>
     <dd>
         ## Sort method by name
         % for method, area_condition_encounters in h.keysort(method_etc, lambda k: k.id):
