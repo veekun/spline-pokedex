@@ -13,7 +13,7 @@
 ## XXX Should these be able to promote to db objects, rather than demoting to
 ## strings and integers?  If so, how to do that without requiring db access
 ## from here?
-<%def name="generation_icon(generation, _=None)"><%
+<%def name="generation_icon(generation)"><%
     """Returns a generation icon, given a generation number."""
     # Convert generation to int if necessary
     if not isinstance(generation, int):
@@ -180,7 +180,7 @@
         )
 %></%def>
 
-<%def name="damage_class_icon(damage_class, _=None)"><%
+<%def name="damage_class_icon(damage_class)"><%
     return pokedex_img(
         "damage-classes/%s.png" % damage_class.identifier,
         alt=damage_class.name,
@@ -213,7 +213,7 @@
     )
 %></%def>
 
-<%def name="item_link(item, include_icon=True, _=None)"><%
+<%def name="item_link(item, include_icon=True)"><%
     """Returns a link to the requested item."""
 
     item_name = item.name
@@ -572,7 +572,6 @@ cry_url = url(controller='dex', action='media',
 </%def>
 
 <%def name="subtle_search(**kwargs)">
-    <% _ = kwargs.pop('_', unicode) %>
     <a href="${url(controller='dex_search', **kwargs)}"
         class="dex-subtle-search-link">
         <img src="${h.static_uri('spline', 'icons/magnifier-small.png')}" alt="${_('Search: ')}" title="${_('Search')}">
