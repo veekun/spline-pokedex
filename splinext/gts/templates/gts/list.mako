@@ -6,9 +6,9 @@
 % for savefile in c.savefiles:
 <div class="gts-pokemon">
     % if savefile.structure.ivs.is_egg:
-    ${h.pokedex.pokedex_img("main-sprites/heartgold-soulsilver/egg.png", class_='icon')}
+    ${dexlib.pokedex_img("main-sprites/heartgold-soulsilver/egg.png", class_='icon')}
     % else:
-    ${h.pokedex.pokemon_form_image(savefile.species_form,
+    ${dexlib.pokemon_form_image(savefile.species_form,
         prefix='main-sprites/heartgold-soulsilver' + ('/shiny' if savefile.is_shiny else ''),
         class_='icon')}
     % endif
@@ -47,7 +47,7 @@
         <span class="secret-id">/ ${"%05d" % savefile.structure.original_trainer_secret_id}</span>
     </p>
     <p>
-        ${h.pokedex.pokedex_img("items/%s.png" % h.pokedex.item_filename(savefile.pokeball),
+        ${dexlib.pokedex_img("items/%s.png" % h.pokedex.item_filename(savefile.pokeball),
                    alt=savefile.pokeball.name, title=savefile.pokeball.name)}
         % if savefile.structure.date_egg_received:
         Egg received on ${savefile.structure.date_egg_received} around ${savefile.egg_location.name}.
@@ -56,7 +56,7 @@
         Encountered via ${savefile.structure.encounter_type}
         and caught on ${savefile.structure.date_met}
         around 
-        ${h.pokedex.version_icons(savefile.structure.original_version)}
+        ${dexlib.version_icons(savefile.structure.original_version)}
         ${savefile.met_location.name}
         at level ${savefile.structure.met_at_level}.
         % endif
@@ -69,7 +69,7 @@
                                       ('sinnoh', savefile.structure.sinnoh_contest_ribbons):
         % for ribbon in reversed(ribbon_container.keys()):
         % if ribbon_container[ribbon]:
-        <li>${h.pokedex.pokedex_img("ribbons/{0}/{1}.png".format(region, ribbon.replace(u'_', u'-')), alt=ribbon.replace(u'_', u' ').title(), title=ribbon.replace(u'_', u' ').title())}</li>
+        <li>${dexlib.pokedex_img("ribbons/{0}/{1}.png".format(region, ribbon.replace(u'_', u'-')), alt=ribbon.replace(u'_', u' ').title(), title=ribbon.replace(u'_', u' ').title())}</li>
         % endif
         % endfor
     % endfor
@@ -77,13 +77,13 @@
 
     ## Shiny leaves
     % if savefile.structure.shining_leaves.crown:
-    <p>${h.pokedex.pokedex_img('chrome/leaf-crown.png', alt='Leaf Crown', title='Leaf Crown')}</p>
+    <p>${dexlib.pokedex_img('chrome/leaf-crown.png', alt='Leaf Crown', title='Leaf Crown')}</p>
     % elif any(savefile.shiny_leaves):
     <ul class="gts-pokemon-leaves">
         % for leaf in savefile.shiny_leaves:
         <li>
             % if leaf:
-            ${h.pokedex.pokedex_img('chrome/shiny-leaf.png', alt='Shiny Leaf', title='Shiny Leaf')}
+            ${dexlib.pokedex_img('chrome/shiny-leaf.png', alt='Shiny Leaf', title='Shiny Leaf')}
             % endif
         </li>
         % endfor
@@ -105,7 +105,7 @@
             <li>Has <a href="${url(controller='dex', action='abilities', name=savefile.ability.name.lower())}">${savefile.ability.name}</a></li>
             <li>
                 % if savefile.held_item:
-                Holding ${h.pokedex.item_link(savefile.held_item)}
+                Holding ${dexlib.item_link(savefile.held_item)}
                 % else:
                 Holding nothing
                 % endif
@@ -201,7 +201,7 @@
         <tbody>
             % for contest_stat in ('beauty', 'cool', 'cute', 'smart', 'tough'):
             <tr>
-                <th>${h.pokedex.pokedex_img("contest-types/en/{0}.png".format(contest_stat))}</th>
+                <th>${dexlib.pokedex_img("contest-types/en/{0}.png".format(contest_stat))}</th>
                 <td>
                     <div class="gts-bar-container">
                         <div class="gts-bar" style="width: ${savefile.structure['contest_' + contest_stat] / 255.0 * 100}%;">&nbsp;${savefile.structure['contest_' + contest_stat]}</div>
