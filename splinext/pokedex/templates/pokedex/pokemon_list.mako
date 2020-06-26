@@ -32,7 +32,7 @@
     <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='4', sort='evolution-chain')}">${h.pokedex.generation_icon(3)} ${_(u"Hoenn")}</a></li>
     <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='6', sort='evolution-chain')}">${h.pokedex.generation_icon(4)} ${_(u"Sinnoh")}</a></li>
     <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='9', sort='evolution-chain')}">${h.pokedex.generation_icon(5)} ${_(u"Unova")}</a></li>
-    <li>${h.pokedex.generation_icon(6)} ${_u("Kalos")}
+    <li>${h.pokedex.generation_icon(6)} ${_(u"Kalos")}
       <ul>
         <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='12', sort='evolution-chain')}">${h.pokedex.generation_icon(6)} ${_(u"Central Kalos")}</a></li>
         <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='13', sort='evolution-chain')}">${h.pokedex.generation_icon(6)} ${_(u"Coastal Kalos")}</a></li>
