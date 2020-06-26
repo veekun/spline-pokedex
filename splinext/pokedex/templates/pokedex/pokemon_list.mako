@@ -33,14 +33,14 @@
     <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='6', sort='evolution-chain')}">${h.pokedex.generation_icon(4)} ${_(u"Sinnoh")}</a></li>
     <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='9', sort='evolution-chain')}">${h.pokedex.generation_icon(5)} ${_(u"Unova")}</a></li>
     <li>${h.pokedex.generation_icon(6)} ${_(u"Kalos")}
-      <ul>
+      <ul class="classic-list">
         <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='12', sort='evolution-chain')}">${h.pokedex.generation_icon(6)} ${_(u"Central Kalos")}</a></li>
         <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='13', sort='evolution-chain')}">${h.pokedex.generation_icon(6)} ${_(u"Coastal Kalos")}</a></li>
         <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='14', sort='evolution-chain')}">${h.pokedex.generation_icon(6)} ${_(u"Mountain Kalos")}</a></li>
       </ul>
     </li>
     <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='21', sort='evolution-chain')}">${h.pokedex.generation_icon(7)} ${_(u"Alola")}</a>
-      <ul>
+      <ul class="classic-list">
         <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='22', sort='evolution-chain')}">${h.pokedex.generation_icon(7)} ${_(u"Melemele")}</a></li>
         <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='23', sort='evolution-chain')}">${h.pokedex.generation_icon(7)} ${_(u"Akala")}</a></li>
         <li><a href="${url(controller='dex_search', action='pokemon_search', in_pokedex='24', sort='evolution-chain')}">${h.pokedex.generation_icon(7)} ${_(u"Ula'ula")}</a></li>
