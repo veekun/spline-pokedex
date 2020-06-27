@@ -76,7 +76,7 @@ def ilike(column, string):
 def in_pokedex_label(pokedex):
     """[ IV ] Sinnoh"""
 
-    return """{gen_icon} {name}""".format(
+    return h.escape("""{gen_icon} {name}""").format(
         gen_icon=pokedex_helpers.generation_icon(pokedex.region.generation),
         name=pokedex.name,
     )
