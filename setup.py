@@ -8,7 +8,7 @@ setup(
         'spline',
         'pokedex',
         'WTForms>=1.0',
-        'SQLAlchemy>=0.7.5',
+        'SQLAlchemy>=0.9.7',
     ],
 
     include_package_data = True,
