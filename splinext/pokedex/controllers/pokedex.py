@@ -1684,7 +1684,7 @@ class PokedexController(PokedexBaseController):
         c.abilities = db.pokedex_session.query(t.Ability) \
             .join(t.Ability.names_local) \
             .filter(t.Ability.is_main_series) \
-            .options(joinedload('prose.short_effect')) \
+            .options(joinedload(t.Ability.prose_local)) \
             .order_by(t.Ability.generation_id.asc(),
                 t.Ability.names_table.name.asc()) \
             .all()
