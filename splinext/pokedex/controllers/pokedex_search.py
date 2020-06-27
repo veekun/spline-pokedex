@@ -257,6 +257,7 @@ class PokemonSearchForm(BaseSearchForm):
         u'In regional Pokédex',
         query_factory=lambda: db.pokedex_session.query(t.Pokedex) \
                                   .filter(t.Pokedex.region_id != None) \
+                                  .order_by(t.Pokedex.region_id.asc(), t.Pokedex.id.asc()) \
                                   .options(joinedload_all('region.generation')),
         get_label=in_pokedex_label,
         get_pk=lambda table: table.id,
